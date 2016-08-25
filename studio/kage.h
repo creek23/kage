@@ -1,0 +1,187 @@
+
+#ifndef GTKMM_KAGE_H
+	#define GTKMM_KAGE_H
+	
+	#include <gtkmm/window.h>
+	#include <gtkmm/button.h>
+	#include <gtkmm/box.h>
+	#include <gtkmm/uimanager.h>
+	#include <gtkmm/stock.h>
+	#include <gtkmm/label.h>
+	//#include <gtkmm/action.h>
+	#include <gtkmm/radioaction.h>
+	//#include <gtkmm/menubar.h>
+	#include <gtkmm/separator.h>
+	#include <gtkmm/paned.h>
+	#include <gtkmm/statusbar.h>
+	#include <gtkmm/togglebutton.h>
+	#include <gtkmm/messagedialog.h>
+	#include <gtkmm/tooltips.h>
+	#include <gtkmm/scrollbar.h>
+	#include <gtkmm/scrolledwindow.h>
+	#include <gtkmm/filechooserdialog.h>
+	#include <gtkmm/colorbutton.h>
+	//#include "kage/data/vectordatamanager.h"
+	#include "kage/timeline/layermanager.h"
+	//#include "kage/timeline/layer.h"
+	#include "kage/timeline/framesmanager.h"
+	//#include "kage/timeline/timeline.h"
+	#include "kage/stage.h"
+	#include "about.h"
+	#include "register.h"
+	#include <iostream>
+	#include <vector>
+	#include <fstream>
+	#include <string>
+
+	class Kage : public Gtk::Window {
+		public:
+			Kage();
+			virtual ~Kage();
+			
+			void addDataToFrame(VectorDataManager v);
+			VectorDataManager getFrameData();
+			void renderFrames();
+			string dumpFrame(bool bKS);
+			
+			string int255ToHex(unsigned int p);
+			char int15ToHex(unsigned int p);
+			
+		protected:
+			enum color {
+				COLOR_RED,
+				COLOR_GREEN,
+				COLOR_BLUE
+			};
+			
+			enum shape {
+				SHAPE_SQUARE,
+				SHAPE_RECTANGLE,
+				SHAPE_OVAL
+			};
+			
+			//Signal handlers:
+			virtual void updateStatus(Glib::ustring status_msg);
+			virtual void onButtonClick();
+			virtual void LayerAdd_onClick();
+			virtual void LayerDel_onClick();
+			virtual void onToolButtonsClick(Gtk::ToggleButton *p_sourceButton);
+			virtual void onActionActivate();
+			virtual void AddFrame_onClick();
+			virtual void Save_onClick();
+			virtual void ExportKS_onClick();
+			virtual void ExportHTML5_onClick();
+			virtual void on_radio_action_color_activated(color chosen_color);
+			virtual void on_radio_action_shape_activated(shape chosen_shape);
+			
+			//Member widgets:
+			Gtk::VBox m_VBoxRoot;
+			Gtk::HBox m_HBoxToolbar;
+			Gtk::VBox m_VBoxTimelineLayer;
+			Gtk::HPaned m_Timeline_HPaned;
+			Gtk::VBox m_Timeline_Layer_VBox;
+			Gtk::HBox m_Timeline_Layer_Add_HBox;
+			Gtk::Label m_Timeline_Label;
+			Gtk::Button m_Timeline_Add_Button;
+			Gtk::Button m_Timeline_Del_Button;
+			Gtk::VBox m_Timeline_Frame_VBox;
+			Gtk::VBox m_VBoxTimelineFrame; //to be deleted
+			Gtk::ScrolledWindow m_Timeline_Layer_ScrolledWindow;
+			Gtk::ScrolledWindow m_Timeline_Frame_ScrolledWindow;
+			KageLayerManager m_KageLayerManager;
+			KageFramesManager m_KageFramesManager;
+			Gtk::VBox m_VBoxToolbar_Holder;
+			Gtk::VBox m_Box1;
+			Gtk::HSeparator m_Separator;
+			Gtk::HSeparator m_Separator_Toolbar1;
+			Gtk::HSeparator m_Separator_Toolbar2;
+			Gtk::HSeparator m_Separator_Toolbar3;
+			Gtk::HSeparator m_Separator_Toolbar4;
+			Gtk::Label m_LabelProp;
+			//Stage Property items
+				Gtk::HBox m_PropStage;
+				Gtk::VBox m_PropStageV1;
+				Gtk::VBox m_PropStageV2;
+				Gtk::Label m_LabelStageWid;
+				Gtk::Label m_LabelStageHgt;
+				Gtk::Label m_LabelStageBG;
+				Gtk::Label m_LabelStageFPS;
+				
+				Gtk::Entry m_EntryStageWid;
+					void EntryStageHgt_onEnter();
+				Gtk::Entry m_EntryStageHgt;
+					void EntryStageWid_onEnter();
+				Gtk::ColorButton m_ColorButtonStage;
+					void ColorButtonStage_onClick();
+				Gtk::Entry m_EntryStageFPS;
+					void EntryStageFPS_onEnter();
+			//Fill Property items
+				Gtk::HBox m_PropFill;
+				Gtk::VBox m_PropFillV1;
+				Gtk::VBox m_PropFillV2;
+				Gtk::Label m_LabelFill;
+				Gtk::ColorButton m_ColorButtonFill;
+			//Stroke Property items
+				Gtk::HBox m_PropStroke;
+				Gtk::VBox m_PropStrokeV1;
+				Gtk::VBox m_PropStrokeV2;
+				Gtk::Label m_LabelStroke;
+				Gtk::Label m_LabelStrokeThickness;
+				Gtk::Entry m_EntryStrokeThickness;
+					void EntryStrokeThickness_onEnter();
+				Gtk::ColorButton m_ColorButtonStroke;
+			
+			Gtk::Label m_LblHolder_Toolbar;
+			KageStage m_KageStage;
+			Glib::RefPtr<Gtk::UIManager> m_refUIManager;
+			Glib::RefPtr<Gtk::ActionGroup> m_refActionGroup;
+			
+			void addToolButton(const Glib::ustring &label);
+			Gtk::ToggleButton m_ToggleBtnSelect;
+			void btnAbout_onClick();
+			void CheckUpdate_onClick();
+			void Website_onClick();
+			std::vector<Gtk::ToggleButton*> toggleButtons;
+			std::vector<Gtk::Tooltips*> tooltips;
+			Gtk::ToggleButton* currentTool;
+			
+			Gtk::HScrollbar m_Timeline_HScrollbar;
+			Gtk::VScrollbar m_Timeline_VScrollbar;
+			Gtk::HBox m_Timeline_HBox;
+			
+			Gtk::VPaned m_VPane_Timeline;
+			Gtk::HPaned m_HPane_DrawingArea;
+			Gtk::Statusbar m_Statusbar;
+			
+			unsigned m_ContextId;
+			
+			bool ksfInited;
+			string ksfPath;
+			std::ofstream ksfFile;
+			
+			bool expInited;
+			string expPath;
+			std::ofstream expFile;
+			bool dtrace(string p_msg);
+			bool exportHtml5(string p_path, string p_msg);
+			bool exportKonsolScript(string p_path, string p_msg);
+			bool dump(string p_path, string p_msg);
+			bool fileWrite(string p_path, string p_msg, std::ofstream &p_file, bool &p_flag);
+			
+			Gdk::Color m_Color;
+			void ChooseFill_onClick();
+			void ChooseStroke_onClick();
+			string strToUpper(string p_str);
+			string strToLower(string p_str);
+			string intToString(int p_src);
+			string uintToString(unsigned int p_src);
+			int stringToInt(string strConvert);
+			int stringToUInt(string strConvert);
+			long stringToLong(string strConvert);
+			
+			bool runExternal(string p_cmd, string p_param);
+			
+			void Play_onClick();
+	};
+
+#endif //GTKMM_KAGE_H

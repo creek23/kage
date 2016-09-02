@@ -8,7 +8,7 @@ KageLayerManager::KageLayerManager() {
 		label.set_size_request(100, 20);
 
 	layerCtr = 0;
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < 5; ++i) {
 //		addLayer();
 	}
 	addLayer();

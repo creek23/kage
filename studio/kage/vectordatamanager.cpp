@@ -1,9 +1,7 @@
 
 #include "vectordatamanager.h"
-#include "color.cpp"
-#include "point.cpp"
-#include "strokecolor.cpp"
-#include "vectordata.cpp"
+#include "kage.h"
+#include "stage.h"
 
 VectorDataManager::VectorDataManager() {
 	init(KageStage::fillColor, KageStage::stroke);
@@ -54,10 +52,10 @@ void VectorDataManager::init(ColorData p_fill, StrokeColorData p_stroke) {
 	}
 }
 void VectorDataManager::addFill(ColorData p_color) {
-	cout << "VectorDataManager::addFill()" << endl;
-	cout << p_color.getR() << endl;
-	cout << p_color.getG() << endl;
-	cout << p_color.getB() << endl;
+	std::cout << "VectorDataManager::addFill()" << std::endl;
+	std::cout << p_color.getR() << std::endl;
+	std::cout << p_color.getG() << std::endl;
+	std::cout << p_color.getB() << std::endl;
 	add(VectorData::TYPE_FILL, p_color, vectorData[vectorData.size() - 1].stroke);
 }
 

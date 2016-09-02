@@ -2,8 +2,8 @@
 	#define GTKMM_KAGE_FRAME_H
 	
 	#include <gtkmm/drawingarea.h>
-	//#include "framemanager.h"
-	#include "kage/data/vectordatamanager.h"
+	#include <time.h>
+	#include "kage/vectordatamanager.h"
 	
 	class KageFrameManager; ///forward declaration
 	
@@ -42,12 +42,16 @@
 			unsigned int frameID;     //which frame among frames in a layer?
 //			bool setTween(bool p_newTween);
 //			bool getTween();
+			
+			void forceRender();
+			virtual bool render();
 		protected:
 			//Override default signal handler:
 			virtual bool on_expose_event(GdkEventExpose *e);
 			virtual bool on_key_press_event(GdkEventKey *e);
 			virtual bool on_event(GdkEvent *e);
-			virtual bool render();
+			
+			bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
 			
 			Glib::ustring sCode;
 			unsigned int frameSource; //drawing is an extension of a `previous frame' -- frameSource is `which frame-number'?

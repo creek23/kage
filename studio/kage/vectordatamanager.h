@@ -3,10 +3,14 @@
 	#define GTKMM_KAGE_MANAGER_DATA_VECTOR_Hx
 	
 	#include <vector>
-	#include "color.h"
-	#include "point.h"
-	#include "strokecolor.h"
-	#include "vectordata.h"
+	#include <iostream>
+	
+	#include "data/color.h"
+	#include "data/point.h"
+	#include "data/strokecolor.h"
+	#include "data/vectordata.h"
+	
+	class Kage; //forward declaration
 	
 	using namespace std;
 	

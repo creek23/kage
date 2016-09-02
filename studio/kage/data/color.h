@@ -3,6 +3,7 @@
 	#define GTKMM_KAGE_DATA_COLOR_H
 	
 	#include <string>
+	#include <sstream>
 	
 	class ColorData {
 		public:

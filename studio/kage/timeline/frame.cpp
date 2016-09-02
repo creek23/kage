@@ -1,13 +1,16 @@
 
-#include "frame.h"
 #include <cairomm/context.h>
 #include <cairomm/cairomm.h>
+#include <gdkmm/general.h> // set_source_pixbuf()
 #include <iostream>
-#include "kage/data/vectordatamanager.cpp"
+
+#include "frame.h"
+#include "framesmanager.h"
+#include "kage.h"
 
 KageFrame::KageFrame(KageFrameManager *p_fm, unsigned p_layerID, unsigned int p_frameID) :
 		vectorsData() {
-	set_flags(Gtk::CAN_FOCUS);
+	set_state_flags(Gtk::STATE_FLAG_NORMAL);
 	set_can_focus(true); //to accept key_press
 	current = false;
 	fm = p_fm;
@@ -28,27 +31,22 @@ KageFrame::~KageFrame() {
 }
 
 bool KageFrame::on_key_press_event(GdkEventKey *e) {
+	Kage::timestamp();
+	std::cout << " KageFrame(F " << frameID << " L " << layerID << ") on_key_press_event" << std::endl;
 	if (e->keyval == 46) { //. dot
 		fm->getFsm()->setCurrentFrame(frameID+1);
 		fm->focusFrame(frameID+1);
 	} else if (e->keyval == 44) { //, comma
 		fm->getFsm()->setCurrentFrame(frameID-1);
 		fm->focusFrame(frameID-1);
-	} else {
-		cout << "f" << frameID << " " << e->keyval << "_" << e->string << endl;
 	}
+	return true;
 }
 bool KageFrame::on_expose_event(GdkEventExpose* e) {
 	if (!window) {
 		window = get_window();
 	}
 	if (window) {
-		Gtk::Allocation allocation = get_allocation();
-		const int width = allocation.get_width();
-		const int height = allocation.get_height();
-		Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
-		cr->rectangle(e->area.x, e->area.y, e->area.width, e->area.height);
-		cr->clip();
 		render();
 	}
 	
@@ -57,11 +55,11 @@ bool KageFrame::on_expose_event(GdkEventExpose* e) {
 
 bool KageFrame::on_event(GdkEvent *e) {
 	if (e->type == GDK_ENTER_NOTIFY) {
-		cout << "f" << frameID << " enter notify... " << e->type << endl;
-		render();
+		Kage::timestamp();
+		std::cout << " KageFrame(F " << frameID << " L " << layerID << ") on_event enter" << std::endl;
 	} else if (e->type == GDK_LEAVE_NOTIFY) {
-		cout << "f" << frameID << " leave notify... " << e->type << endl;
-		render();
+		Kage::timestamp();
+		std::cout << " KageFrame(F " << frameID << " L " << layerID << ") on_event leave" << std::endl;
 	} else if (e->type == GDK_BUTTON_RELEASE) {
 		KageFrame::mouseIsDown = false;
 		fm->getFsm()->setCurrentFrame(KageFramesManager::currentFrame);
@@ -69,13 +67,14 @@ bool KageFrame::on_event(GdkEvent *e) {
 //		render();
 	} else if (e->type == GDK_BUTTON_PRESS) {
 		KageFrame::mouseIsDown = true;
-		//KageFramesManager::currentFrame = frameID;
-		cout << "layerID " << layerID << endl;
+		//KageFramesManager::currentFrame = frameID; ///?!?
 		fm->getFsm()->setCurrentLayer(layerID);
 		fm->getFsm()->setCurrentFrame(frameID);
 		fm->getFsm()->selectAll(false);
 		setSelected(true);
 		cout << e->button.x << " " << e->button.y << endl;
+		
+		fm->getFsm()->renderStage();
 	} else if (e->type == GDK_EXPOSE) {
 		on_expose_event((GdkEventExpose*) e);
 	} else if (e->type == GDK_FOCUS_CHANGE) {
@@ -87,14 +86,34 @@ bool KageFrame::on_event(GdkEvent *e) {
 		//filter out from echos
 	} else if (e->type == GDK_CONFIGURE) {
 		//filter out from echos 
-	} else {
-		cout << "f" << frameID << "?" << e->type << endl;
 	}
 	return true;
 }
 
 
+void KageFrame::forceRender() {
+	render();
+}
 bool KageFrame::render() {
+	Kage::timestamp();
+	std::cout << " KageFrame(F " << frameID << " L " << layerID << ") render < " << std::endl;
+	if (!window) {
+		window = get_window();
+	}
+	
+	// force our program to redraw the entire stage
+	Gdk::Rectangle r(0, 0, get_allocation().get_width(),
+			get_allocation().get_height());
+	Kage::timestamp();
+	std::cout << " KageFrame(F " << frameID << " L " << layerID << ") render > " << std::endl;
+	window->invalidate_rect(r, false);
+	
+	return true;
+}	
+	
+bool KageFrame::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
+	Kage::timestamp();
+	std::cout << " KageFrame(F " << frameID << " L " << layerID << ") on_draw" << std::endl;
 	if (!window) {
 		window = get_window();
 	}
@@ -124,68 +143,29 @@ bool KageFrame::render() {
 			KageFrame::imageSELECTED_CUR = Gdk::Pixbuf::create_from_file("shared/frame/selected_cur.png");
 		}
 		if (isSelected() == true) {
-			//if (isCurrent() == true) {
 			if (KageFramesManager::currentFrame == frameID) {
-				KageFrame::imageSELECTED_CUR->render_to_drawable(window, get_style()->get_black_gc(), 0, 0, 0, 0, 8, 20, Gdk::RGB_DITHER_NONE, 0, 0);
+				Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageSELECTED_CUR, 0, 0);
 			} else {
-				KageFrame::imageSELECTED->render_to_drawable(window, get_style()->get_black_gc(), 0, 0, 0, 0, 8, 20, Gdk::RGB_DITHER_NONE, 0, 0);
+				Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageSELECTED, 0, 0);
+			}
+		} else if (isEmpty() == true) {
+			if (KageFramesManager::currentFrame == frameID) {
+				Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK_CUR, 0, 0);
+			} else {
+				Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK, 0, 0);
 			}
 		} else {
-			if (isEmpty() == true) {
-				//if (isCurrent() == true) {
-				if (KageFramesManager::currentFrame == frameID) {
-					KageFrame::imageBLANK_CUR->render_to_drawable(
-							window, get_style()->get_black_gc(),
-							0, 0, 0, 0, 8, 20, // draw the whole imageNULL (from 0,0 to the full width,height) at 100,80 in the window
-						//	0, 0, 0, 0, imageNULL->get_width(), imageNULL->get_height(),
-							Gdk::RGB_DITHER_NONE, 0, 0
-						);
-				} else {
-					KageFrame::imageBLANK->render_to_drawable(window, get_style()->get_black_gc(), 0, 0, 0, 0, 8, 20, Gdk::RGB_DITHER_NONE, 0, 0);
-				}
+			if (KageFramesManager::currentFrame == frameID) {
+				Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN_CUR, 0, 0);
 			} else {
-				//if (isCurrent() == true) {
-				if (KageFramesManager::currentFrame == frameID) {
-					KageFrame::imageDRAWN_CUR->render_to_drawable(window, get_style()->get_black_gc(), 0, 0, 0, 0, 8, 20, Gdk::RGB_DITHER_NONE, 0, 0);
-				} else {
-					KageFrame::imageDRAWN->render_to_drawable(window, get_style()->get_black_gc(), 0, 0, 0, 0, 8, 20, Gdk::RGB_DITHER_NONE, 0, 0);
-				}
+				Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN, 0, 0);
 			}
 		}
+		cr->paint();
 		
 		return true;
-		Gtk::Allocation allocation = get_allocation();
-		const int width = allocation.get_width();
-		const int height = allocation.get_height();
-		Cairo::RefPtr<Cairo::Context> cr = window->create_cairo_context();
-//		cr->rectangle(e->area.x, e->area.y, e->area.width, e->area.height);
-//		cr->clip();
-		//draw frame-background
-		cr->set_line_width(0.0);
-		if (isSelected() == true) {
-			cr->set_source_rgb(0.0, 0.0, 0.44);
-		} else {
-			if (isEmpty() == true) {
-				cr->set_source_rgb(1.0, 1.0, 1.0);
-			} else {
-				cr->set_source_rgb(0.9, 0.9, 0.9);
-			}
-		}
-			cr->move_to(0, 0);
-			cr->line_to(width, 0);
-			cr->line_to(width, height);
-			cr->line_to(0, height);
-			cr->line_to(0, 0);
-		cr->fill_preserve();
-
-		//draw frame-border
-		cr->set_line_width(1.0);
-		cr->set_source_rgb(0.87, 0.87, 0.87);
-		cr->move_to(width, 0);
-		cr->line_to(width, height);
-		cr->line_to(0, height);
-		cr->stroke();
 	}
+	return false;
 }
 
 void KageFrame::setSelected(bool p_selected) {

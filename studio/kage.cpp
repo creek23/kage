@@ -1,10 +1,5 @@
 
 #include "kage.h"
-#include "kage/timeline/layermanager.cpp"
-//#include "kage/timeline/layer.cpp"
-#include "kage/timeline/framesmanager.cpp"
-//#include "kage/timeline/timeline.cpp"
-#include "kage/stage.cpp"
 #include "about.cpp"
 
 const Glib::ustring app_title = "Kage Studio";
@@ -13,23 +8,41 @@ bool KageFrame::mouseIsDown = false;
 ColorData KageStage::stageBG(255, 255, 255);
 ColorData KageStage::fillColor(0, 0, 255, 255);
 StrokeColorData KageStage::stroke(255, 0, 0, 255);
+KageStage::ToolMode KageStage::toolMode = MODE_NONE;
+GdkPoint KageStage::moveStageXY;
 
-Kage::Kage() : m_LabelStageWid("Width"),
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageNULL;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageNULL_CUR;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageBLANK;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageBLANK_CUR;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageDRAWN;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageDRAWN_CUR;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageEXTENSION;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageEXTENSION_CUR;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageSELECTED;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageSELECTED_CUR;
+
+unsigned int KageFramesManager::currentFrame;
+unsigned int KageFramesManager::currentLayer;
+unsigned int VectorDataManager::idmaker;
+
+Kage::Kage() : m_KageLayerManager(),
+			   m_KageFramesManager(this),
+			   m_LabelProp("Properties"),
+			   m_LabelStageWid("Width"),
 			   m_LabelStageHgt("Height"),
 			   m_LabelStageBG("Background"),
 			   m_LabelFill("Fill"),
 			   m_LabelStroke("Stroke"),
 			   m_LabelStrokeThickness("Thickness"),
-			   m_LabelProp("Properties"),
 			   m_LblHolder_Toolbar("Toolbar"),
-			   m_KageLayerManager(),
-			   m_KageFramesManager(this),
 			   m_KageStage(this) {
 	m_ContextId = m_Statusbar.get_context_id(app_title);
 	
 	set_title("Kage Studio");
 	set_icon_from_file("shared/icons/default.png"); //TODO: change this place-holder
 	set_border_width(0);
+	set_default_size(960,720);
 	
 	//Define the actions:
 	m_refActionGroup = Gtk::ActionGroup::create("Actions"); //It also works with no name, which is probably better if there is only one.
@@ -286,11 +299,11 @@ Kage::Kage() : m_LabelStageWid("Width"),
 							m_Timeline_Frame_ScrolledWindow.add(m_KageFramesManager);
 							m_Timeline_Frame_ScrolledWindow.set_shadow_type(Gtk::SHADOW_NONE);
 					m_Timeline_Frame_VBox.pack_start(m_Timeline_HScrollbar, Gtk::PACK_SHRINK);
-						m_Timeline_HScrollbar.set_adjustment(*m_Timeline_Frame_ScrolledWindow.get_hadjustment());
+						m_Timeline_HScrollbar.set_adjustment(m_Timeline_Frame_ScrolledWindow.get_hadjustment());
 					
 			m_Timeline_HBox.pack_start(m_Timeline_VScrollbar, Gtk::PACK_SHRINK);
-				m_Timeline_VScrollbar.set_adjustment(*m_Timeline_Frame_ScrolledWindow.get_vadjustment());
-					m_Timeline_Layer_ScrolledWindow.set_vadjustment(*m_Timeline_Frame_ScrolledWindow.get_vadjustment());
+				m_Timeline_VScrollbar.set_adjustment(m_Timeline_Frame_ScrolledWindow.get_vadjustment());
+					m_Timeline_Layer_ScrolledWindow.set_vadjustment(m_Timeline_Frame_ScrolledWindow.get_vadjustment());
 					
 		m_VPane_Timeline.add2(m_HPane_DrawingArea);
 			m_HPane_DrawingArea.add1(m_KageStage);
@@ -381,7 +394,7 @@ Kage::Kage() : m_LabelStageWid("Width"),
 						m_EntryStrokeThickness.set_text(intToString((int)KageStage::stroke.getThickness()));
 						m_EntryStrokeThickness.signal_activate().connect(
 							sigc::mem_fun(*this, &Kage::EntryStrokeThickness_onEnter) );
-				
+	
 	show_all();
 	m_PropFill.set_visible(false);
 	m_PropStroke.set_visible(false);
@@ -451,10 +464,11 @@ void Kage::onButtonClick() {
 
 void Kage::addDataToFrame(VectorDataManager v) {
 	m_KageFramesManager.getFrame()->vectorsData.push(v);
-//	m_KageFramesManager.getFrame()->render();
+	m_KageFramesManager.getFrame()->forceRender();
 }
 VectorDataManager Kage::getFrameData() {
-	cout << "Kage::getFrameData() F " << KageFramesManager::currentFrame << " L " << KageFramesManager::currentLayer << endl;
+	Kage::timestamp();
+	cout << "Kage::getFrameData F " << KageFramesManager::currentFrame << " L " << KageFramesManager::currentLayer << endl;
 	return m_KageFramesManager.getFrame()->vectorsData;
 }
 
@@ -462,15 +476,45 @@ VectorDataManager Kage::getFrameData() {
 	renders all frameN in all layers, where frameN is the currentFrame
 */
 void Kage::renderFrames() {
+	Kage::timestamp();
+	std::cout << " Kage::renderFrames <" << std::endl;
 	unsigned int c = m_KageLayerManager.layerCount();
-	unsigned int i;
 	m_KageStage.clearScreen();
 	unsigned int t = KageFramesManager::currentLayer;
-		for (i = 1; i <= c; i++) {
+		for (unsigned int i = 1; i <= c; ++i) {
 			m_KageFramesManager.setCurrentLayer(i);
 			m_KageStage.renderFrame();
 		}
 	KageFramesManager::currentLayer = t;
+	Kage::timestamp();
+	std::cout << " Kage::renderFrames > " << c << std::endl;
+}
+
+void Kage::renderFramesBelowCurrentLayer() {
+	Kage::timestamp();
+	std::cout << " Kage::renderFramesBelowCurrentLayer <" << std::endl;
+	m_KageStage.clearScreen();
+	unsigned int t = KageFramesManager::currentLayer;
+		for (unsigned int i = 1; i < t; ++i) {
+			m_KageFramesManager.setCurrentLayer(i);
+			m_KageStage.renderFrame();
+		}
+	KageFramesManager::currentLayer = t;
+	Kage::timestamp();
+	std::cout << " Kage::renderFramesBelowCurrentLayer >" << std::endl;
+}
+void Kage::renderFramesAboveCurrentLayer() {
+	Kage::timestamp();
+	std::cout << " Kage::renderFramesAboveCurrentLayer <" << std::endl;
+	unsigned int c = m_KageLayerManager.layerCount();
+	unsigned int t = KageFramesManager::currentLayer;
+		for (unsigned int i = (t + 1); i < c; ++i) {
+			m_KageFramesManager.setCurrentLayer(i);
+			m_KageStage.renderFrame();
+		}
+	KageFramesManager::currentLayer = t;
+	Kage::timestamp();
+	std::cout << " Kage::renderFramesAboveCurrentLayer >" << std::endl;
 }
 
 void Kage::Save_onClick() {
@@ -479,9 +523,9 @@ void Kage::Save_onClick() {
 		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 		dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
 	//Add filters, so that only certain file types can be selected:
-	Gtk::FileFilter filter_kage;
-		filter_kage.set_name("KAGE");
-		filter_kage.add_mime_type("text/plain");
+	auto filter_kage = Gtk::FileFilter::create();
+		filter_kage->set_name("KAGE");
+		filter_kage->add_mime_type("text/x-kage");
 			dialog.add_filter(filter_kage);
 //	Gtk::FileFilter filter_text;
 //		filter_text.set_name("Text files");
@@ -508,6 +552,8 @@ void Kage::Save_onClick() {
 			
 			//TODO: save file then zip.
 			break;
+		default:
+			std::cout << "clicked " << result << endl;
 	}
 }
 
@@ -518,9 +564,9 @@ void Kage::ExportKS_onClick() {
 		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 		dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
 	
-	Gtk::FileFilter filter_ks;
-		filter_ks.set_name("KonsolScript");
-		filter_ks.add_mime_type("text/x-konsolscript");
+	auto filter_ks = Gtk::FileFilter::create();
+		filter_ks->set_name("KonsolScript");
+		filter_ks->add_mime_type("text/x-konsolscript");
 			dialog.add_filter(filter_ks);
 	int result = dialog.run();
 	
@@ -554,9 +600,9 @@ void Kage::ExportHTML5_onClick() {
 		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 		dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
 	
-	Gtk::FileFilter filter_html5;
-		filter_html5.set_name("HTML5");
-		filter_html5.add_mime_type("text/html");
+	auto filter_html5 = Gtk::FileFilter::create();
+		filter_html5->set_name("HTML5");
+		filter_html5->add_mime_type("text/html");
 			dialog.add_filter(filter_html5);
 	int result = dialog.run();
 	
@@ -597,7 +643,7 @@ void Kage::ExportHTML5_onClick() {
 				exportHtml5(expPath, "}");
 			}
 				t = KageFramesManager::currentLayer;
-					for (j = 1; j <= l_fMax; j++) {
+					for (j = 1; j <= l_fMax; ++j) {
 						m_KageFramesManager.setCurrentFrame(j);
 						exportHtml5(expPath, "function ks_f" + uintToString(j) + "() {");
 						for (i = 1; i <= l_lMax; i++) {
@@ -640,14 +686,14 @@ void Kage::onActionActivate() {
 }
 
 void Kage::Play_onClick() {
-	std::cout << "Play activated." << std::endl;
+	std::cout << "Kage::Play_onClick" << std::endl;
 	unsigned int c = m_KageFramesManager.frameCount();
-	unsigned int i;
 	m_KageStage.clearScreen();
-	for (i = 1; i <= c; i++) {
+	for (unsigned int i = 1; i <= c; ++i) {
 		m_KageFramesManager.setCurrentFrame(i);
 		renderFrames();
-		Glib::usleep(1000000/m_KageStage.fps); //usleep requires MICROseconds -- NOT MILLIseconds
+//		Glib::usleep(1000000/m_KageStage.fps); //usleep requires MICROseconds -- NOT MILLIseconds
+		std::cout << "TODO: add DELAY as per FPS" << std::endl;
 	}
 }
 
@@ -670,9 +716,8 @@ void Kage::addToolButton(const Glib::ustring &label) {
 		m_VBoxToolbar_Holder.pack_start(*toggleButtons.back(), Gtk::PACK_SHRINK);
 			(*toggleButtons.back()).add_pixlabel("shared/icons/" + label + "_tango.png",""); //find way to make the image centered
 			(*toggleButtons.back()).set_focus_on_click(false);
+			(*toggleButtons.back()).set_tooltip_text(label + " Tool");
 			(*toggleButtons.back()).signal_clicked().connect(sigc::bind(sigc::mem_fun(*this, &Kage::onToolButtonsClick), toggleButtons.back()));
-	tooltips.push_back(Gtk::manage(new Gtk::Tooltips()));
-		(*tooltips.back()).set_tip(*toggleButtons.back(), label + " Tool");
 }
 
 void Kage::btnAbout_onClick() {
@@ -687,16 +732,16 @@ void Kage::CheckUpdate_onClick() {
 
 void Kage::Website_onClick() {
 	GError *error = NULL;
-	gtk_show_uri(NULL, "http://www.konsolscript.org", gtk_get_current_event_time(), &error);
+	gtk_show_uri(NULL, "http://konsolscript.sf.net", gtk_get_current_event_time(), &error);
 //	gtk_show_uri(gdk_screen_get_default(), "http://www.konsolscript.org", gtk_get_current_event_time(), &error);
 	if (error) {
 		cout << error->message << endl;
 		cout << "Launching default web browser..." << endl;
-		runExternal("start", "http://www.konsolscript.org/kagestudio");
+		runExternal("start", "http://konsolscript.sf.net/kagestudio");
 	}
 }
 
-bool Kage::fileWrite(string p_path, string p_msg, std::ofstream &p_file, bool &p_flag) {
+bool Kage::fileWrite(std::string p_path, std::string p_msg, std::ofstream &p_file, bool &p_flag) {
 	if (p_flag == false) {
 		p_file.open(p_path.c_str(), ios::trunc);
 		p_flag = true;
@@ -710,7 +755,7 @@ bool Kage::fileWrite(string p_path, string p_msg, std::ofstream &p_file, bool &p
 		return false;
 	}
 	
-	p_file << p_msg << endl;
+	p_file << p_msg << std::endl;
 	
 	return true;
 }
@@ -744,7 +789,7 @@ bool Kage::dtrace(string p_msg) {
 string Kage::strToUpper(string p_str) {
 	unsigned int i;
 	
-	for(i = 0; i < p_str.length(); i++) {
+	for(i = 0; i < p_str.length(); ++i) {
 		p_str[i] = toupper(p_str[i]);
 	}
 	
@@ -754,7 +799,7 @@ string Kage::strToUpper(string p_str) {
 //change each element of the string to lower case
 string Kage::strToLower(string p_str) {
 	unsigned int i;
-	for(i = 0; i < p_str.length(); i++) {
+	for(i = 0; i < p_str.length(); ++i) {
 		p_str[i] = tolower(p_str[i]);
 	}
 	return p_str;
@@ -817,7 +862,7 @@ void Kage::EntryStageFPS_onEnter() {
 
 void Kage::ColorButtonStage_onClick() {
 	m_Color = m_ColorButtonStage.get_color();
-	m_KageStage.modify_bg(Gtk::STATE_NORMAL, m_Color);
+//	m_KageStage.modify_bg(Gtk::STATE_NORMAL, m_Color);
 	m_KageStage.setStageBG(m_Color);
 }
 void Kage::ChooseFill_onClick() {
@@ -835,19 +880,20 @@ string Kage::dumpFrame(bool bKS) {
 	ostringstream l_ostringstream;
 	unsigned int vsize = v.size();//-1;
 	unsigned int fillCtr = 0;
-	unsigned int thickness = 0;
 	ColorData fcolor;
 	StrokeColorData scolor;
 	StrokeColorData scolorPrev;
 	PointData p;
-	double x1;
+/*	double x1;
 	double y1;
 	double x2;
-	double y2;
-	double x3;
-	double y3;
-	for (unsigned int i = 1; i < vsize; i++) {
+	double y2;*/
+	double x3 = 0.0;
+	double y3 = 0.0;
+	for (unsigned int i = 1; i < vsize; ++i) {
 		switch (v[i].vectorType) {
+			case VectorData::TYPE_INIT: break;
+			case VectorData::TYPE_TEXT: break;
 			case VectorData::TYPE_FILL:
 				fcolor = v[i].fillColor;
 				if (bKS == true) {
@@ -985,6 +1031,7 @@ char Kage::int15ToHex(unsigned int p) {
 	} else if (p == 0) {
 		return '0';
 	}
+	return '\0';
 }
 
 bool Kage::runExternal(string p_cmd, string p_param) {
@@ -996,4 +1043,12 @@ bool Kage::runExternal(string p_cmd, string p_param) {
 		return true;
 	}
 	return false;
+}
+
+void Kage::timestamp() {
+	time_t rawtime;
+	time(&rawtime);
+	struct tm * timeinfo = localtime (&rawtime);
+	
+	std::cout << timeinfo->tm_hour << ":" << timeinfo->tm_min << ":" << timeinfo->tm_sec; // << " " << *timeinfo;
 }

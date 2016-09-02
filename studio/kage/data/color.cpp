@@ -45,8 +45,8 @@ void ColorData::copy(ColorData p_color) {
 	setA(p_color.getA());
 }
 
-string ColorData::toString() {
-	ostringstream l_ostringstream;
+std::string ColorData::toString() {
+	std::ostringstream l_ostringstream;
 		l_ostringstream << "(" << getR() << ", " << getG() << ", " << getB() << ", " << getA() << ")";
 	return l_ostringstream.str();
 }

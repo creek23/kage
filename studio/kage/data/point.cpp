@@ -6,9 +6,9 @@ PointData::PointData() {
 	y = 0;
 }
 
-PointData::PointData(Gdk::Point p) {
-	x = (double) p.get_x();
-	y = (double) p.get_y();
+PointData::PointData(GdkPoint p) {
+	x = (double) p.x;
+	y = (double) p.y;
 }
 
 PointData::PointData(double p_x, double p_y) {

@@ -1,13 +1,13 @@
 
 #include "framemanager.h"
-#include "frame.cpp"
+#include "framesmanager.h"
 
 KageFrameManager::KageFrameManager(KageFramesManager *p_fsm, unsigned int p_layerID, unsigned int p_frameCount) {
 	fsm = p_fsm;
 	layerID = p_layerID;
 	frameCtr = 0;
 	unsigned int i = 0;
-	for (i = 0; i < p_frameCount; i++) {
+	for (i = 0; i < p_frameCount; ++i) {
 		addFrame();
 	}
 }
@@ -17,13 +17,13 @@ KageFrameManager::~KageFrameManager() {
 }
 
 void KageFrameManager::addFrame() {
-	frameCtr++;
+	++frameCtr;
 	frames.push_back(Gtk::manage(new KageFrame(this, layerID, frameCtr)));
 		pack_start(*frames.back(), Gtk::PACK_SHRINK);
 }
 
 void KageFrameManager::extendFrame(unsigned int p_frameID) {
-	frameCtr++;
+	++frameCtr;
 	frames.push_back(Gtk::manage(new KageFrame(this, layerID, frameCtr)));
 		pack_start(*frames.back(), Gtk::PACK_SHRINK);
 }
@@ -37,7 +37,7 @@ unsigned int KageFrameManager::getFrameCount() {
 }
 
 bool KageFrameManager::selectAll(bool p_selectAll) {
-	for (int i = 0; i < frameCtr; i++) {
+	for (unsigned int i = 0; i < frameCtr; ++i) {
 		frames[i]->setSelected(p_selectAll);
 	}
 	return true;
@@ -51,7 +51,7 @@ void KageFrameManager::setCurrentFrame(unsigned int p_frame) {
 	if (p_frame < 1 || p_frame > getFrameCount()) {
 		return;
 	}
-	for (int i = 0; i < frameCtr; i++) {
+	for (unsigned int i = 0; i < frameCtr; ++i) {
 		frames[i]->setCurrent(false);
 	}
 	frames[p_frame-1]->setCurrent(true);

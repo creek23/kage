@@ -16,12 +16,11 @@
 	#include <gtkmm/statusbar.h>
 	#include <gtkmm/togglebutton.h>
 	#include <gtkmm/messagedialog.h>
-	#include <gtkmm/tooltips.h>
+	#include <gtkmm/tooltip.h>
 	#include <gtkmm/scrollbar.h>
 	#include <gtkmm/scrolledwindow.h>
 	#include <gtkmm/filechooserdialog.h>
 	#include <gtkmm/colorbutton.h>
-	//#include "kage/data/vectordatamanager.h"
 	#include "kage/timeline/layermanager.h"
 	//#include "kage/timeline/layer.h"
 	#include "kage/timeline/framesmanager.h"
@@ -29,10 +28,9 @@
 	#include "kage/stage.h"
 	#include "about.h"
 	#include "register.h"
-	#include <iostream>
-	#include <vector>
-	#include <fstream>
-	#include <string>
+	
+	#include <fstream> //ofstream
+	#include <iostream> //cerr
 
 	class Kage : public Gtk::Window {
 		public:
@@ -42,6 +40,8 @@
 			void addDataToFrame(VectorDataManager v);
 			VectorDataManager getFrameData();
 			void renderFrames();
+			void renderFramesBelowCurrentLayer();
+			void renderFramesAboveCurrentLayer();
 			string dumpFrame(bool bKS);
 			
 			string int255ToHex(unsigned int p);
@@ -75,6 +75,8 @@
 			virtual void on_radio_action_shape_activated(shape chosen_shape);
 			
 			//Member widgets:
+			KageLayerManager m_KageLayerManager;
+			KageFramesManager m_KageFramesManager;
 			Gtk::VBox m_VBoxRoot;
 			Gtk::HBox m_HBoxToolbar;
 			Gtk::VBox m_VBoxTimelineLayer;
@@ -88,8 +90,6 @@
 			Gtk::VBox m_VBoxTimelineFrame; //to be deleted
 			Gtk::ScrolledWindow m_Timeline_Layer_ScrolledWindow;
 			Gtk::ScrolledWindow m_Timeline_Frame_ScrolledWindow;
-			KageLayerManager m_KageLayerManager;
-			KageFramesManager m_KageFramesManager;
 			Gtk::VBox m_VBoxToolbar_Holder;
 			Gtk::VBox m_Box1;
 			Gtk::HSeparator m_Separator;
@@ -142,7 +142,7 @@
 			void CheckUpdate_onClick();
 			void Website_onClick();
 			std::vector<Gtk::ToggleButton*> toggleButtons;
-			std::vector<Gtk::Tooltips*> tooltips;
+			std::vector<Gtk::Tooltip*> tooltips;
 			Gtk::ToggleButton* currentTool;
 			
 			Gtk::HScrollbar m_Timeline_HScrollbar;
@@ -182,6 +182,9 @@
 			bool runExternal(string p_cmd, string p_param);
 			
 			void Play_onClick();
+			
+		public:
+			static void timestamp();
 	};
 
 #endif //GTKMM_KAGE_H

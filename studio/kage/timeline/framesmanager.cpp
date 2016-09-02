@@ -1,6 +1,6 @@
 
 #include "framesmanager.h"
-#include "framemanager.cpp"
+#include "kage.h"
 
 KageFramesManager::KageFramesManager(Kage *p_win) {
 	win = p_win;
@@ -35,7 +35,7 @@ bool KageFramesManager::addFrame() {
 	if (framemanager.size() > 0) {
 		l_count = framemanager.size();
 	}
-	for (int i = 0; i < l_count; i++) {
+	for (unsigned int i = 0; i < l_count; ++i) {
 		framemanager[i]->addFrame();
 	}
 	return true;
@@ -46,7 +46,7 @@ bool KageFramesManager::extendFrame(unsigned int p_frameID) {
 	if (framemanager.size() > 0) {
 		l_count = framemanager.size();
 	}
-	for (int i = 0; i < l_count; i++) {
+	for (unsigned int i = 0; i < l_count; ++i) {
 		framemanager[i]->extendFrame(p_frameID);
 	}
 	return true;
@@ -122,7 +122,7 @@ void KageFramesManager::setCurrentFrame(unsigned int p_currentFrame) {
 			p_currentFrame = 1;
 		}
 		
-		for (int i = 0; i < l_count; i++) {
+		for (unsigned int i = 0; i < l_count; ++i) {
 			framemanager[i]->setCurrentFrame(p_currentFrame);
 		}
 		
@@ -131,12 +131,20 @@ void KageFramesManager::setCurrentFrame(unsigned int p_currentFrame) {
 	}
 }
 
+void KageFramesManager::renderStage() {
+	Kage::timestamp();
+	cout << "KageFramesManager::renderStage <" << endl;
+	win->renderFrames();
+	Kage::timestamp();
+	cout << "KageFramesManager::renderStage >" << endl;
+}
+
 void KageFramesManager::selectAll(bool p_selectAll) {
 	unsigned int l_count = 1;
 	if (framemanager.size() > 0) {
 		l_count = framemanager.size();
 	}
-	for (int i = 0; i < l_count; i++) {
+	for (unsigned int i = 0; i < l_count; ++i) {
 		framemanager[i]->selectAll(p_selectAll);
 	}
 }

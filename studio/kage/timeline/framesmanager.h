@@ -3,6 +3,7 @@
 	
 	#include <gtkmm/box.h>
 	#include <gtkmm/window.h>
+	#include <gtkmm/label.h>
 	#include "framemanager.h"
 	
 	class Kage;
@@ -24,10 +25,12 @@
 			unsigned int frameCount();
 			void selectAll(bool p_selectAll); //used by KageFrame
 			KageFrame *getFrame();
+			
+			void renderStage(); //used by KageFrame
+			
 		protected:
+			Kage *win;
 			Gtk::Label place_holder;
 			std::vector<KageFrameManager*> framemanager;
-			
-			Kage *win;
 	};
 #endif // GTKMM_KAGE_MANAGER_FRAMES_H

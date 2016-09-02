@@ -2,14 +2,19 @@
 	#define GTKMM_KAGE_STAGE_H
 	
 	#include <gtkmm/drawingarea.h>
+	#include <iostream>
 	
 	#include "data/color.h"
-//	#include "data/point.h"
+	#include "data/strokecolor.h"
+	#include "data/vectordata.h"
 	
 	class Kage; //forward declaration
 	
 	class KageStage : public Gtk::DrawingArea {
 		public:
+			KageStage(Kage *p_win);
+			virtual ~KageStage();
+		
 			enum ToolMode {
 				MODE_NONE,
 				MODE_SELECT,
@@ -24,14 +29,11 @@
 			static ColorData fillColor; //direct use for get only
 			static StrokeColorData stroke; //direct use for get only
 			static ToolMode toolMode;
-			static Gdk::Point moveStageXY;
+			static GdkPoint moveStageXY;
 			unsigned int wid;
 			unsigned int hgt;
 			unsigned int fps;
-			//static PointData moveStageXY;
 			
-			KageStage(Kage *p_win);
-			virtual ~KageStage();
 			void render();
 			
 			void setStageBG(Gdk::Color p_Color);
@@ -44,15 +46,14 @@
 			unsigned int stageHeight; //direct use for get only
 			void clearScreen();
 			void renderFrame();
-			Glib::RefPtr<Gdk::Image> _bg;
+			Glib::RefPtr<Gdk::Pixbuf> _bg;
 			Cairo::RefPtr<Cairo::Surface> _bgcr;
 		protected:
 			ToolMode prevTool; //used by Hand-tool shortcut [spacebar]
 			Kage *win;
-			Gdk::Point origin;
-			Gdk::Point draw1;
-			Gdk::Point draw2;
-			//PointData origin;
+			GdkPoint origin;
+			GdkPoint draw1;
+			GdkPoint draw2;
 			Glib::RefPtr<Gdk::Window> window;
 			Cairo::RefPtr<Cairo::Context> cr;
 			bool gotContext;
@@ -64,5 +65,9 @@
 			virtual bool on_key_press_event(GdkEventKey *e);
 			virtual bool on_key_release_event(GdkEventKey *e);
 			virtual bool on_event(GdkEvent *e);
+			
+			bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
+			
+			bool on_timeout();
 	};
 #endif // GTKMM_KAGE_STAGE_H

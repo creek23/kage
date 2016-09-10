@@ -17,6 +17,7 @@ StrokeColorData::StrokeColorData(unsigned int p_r, unsigned int p_g, unsigned in
 
 StrokeColorData StrokeColorData::clone() {
 	StrokeColorData s(getR(), getG(), getB(), getA());
+	s.setThickness(getThickness());
 	return s;
 }
 

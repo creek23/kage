@@ -18,10 +18,12 @@
 			enum ToolMode {
 				MODE_NONE,
 				MODE_SELECT,
+				MODE_ANCHOR,
 				MODE_MOVE_STAGE,
 				MODE_DRAW_RECT,
 				MODE_DRAW_TEXT,
 				MODE_DRAW_POLY,
+				MODE_DRAW_OVAL,
 				MODE_DRAW_LINE
 			};
 			
@@ -46,6 +48,7 @@
 			unsigned int stageHeight; //direct use for get only
 			void clearScreen();
 			void renderFrame();
+			void renderAnchors();
 			Glib::RefPtr<Gdk::Pixbuf> _bg;
 			Cairo::RefPtr<Cairo::Surface> _bgcr;
 		protected:
@@ -69,5 +72,8 @@
 			bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
 			
 			bool on_timeout();
+			unsigned int mouseOnPoint;
+			void renderAnchor(double p_x, double p_y, bool p_selected);
+			bool isMouseOnAnchor(double p_x, double p_y);
 	};
 #endif // GTKMM_KAGE_STAGE_H

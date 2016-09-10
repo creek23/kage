@@ -23,6 +23,7 @@
 			
 			void setVectorData(vector<VectorData> p_vectorData);
 			vector<VectorData> getVectorData();
+			VectorDataManager clone();
 			
 			void clear();
 			void addFill(ColorData p_color);

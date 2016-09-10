@@ -10,6 +10,7 @@ ColorData KageStage::fillColor(0, 0, 255, 255);
 StrokeColorData KageStage::stroke(255, 0, 0, 255);
 KageStage::ToolMode KageStage::toolMode = MODE_NONE;
 GdkPoint KageStage::moveStageXY;
+unsigned int PointData::debug_pts;
 
 Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageNULL;
 Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageNULL_CUR;
@@ -154,7 +155,7 @@ Kage::Kage() : m_KageLayerManager(),
 	m_refActionGroup->add(
 		Gtk::Action::create("DuplicateFrame", "_Duplicate Frame", "Duplicate Frame"),
 		Gtk::AccelKey("F6"),
-		sigc::mem_fun(*this, &Kage::onActionActivate)
+		sigc::mem_fun(*this, &Kage::DuplicateFrame_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("AddLayer", "_Add Layer", "Add Layer"),
@@ -417,9 +418,35 @@ void Kage::AddFrame_onClick() {
 	show_all();
 }
 
+void Kage::DuplicateFrame_onClick() {
+	m_KageFramesManager.addFrame();
+	
+	VectorDataManager l_vectorsData = m_KageFramesManager.getFrame()->vectorsData.clone();
+	
+	m_KageFramesManager.setCurrentFrame(KageFramesManager::currentFrame + 1);
+	
+	m_KageFramesManager.getFrame()->vectorsData = l_vectorsData;
+	
+	show_all();
+}
+
+void Kage::switchToPreviousFrame() {
+	if (KageFramesManager::currentFrame > 1) {
+		m_KageFramesManager.setCurrentFrame(KageFramesManager::currentFrame - 1);
+		show_all();
+	}
+}
+
+void Kage::switchToNextFrame() {
+	if (KageFramesManager::currentFrame < m_KageFramesManager.frameCount()) {
+		m_KageFramesManager.setCurrentFrame(KageFramesManager::currentFrame + 1);
+		show_all();
+	}
+}
+
 void Kage::LayerAdd_onClick() {
-	m_KageFramesManager.addFrameManager(m_KageLayerManager.layerCount());
 	m_KageLayerManager.addLayer();
+	m_KageFramesManager.addFrameManager(m_KageLayerManager.layerCount());
 	std::cout << "Layer Count: " << m_KageLayerManager.layerCount() << std::endl;
 	show_all();
 	updateStatus("New Layer Added");
@@ -439,6 +466,21 @@ void Kage::onToolButtonsClick(Gtk::ToggleButton *p_sourceButton) {
 			m_PropStroke.set_visible(false);
 			m_PropStage.set_visible(true);
 			KageStage::toolMode = KageStage::MODE_SELECT;
+		} else if (p_sourceButton->get_tooltip_text() == "Anchor Tool") {
+			m_PropStage.set_visible(false);
+			m_PropFill.set_visible(false);
+			m_PropStroke.set_visible(false);
+			m_ColorButtonFill.set_color(m_KageStage.getFill());
+			m_ColorButtonStroke.set_color(m_KageStage.getStroke());
+			KageStage::toolMode = KageStage::MODE_ANCHOR;
+			forceRenderFrames();
+		} else if (p_sourceButton->get_tooltip_text() == "Oval Tool") {
+			m_PropStage.set_visible(false);
+			m_PropFill.set_visible(true);
+			m_PropStroke.set_visible(true);
+			m_ColorButtonFill.set_color(m_KageStage.getFill());
+			m_ColorButtonStroke.set_color(m_KageStage.getStroke());
+			KageStage::toolMode = KageStage::MODE_DRAW_OVAL;
 		} else if (p_sourceButton->get_tooltip_text() == "Rectangle Tool") {
 			m_PropStage.set_visible(false);
 			m_PropFill.set_visible(true);
@@ -448,7 +490,7 @@ void Kage::onToolButtonsClick(Gtk::ToggleButton *p_sourceButton) {
 			KageStage::toolMode = KageStage::MODE_DRAW_RECT;
 		} else if (p_sourceButton->get_tooltip_text() == "Poly Tool") {
 			m_PropStage.set_visible(false);
-			m_PropFill.set_visible(false);
+			m_PropFill.set_visible(true);
 			m_PropStroke.set_visible(true);
 			m_ColorButtonStroke.set_color(m_KageStage.getStroke());
 			KageStage::toolMode = KageStage::MODE_DRAW_POLY;
@@ -468,10 +510,20 @@ void Kage::addDataToFrame(VectorDataManager v) {
 }
 VectorDataManager Kage::getFrameData() {
 	Kage::timestamp();
-	cout << "Kage::getFrameData F " << KageFramesManager::currentFrame << " L " << KageFramesManager::currentLayer << endl;
+	cout << " Kage::getFrameData F " << KageFramesManager::currentFrame << " L " << KageFramesManager::currentLayer << endl;
 	return m_KageFramesManager.getFrame()->vectorsData;
 }
 
+void Kage::setFrameData(VectorDataManager p_vectorsData) {
+	Kage::timestamp();
+	m_KageFramesManager.getFrame()->vectorsData.clear();
+	m_KageFramesManager.getFrame()->vectorsData = p_vectorsData.clone();
+}
+
+void Kage::forceRenderFrames() {
+	m_KageStage.render();
+	renderFrames();
+}
 /**
 	renders all frameN in all layers, where frameN is the currentFrame
 */
@@ -686,7 +738,7 @@ void Kage::onActionActivate() {
 }
 
 void Kage::Play_onClick() {
-	std::cout << "Kage::Play_onClick" << std::endl;
+	std::cout << " Kage::Play_onClick" << std::endl;
 	unsigned int c = m_KageFramesManager.frameCount();
 	m_KageStage.clearScreen();
 	for (unsigned int i = 1; i <= c; ++i) {
@@ -884,12 +936,7 @@ string Kage::dumpFrame(bool bKS) {
 	StrokeColorData scolor;
 	StrokeColorData scolorPrev;
 	PointData p;
-/*	double x1;
-	double y1;
-	double x2;
-	double y2;*/
-	double x3 = 0.0;
-	double y3 = 0.0;
+	bool doStroke = false;
 	for (unsigned int i = 1; i < vsize; ++i) {
 		switch (v[i].vectorType) {
 			case VectorData::TYPE_INIT: break;
@@ -917,8 +964,8 @@ string Kage::dumpFrame(bool bKS) {
 						l_ostringstream << "screen.fill();\n";
 					}
 				}
-					if (scolor.getThickness() > 0) {
-						if (bKS == false) {
+//					if (scolor.getThickness() > 0) {
+						if (bKS == false && doStroke == true) {
 							if (scolorPrev.equalTo(scolor) || scolorPrev.getThickness() != scolor.getThickness()) {
 								if (scolor.getA() == 255) {
 									l_ostringstream << "screen.strokeStyle = '#" << int255ToHex(scolor.getR()) << int255ToHex(scolor.getG()) << int255ToHex(scolor.getB()) << "';\n";
@@ -931,8 +978,9 @@ string Kage::dumpFrame(bool bKS) {
 								scolorPrev = scolor.clone();
 							}
 							l_ostringstream << "screen.stroke();\n";
+							doStroke = false;
 						}
-					}
+//					}
 				if (fillCtr > 0) {
 					fillCtr--;
 				}
@@ -943,7 +991,8 @@ string Kage::dumpFrame(bool bKS) {
 					l_ostringstream << "Draw:LineStyle(" << scolor.getThickness() << ", 0x" << int255ToHex(scolor.getR()) << int255ToHex(scolor.getG()) << int255ToHex(scolor.getB()) << ", " << scolor.getA() << ", screen)\n";
 				} else {
 					if (scolorPrev.equalTo(scolor) || scolorPrev.getThickness() != scolor.getThickness()) {
-						l_ostringstream << "screen.beginPath();\n";
+//						l_ostringstream << "screen.beginPath();\n";
+						doStroke = true;
 						
 						scolorPrev = scolor.clone();
 					}
@@ -976,8 +1025,8 @@ string Kage::dumpFrame(bool bKS) {
 					l_ostringstream << "screen.quadraticCurveTo(" << p.x << ", " << p.y << ", " << v[i].points[0].x << ", " << v[i].points[0].y << ", " << v[i].points[1].x << ", " << v[i].points[1].y << ");\n";
 				}
 				
-				p.x = x3;
-				p.y = y3;
+				p.x = v[i].points[1].x;
+				p.y = v[i].points[1].y;
 				break;
 			case VectorData::TYPE_CURVE_CUBIC:
 				if (bKS == true) {

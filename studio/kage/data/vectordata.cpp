@@ -1,10 +1,12 @@
 
 #include "vectordata.h"
+#include "kage.h"
 
 VectorData::VectorData() {
-	//
+	count = 0;
 }
 VectorData::VectorData(type p_type) {
+	count = 0;
 	setType(p_type);
 }
 
@@ -17,6 +19,11 @@ void VectorData::setType(type p_type) {
 		vectorType = p_type;
 	}
 }
+
+VectorData::type VectorData::getType() const {
+	return vectorType;
+}
+
 void VectorData::setPoints(vector<PointData> p_points) {
 	points = p_points;
 	count = p_points.size();
@@ -24,4 +31,19 @@ void VectorData::setPoints(vector<PointData> p_points) {
 
 vector<PointData> VectorData::getPoints() {
 	return points;
+}
+
+VectorData VectorData::clone() {
+	VectorData l_vectorData(getType());
+	vector<PointData> l_points;
+		for (unsigned int i = 0; i < count; ++i) {
+			//l_points.push_back(points[i].clone());
+			PointData pd = points[i];
+			l_points.push_back(pd);
+		}
+	l_vectorData.setPoints(l_points);
+	l_vectorData.stroke = stroke.clone();
+	l_vectorData.fillColor = fillColor.clone();
+	
+	return l_vectorData;
 }

@@ -57,12 +57,15 @@ bool KageFrame::on_event(GdkEvent *e) {
 	if (e->type == GDK_ENTER_NOTIFY) {
 		Kage::timestamp();
 		std::cout << " KageFrame(F " << frameID << " L " << layerID << ") on_event enter" << std::endl;
+		render();
 	} else if (e->type == GDK_LEAVE_NOTIFY) {
 		Kage::timestamp();
 		std::cout << " KageFrame(F " << frameID << " L " << layerID << ") on_event leave" << std::endl;
+		render();
 	} else if (e->type == GDK_BUTTON_RELEASE) {
 		KageFrame::mouseIsDown = false;
-		fm->getFsm()->setCurrentFrame(KageFramesManager::currentFrame);
+		fm->getFsm()->setCurrentFrame(frameID);
+		fm->getFsm()->setCurrentLayer(layerID);
 		grab_focus();
 //		render();
 	} else if (e->type == GDK_BUTTON_PRESS) {
@@ -109,8 +112,8 @@ bool KageFrame::render() {
 	window->invalidate_rect(r, false);
 	
 	return true;
-}	
-	
+}
+
 bool KageFrame::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 	Kage::timestamp();
 	std::cout << " KageFrame(F " << frameID << " L " << layerID << ") on_draw" << std::endl;

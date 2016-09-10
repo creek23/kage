@@ -8,9 +8,6 @@ KageLayerManager::KageLayerManager() {
 		label.set_size_request(100, 20);
 
 	layerCtr = 0;
-	for (int i = 0; i < 5; ++i) {
-//		addLayer();
-	}
 	addLayer();
 }
 
@@ -19,7 +16,7 @@ KageLayerManager::~KageLayerManager() {
 }
 
 void KageLayerManager::addLayer(Glib::ustring p_name) {
-	layerCtr++;
+	++layerCtr;
 	if (p_name == "") {
 		//p_name = "Layer ";// + layerCtr;
 		p_name = Glib::ustring::compose("Layer %1", layerCtr) ;//"is lower than 0x%2.", ustring::format(std::hex, 16));
@@ -36,4 +33,3 @@ void KageLayerManager::addLayer(Glib::ustring p_name) {
 unsigned int KageLayerManager::layerCount() {
 	return layerCtr;
 }
-

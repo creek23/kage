@@ -55,7 +55,6 @@ bool KageFramesManager::extendFrame(unsigned int p_frameID) {
 ///Use KageFramesManager::currentLayer instead of calling this function
 unsigned int KageFramesManager::getCurrentLayer() {
 	//filter and make sure value is valid
-	//NOTE: do NOT call setCurrentLayer to avoid recursive call to Kage::renderFrames()
 	unsigned int l_count = 1;
 	if (framemanager.size() > 0) {
 		l_count = framemanager.size();
@@ -127,14 +126,14 @@ void KageFramesManager::setCurrentFrame(unsigned int p_currentFrame) {
 		}
 		
 		KageFramesManager::currentFrame = p_currentFrame;
-		win->renderFrames();
+		win->forceRenderFrames();
 	}
 }
 
 void KageFramesManager::renderStage() {
 	Kage::timestamp();
 	cout << "KageFramesManager::renderStage <" << endl;
-	win->renderFrames();
+	win->forceRenderFrames();
 	Kage::timestamp();
 	cout << "KageFramesManager::renderStage >" << endl;
 }

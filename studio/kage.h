@@ -39,6 +39,8 @@
 			
 			void addDataToFrame(VectorDataManager v);
 			VectorDataManager getFrameData();
+			void setFrameData(VectorDataManager p_vectorsData);
+			void forceRenderFrames();
 			void renderFrames();
 			void renderFramesBelowCurrentLayer();
 			void renderFramesAboveCurrentLayer();
@@ -68,6 +70,7 @@
 			virtual void onToolButtonsClick(Gtk::ToggleButton *p_sourceButton);
 			virtual void onActionActivate();
 			virtual void AddFrame_onClick();
+			virtual void DuplicateFrame_onClick();
 			virtual void Save_onClick();
 			virtual void ExportKS_onClick();
 			virtual void ExportHTML5_onClick();
@@ -185,6 +188,9 @@
 			
 		public:
 			static void timestamp();
+			
+			void switchToPreviousFrame();
+			void switchToNextFrame();
 	};
 
 #endif //GTKMM_KAGE_H

@@ -22,6 +22,7 @@ KageStage::KageStage(Kage *p_win) {
 	stageHeight = 600;
 	stroke.setThickness(3.0);
 	drawCtr = 0;
+	mouseOnPoint = -1;
 }
 
 KageStage::~KageStage() {
@@ -46,8 +47,10 @@ bool KageStage::on_key_press_event(GdkEventKey *e) {
 			win->addDataToFrame(v);
 			render();
 		}
+	} else if (e->keyval == 46) { //. dot
+		win->switchToNextFrame();
 	} else if (e->keyval == 44) { //, comma
-		//
+		win->switchToPreviousFrame();
 	} else {
 		std::cout << "stage " << e->keyval << "_" << e->string << endl;
 	}
@@ -81,44 +84,67 @@ bool KageStage::on_event(GdkEvent *e) {
 	} else if (e->type == GDK_LEAVE_NOTIFY) {
 		Kage::timestamp();
 		std::cout << " KageStage::on_event leave" << std::endl;
-//		render();
+		render();
 	} else if (e->type == GDK_KEY_PRESS) {
 		on_key_press_event((GdkEventKey*) e);
 	} else if (e->type == GDK_KEY_RELEASE) {
 		on_key_release_event((GdkEventKey*) e);
 	} else if (e->type == GDK_BUTTON_PRESS) {
 		mouseDown = true;
-		if (KageStage::toolMode == MODE_DRAW_RECT) {
-			//
+		if (KageStage::toolMode == MODE_DRAW_RECT
+				|| KageStage::toolMode == MODE_DRAW_OVAL) {
+			draw1.x = e->button.x;
+			draw1.y = e->button.y;
+				draw2.x = e->button.x;
+				draw2.y = e->button.y;
 		} else if (KageStage::toolMode == MODE_DRAW_POLY) {
 			draw1.x = e->button.x;
 			draw1.y = e->button.y;
 		} else {
 			//
 		}
-		if (KageStage::toolMode == MODE_DRAW_RECT) {
-			draw1.x = e->button.x;
-			draw1.y = e->button.y;
-				draw2.x = e->button.x;
-				draw2.y = e->button.y;
-		}
 		Kage::timestamp();
 		std::cout << " KageStage::on_event mouse down " << e->button.x << " " << e->button.y << endl;
 	} else if (e->type == GDK_BUTTON_RELEASE) {
 		mouseDown = false;
 		grab_focus();
-		if (KageStage::toolMode == MODE_DRAW_RECT) {
-			draw1.x = (draw1.x - origin.x);
-			draw1.y = (draw1.y - origin.y);
-				draw2.x = (draw2.x - origin.x);
-				draw2.y = (draw2.y - origin.y);
-		} else if (KageStage::toolMode == MODE_DRAW_POLY) {
-			draw1.x = (draw1.x - origin.x);
-			draw1.y = (draw1.y - origin.y);
-				draw2.x = (draw2.x - origin.x);
-				draw2.y = (draw2.y - origin.y);
-		}
-		if (KageStage::toolMode == MODE_DRAW_RECT) {
+		
+		draw1.x = (draw1.x - origin.x);
+		draw1.y = (draw1.y - origin.y);
+			draw2.x = (draw2.x - origin.x);
+			draw2.y = (draw2.y - origin.y);
+		
+		if (KageStage::toolMode == MODE_ANCHOR) {
+			mouseOnPoint = -1;
+		} else if (KageStage::toolMode == MODE_DRAW_OVAL) {
+/*
++--x--x
+|     |
+x     x
+|     |
+x--x--+
+
+*/
+			PointData p1(                draw1.x, ((draw1.y + draw2.y)/2));
+			PointData p2(                draw1.x,                 draw1.y);
+			PointData p3(((draw1.x + draw2.x)/2),                 draw1.y);
+			PointData p4(                draw2.x,                 draw1.y);
+			PointData p5(                draw2.x, ((draw1.y + draw2.y)/2));
+			PointData p6(                draw2.x,                 draw2.y);
+			PointData p7(((draw1.x + draw2.x)/2),                 draw2.y);
+			PointData p8(                draw1.x,                 draw2.y);
+			VectorDataManager v;
+				v.addFill(KageStage::fillColor.clone());
+				v.addLineStyle(KageStage::stroke.clone());
+				v.addMove(p1);
+				v.addCubic(p2, p3);
+				v.addCubic(p4, p5);
+				v.addCubic(p6, p7);
+				v.addCubic(p8, p1);
+				v.addEndFill();
+			win->addDataToFrame(v);
+			render();
+		} else if (KageStage::toolMode == MODE_DRAW_RECT) {
 			PointData p1(draw1);
 			PointData p2(draw2.x, draw1.y);
 			PointData p3(draw2);
@@ -158,12 +184,15 @@ bool KageStage::on_event(GdkEvent *e) {
 		}
 		Kage::timestamp();
 		std::cout << " KageStage::on_event mouse up " << e->button.x << " " << e->button.y << endl;
-	} else if (e->type == GDK_MOTION_NOTIFY) {
-		if (mouseDown == true) {
-			Kage::timestamp();
-			std::cout << " KageStage::on_event mouse move " << e->button.x << " " << e->button.y << endl;
-		}
-		if (KageStage::toolMode == MODE_DRAW_RECT) {
+	} else if (e->type == GDK_MOTION_NOTIFY) { ///mouse move
+		if (KageStage::toolMode == MODE_ANCHOR) {
+			draw1.x = (e->button.x);
+			draw1.y = (e->button.y);
+			renderAnchors();
+			
+			render();
+		} else if (KageStage::toolMode == MODE_DRAW_OVAL
+				|| KageStage::toolMode == MODE_DRAW_RECT) {
 			if (mouseDown == true) {
 				draw2.x = (e->button.x);
 				draw2.y = (e->button.y);
@@ -205,20 +234,20 @@ bool KageStage::on_event(GdkEvent *e) {
 	return true;
 }
 
-void KageStage::setStageBG(Gdk::Color p_Color) {
-	KageStage::stageBG.setR(p_Color.get_red() / 256);
-	KageStage::stageBG.setG(p_Color.get_green() / 256);
-	KageStage::stageBG.setB(p_Color.get_blue() / 256);
-	std::cout << KageStage::stageBG.getR() << " " << p_Color.get_red() << " " << (p_Color.get_red() / 256) << endl;
+void KageStage::setStageBG(Gdk::Color p_c) {
+	KageStage::stageBG.setR(p_c.get_red() / 256);
+	KageStage::stageBG.setG(p_c.get_green() / 256);
+	KageStage::stageBG.setB(p_c.get_blue() / 256);
+	std::cout << KageStage::stageBG.getR() << " " << p_c.get_red() << " " << (p_c.get_red() / 256) << endl;
 	render();
 }
 Gdk::Color KageStage::getStageBG() {
-	Gdk::Color tColor;
-	tColor.set_red((gushort)KageStage::stageBG.getR() * 256);
-	tColor.set_green((gushort)KageStage::stageBG.getG() * 256);
-	tColor.set_blue((gushort)KageStage::stageBG.getB() * 256);
+	Gdk::Color l_c;
+	l_c.set_red((gushort)KageStage::stageBG.getR() * 256);
+	l_c.set_green((gushort)KageStage::stageBG.getG() * 256);
+	l_c.set_blue((gushort)KageStage::stageBG.getB() * 256);
 	
-	return tColor;
+	return l_c;
 }
 
 void KageStage::setFill(Gdk::Color p_Color) {
@@ -239,19 +268,19 @@ Gdk::Color KageStage::getFill() {
 	return tColor;
 }
 
-void KageStage::setStroke(Gdk::Color p_Color) {
-	KageStage::stroke.setR(p_Color.get_red() / 256);
-	KageStage::stroke.setG(p_Color.get_green() / 256);
-	KageStage::stroke.setB(p_Color.get_blue() / 256);
+void KageStage::setStroke(Gdk::Color p_c) {
+	KageStage::stroke.setR(p_c.get_red() / 256);
+	KageStage::stroke.setG(p_c.get_green() / 256);
+	KageStage::stroke.setB(p_c.get_blue() / 256);
 	render();
 }
 Gdk::Color KageStage::getStroke() {
-	Gdk::Color tColor;
-	tColor.set_red((gushort)KageStage::stroke.getR() * 256);
-	tColor.set_green((gushort)KageStage::stroke.getG() * 256);
-	tColor.set_blue((gushort)KageStage::stroke.getB() * 256);
+	Gdk::Color l_c;
+	l_c.set_red((gushort)KageStage::stroke.getR() * 256);
+	l_c.set_green((gushort)KageStage::stroke.getG() * 256);
+	l_c.set_blue((gushort)KageStage::stroke.getB() * 256);
 	
-	return tColor;
+	return l_c;
 }
 
 void KageStage::render() {
@@ -268,7 +297,7 @@ void KageStage::render() {
 	std::cout << " KageStage::render > " << get_allocation().get_width() << "x" << get_allocation().get_height() << endl;
 	window->invalidate_rect(r, false);
 }	
-	
+
 bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
 	Kage::timestamp();
 	std::cout << " KageStage::on_draw <" << std::endl;
@@ -286,7 +315,9 @@ bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
 		}
 		
 		//draw user-drawn object
-		if (KageStage::toolMode == MODE_DRAW_POLY && drawCtr > 0) {
+		if (KageStage::toolMode == MODE_ANCHOR) {
+			renderAnchors();
+		} else if (KageStage::toolMode == MODE_DRAW_POLY && drawCtr > 0) {
 //			cr->move_to(draw1.x, draw1.y);
 			cr->line_to(draw2.x, draw2.y);
 				cr->set_source_rgba((double)KageStage::fillColor.getR()/255, (double)KageStage::fillColor.getG()/255, (double)KageStage::fillColor.getB()/255, (double)KageStage::fillColor.getA()/255);
@@ -305,6 +336,34 @@ bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
 					cr->set_line_width(stroke.getThickness());
 					cr->set_source_rgba((double)KageStage::stroke.getR()/255, (double)KageStage::stroke.getG()/255, (double)KageStage::stroke.getB()/255, (double)KageStage::stroke.getA()/255);
 					cr->stroke();
+		} else if (KageStage::toolMode == MODE_DRAW_OVAL && mouseDown == true) {
+			cr->move_to(            draw1.x, ((draw1.y + draw2.y)/2));
+			cr->curve_to(
+									draw1.x, ((draw1.y + draw2.y)/2),
+									draw1.x,                 draw1.y,
+					((draw1.x + draw2.x)/2),                 draw1.y
+				);
+			cr->curve_to(
+					((draw1.x + draw2.x)/2),                 draw1.y,
+					                draw2.x,                 draw1.y,
+					                draw2.x, ((draw1.y + draw2.y)/2)
+				);
+			cr->curve_to(
+					                draw2.x, ((draw1.y + draw2.y)/2),
+					                draw2.x,                 draw2.y,
+					((draw1.x + draw2.x)/2),                 draw2.y
+				);
+			cr->curve_to(
+					((draw1.x + draw2.x)/2),                 draw2.y,
+					                draw1.x,                 draw2.y,
+					                draw1.x, ((draw1.y + draw2.y)/2)
+				);
+			cr->close_path();
+				cr->set_source_rgba((double)KageStage::fillColor.getR()/255, (double)KageStage::fillColor.getG()/255, (double)KageStage::fillColor.getB()/255, (double)KageStage::fillColor.getA()/255);
+				cr->fill_preserve();
+					cr->set_line_width(stroke.getThickness());
+					cr->set_source_rgba((double)KageStage::stroke.getR()/255, (double)KageStage::stroke.getG()/255, (double)KageStage::stroke.getB()/255, (double)KageStage::stroke.getA()/255);
+					cr->stroke();
 		}
 		if (mouseDown) {
 			win->renderFramesAboveCurrentLayer();
@@ -316,8 +375,6 @@ bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
 }
 
 void KageStage::clearScreen() {
-	Kage::timestamp();
-	std::cout << " KageStage::clearScreen <" << std::endl;
 	if (!cr) return;
 	if (window) {
 		Gtk::Allocation allocation = get_allocation();
@@ -346,8 +403,6 @@ void KageStage::clearScreen() {
 				cr->set_source_rgb(0.0, 0.0, 0.0);
 				cr->stroke();
 	}
-	Kage::timestamp();
-	std::cout << " KageStage::clearScreen >" << std::endl;
 }
 
 void KageStage::renderFrame() {
@@ -449,11 +504,140 @@ void KageStage::renderFrame() {
 				break;
 			case VectorData::TYPE_IMAGE:
 				//2 '1st is for X/Y, 2nd is for width/height  -- ?!?
+				break;
 			case VectorData::TYPE_INIT:
-				///for review forgot what for.
+				break;
+			default:
 				break;
 		}
 	}
 	Kage::timestamp();
 	std::cout << " KageStage::renderFrame >" << std::endl;
+}
+
+void KageStage::renderAnchors() {
+	vector<VectorData> v = win->getFrameData().getVectorData();
+	bool l_move = false;
+	double l_x;
+	double l_y;
+	unsigned int vsize = v.size();
+	for (unsigned int i = 1; i < vsize; ++i) {
+		switch (v[i].vectorType) {
+			case VectorData::TYPE_FILL:
+			case VectorData::TYPE_ENDFILL:
+			case VectorData::TYPE_STROKE:
+				break;
+			case VectorData::TYPE_MOVE:
+			case VectorData::TYPE_LINE:
+				if (mouseDown == true && mouseOnPoint == i) {
+					l_move = true;
+					v[i].points[0].x = draw1.x - origin.x;
+					v[i].points[0].y = draw1.y - origin.y;
+				}
+				l_x = v[i].points[0].x + origin.x;
+				l_y = v[i].points[0].y + origin.y;
+				
+				if (isMouseOnAnchor(l_x, l_y) == true) {
+					if (mouseDown == true) {
+						l_move = true;
+						mouseOnPoint = i;
+						
+						v[i].points[0].x = draw1.x - origin.x;
+						v[i].points[0].y = draw1.y - origin.y;
+						
+						l_x = v[i].points[0].x + origin.x;
+						l_y = v[i].points[0].y + origin.y;
+					}
+					renderAnchor(l_x, l_y, true);
+				} else {
+					renderAnchor(l_x, l_y, false);
+				}
+				break;
+			case VectorData::TYPE_CURVE_QUADRATIC:
+			case VectorData::TYPE_CURVE_CUBIC:
+				if (mouseDown == true && mouseOnPoint == i) {
+					l_move = true;
+					v[i].points[0].x = draw1.x - origin.x;
+					v[i].points[0].y = draw1.y - origin.y;
+				}
+				l_x = v[i].points[0].x + origin.x;
+				l_y = v[i].points[0].y + origin.y;
+				
+				if (isMouseOnAnchor(l_x, l_y) == true) {
+					if (mouseDown == true) {
+						l_move = true;
+						mouseOnPoint = i;
+						
+						v[i].points[0].x = draw1.x - origin.x;
+						v[i].points[0].y = draw1.y - origin.y;
+						
+						l_x = v[i].points[0].x + origin.x;
+						l_y = v[i].points[0].y + origin.y;
+					}
+					renderAnchor(l_x, l_y, true);
+				} else {
+					renderAnchor(l_x, l_y, false);
+				}
+				
+				if (mouseDown == true && mouseOnPoint == i) {
+					l_move = true;
+					v[i].points[1].x = draw1.x - origin.x;
+					v[i].points[1].y = draw1.y - origin.y;
+				}
+				l_x = v[i].points[1].x + origin.x;
+				l_y = v[i].points[1].y + origin.y;
+				
+				if (isMouseOnAnchor(l_x, l_y) == true) {
+					if (mouseDown == true) {
+						l_move = true;
+						mouseOnPoint = i;
+						
+						v[i].points[1].x = draw1.x - origin.x;
+						v[i].points[1].y = draw1.y - origin.y;
+						
+						l_x = v[i].points[1].x + origin.x;
+						l_y = v[i].points[1].y + origin.y;
+					}
+					renderAnchor(l_x, l_y, true);
+				} else {
+					renderAnchor(l_x, l_y, false);
+				}
+				break;
+			case VectorData::TYPE_TEXT:
+			case VectorData::TYPE_IMAGE:
+			case VectorData::TYPE_INIT:
+			default:
+				break;
+		}
+	}
+	if (l_move == true) {
+		win->setFrameData(v);
+	}
+}
+
+void KageStage::renderAnchor(double p_x, double p_y, bool p_selected) {
+	cr->move_to(p_x-5, p_y);
+		cr->line_to(p_x  , p_y-5);
+		cr->line_to(p_x+5, p_y  );
+		cr->line_to(p_x  , p_y+5);
+	cr->close_path();
+	if (p_selected == true) {
+		cr->set_source_rgba(1.00,0.00,0.00,1.00);
+	} else {
+		cr->set_source_rgba(0.75,0.75,0.75,1.00);
+	}
+		cr->fill_preserve();
+	
+	cr->set_source_rgba(0.0, 0.0, 0.0, 1.0);
+		cr->set_line_width(0.2);
+			cr->set_line_cap(Cairo::LINE_CAP_ROUND);
+				cr->stroke();
+}
+
+bool KageStage::isMouseOnAnchor(double p_x, double p_y) {
+	if (p_x-5 <= draw1.x && p_x+5 >= draw1.x
+			&& p_y-5 <= draw1.y && p_y+5 >= draw1.y) {
+		return true;
+	}
+	return false;
 }

@@ -6,8 +6,7 @@ KageFrameManager::KageFrameManager(KageFramesManager *p_fsm, unsigned int p_laye
 	fsm = p_fsm;
 	layerID = p_layerID;
 	frameCtr = 0;
-	unsigned int i = 0;
-	for (i = 0; i < p_frameCount; ++i) {
+	for (unsigned int i = 0; i < p_frameCount; ++i) {
 		addFrame();
 	}
 }

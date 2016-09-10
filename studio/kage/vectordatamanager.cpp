@@ -31,7 +31,7 @@ void VectorDataManager::push(VectorDataManager p_vectorsData) {
 	vector<VectorData> l_v = p_vectorsData.getVectorData();
 	int isrc = l_v.size();
 	
-	for (int i = 1; i <= isrc-1; i++) {
+	for (int i = 1; i <= isrc-1; ++i) {
 		vectorData.push_back(l_v[i]);
 	}
 }
@@ -52,7 +52,7 @@ void VectorDataManager::init(ColorData p_fill, StrokeColorData p_stroke) {
 	}
 }
 void VectorDataManager::addFill(ColorData p_color) {
-	std::cout << "VectorDataManager::addFill()" << std::endl;
+	std::cout << " VectorDataManager::addFill()" << std::endl;
 	std::cout << p_color.getR() << std::endl;
 	std::cout << p_color.getG() << std::endl;
 	std::cout << p_color.getB() << std::endl;
@@ -65,6 +65,28 @@ void VectorDataManager::addEndFill() {
 		p_stroke.setA(0);
 	add(VectorData::TYPE_ENDFILL, p_fill, p_stroke);
 }
+
+VectorDataManager VectorDataManager::clone() {
+	vector<VectorData> l_vectorData;
+	unsigned int count = vectorData.size();
+		for (unsigned int i = 0; i < count; ++i) {
+			l_vectorData.push_back(vectorData[i].clone());
+		}
+	VectorDataManager l_vectorDataManager(l_vectorData);
+	
+	return l_vectorDataManager;
+}
+/*
+const VectorDataManager& VectorDataManager::operator=( const VectorDataManager& s ) {
+	vector<VectorData> l_vectorData;
+	unsigned int count = vectorData.size();
+		for (unsigned int i = 1; i < count; ++i) {
+			l_vectorData.push_back(vectorData[i-1]);
+		}
+	VectorDataManager l_vectorDataManager(l_vectorData);
+	
+	return l_vectorDataManager;
+}*/
 
 void VectorDataManager::addCubic(PointData p_point1, PointData p_point2) {
 	addCurve(p_point1, p_point2, VectorData::TYPE_CURVE_CUBIC);

@@ -1,0 +1,25 @@
+id ICON "kage.ico"
+1 VERSIONINFO
+FILEVERSION     0,2016,12,6
+PRODUCTVERSION  0,2016,12,6
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    BEGIN
+      VALUE "CompanyName", "Krixware Studios"
+      VALUE "FileDescription", "Kage Animation Tool"
+      VALUE "FileVersion", "0.2016"
+      VALUE "InternalName", "kage_studio"
+      VALUE "LegalCopyright", "Kage Studio"
+      VALUE "OriginalFilename", "kagestudio.exe"
+      VALUE "ProductName", "Kage Studio"
+      VALUE "ProductVersion", "0.2016"
+    END
+  END
+
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1252
+  END
+END

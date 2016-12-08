@@ -3,7 +3,7 @@
 	
 	#include <gtkmm/drawingarea.h>
 	#include <time.h>
-	#include "kage/vectordatamanager.h"
+	#include "../vectordatamanager.h"
 	
 	class KageFrameManager; ///forward declaration
 	

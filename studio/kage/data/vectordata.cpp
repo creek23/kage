@@ -1,6 +1,6 @@
 
 #include "vectordata.h"
-#include "kage.h"
+#include "../../kage.h"
 
 VectorData::VectorData() {
 	count = 0;
@@ -37,9 +37,7 @@ VectorData VectorData::clone() {
 	VectorData l_vectorData(getType());
 	vector<PointData> l_points;
 		for (unsigned int i = 0; i < count; ++i) {
-			//l_points.push_back(points[i].clone());
-			PointData pd = points[i];
-			l_points.push_back(pd);
+			l_points.push_back(points[i].clone());
 		}
 	l_vectorData.setPoints(l_points);
 	l_vectorData.stroke = stroke.clone();

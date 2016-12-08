@@ -1,6 +1,6 @@
 
 #include "framesmanager.h"
-#include "kage.h"
+#include "../../kage.h"
 
 KageFramesManager::KageFramesManager(Kage *p_win) {
 	win = p_win;

@@ -6,7 +6,7 @@
 
 #include "frame.h"
 #include "framesmanager.h"
-#include "kage.h"
+#include "../../kage.h"
 
 KageFrame::KageFrame(KageFrameManager *p_fm, unsigned p_layerID, unsigned int p_frameID) :
 		vectorsData() {

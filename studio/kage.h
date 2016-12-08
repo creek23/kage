@@ -69,13 +69,12 @@
 			virtual void LayerDel_onClick();
 			virtual void onToolButtonsClick(Gtk::ToggleButton *p_sourceButton);
 			virtual void onActionActivate();
+			virtual void Delete_onClick();
 			virtual void AddFrame_onClick();
 			virtual void DuplicateFrame_onClick();
 			virtual void Save_onClick();
 			virtual void ExportKS_onClick();
 			virtual void ExportHTML5_onClick();
-			virtual void on_radio_action_color_activated(color chosen_color);
-			virtual void on_radio_action_shape_activated(shape chosen_shape);
 			
 			//Member widgets:
 			KageLayerManager m_KageLayerManager;
@@ -185,6 +184,11 @@
 			bool runExternal(string p_cmd, string p_param);
 			
 			void Play_onClick();
+			void ToolSelect_onClick();
+			void ToolNode_onClick();
+			void ToolOval_onClick();
+			void ToolRectangle_onClick();
+			
 			
 		public:
 			static void timestamp();

@@ -12,7 +12,7 @@
 			virtual ~PointData();
 			
 			PointData clone();
-			const PointData& operator=( const PointData& p_origin );
+			//const PointData& operator=( const PointData& p_origin );
 			
 			double x;
 			double y;

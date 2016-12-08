@@ -18,7 +18,7 @@
 			enum ToolMode {
 				MODE_NONE,
 				MODE_SELECT,
-				MODE_ANCHOR,
+				MODE_NODE,
 				MODE_MOVE_STAGE,
 				MODE_DRAW_RECT,
 				MODE_DRAW_TEXT,
@@ -48,7 +48,16 @@
 			unsigned int stageHeight; //direct use for get only
 			void clearScreen();
 			void renderFrame();
-			void renderAnchors();
+			void initNodeTool();
+			void handleNodes();
+			void handleNodesMouseUp();
+			bool handleNodesMouseUpHelper(double p_x, double p_y, unsigned int p_index, vector<VectorData> p_v);
+			void handleDrawOvalMouseUp();
+			void handleDrawRectMouseUp();
+			void handleDrawPolyMouseUp();
+			void handlePoly();
+			void handleRect();
+			void handleOval();
 			Glib::RefPtr<Gdk::Pixbuf> _bg;
 			Cairo::RefPtr<Cairo::Surface> _bgcr;
 		protected:
@@ -57,6 +66,8 @@
 			GdkPoint origin;
 			GdkPoint draw1;
 			GdkPoint draw2;
+			double polyX, polyY;
+			double polyXprev, polyYprev;
 			Glib::RefPtr<Gdk::Window> window;
 			Cairo::RefPtr<Cairo::Context> cr;
 			bool gotContext;
@@ -72,8 +83,13 @@
 			bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
 			
 			bool on_timeout();
-			unsigned int mouseOnPoint;
-			void renderAnchor(double p_x, double p_y, bool p_selected);
-			bool isMouseOnAnchor(double p_x, double p_y);
+			unsigned int mouseOnNode;
+			unsigned int mouseOnNodeIndex;
+			unsigned int selectedNode;
+			void renderNode(double p_x, double p_y, unsigned int p_state = 5);
+			void renderNodeControl(double p_x, double p_y, bool p_selected);
+			bool isMouseOnNode(double p_x, double p_y, unsigned int p_buffer = 5);
+			
+			double _nodeToMouseDistance;
 	};
 #endif // GTKMM_KAGE_STAGE_H

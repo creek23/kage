@@ -1,6 +1,6 @@
 
 #include "point.h"
-#include "kage.h"
+#include "../../kage.h"
 #include <iostream>
 
 PointData::PointData() {
@@ -23,10 +23,6 @@ PointData::PointData(double p_x, double p_y) {
 
 PointData PointData::clone() {
 	PointData l_p(x, y);
-	return l_p;
-}
-const PointData& PointData::operator=(const PointData& p_origin) {
-	PointData l_p(p_origin.x, p_origin.y);
 	return l_p;
 }
 

@@ -1,28 +1,17 @@
 #!/bin/sh
-rm *_gtkmm3.o
-rm kage_gtkmm3.exe
-g++ -std=gnu++11 -fmax-errors=3 -Wall -c "./kage/data/point_gtkmm3.cpp"  -I. $(pkg-config gtkmm-3.0 --cflags --libs | sed 's/ -I/ -isystem /g')
-g++ -std=gnu++11 -fmax-errors=3 -Wall -c "./kage/data/color_gtkmm3.cpp"  -I. $(pkg-config gtkmm-3.0 --cflags --libs | sed 's/ -I/ -isystem /g')
-g++ -std=gnu++11 -fmax-errors=3 -Wall -c "./kage/data/strokecolor_gtkmm3.cpp"  -I. $(pkg-config gtkmm-3.0 --cflags --libs | sed 's/ -I/ -isystem /g')
-g++ -std=gnu++11 -fmax-errors=3 -Wall -c "./kage/data/vectordata_gtkmm3.cpp"  -I. $(pkg-config gtkmm-3.0 --cflags --libs | sed 's/ -I/ -isystem /g')
-g++ -std=gnu++11 -fmax-errors=3 -Wall -c "./kage/timeline/frame_gtkmm3.cpp"  -I. $(pkg-config gtkmm-3.0 --cflags --libs | sed 's/ -I/ -isystem /g')
-g++ -std=gnu++11 -fmax-errors=3 -Wall -c "./kage/timeline/framemanager_gtkmm3.cpp"  -I. $(pkg-config gtkmm-3.0 --cflags --libs | sed 's/ -I/ -isystem /g')
-g++ -std=gnu++11 -fmax-errors=3 -Wall -c "./kage/timeline/framesmanager_gtkmm3.cpp"  -I. $(pkg-config gtkmm-3.0 --cflags --libs | sed 's/ -I/ -isystem /g')
-g++ -std=gnu++11 -fmax-errors=3 -Wall -c "./kage/timeline/layermanager_gtkmm3.cpp"  -I. $(pkg-config gtkmm-3.0 --cflags --libs | sed 's/ -I/ -isystem /g')
-g++ -std=gnu++11 -fmax-errors=3 -Wall -c "./kage/vectordatamanager_gtkmm3.cpp"  -I. $(pkg-config gtkmm-3.0 --cflags --libs | sed 's/ -I/ -isystem /g')
-g++ -std=gnu++11 -fmax-errors=3 -Wall -c "./kage/stage_gtkmm3.cpp"  -I. $(pkg-config gtkmm-3.0 --cflags --libs | sed 's/ -I/ -isystem /g')
-g++ -std=gnu++11 -fmax-errors=3 -Wall -c "kage_gtkmm3.cpp"  -I. $(pkg-config gtkmm-3.0 --cflags --libs | sed 's/ -I/ -isystem /g')
-g++ -std=gnu++11 -fmax-errors=3 -Wall -c "main_gtkmm3.cpp"  -I. $(pkg-config gtkmm-3.0 --cflags --libs | sed 's/ -I/ -isystem /g')
-g++ -Wall "point_gtkmm3.o" \
-"./color_gtkmm3.o" \
-"./strokecolor_gtkmm3.o" \
-"./vectordata_gtkmm3.o" \
-"./vectordatamanager_gtkmm3.o" \
-"./frame_gtkmm3.o" \
-"./framemanager_gtkmm3.o" \
-"./framesmanager_gtkmm3.o" \
-"./layermanager_gtkmm3.o" \
-"./stage_gtkmm3.o" \
-"./kage_gtkmm3.o" \
-"./main_gtkmm3.o" \
--o "kage_gtkmm3.exe" $(pkg-config gtkmm-3.0 --cflags --libs | sed 's/ -I/ -isystem /g')
+rm *.o
+rm kage.exe
+g++ -c -I./ `pkg-config gtkmm-3.0 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -fmax-errors=5 -Wfatal-errors kage/data/point.cpp -o kage/data/point.o
+g++ -c -I./ `pkg-config gtkmm-3.0 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -fmax-errors=5 -Wfatal-errors kage/data/color.cpp -o kage/data/color.o
+g++ -c -I./ `pkg-config gtkmm-3.0 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -fmax-errors=5 -Wfatal-errors kage/data/strokecolor.cpp -o kage/data/strokecolor.o
+g++ -c -I./ `pkg-config gtkmm-3.0 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -fmax-errors=5 -Wfatal-errors kage/data/vectordata.cpp -o kage/data/vectordata.o
+g++ -c -I./ `pkg-config gtkmm-3.0 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -fmax-errors=5 -Wfatal-errors kage/timeline/frame.cpp -o kage/timeline/frame.o
+g++ -c -I./ `pkg-config gtkmm-3.0 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -fmax-errors=5 -Wfatal-errors kage/timeline/framemanager.cpp -o kage/timeline/framemanager.o
+g++ -c -I./ `pkg-config gtkmm-3.0 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -fmax-errors=5 -Wfatal-errors kage/timeline/framesmanager.cpp -o kage/timeline/framesmanager.o
+g++ -c -I./ `pkg-config gtkmm-3.0 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -fmax-errors=5 -Wfatal-errors kage/timeline/layermanager.cpp -o kage/timeline/layermanager.o
+g++ -c -I./ `pkg-config gtkmm-3.0 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -fmax-errors=5 -Wfatal-errors kage/stage.cpp -o kage/stage.o
+g++ -c -I./ `pkg-config gtkmm-3.0 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -fmax-errors=5 -Wfatal-errors kage/vectordatamanager.cpp -o kage/vectordatamanager.o
+g++ -c -I./ `pkg-config gtkmm-3.0 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -fmax-errors=5 -Wfatal-errors kage.cpp -o kage.o
+g++ -c -I./ `pkg-config gtkmm-3.0 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -fmax-errors=5 -Wfatal-errors main.cpp -o main.o
+windres kage.rc -O coff -o kage.res
+g++ ./kage/data/point.o ./kage/data/color.o ./kage/data/strokecolor.o ./kage/data/vectordata.o ./kage/timeline/frame.o ./kage/timeline/framemanager.o ./kage/timeline/framesmanager.o ./kage/timeline/layermanager.o ./kage/stage.o ./kage/vectordatamanager.o kage_gtkmm3.o main.o kage.res -o kage `pkg-config gtkmm-3.0 --libs | sed 's/ -I/ -isystem /g'`

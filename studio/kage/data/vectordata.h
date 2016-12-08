@@ -37,6 +37,8 @@
 			
 			type vectorType;
 			vector<PointData> points;
+			
+			VectorData clone();
 		protected:
 			
 			long lImg;  //index reference to array of typeImage

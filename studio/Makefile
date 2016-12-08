@@ -1,5 +1,5 @@
 # Makefile for KageStudio
-BIN = kage_gtkmm3
+BIN = kage
 CXX = g++
 CXXFLAGS = -c -I./ `pkg-config gtkmm-3.0 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -fmax-errors=5 -Wfatal-errors
 CXXLINKS = `pkg-config gtkmm-3.0 --libs | sed 's/ -I/ -isystem /g'`
@@ -8,18 +8,18 @@ RESFILE = kage.res
 RCFILE = kage.rc
 
 SOURCES = \
-	./kage/data/point_gtkmm3.cpp \
-	./kage/data/color_gtkmm3.cpp \
-	./kage/data/strokecolor_gtkmm3.cpp \
-	./kage/data/vectordata_gtkmm3.cpp \
-	./kage/timeline/frame_gtkmm3.cpp \
-	./kage/timeline/framemanager_gtkmm3.cpp \
-	./kage/timeline/framesmanager_gtkmm3.cpp \
-	./kage/timeline/layermanager_gtkmm3.cpp \
-	./kage/stage_gtkmm3.cpp \
-	./kage/vectordatamanager_gtkmm3.cpp \
-	kage_gtkmm3.cpp \
-	main_gtkmm3.cpp
+	./kage/data/point.cpp \
+	./kage/data/color.cpp \
+	./kage/data/strokecolor.cpp \
+	./kage/data/vectordata.cpp \
+	./kage/timeline/frame.cpp \
+	./kage/timeline/framemanager.cpp \
+	./kage/timeline/framesmanager.cpp \
+	./kage/timeline/layermanager.cpp \
+	./kage/stage.cpp \
+	./kage/vectordatamanager.cpp \
+	kage.cpp \
+	main.cpp
 
 OBJECTS = $(SOURCES:.cpp=.o)
 

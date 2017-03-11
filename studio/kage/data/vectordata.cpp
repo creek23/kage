@@ -20,7 +20,7 @@ void VectorData::setType(type p_type) {
 	}
 }
 
-VectorData::type VectorData::getType() const {
+VectorData::type VectorData::getType() {
 	return vectorType;
 }
 

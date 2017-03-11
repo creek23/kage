@@ -1,6 +1,6 @@
 
 #include "vectordatamanager.h"
-#include "kage.h"
+#include "../kage.h"
 #include "stage.h"
 
 VectorDataManager::VectorDataManager() {
@@ -31,7 +31,7 @@ void VectorDataManager::push(VectorDataManager p_vectorsData) {
 	vector<VectorData> l_v = p_vectorsData.getVectorData();
 	int isrc = l_v.size();
 	
-	for (int i = 1; i <= isrc-1; ++i) {
+	for (int i = 0; i < isrc; ++i) {
 		vectorData.push_back(l_v[i]);
 	}
 }
@@ -88,19 +88,54 @@ const VectorDataManager& VectorDataManager::operator=( const VectorDataManager& 
 	return l_vectorDataManager;
 }*/
 
-void VectorDataManager::addCubic(PointData p_point1, PointData p_point2) {
-	addCurve(p_point1, p_point2, VectorData::TYPE_CURVE_CUBIC);
+void VectorDataManager::addCubic(PointData p_point1, PointData p_point2, PointData p_point3) {
+	addCurve(p_point1, p_point2, p_point3, VectorData::TYPE_CURVE_CUBIC);
 }
 
-void VectorDataManager::addQuadratic(PointData p_point1, PointData p_point2) {
-	addCurve(p_point1, p_point2, VectorData::TYPE_CURVE_QUADRATIC);
+void VectorDataManager::addQuadratic(PointData p_point1, PointData p_point2, PointData p_point3) {
+	addCurve(p_point1, p_point2, p_point3, VectorData::TYPE_CURVE_QUADRATIC);
+}
+
+void VectorDataManager::addLinePoly(PointData p_point, double p_x, double p_y) {
+	VectorData l_vectorData = vectorData[vectorData.size()-1];
+	add(VectorData::TYPE_CURVE_CUBIC, l_vectorData.fillColor, l_vectorData.stroke);
+	
+	vector<PointData> ps;
+		ps.push_back(
+			PointData(
+				(p_x + p_point.x)/2,
+				(p_y + p_point.y)/2
+			)
+				);
+		ps.push_back(
+			PointData(
+				(p_x + p_point.x)/2,
+				(p_y + p_point.y)/2
+			)
+				);
+		ps.push_back(p_point);
+	vectorData[vectorData.size()-1].setPoints(ps);
 }
 
 void VectorDataManager::addLine(PointData p_point) {
+	vector<PointData> p_prevPoints = vectorData[vectorData.size()-1].getPoints();
+	
 	VectorData l_vectorData = vectorData[vectorData.size()-1];
-	add(VectorData::TYPE_LINE, l_vectorData.fillColor, l_vectorData.stroke);
+	add(VectorData::TYPE_CURVE_CUBIC, l_vectorData.fillColor, l_vectorData.stroke);
 	
 	vector<PointData> ps;
+		ps.push_back(
+			PointData(
+				(p_prevPoints[p_prevPoints.size()-1].x + p_point.x)/2,
+				(p_prevPoints[p_prevPoints.size()-1].y + p_point.y)/2
+			)
+				);
+		ps.push_back(
+			PointData(
+				(p_prevPoints[p_prevPoints.size()-1].x + p_point.x)/2,
+				(p_prevPoints[p_prevPoints.size()-1].y + p_point.y)/2
+			)
+				);
 		ps.push_back(p_point);
 	vectorData[vectorData.size()-1].setPoints(ps);
 }
@@ -118,12 +153,13 @@ void VectorDataManager::addLineStyle(StrokeColorData p_stroke) {
 	add(VectorData::TYPE_STROKE, vectorData[vectorData.size() - 1].fillColor, p_stroke);
 }
 
-void VectorDataManager::addCurve(PointData p_point1, PointData p_point2, VectorData::type p_curveType) {
+void VectorDataManager::addCurve(PointData p_point1, PointData p_point2, PointData p_point3, VectorData::type p_curveType) {
 	VectorData l_vectorData = vectorData[vectorData.size()-1];
 	add(p_curveType, l_vectorData.fillColor, l_vectorData.stroke);
 	
 	vector<PointData> ps;
 		ps.push_back(p_point1);
 		ps.push_back(p_point2);
+		ps.push_back(p_point3);
 	vectorData[vectorData.size()-1].setPoints(ps);
 }

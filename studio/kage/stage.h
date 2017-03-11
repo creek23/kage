@@ -4,6 +4,7 @@
 	#include <gtkmm/drawingarea.h>
 	#include <iostream>
 	
+	#include "data/anchor.h"
 	#include "data/color.h"
 	#include "data/strokecolor.h"
 	#include "data/vectordata.h"
@@ -12,6 +13,11 @@
 	
 	class KageStage : public Gtk::DrawingArea {
 		public:
+			static Glib::RefPtr<Gdk::Pixbuf> imageSHAPE_000;
+			static Glib::RefPtr<Gdk::Pixbuf> imageSHAPE_045;
+			static Glib::RefPtr<Gdk::Pixbuf> imageSHAPE_090;
+			static Glib::RefPtr<Gdk::Pixbuf> imageSHAPE_135;
+			
 			KageStage(Kage *p_win);
 			virtual ~KageStage();
 		
@@ -49,9 +55,17 @@
 			void clearScreen();
 			void renderFrame();
 			void initNodeTool();
+			void handleShapes();
+			void handleShapes_scaleNorth();
+			void handleShapes_scaleEast();
+			void handleShapes_scaleWest();
+			void handleShapes_scaleSouth();
+			void handleShapes_moveShape(double p_diffX, double p_diffY);
+			void handleShapes_updateAnchors(double p_x, double p_y);
+			void handleShapesMouseUp();
 			void handleNodes();
 			void handleNodesMouseUp();
-			bool handleNodesMouseUpHelper(double p_x, double p_y, unsigned int p_index, vector<VectorData> p_v);
+			bool handleNodes_getNearestShape(double p_x, double p_y, unsigned int p_index, vector<VectorData> p_v);
 			void handleDrawOvalMouseUp();
 			void handleDrawRectMouseUp();
 			void handleDrawPolyMouseUp();
@@ -60,6 +74,8 @@
 			void handleOval();
 			Glib::RefPtr<Gdk::Pixbuf> _bg;
 			Cairo::RefPtr<Cairo::Surface> _bgcr;
+			
+			void updateShapeColor();
 		protected:
 			ToolMode prevTool; //used by Hand-tool shortcut [spacebar]
 			Kage *win;
@@ -86,10 +102,18 @@
 			unsigned int mouseOnNode;
 			unsigned int mouseOnNodeIndex;
 			unsigned int selectedNode;
+			unsigned int mouseOnShape;
+			unsigned int selectedShape;
+			AnchorData::type mouseOnAnchor;
 			void renderNode(double p_x, double p_y, unsigned int p_state = 5);
 			void renderNodeControl(double p_x, double p_y, bool p_selected);
 			bool isMouseOnNode(double p_x, double p_y, unsigned int p_buffer = 5);
 			
+			double getSelectedShapeViaNode(unsigned int p_index, vector<VectorData> p_v);
 			double _nodeToMouseDistance;
+			
+			AnchorData anchor_upperLeft;
+			AnchorData anchor_center;
+			AnchorData anchor_lowerRight;
 	};
 #endif // GTKMM_KAGE_STAGE_H

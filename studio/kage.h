@@ -110,28 +110,25 @@
 				Gtk::Label m_LabelStageFPS;
 				
 				Gtk::Entry m_EntryStageWid;
-					void EntryStageHgt_onEnter();
 				Gtk::Entry m_EntryStageHgt;
-					void EntryStageWid_onEnter();
+					void EntryStageArea_onEnter();
 				Gtk::ColorButton m_ColorButtonStage;
 					void ColorButtonStage_onClick();
 				Gtk::Entry m_EntryStageFPS;
 					void EntryStageFPS_onEnter();
-			//Fill Property items
-				Gtk::HBox m_PropFill;
-				Gtk::VBox m_PropFillV1;
-				Gtk::VBox m_PropFillV2;
+			//Fill  & Stroke Property items
+				Gtk::HBox m_PropFillStroke;
+				Gtk::VBox m_PropFillStrokeV1;
+				Gtk::VBox m_PropFillStrokeV2;
 				Gtk::Label m_LabelFill;
 				Gtk::ColorButton m_ColorButtonFill;
-			//Stroke Property items
-				Gtk::HBox m_PropStroke;
-				Gtk::VBox m_PropStrokeV1;
-				Gtk::VBox m_PropStrokeV2;
+					void ColorButtonFill_onClick();
 				Gtk::Label m_LabelStroke;
 				Gtk::Label m_LabelStrokeThickness;
 				Gtk::Entry m_EntryStrokeThickness;
 					void EntryStrokeThickness_onEnter();
 				Gtk::ColorButton m_ColorButtonStroke;
+					void ColorButtonStroke_onClick();
 			
 			Gtk::Label m_LblHolder_Toolbar;
 			KageStage m_KageStage;
@@ -171,8 +168,6 @@
 			bool fileWrite(string p_path, string p_msg, std::ofstream &p_file, bool &p_flag);
 			
 			Gdk::Color m_Color;
-			void ChooseFill_onClick();
-			void ChooseStroke_onClick();
 			string strToUpper(string p_str);
 			string strToLower(string p_str);
 			string intToString(int p_src);
@@ -186,15 +181,19 @@
 			void Play_onClick();
 			void ToolSelect_onClick();
 			void ToolNode_onClick();
+			void ToolPoly_onClick();
 			void ToolOval_onClick();
 			void ToolRectangle_onClick();
 			
+			void toolsButtonToggle(string p_toolTip);
 			
 		public:
 			static void timestamp();
 			
 			void switchToPreviousFrame();
 			void switchToNextFrame();
+			
+			void updateColors();
 	};
 
 #endif //GTKMM_KAGE_H

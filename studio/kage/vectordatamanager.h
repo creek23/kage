@@ -28,9 +28,10 @@
 			void clear();
 			void addFill(ColorData p_color);
 			void addEndFill();
-			void addCubic(PointData p_point1, PointData p_point2);
-			void addQuadratic(PointData p_point1, PointData p_point2);
+			void addCubic(PointData p_point1, PointData p_point2, PointData p_point3);
+			void addQuadratic(PointData p_point1, PointData p_point2, PointData p_point3);
 			void addLine(PointData p_point);
+			void addLinePoly(PointData p_point, double p_x, double p_y);
 			void addMove(PointData p_point);
 			void addLineStyle(StrokeColorData p_stroke);
 			
@@ -41,6 +42,6 @@
 			
 			vector<VectorData> vectorData;
 			
-			void addCurve(PointData p_point1, PointData p_point2, VectorData::type p_curveType);
+			void addCurve(PointData p_point1, PointData p_point2, PointData p_point3, VectorData::type p_curveType);
 	};
 #endif //GTKMM_KAGE_MANAGER_DATA_VECTOR_Hx

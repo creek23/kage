@@ -39,3 +39,9 @@ void StrokeColorData::setThickness(double p_thickness) {
 double StrokeColorData::getThickness() {
 	return thickness;
 }
+
+std::string StrokeColorData::toString() const {
+	std::ostringstream l_ostringstream;
+		l_ostringstream << "(" << R << ", " << G << ", " << B << ", " << A << ", " << thickness << ")";
+	return l_ostringstream.str();
+}

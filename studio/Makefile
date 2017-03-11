@@ -8,6 +8,7 @@ RESFILE = kage.res
 RCFILE = kage.rc
 
 SOURCES = \
+	./kage/data/anchor.cpp \
 	./kage/data/point.cpp \
 	./kage/data/color.cpp \
 	./kage/data/strokecolor.cpp \

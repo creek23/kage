@@ -10,14 +10,14 @@ PointData::PointData() {
 }
 
 PointData::PointData(GdkPoint p) {
-	x = (double) p.x;
-	y = (double) p.y;
+	x = (double) (((double)((int)(p.x*100)))/100);
+	y = (double) (((double)((int)(p.y*100)))/100);
 	debug_id = PointData::debug_pts++;
 }
 
 PointData::PointData(double p_x, double p_y) {
-	x = p_x;
-	y = p_y;
+	x = (double) (((double)((int)(p_x*100)))/100);
+	y = (double) (((double)((int)(p_y*100)))/100);
 	debug_id = PointData::debug_pts++;
 }
 

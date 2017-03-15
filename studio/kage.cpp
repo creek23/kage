@@ -39,7 +39,9 @@ Kage::Kage() : m_KageLayerManager(),
 			   m_LabelStageHgt("Height"),
 			   m_LabelStageBG("Background"),
 			   m_LabelFill("Fill"),
+			   m_LabelFillAlpha("Fill Alpha"),
 			   m_LabelStroke("Stroke"),
+			   m_LabelStrokeAlpha("Stroke Alpha"),
 			   m_LabelStrokeThickness("Thickness"),
 			   m_LblHolder_Toolbar("Toolbar"),
 			   m_KageStage(this) {
@@ -48,7 +50,6 @@ Kage::Kage() : m_KageLayerManager(),
 	set_title("Kage Studio");
 	set_icon_from_file("shared/icons/default.png"); //TODO: change this place-holder
 	set_border_width(0);
-	set_default_size(960,720);
 	
 	//workaround for known bug about resizing/maximizing main window with gtk3.22-9
 	set_default_size(1920,1080);
@@ -62,8 +63,6 @@ Kage::Kage() : m_KageLayerManager(),
 	m_refActionGroup->add( Gtk::Action::create("FileMenu", "_File") ); 
 	m_refActionGroup->add( Gtk::Action::create("EditMenu", "_Edit") );
 	m_refActionGroup->add( Gtk::Action::create("TimelineMenu", "_Timeline") );
-/*	m_refActionGroup->add( Gtk::Action::create("ColorMenu", "_Color") );
-	m_refActionGroup->add( Gtk::Action::create("ShapeMenu", "_Shape") );*/
 	m_refActionGroup->add( Gtk::Action::create("ToolsMenu", "T_ools") );
 	m_refActionGroup->add( Gtk::Action::create("HelpMenu", "_Help") );
 	m_refActionGroup->add(
@@ -109,38 +108,6 @@ Kage::Kage() : m_KageLayerManager(),
 		//sigc::mem_fun(*this, &Kage::onActionActivate)
 	//);
 	
-	////Add Radio Actions:
-	//Gtk::RadioAction::Group group_colors;
-	//m_refActionGroup->add(
-		//Gtk::RadioAction::create(group_colors, "Red", "_Red", "Blood"),
-		//Gtk::AccelKey("<control>R"),
-		//sigc::bind<-1>( sigc::mem_fun(*this, &Kage::on_radio_action_color_activated), COLOR_RED )
-	//);
-	//m_refActionGroup->add(
-		//Gtk::RadioAction::create(group_colors, "Green", "_Green", "Grass"),
-		//Gtk::AccelKey("<control>G"),
-		//sigc::bind<-1>( sigc::mem_fun(*this, &Kage::on_radio_action_color_activated), COLOR_GREEN )
-	//);
-	//m_refActionGroup->add( Gtk::RadioAction::create(group_colors, "Blue", "_Blue", "Sky"),
-	//Gtk::AccelKey("<control>B"),
-	//sigc::bind<-1>( sigc::mem_fun(*this, &Kage::on_radio_action_color_activated), COLOR_BLUE ) );
-	
-	//Gtk::RadioAction::Group group_shapes;
-	//m_refActionGroup->add(
-		//Gtk::RadioAction::create(group_shapes, "Square", "_Square", "Square"),
-		//Gtk::AccelKey("<control>S"),
-		//sigc::bind<-1>( sigc::mem_fun(*this, &Kage::on_radio_action_shape_activated), SHAPE_SQUARE )
-	//);
-	//m_refActionGroup->add(
-		//Gtk::RadioAction::create(group_shapes, "Rectangle", "_Rectangle", "Rectangle"),
-		//Gtk::AccelKey("<control>R"),
-		//sigc::bind<-1>( sigc::mem_fun(*this, &Kage::on_radio_action_shape_activated), SHAPE_RECTANGLE )
-	//);
-	//m_refActionGroup->add(
-		//Gtk::RadioAction::create(group_shapes, "Oval", "_Oval", "Egg"),
-		//Gtk::AccelKey("<control>O"),
-		//sigc::bind<-1>( sigc::mem_fun(*this, &Kage::on_radio_action_shape_activated), SHAPE_OVAL )
-	//);
 	m_refActionGroup->add(
 		Gtk::Action::create("Play", "Play", "Play Animation"),
 		Gtk::AccelKey("F9"),
@@ -183,12 +150,12 @@ Kage::Kage() : m_KageLayerManager(),
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("ToolSelect", "_Select", "Select Tool"),
-//		Gtk::AccelKey("?"),
+		Gtk::AccelKey("V"),
 		sigc::mem_fun(*this, &Kage::ToolSelect_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("ToolNode", "_Node", "Node Tool"),
-//		Gtk::AccelKey("?"),
+		Gtk::AccelKey("A"),
 		sigc::mem_fun(*this, &Kage::ToolNode_onClick)
 	);
 	m_refActionGroup->add(
@@ -206,6 +173,20 @@ Kage::Kage() : m_KageLayerManager(),
 		Gtk::AccelKey("R"),
 		sigc::mem_fun(*this, &Kage::ToolRectangle_onClick)
 	);
+	m_refActionGroup->add(
+		Gtk::Action::create("ToolStroke", "_Stroke", "Stroke Tool"),
+		Gtk::AccelKey("K"),
+		sigc::mem_fun(*this, &Kage::ToolStroke_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("ToolFill", "_Fill", "Fill Tool"),
+		Gtk::AccelKey("G"),
+		sigc::mem_fun(*this, &Kage::ToolFill_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("ToolEyedrop", "_Eyedrop", "Eyedrop Tool"),
+		Gtk::AccelKey("I"),
+		sigc::mem_fun(*this, &Kage::ToolEyedrop_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("HelpTopic", "_Topic", "Topic"),
@@ -247,17 +228,6 @@ Kage::Kage() : m_KageLayerManager(),
 		"		</menu>"
 		"		<menu action='EditMenu'>"
 		"			<menuitem action='Delete'/>"
-/*		"			<menu action='ColorMenu'>"
-		"				<menuitem action='Red'/>"
-		"				<menuitem action='Green'/>"
-		"				<menuitem action='Blue'/>"
-		"			</menu>"
-		"			<menu action='ShapeMenu'>"
-		"				<menuitem action='Square'/>"
-		"				<menuitem action='Rectangle'/>"
-		"				<menuitem action='Oval'/>"
-		"			</menu>"
-		"			<menuitem action='Bold'/>"*/
 		"		</menu>"
 		"		<menu action='TimelineMenu'>"
 		"			<menuitem action='Play'/>"
@@ -277,6 +247,9 @@ Kage::Kage() : m_KageLayerManager(),
 		"			<menuitem action='ToolPoly'/>"
 		"			<menuitem action='ToolOval'/>"
 		"			<menuitem action='ToolRectangle'/>"
+		"			<menuitem action='ToolStroke'/>"
+		"			<menuitem action='ToolFill'/>"
+		"			<menuitem action='ToolEyedrop'/>"
 		"		</menu>"
 		"		<menu action='HelpMenu'>"
 		"			<menuitem action='HelpTopic'/>"
@@ -319,8 +292,6 @@ Kage::Kage() : m_KageLayerManager(),
 		addToolButton("Eraser");
 		m_VBoxToolbar_Holder.pack_start(m_Separator_Toolbar4, Gtk::PACK_SHRINK);
 		addToolButton("Zoom"); //gtk-zoom-in
-		currentTool = toggleButtons[0];
-		currentTool->set_active(true);
 		
 	m_HBoxToolbar.pack_start(m_VPane_Timeline, Gtk::PACK_EXPAND_WIDGET);
 		m_VPane_Timeline.add1(m_Timeline_HBox);
@@ -410,7 +381,9 @@ Kage::Kage() : m_KageLayerManager(),
 					m_PropFillStrokeV1.set_border_width(4);
 					m_PropFillStrokeV1.set_spacing(4);
 					m_PropFillStrokeV1.pack_start(m_LabelFill);
+					m_PropFillStrokeV1.pack_start(m_LabelFillAlpha);
 					m_PropFillStrokeV1.pack_start(m_LabelStroke);
+					m_PropFillStrokeV1.pack_start(m_LabelStrokeAlpha);
 					m_PropFillStrokeV1.pack_start(m_LabelStrokeThickness);
 				m_PropFillStroke.pack_start(m_PropFillStrokeV2);;
 					m_PropFillStrokeV2.set_border_width(4);
@@ -421,23 +394,39 @@ Kage::Kage() : m_KageLayerManager(),
 						m_ColorButtonFill.set_title("Choose Fill Color");
 							m_ColorButtonFill.set_color(m_KageStage.getStageBG());
 						m_ColorButtonFill.signal_color_set().connect(sigc::mem_fun(* this, &Kage::ColorButtonFill_onClick) );
+					m_PropFillStrokeV2.pack_start(m_EntryFillAlpha, Gtk::PACK_SHRINK);
+						m_EntryFillAlpha.set_size_request(32, 24);
+						m_EntryFillAlpha.set_max_length(3);
+						m_EntryFillAlpha.set_text(intToString((int)KageStage::fillColor.getA()));
+						m_EntryFillAlpha.signal_activate().connect(
+							sigc::mem_fun(*this, &Kage::EntryFillAlpha_onEnter));
 					m_PropFillStrokeV2.pack_start(m_ColorButtonStroke);
 						m_ColorButtonStroke.set_size_request(32, 32);
 						m_ColorButtonStroke.set_use_alpha(true);
 						m_ColorButtonStroke.set_title("Choose Stroke Color");
 							m_ColorButtonStroke.set_color(m_KageStage.getStageBG());
 						m_ColorButtonStroke.signal_color_set().connect(sigc::mem_fun(* this, &Kage::ColorButtonStroke_onClick) );
+					m_PropFillStrokeV2.pack_start(m_EntryStrokeAlpha, Gtk::PACK_SHRINK);
+						m_EntryStrokeAlpha.set_size_request(32, 24);
+						m_EntryStrokeAlpha.set_max_length(3);
+						m_EntryStrokeAlpha.set_text(intToString((int)KageStage::stroke.getA()));
+						m_EntryStrokeAlpha.signal_activate().connect(
+							sigc::mem_fun(*this, &Kage::EntryStrokeAlpha_onEnter));
 					m_PropFillStrokeV2.pack_start(m_EntryStrokeThickness, Gtk::PACK_SHRINK);
-						m_EntryStrokeThickness.set_size_request(50, 24);
+						m_EntryStrokeThickness.set_size_request(32, 24);
 						m_EntryStrokeThickness.set_max_length(2);
 						m_EntryStrokeThickness.set_text(intToString((int)KageStage::stroke.getThickness()));
 						m_EntryStrokeThickness.signal_activate().connect(
-							sigc::mem_fun(*this, &Kage::EntryStrokeThickness_onEnter) );
+							sigc::mem_fun(*this, &Kage::EntryStrokeThickness_onEnter));
 	
 	show_all();
 	m_PropFillStroke.set_visible(false);
 	m_KageFramesManager.setCurrentFrame(1);
 	m_KageFramesManager.setCurrentLayer(1);
+	
+	currentTool = toggleButtons[0];
+	currentTool->set_active(true);
+	
 	updateStatus("Ready");
 }
 
@@ -451,13 +440,17 @@ void Kage::updateStatus(Glib::ustring status_msg) {
 
 void Kage::Delete_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		///try delete SHAPE
 		Kage::timestamp();
 		std::cout << " Kage::Delete_onClick SHAPE" << std::endl;
+		if (m_KageStage.deleteSelectedShape() == true) {
+			forceRenderFrames();
+		}
 	} else if (KageStage::toolMode == KageStage::MODE_NODE) {
-		///try delete NODE
 		Kage::timestamp();
 		std::cout << " Kage::Delete_onClick NODE" << std::endl;
+		if (m_KageStage.deleteSelectedNode() == true) {
+			forceRenderFrames();
+		}
 	}
 }
 
@@ -532,6 +525,12 @@ void Kage::onToolButtonsClick(Gtk::ToggleButton *p_sourceButton) {
 			ToolOval_onClick();
 		} else if (p_sourceButton->get_tooltip_text() == "Rectangle Tool") {
 			ToolRectangle_onClick();
+		} else if (p_sourceButton->get_tooltip_text() == "Stroke Tool") {
+			ToolStroke_onClick();
+		} else if (p_sourceButton->get_tooltip_text() == "Fill Tool") {
+			ToolFill_onClick();
+		} else if (p_sourceButton->get_tooltip_text() == "Eyedrop Tool") {
+			ToolEyedrop_onClick();
 //		} else if (p_sourceButton->get_tooltip_text() == "Stroke Tool") {
 //			KageStage::toolMode = KageStage::MODE_MOVE_STAGE;
 		} else {
@@ -566,12 +565,7 @@ void Kage::ToolPoly_onClick() {
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
 	KageStage::toolMode = KageStage::MODE_DRAW_POLY;
-}
-
-void Kage::updateColors() {
-	m_ColorButtonFill.set_color(m_KageStage.getFill());
-	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
-	m_EntryStrokeThickness.set_text(uintToString(KageStage::stroke.getThickness()));
+	m_KageStage.initNodeTool();
 }
 
 void Kage::ToolOval_onClick() {
@@ -581,6 +575,7 @@ void Kage::ToolOval_onClick() {
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
 	KageStage::toolMode = KageStage::MODE_DRAW_OVAL;
+	m_KageStage.initNodeTool();
 }
 
 void Kage::ToolRectangle_onClick() {
@@ -590,6 +585,48 @@ void Kage::ToolRectangle_onClick() {
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
 	KageStage::toolMode = KageStage::MODE_DRAW_RECT;
+	m_KageStage.initNodeTool();
+}
+
+void Kage::ToolStroke_onClick() {
+	toolsButtonToggle("Stroke Tool");
+	m_PropStage.set_visible(false);
+	m_PropFillStroke.set_visible(true);
+	m_ColorButtonFill.set_color(m_KageStage.getFill());
+	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
+	KageStage::toolMode = KageStage::MODE_STROKE;
+//	m_KageStage.initNodeTool();
+//	forceRenderFrames();
+}
+
+void Kage::ToolFill_onClick() {
+	toolsButtonToggle("Fill Tool");
+	m_PropStage.set_visible(false);
+	m_PropFillStroke.set_visible(true);
+	m_ColorButtonFill.set_color(m_KageStage.getFill());
+	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
+	KageStage::toolMode = KageStage::MODE_FILL;
+//	m_KageStage.initNodeTool();
+//	forceRenderFrames();
+}
+
+void Kage::ToolEyedrop_onClick() {
+	toolsButtonToggle("Eyedrop Tool");
+	m_PropStage.set_visible(false);
+	m_PropFillStroke.set_visible(true);
+	m_ColorButtonFill.set_color(m_KageStage.getFill());
+	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
+	KageStage::toolMode = KageStage::MODE_EYEDROP;
+	m_KageStage.initNodeTool();
+	forceRenderFrames();
+}
+
+void Kage::updateColors() {
+	m_ColorButtonFill.set_color(m_KageStage.getFill());
+	m_EntryFillAlpha.set_text(uintToString(KageStage::fillColor.getA()));
+	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
+	m_EntryStrokeAlpha.set_text(uintToString(KageStage::stroke.getA()));
+	m_EntryStrokeThickness.set_text(uintToString(KageStage::stroke.getThickness()));
 }
 
 void Kage::onButtonClick() {
@@ -841,9 +878,23 @@ void Kage::Play_onClick() {
 	}
 }
 
+void Kage::EntryFillAlpha_onEnter() {
+	unsigned int l_uint = stringToUInt(m_EntryFillAlpha.get_text());
+	KageStage::fillColor.setA(l_uint % 256);
+	m_EntryFillAlpha.set_text(uintToString(KageStage::fillColor.getA()));
+	m_KageStage.updateShapeColor();
+}
+
+void Kage::EntryStrokeAlpha_onEnter() {
+	unsigned int l_uint = stringToUInt(m_EntryStrokeAlpha.get_text());
+	KageStage::stroke.setA(l_uint % 256);
+	m_EntryStrokeAlpha.set_text(uintToString(KageStage::stroke.getA()));
+	m_KageStage.updateShapeColor();
+}
+
 void Kage::EntryStrokeThickness_onEnter() {
-	string t = m_EntryStrokeThickness.get_text();
-	KageStage::stroke.setThickness(stringToUInt(t));
+	unsigned int l_uint = stringToUInt(m_EntryStrokeThickness.get_text());
+	KageStage::stroke.setThickness(l_uint);
 	m_EntryStrokeThickness.set_text(uintToString(KageStage::stroke.getThickness()));
 	m_KageStage.updateShapeColor();
 }
@@ -1007,6 +1058,32 @@ void Kage::ColorButtonStroke_onClick() {
 	m_Color = m_ColorButtonStroke.get_color();
 	m_KageStage.setStroke(m_Color);
 	m_KageStage.updateShapeColor();
+}
+
+void Kage::updateSelectedShapeColor(bool p_doFill, bool p_doStroke) {
+	unsigned int l_uint;
+	if (p_doFill == true) {
+		m_Color = m_ColorButtonFill.get_color();
+		m_KageStage.setFill  (m_Color);
+		
+		l_uint = stringToUInt(m_EntryFillAlpha.get_text());
+		l_uint %= 256;
+		m_EntryFillAlpha.set_text(uintToString(l_uint));
+		m_KageStage.fillColor.setA(l_uint % 256);
+	}
+	if (p_doStroke == true) {
+		m_Color = m_ColorButtonStroke.get_color();
+		m_KageStage.setStroke(m_Color);
+		
+		l_uint = stringToUInt(m_EntryStrokeAlpha.get_text());
+		l_uint %= 256;
+		m_EntryStrokeAlpha.set_text(uintToString(l_uint));
+		m_KageStage.fillColor.setA(l_uint);
+		
+		l_uint = stringToUInt(m_EntryStrokeThickness.get_text());
+		KageStage::stroke.setThickness(l_uint);
+	}
+	m_KageStage.updateShapeColor(p_doFill, p_doStroke);
 }
 
 string Kage::dumpFrame(bool bKS) {

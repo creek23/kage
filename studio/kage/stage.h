@@ -25,6 +25,9 @@
 				MODE_NONE,
 				MODE_SELECT,
 				MODE_NODE,
+				MODE_STROKE,
+				MODE_FILL,
+				MODE_EYEDROP,
 				MODE_MOVE_STAGE,
 				MODE_DRAW_RECT,
 				MODE_DRAW_TEXT,
@@ -72,10 +75,17 @@
 			void handlePoly();
 			void handleRect();
 			void handleOval();
+			void handleStrokeMouseUp();
+			void handleFillMouseUp();
+			void handleEyedrop();
+			void handleEyedropMouseUp();
 			Glib::RefPtr<Gdk::Pixbuf> _bg;
 			Cairo::RefPtr<Cairo::Surface> _bgcr;
 			
-			void updateShapeColor();
+			bool deleteSelectedShape();
+			bool deleteSelectedNode();
+			
+			void updateShapeColor(bool p_doFill = true, bool p_doStroke = true);
 		protected:
 			ToolMode prevTool; //used by Hand-tool shortcut [spacebar]
 			Kage *win;
@@ -115,5 +125,12 @@
 			AnchorData anchor_upperLeft;
 			AnchorData anchor_center;
 			AnchorData anchor_lowerRight;
+			
+			bool keyShiftDown;
+			bool keyControlDown;
+			bool keyUpDown;
+			bool keyDownDown;
+			bool keyLeftDown;
+			bool keyRightDown;
 	};
 #endif // GTKMM_KAGE_STAGE_H

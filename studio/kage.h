@@ -120,13 +120,21 @@
 				Gtk::HBox m_PropFillStroke;
 				Gtk::VBox m_PropFillStrokeV1;
 				Gtk::VBox m_PropFillStrokeV2;
+				
 				Gtk::Label m_LabelFill;
 				Gtk::ColorButton m_ColorButtonFill;
 					void ColorButtonFill_onClick();
+				Gtk::Label m_LabelFillAlpha;
+				Gtk::Entry m_EntryFillAlpha;
+					void EntryFillAlpha_onEnter();
+				
 				Gtk::Label m_LabelStroke;
 				Gtk::Label m_LabelStrokeThickness;
 				Gtk::Entry m_EntryStrokeThickness;
 					void EntryStrokeThickness_onEnter();
+				Gtk::Label m_LabelStrokeAlpha;
+				Gtk::Entry m_EntryStrokeAlpha;
+					void EntryStrokeAlpha_onEnter();
 				Gtk::ColorButton m_ColorButtonStroke;
 					void ColorButtonStroke_onClick();
 			
@@ -184,6 +192,9 @@
 			void ToolPoly_onClick();
 			void ToolOval_onClick();
 			void ToolRectangle_onClick();
+			void ToolStroke_onClick();
+			void ToolFill_onClick();
+			void ToolEyedrop_onClick();
 			
 			void toolsButtonToggle(string p_toolTip);
 			
@@ -194,6 +205,7 @@
 			void switchToNextFrame();
 			
 			void updateColors();
+			void updateSelectedShapeColor(bool p_doFill = true, bool p_doStroke = true);
 	};
 
 #endif //GTKMM_KAGE_H

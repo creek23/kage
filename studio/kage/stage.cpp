@@ -60,13 +60,73 @@ bool KageStage::on_key_press_event(GdkEventKey *e) {
 	} else if (e->keyval == 44) { //, comma
 		win->switchToPreviousFrame();
 	} else {
-		//
+		if (KageStage::toolMode == MODE_SELECT
+				|| KageStage::toolMode == MODE_NODE) {
+			if (e->keyval == 65362) { // UP-ARROW
+				keyUpDown = true;
+			} else if (e->keyval == 65364) { // DOWN-ARROW
+				keyDownDown =  true;
+			} else if (e->keyval == 65361) { // LEFT-ARROW
+				keyLeftDown =  true;
+			} else if (e->keyval == 65363) { // RIGHT-ARROW
+				keyRightDown =  true;
+			} else if (e->keyval == 65505 || e->keyval == 65506) { //[SHIFT]
+				keyShiftDown = true;
+			} else if (e->keyval == 65507 || e->keyval == 65508) { //[CONTROL]
+				keyControlDown = true;
+			}
+			double l_diffX = 0;
+			double l_diffY = 0;
+			if (keyUpDown == true) {
+				l_diffY = -1;
+			} else if (keyDownDown == true) {
+				l_diffY =  1;
+			}
+			if (keyLeftDown == true) {
+				l_diffX = -1;
+			} else if (keyRightDown == true) {
+				l_diffX =  1;
+			}
+			if (keyShiftDown == true) {
+				if (l_diffX != 0) {
+					l_diffX *= 10;
+				}
+				if (l_diffY != 0) {
+					l_diffY *= 10;
+				}
+			}
+			if (keyControlDown == true) {
+				origin.x -= l_diffX;
+				origin.y -= l_diffY;
+			} else {
+				handleShapes_moveShape(l_diffX, l_diffY);
+			}
+			if (KageStage::toolMode == MODE_SELECT) {
+				render();
+			}
+		} else {
+			std::cout << "stage " << e->keyval << "_" << e->string << std::endl;
+		}
 	}
 	return true;
 }
 bool KageStage::on_key_release_event(GdkEventKey *e) {
 	if (e->keyval == 32) { // space [hand tool]
 		KageStage::toolMode = prevTool;
+		Kage::timestamp();
+		std::cout << " KageStage::on_key_release_event No Hand" << std::endl;
+	} else if (e->keyval == 65362) { // UP-ARROW
+		keyUpDown = false;
+	} else if (e->keyval == 65364) { // DOWN-ARROW
+		keyDownDown =  false;
+	} else if (e->keyval == 65361) { // LEFT-ARROW
+		keyLeftDown =  false;
+	} else if (e->keyval == 65363) { // RIGHT-ARROW
+		keyRightDown =  false;
+	} else if (e->keyval == 65505 || e->keyval == 65506) { //[SHIFT]
+		keyShiftDown = false;
+	} else if (e->keyval == 65507 || e->keyval == 65508) { //[CONTROL]
+		keyControlDown = false;
 	}
 	return true;
 }
@@ -93,17 +153,18 @@ bool KageStage::on_event(GdkEvent *e) {
 		on_key_release_event((GdkEventKey*) e);
 	} else if (e->type == GDK_BUTTON_PRESS) { ///mouse down
 		mouseDown = true;
+		draw1.x = e->button.x;
+		draw1.y = e->button.y;
 		if (KageStage::toolMode == MODE_DRAW_OVAL
 				|| KageStage::toolMode == MODE_DRAW_RECT) {
-			draw1.x = e->button.x;
-			draw1.y = e->button.y;
+			draw2.x = e->button.x;
+			draw2.y = e->button.y;
+		} else if (KageStage::toolMode == MODE_SELECT) {
 				draw2.x = e->button.x;
 				draw2.y = e->button.y;
-		} else if (KageStage::toolMode == MODE_SELECT
-				|| KageStage::toolMode == MODE_DRAW_POLY
-				|| KageStage::toolMode == MODE_NODE) {
-			draw1.x = e->button.x;
-			draw1.y = e->button.y;
+		} else if (KageStage::toolMode == MODE_NODE) {
+		} else if (KageStage::toolMode == MODE_DRAW_POLY) {
+			//
 		} else {
 			//
 		}
@@ -117,9 +178,26 @@ bool KageStage::on_event(GdkEvent *e) {
 			draw2.y = (draw2.y - origin.y);
 		
 		if (KageStage::toolMode == MODE_SELECT) {
-			handleShapesMouseUp();
+			draw1.x = e->button.x;
+			draw1.y = e->button.y;
+				handleShapesMouseUp();
 		} else if (KageStage::toolMode == MODE_NODE) {
-			handleNodesMouseUp();
+			//DEBUG INFO: does not need `draw2' data
+			draw1.x = e->button.x;
+			draw1.y = e->button.y;
+				handleNodesMouseUp();
+		} else if (KageStage::toolMode == MODE_STROKE) {
+			draw1.x = e->button.x;
+			draw1.y = e->button.y;
+				handleStrokeMouseUp();
+		} else if (KageStage::toolMode == MODE_FILL) {
+			draw1.x = e->button.x;
+			draw1.y = e->button.y;
+				handleFillMouseUp();
+		} else if (KageStage::toolMode == MODE_EYEDROP) {
+			draw1.x = e->button.x;
+			draw1.y = e->button.y;
+				handleEyedropMouseUp();
 		} else if (KageStage::toolMode == MODE_DRAW_OVAL) {
 			handleDrawOvalMouseUp();
 		} else if (KageStage::toolMode == MODE_DRAW_RECT) {
@@ -139,8 +217,11 @@ bool KageStage::on_event(GdkEvent *e) {
 			draw1.y = (e->button.y);
 			
 			render();
-		} else if (KageStage::toolMode == MODE_SELECT
-				|| KageStage::toolMode == MODE_DRAW_OVAL
+		} else if (KageStage::toolMode == MODE_SELECT) {
+			draw2.x = (e->button.x);
+			draw2.y = (e->button.y);
+			render();
+		} else if (KageStage::toolMode == MODE_DRAW_OVAL
 				|| KageStage::toolMode == MODE_DRAW_RECT) {
 			if (mouseDown == true) {
 				draw2.x = (e->button.x);
@@ -273,6 +354,8 @@ bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
 			handleRect();
 		} else if (KageStage::toolMode == MODE_DRAW_OVAL && mouseDown == true) {
 			handleOval();
+		} else if (KageStage::toolMode == MODE_EYEDROP) {
+			handleEyedrop();
 		}
 		if (mouseDown) {
 			win->renderFramesAboveCurrentLayer();
@@ -343,7 +426,7 @@ void KageStage::renderFrame() {
 					cr->fill_preserve();
 					fillCtr--;
 				}
-				if (scolor.getThickness() > 0) {
+//				if (scolor.getThickness() > 0) {
 					cr->set_source_rgba((double)scolor.getR()/255,
 										(double)scolor.getG()/255,
 										(double)scolor.getB()/255,
@@ -351,7 +434,7 @@ void KageStage::renderFrame() {
 					cr->set_line_width(scolor.getThickness());
 						cr->set_line_cap(Cairo::LINE_CAP_ROUND);
 							cr->stroke();
-				}
+//				}
 				break;
 			case VectorData::TYPE_STROKE:
 				scolor = v[i].stroke;
@@ -455,8 +538,6 @@ void KageStage::handleShapes_scaleNorth() {
 			diffOld = anchor_lowerRight.y - (v[typeMovesIndex].points[0].y + origin.y);
 			diffNew = diffRatio * diffOld;
 				v[typeMovesIndex].points[0].y = anchor_lowerRight.y - diffNew - origin.y;
-			
-			i = vsize;
 			break;
 		}
 	}
@@ -496,8 +577,6 @@ void KageStage::handleShapes_scaleEast() {
 			diffOld = anchor_upperLeft.x - (v[typeMovesIndex].points[0].x + origin.x);
 			diffNew = diffRatio * diffOld;
 				v[typeMovesIndex].points[0].x = anchor_upperLeft.x - diffNew - origin.x;
-			
-			i = vsize;
 			break;
 		}
 	}
@@ -537,8 +616,6 @@ void KageStage::handleShapes_scaleWest() {
 			diffOld = anchor_lowerRight.x - (v[typeMovesIndex].points[0].x + origin.x);
 			diffNew = diffRatio * diffOld;
 				v[typeMovesIndex].points[0].x = anchor_lowerRight.x - diffNew - origin.x;
-			
-			i = vsize;
 			break;
 		}
 	}
@@ -578,8 +655,6 @@ void KageStage::handleShapes_scaleSouth() {
 			diffOld = anchor_upperLeft.y - (v[typeMovesIndex].points[0].y + origin.y);
 			diffNew = diffRatio * diffOld;
 				v[typeMovesIndex].points[0].y = anchor_upperLeft.y - diffNew - origin.y;
-			
-			i = vsize;
 			break;
 		}
 	}
@@ -610,8 +685,6 @@ void KageStage::handleShapes_moveShape(double p_diffX, double p_diffY) {
 		} else if (v[i].vectorType == VectorData::TYPE_ENDFILL) {
 			v[typeMovesIndex].points[0].x += p_diffX;
 			v[typeMovesIndex].points[0].y += p_diffY;
-			
-			i = vsize;
 			break;
 		}
 	}
@@ -630,7 +703,7 @@ void KageStage::handleShapes_updateAnchors(double p_x, double p_y) {
 		anchor_lowerRight.y = p_y;
 	}
 }
-void KageStage::updateShapeColor() {
+void KageStage::updateShapeColor(bool p_doFill, bool p_doStroke) {
 	unsigned int l_temp = -1;
 	
 	if (selectedShape == l_temp) {
@@ -638,18 +711,17 @@ void KageStage::updateShapeColor() {
 	}
 	
 	vector<VectorData> v = win->getFrameData().getVectorData();
-//	unsigned int typeMovesIndex = -1;
 	unsigned int vsize = v.size();
 	for (unsigned int i = selectedShape; i < vsize; ++i) {
-		if (v[i].vectorType == VectorData::TYPE_MOVE) {
-			///register i for later use in ENDFILL
-//			typeMovesIndex = i;
-		} else if (v[i].vectorType == VectorData::TYPE_FILL) {
-			v[i].fillColor = fillColor.clone();
+		if (v[i].vectorType == VectorData::TYPE_FILL) {
+			if (p_doFill == true) {
+				v[i].fillColor = fillColor.clone();
+			}
 		} else if (v[i].vectorType == VectorData::TYPE_STROKE) {
-			v[i].stroke = stroke.clone();
+			if (p_doStroke == true) {
+				v[i].stroke = stroke.clone();
+			}
 			
-			i = vsize;
 			break;
 		}
 	}
@@ -719,14 +791,14 @@ void KageStage::handleShapes() {
 			} else if (isMouseOnNode( anchor_upperLeft.x - 7, anchor_lowerRight.y + 7, 7) == true) {
 				mouseOnAnchor = AnchorData::TYPE_SOUTH_WEST;
 			} else {
-				double l_X = anchor_lowerRight.x - anchor_center.x;
-				double l_Y = anchor_lowerRight.y - anchor_center.y;
-				double l_distance = 5;
-				if (l_X > l_Y) {
-					l_distance = l_Y;
-				} else {
-					l_distance = l_X;
-				}
+//				double l_X = anchor_lowerRight.x - anchor_center.x;
+//				double l_Y = anchor_lowerRight.y - anchor_center.y;
+				double l_distance = 7;
+//				if (l_X > l_Y) {
+//					l_distance = l_Y;
+//				} else {
+//					l_distance = l_X;
+//				}
 				if (isMouseOnNode(    anchor_center.x    ,     anchor_center.y    , l_distance) == true) {
 					mouseOnAnchor = AnchorData::TYPE_MOVE;
 				}
@@ -797,15 +869,23 @@ void KageStage::handleShapes() {
 				cr->set_line_cap(Cairo::LINE_CAP_ROUND);
 					cr->stroke();
 	dashes.clear();
-	cr->set_dash(dashes, 0.0);
+	cr->unset_dash();
 	
 	if (mouseDown == false) {
+		//draw center anchor
+		cr->set_line_width(1.0);
+		cr->arc(anchor_center.x, anchor_center.y, 7, 0, 2 * M_PI);
+			cr->set_source_rgba(1.0,1.0,1.0,1.0);
+				cr->fill_preserve();
+			cr->set_source_rgba(0.0, 0.0, 0.0, 1.0);
+				cr->stroke();
+		
 		//draw 4 corners anchors
 		Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_135,
 				 anchor_upperLeft.x - 13,
 				 anchor_upperLeft.y - 13);
 			cr->paint();
-
+		
 		Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_045,
 				anchor_lowerRight.x     ,
 				 anchor_upperLeft.y - 13);
@@ -843,9 +923,9 @@ void KageStage::handleShapes() {
 	}
 }
 void KageStage::handleShapesMouseUp() {
-	mouseDown = false;
 	mouseOnAnchor = AnchorData::TYPE_NONE;
 	handleNodesMouseUp();
+	win->updateColors();
 }
 
 void KageStage::handleNodes() {
@@ -1099,24 +1179,23 @@ bool KageStage::handleNodes_getNearestShape(double p_x, double p_y, unsigned int
 	
 	l_distance = sqrt((l_vXdiff * l_vXdiff) + (l_vYdiff * l_vYdiff));
 	if (l_distance <= _nodeToMouseDistance
-			&& isMouseOnNode(p_x + origin.x, p_y + origin.y, 100) == true) {
+			&& isMouseOnNode(p_x, p_y, 100) == true) {
 		_nodeToMouseDistance = l_distance;
 		selectedShape = getSelectedShapeViaNode(p_index, p_v);
 		return true;
 	}
-	std::cout << " >> " << l_distance << std::endl;
+	
 	return false;
 }
+
 double KageStage::getSelectedShapeViaNode(unsigned int p_index, vector<VectorData> p_v) {
 	int l_tmp = selectedShape;
 	for (unsigned int i = p_index; i > 0; --i) {
 		switch (p_v[i].vectorType) {
 			case VectorData::TYPE_FILL:
 				fillColor = p_v[i].fillColor.clone();
-				l_tmp = i;
-				win->updateColors();
 				
-				return l_tmp;
+				return i;
 			case VectorData::TYPE_ENDFILL:
 				break;
 			case VectorData::TYPE_STROKE:
@@ -1238,6 +1317,165 @@ void KageStage::handleDrawRectMouseUp() {
 		v.addEndFill();
 	win->addDataToFrame(v);
 	render();
+}
+
+void KageStage::handleStrokeMouseUp() {
+	handleNodesMouseUp();
+	
+	win->updateSelectedShapeColor(false, true);
+	initNodeTool();
+}
+
+bool KageStage::deleteSelectedShape() {
+	unsigned int l_temp = -1;
+	Kage::timestamp();
+	std::cout << " KageStage::deleteSelectedShape " << selectedShape << std::endl;
+	
+	if (selectedShape == l_temp) {
+		return false;
+	}
+	
+	vector<VectorData> v = win->getFrameData().getVectorData();
+	
+	unsigned int vsize = v.size();
+	for (unsigned int i = selectedShape; i < vsize; ++i) {
+		if (v[i].vectorType == VectorData::TYPE_ENDFILL) {
+			l_temp = i;
+			break;
+		}
+	}
+	
+	v.erase (v.begin() + selectedShape,
+			 v.begin() + l_temp);
+	
+	win->setFrameData(v);
+	
+	return true;
+}
+
+bool KageStage::deleteSelectedNode() {
+	unsigned int l_temp = -1;
+	Kage::timestamp();
+	std::cout << " KageStage::deleteSelectedNode " << selectedShape << " " << selectedNode << std::endl;
+	
+	if (selectedShape == l_temp) {
+		return false;
+	}
+	
+	vector<VectorData> v = win->getFrameData().getVectorData();
+	
+	unsigned int vsize = v.size();
+	
+	unsigned int l_sequence = 0;
+	if (vsize >= 5) {
+		if (v[selectedShape + 0].vectorType == VectorData::TYPE_FILL       ) ++l_sequence;
+		if (v[selectedShape + 1].vectorType == VectorData::TYPE_STROKE     ) ++l_sequence;
+		if (v[selectedShape + 2].vectorType == VectorData::TYPE_MOVE       ) ++l_sequence;
+		if (v[selectedShape + 3].vectorType == VectorData::TYPE_CURVE_CUBIC) ++l_sequence;
+		if (v[selectedShape + 4].vectorType == VectorData::TYPE_ENDFILL    ) ++l_sequence;
+	}
+	std::cout << "vsize " << vsize << std::endl;
+	for (unsigned int i = selectedShape; i < vsize; ++i) {
+		std::cout << "[" << i << "].vectorType " << v[i].vectorType << std::endl;
+		if (v[i].vectorType == VectorData::TYPE_ENDFILL) {
+			l_temp = i;
+			break;
+		}
+	}
+	
+	if (l_sequence == 5) {
+		v.erase (v.begin() + selectedShape,
+				 v.begin() + selectedShape + l_sequence);
+	} else {
+		v.erase (v.begin() + selectedNode);
+	}
+	
+	win->setFrameData(v);
+	
+	return true;
+}
+
+void KageStage::handleFill() {
+//	handleEyedrop();
+}
+
+void KageStage::handleFillMouseUp() {
+	handleNodesMouseUp();
+	
+	win->updateSelectedShapeColor(true, false);
+	initNodeTool();
+}
+
+void KageStage::handleEyedrop() {
+	unsigned int l_temp = -1;
+	Kage::timestamp();
+	std::cout << " KageStage::handleEyedrop " << selectedShape << std::endl;
+	
+	if (selectedShape == l_temp) {
+		return;
+	}
+	
+	vector<VectorData> v = win->getFrameData().getVectorData();
+	bool l_move = false;
+	double l_x;
+	double l_y;
+	
+	anchor_upperLeft.x = 100000;
+	anchor_upperLeft.y = 100000;
+	
+	anchor_lowerRight.x = -100000;
+	anchor_lowerRight.y = -100000;
+	
+	unsigned int vsize = v.size();
+	for (unsigned int i = selectedShape; i < vsize; ++i) {
+		if (v[i].vectorType == VectorData::TYPE_LINE) {
+			handleShapes_updateAnchors(
+				v[i].points[0].x + origin.x,
+				v[i].points[0].y + origin.y);
+		} else if (v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC
+				|| v[i].vectorType == VectorData::TYPE_CURVE_CUBIC) {
+			handleShapes_updateAnchors(
+				v[i].points[0].x + origin.x,
+				v[i].points[0].y + origin.y);
+			handleShapes_updateAnchors(
+				v[i].points[1].x + origin.x,
+				v[i].points[1].y + origin.y);
+			handleShapes_updateAnchors(
+				v[i].points[2].x + origin.x,
+				v[i].points[2].y + origin.y);
+		} else if (v[i].vectorType == VectorData::TYPE_ENDFILL) {
+			i = vsize;
+		}
+	}
+	anchor_center.x = (anchor_upperLeft.x + anchor_lowerRight.x) / 2;
+	anchor_center.y = (anchor_upperLeft.y + anchor_lowerRight.y) / 2;
+	
+	vector<double> dashes;
+		dashes.push_back(4.0); /* ink */
+		dashes.push_back(4.0); /* skip */
+	
+	cr->set_dash(dashes, 0.0);
+	//draw bounding rectangle for the shape
+	cr->move_to(anchor_upperLeft.x, anchor_upperLeft.y);
+		cr->line_to( anchor_lowerRight.x,  anchor_upperLeft.y);
+		cr->line_to( anchor_lowerRight.x, anchor_lowerRight.y);
+		cr->line_to(  anchor_upperLeft.x, anchor_lowerRight.y);
+		cr->line_to(  anchor_upperLeft.x,  anchor_upperLeft.y);
+			cr->set_source_rgba(0.0,0.0,0.0,1.0);
+			cr->set_line_width(1.0);
+				cr->set_line_cap(Cairo::LINE_CAP_ROUND);
+					cr->stroke();
+	dashes.clear();
+	cr->set_dash(dashes, 0.0);
+
+	if (l_move == true) {
+		win->setFrameData(v);
+	}
+}
+
+void KageStage::handleEyedropMouseUp() {
+	handleNodesMouseUp();
+	win->updateColors();
 }
 
 void KageStage::handleDrawPolyMouseUp() {

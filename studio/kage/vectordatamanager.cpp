@@ -31,7 +31,8 @@ void VectorDataManager::push(VectorDataManager p_vectorsData) {
 	vector<VectorData> l_v = p_vectorsData.getVectorData();
 	int isrc = l_v.size();
 	
-	for (int i = 0; i < isrc; ++i) {
+	//NOTE: start i at 0 to avoid TYPE_INIT from VectorDataManager::init()
+	for (int i = 1; i < isrc; ++i) {
 		vectorData.push_back(l_v[i]);
 	}
 }

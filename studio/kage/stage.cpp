@@ -1395,9 +1395,9 @@ bool KageStage::deleteSelectedNode() {
 	return true;
 }
 
-void KageStage::handleFill() {
-//	handleEyedrop();
-}
+//void KageStage::handleFill() {
+////	handleEyedrop();
+//}
 
 void KageStage::handleFillMouseUp() {
 	handleNodesMouseUp();

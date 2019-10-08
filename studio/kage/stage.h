@@ -2,6 +2,7 @@
 	#define GTKMM_KAGE_STAGE_H
 	
 	#include <gtkmm/drawingarea.h>
+	#include <gdkmm/general.h>
 	#include <iostream>
 	
 	#include "data/anchor.h"

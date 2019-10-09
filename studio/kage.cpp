@@ -758,7 +758,7 @@ void Kage::ExportKS_onClick() {
 			
 			exportKonsolScript(ksfPath, "Var:Number bgcolor;\n");
 			exportKonsolScript(ksfPath, "function kagestudio_screencls() {");
-			exportKonsolScript(ksfPath, "\tDraw:RectFill(0, 0, 800, 600, bgcolor, screen)");
+			exportKonsolScript(ksfPath, "\tDraw:RectFill(0, 0, " + uintToString(m_KageStage.wid) + ", " + uintToString(m_KageStage.hgt) + ", bgcolor, screen)");
 			exportKonsolScript(ksfPath, "}");
 			exportKonsolScript(ksfPath, "function render() {");
 			exportKonsolScript(ksfPath, "\tkagestudio_screencls()");
@@ -811,7 +811,7 @@ void Kage::ExportHTML5_onClick() {
 				exportHtml5(expPath, "}");
 				exportHtml5(expPath, "function kagestudio_screencls() {");
 				exportHtml5(expPath, "\tscreen.fillStyle = \"rgb(" + intToString(m_KageStage.stageBG.getR()) + ", " + intToString(m_KageStage.stageBG.getG()) + "," + intToString(m_KageStage.stageBG.getB()) + ")\";");
-				exportHtml5(expPath, "\tscreen.fillRect(0, 0, 800, 600);");
+				exportHtml5(expPath, "\tscreen.fillRect(0, 0, " + uintToString(m_KageStage.wid) + ", " + uintToString(m_KageStage.hgt) + ");");
 				exportHtml5(expPath, "}");
 				exportHtml5(expPath, "function kagestudio_loop() {");
 				exportHtml5(expPath, "\tkagestudio_screencls()");
@@ -835,7 +835,7 @@ void Kage::ExportHTML5_onClick() {
 					}
 				KageFramesManager::currentLayer = t;
 			exportHtml5(expPath, "function main() {\n\t//add variable initialization...\n}");
-			exportHtml5(expPath, "</script>\n</head>\n<body align='center' onload='kagestudio();'>\n<canvas id='screen' width='640' height='480'></canvas>\n</body>\n</html>");
+			exportHtml5(expPath, "</script>\n</head>\n<body align='center' onload='kagestudio();'>\n<canvas id='screen' width='" + uintToString(m_KageStage.wid) + "' height='" + uintToString(m_KageStage.hgt) + "'></canvas>\n</body>\n</html>");
 			break;
 	}
 }
@@ -920,11 +920,11 @@ void Kage::CheckUpdate_onClick() {
 
 void Kage::Website_onClick() {
 	GError *error = NULL;
-	gtk_show_uri_on_window(NULL, "http://konsolscript.sf.net", gtk_get_current_event_time(), &error);
+	gtk_show_uri_on_window(NULL, "http://konsolscript.sf.net/web/?s=kage+studio", gtk_get_current_event_time(), &error);
 	if (error) {
 		cout << error->message << endl;
 		cout << "Launching default web browser..." << endl;
-		runExternal("start", "http://konsolscript.sf.net/kagestudio");
+		runExternal("start", "http://konsolscript.sf.net/web/?s=kage+studio");
 	}
 }
 

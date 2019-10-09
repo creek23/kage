@@ -1126,7 +1126,7 @@ string Kage::dumpFrame(bool bKS) {
 				}
 //					if (scolor.getThickness() > 0) {
 						if (bKS == false && doStroke == true) {
-							if (scolorPrev.equalTo(scolor) || scolorPrev.getThickness() != scolor.getThickness()) {
+							if (!scolorPrev.equalTo(scolor) || scolorPrev.getThickness() != scolor.getThickness()) {
 								if (scolor.getA() == 255) {
 									l_ostringstream << "screen.strokeStyle = '#" << int255ToHex(scolor.getR()) << int255ToHex(scolor.getG()) << int255ToHex(scolor.getB()) << "';\n";
 								} else {
@@ -1150,7 +1150,7 @@ string Kage::dumpFrame(bool bKS) {
 				if (bKS == true) {
 					l_ostringstream << "Draw:LineStyle(" << scolor.getThickness() << ", 0x" << int255ToHex(scolor.getR()) << int255ToHex(scolor.getG()) << int255ToHex(scolor.getB()) << ", " << scolor.getA() << ", screen)\n";
 				} else {
-					if (scolorPrev.equalTo(scolor) || scolorPrev.getThickness() != scolor.getThickness()) {
+					if (!scolorPrev.equalTo(scolor) || scolorPrev.getThickness() != scolor.getThickness()) {
 //						l_ostringstream << "screen.beginPath();\n";
 						doStroke = true;
 						

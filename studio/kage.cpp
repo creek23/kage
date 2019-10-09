@@ -755,6 +755,7 @@ void Kage::ExportKS_onClick() {
 		case Gtk::RESPONSE_OK:
 			ksfPath = dialog.get_filename();
 			ksfInited = false;
+			ksfFile.close();
 			
 			exportKonsolScript(ksfPath, "Var:Number bgcolor;\n");
 			exportKonsolScript(ksfPath, "function kagestudio_screencls() {");
@@ -792,6 +793,7 @@ void Kage::ExportHTML5_onClick() {
 			expPath = dialog.get_filename();
 			cout << "uri:" << dialog.get_uri() << endl;
 			expInited = false;
+			expFile.close();
 			
 			unsigned int l_lMax = m_KageLayerManager.layerCount();
 			unsigned int i;
@@ -1119,7 +1121,7 @@ string Kage::dumpFrame(bool bKS) {
 						if (fcolor.getA() == 255) {
 							l_ostringstream << "screen.fillStyle = '#" << int255ToHex(fcolor.getR()) << int255ToHex(fcolor.getG()) << int255ToHex(fcolor.getB()) << "';\n";
 						} else {
-							l_ostringstream << "screen.fillStyle = 'rgba(" << fcolor.getR() << "," << fcolor.getG() << "," << fcolor.getB() << "," << (double)(fcolor.getA()/255) << ")';\n";
+							l_ostringstream << "screen.fillStyle = 'rgba(" << fcolor.getR() << "," << fcolor.getG() << "," << fcolor.getB() << "," << (fcolor.getA()/255.0f) << ")';\n";
 						}
 						l_ostringstream << "screen.fill();\n";
 					}
@@ -1130,7 +1132,7 @@ string Kage::dumpFrame(bool bKS) {
 								if (scolor.getA() == 255) {
 									l_ostringstream << "screen.strokeStyle = '#" << int255ToHex(scolor.getR()) << int255ToHex(scolor.getG()) << int255ToHex(scolor.getB()) << "';\n";
 								} else {
-									l_ostringstream << "screen.strokeStyle = 'rgba(" << scolor.getR() << "," << scolor.getG() << "," << scolor.getB() << "," << (double)(scolor.getA()/255) << ")';\n";
+									l_ostringstream << "screen.strokeStyle = 'rgba(" << scolor.getR() << "," << scolor.getG() << "," << scolor.getB() << "," << (scolor.getA()/255.0f) << ")';\n";
 								}
 								l_ostringstream << "screen.lineWidth = " << scolor.getThickness() << ";\n";
 								l_ostringstream << "screen.lineCap = 'round';\n";

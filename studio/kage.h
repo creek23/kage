@@ -44,6 +44,7 @@
 			void renderFrames();
 			void renderFramesBelowCurrentLayer();
 			void renderFramesAboveCurrentLayer();
+			string saveFrame();
 			string dumpFrame(bool bKS);
 			
 			string int255ToHex(unsigned int p);
@@ -69,12 +70,19 @@
 			virtual void LayerDel_onClick();
 			virtual void onToolButtonsClick(Gtk::ToggleButton *p_sourceButton);
 			virtual void onActionActivate();
+			virtual void Undo_onClick();
+			virtual void Redo_onClick();
 			virtual void Delete_onClick();
 			virtual void AddFrame_onClick();
 			virtual void DuplicateFrame_onClick();
 			virtual void Save_onClick();
 			virtual void ExportKS_onClick();
 			virtual void ExportHTML5_onClick();
+			
+			unsigned int undoStackCount;
+			unsigned int undoStackPointer;
+			std::vector<unsigned int> undoStack;
+			
 			
 			//Member widgets:
 			KageLayerManager m_KageLayerManager;
@@ -138,6 +146,23 @@
 				Gtk::ColorButton m_ColorButtonStroke;
 					void ColorButtonStroke_onClick();
 			
+			//X/Y Width/Height Shape's properties
+				Gtk::HBox m_Properties;
+				Gtk::VBox m_PropertiesV1;
+				Gtk::VBox m_PropertiesV2;
+				Gtk::Label m_LabelX;
+				Gtk::Entry m_EntryX;
+					void EntryX_onEnter();
+				Gtk::Label m_LabelY;
+				Gtk::Entry m_EntryY;
+					void EntryY_onEnter();
+				Gtk::Label m_LabelWidth;
+				Gtk::Entry m_EntryWidth;
+					void EntryWidth_onEnter();
+				Gtk::Label m_LabelHeight;
+				Gtk::Entry m_EntryHeight;
+					void EntryHeight_onEnter();
+			
 			Gtk::Label m_LblHolder_Toolbar;
 			KageStage m_KageStage;
 			Glib::RefPtr<Gtk::UIManager> m_refUIManager;
@@ -145,6 +170,7 @@
 			
 			void addToolButton(const Glib::ustring &label);
 			Gtk::ToggleButton m_ToggleBtnSelect;
+			void btnDebug_onClick();
 			void btnAbout_onClick();
 			void CheckUpdate_onClick();
 			void Website_onClick();
@@ -170,6 +196,7 @@
 			string expPath;
 			std::ofstream expFile;
 			bool dtrace(string p_msg);
+			bool saveKageStudio(string p_path, string p_msg);
 			bool exportHtml5(string p_path, string p_msg);
 			bool exportKonsolScript(string p_path, string p_msg);
 			bool dump(string p_path, string p_msg);
@@ -180,14 +207,16 @@
 			string strToLower(string p_str);
 			string intToString(int p_src);
 			string uintToString(unsigned int p_src);
+			string doubleToString(double p_src);
 			int stringToInt(string strConvert);
 			int stringToUInt(string strConvert);
 			long stringToLong(string strConvert);
+			double stringToDouble(string strConvert);
 			
 			bool runExternal(string p_cmd, string p_param);
 			
 			void Play_onClick();
-			void ToolSelect_onClick();
+//			void ToolSelect_onClick();
 			void ToolNode_onClick();
 			void ToolPoly_onClick();
 			void ToolOval_onClick();
@@ -199,12 +228,15 @@
 			void toolsButtonToggle(string p_toolTip);
 			
 		public:
+			void ToolSelect_onClick();
+			
 			static void timestamp();
 			
 			void switchToPreviousFrame();
 			void switchToNextFrame();
 			
 			void updateColors();
+			void updateProperties();
 			void updateSelectedShapeColor(bool p_doFill = true, bool p_doStroke = true);
 	};
 

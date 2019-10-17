@@ -9,6 +9,7 @@
 	#include "data/color.h"
 	#include "data/strokecolor.h"
 	#include "data/vectordata.h"
+	#include <cairomm/context.h>
 	
 	class Kage; //forward declaration
 	
@@ -18,6 +19,7 @@
 			static Glib::RefPtr<Gdk::Pixbuf> imageSHAPE_045;
 			static Glib::RefPtr<Gdk::Pixbuf> imageSHAPE_090;
 			static Glib::RefPtr<Gdk::Pixbuf> imageSHAPE_135;
+			static Glib::RefPtr<Gdk::Pixbuf> imageSHAPE_MOVE;
 			
 			KageStage(Kage *p_win);
 			virtual ~KageStage();
@@ -45,7 +47,16 @@
 			unsigned int wid;
 			unsigned int hgt;
 			unsigned int fps;
+			double propX = 0;
+			int propXindex1;
+			int propXindex2;
+			double propY = 0;
+			int propYindex1;
+			int propYindex2;
+			double propWidth = 0;
+			double propHeight = 0;
 			
+			void printVectors();
 			void render();
 			
 			void setStageBG(Gdk::Color p_Color);
@@ -59,15 +70,17 @@
 			void clearScreen();
 			void renderFrame();
 			void initNodeTool();
-			void handleShapes();
+			void handleShapes(bool p_hideAnchor = true);
 			void handleShapes_scaleNorth();
 			void handleShapes_scaleEast();
 			void handleShapes_scaleWest();
 			void handleShapes_scaleSouth();
 			void handleShapes_moveShape(double p_diffX, double p_diffY);
 			void handleShapes_updateAnchors(double p_x, double p_y);
+			void handleShapesMouseDown();
 			void handleShapesMouseUp();
 			void handleNodes();
+			void handleNodesMouseDown();
 			void handleNodesMouseUp();
 			bool handleNodes_getNearestShape(double p_x, double p_y, unsigned int p_index, vector<VectorData> p_v);
 			void handleDrawOvalMouseUp();
@@ -76,7 +89,9 @@
 			void handlePoly();
 			void handleRect();
 			void handleOval();
+			void handleStroke(); //needed?
 			void handleStrokeMouseUp();
+			void handleFill(); //needed?
 			void handleFillMouseUp();
 			void handleEyedrop();
 			void handleEyedropMouseUp();
@@ -87,6 +102,11 @@
 			bool deleteSelectedNode();
 			
 			void updateShapeColor(bool p_doFill = true, bool p_doStroke = true);
+			void updateShapeX(double p_value);
+			void updateShapeY(double p_value);
+			void updateShapeWidth(double p_value);
+			void updateShapeHeight(double p_value);
+			
 		protected:
 			ToolMode prevTool; //used by Hand-tool shortcut [spacebar]
 			Kage *win;

@@ -26,8 +26,10 @@
 			VectorDataManager clone();
 			
 			void clear();
+			void addInit();
 			void addFill(ColorData p_color);
 			void addEndFill();
+			void addClosePath();
 			void addCubic(PointData p_point1, PointData p_point2, PointData p_point3);
 			void addQuadratic(PointData p_point1, PointData p_point2, PointData p_point3);
 			void addLine(PointData p_point);
@@ -35,7 +37,7 @@
 			void addMove(PointData p_point);
 			void addLineStyle(StrokeColorData p_stroke);
 			
-			void init(ColorData p_fill, StrokeColorData p_stroke);
+//			void init(ColorData p_fill, StrokeColorData p_stroke);
 			void push(VectorDataManager p_vectorsData);
 		protected:
 			void add(VectorData::type p_type, ColorData p_fill, StrokeColorData p_stroke);

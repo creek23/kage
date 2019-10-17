@@ -71,18 +71,18 @@ void ColorData::setA(unsigned int p_a) {
 	A = p_a;
 }
 
-unsigned int ColorData::getR() {
+unsigned int ColorData::getR() const {
 	return R;
 }
 
-unsigned int ColorData::getG() {
+unsigned int ColorData::getG() const {
 	return G;
 }
 
-unsigned int ColorData::getB() {
+unsigned int ColorData::getB() const {
 	return B;
 }
 
-unsigned int ColorData::getA() {
+unsigned int ColorData::getA() const {
 	return A;
 }

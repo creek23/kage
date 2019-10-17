@@ -14,7 +14,7 @@
 			
 			//ColorData color;
 			void setThickness(double p_thickness);
-			double getThickness();
+			double getThickness() const;
 			StrokeColorData clone();
 			std::string toString() const;
 		protected:

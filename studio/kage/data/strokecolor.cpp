@@ -36,7 +36,7 @@ void StrokeColorData::setThickness(double p_thickness) {
 	thickness = p_thickness;
 }
 
-double StrokeColorData::getThickness() {
+double StrokeColorData::getThickness() const {
 	return thickness;
 }
 

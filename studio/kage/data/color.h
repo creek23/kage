@@ -16,10 +16,10 @@
 			void setG(unsigned int p_g);
 			void setB(unsigned int p_b);
 			void setA(unsigned int p_a);
-			unsigned int getR();
-			unsigned int getG();
-			unsigned int getB();
-			unsigned int getA();
+			unsigned int getR() const;
+			unsigned int getG() const;
+			unsigned int getB() const;
+			unsigned int getA() const;
 			ColorData clone();
 			std::string toString();
 			void copy(ColorData p_color);

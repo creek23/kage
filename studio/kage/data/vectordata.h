@@ -14,6 +14,7 @@
 			enum type {
 				TYPE_INIT,            //holds initial fill/stroke; no vectors to use
 				TYPE_FILL,            //holds fillColor; no vectors to use
+				TYPE_CLOSE_PATH,      //no vectors to use
 				TYPE_ENDFILL,         //holds transparent fillColor; no vectors to use
 				TYPE_STROKE,          //holds strokeColor
 				TYPE_MOVE,            //moves p0 to p1; p1 is to be stored
@@ -28,7 +29,7 @@
 			virtual ~VectorData();
 			
 			void setType(type p_type);
-			type getType();
+			type getType() const;
 			void setPoints(vector<PointData> p_points);
 			vector<PointData> getPoints();
 			StrokeColorData stroke;

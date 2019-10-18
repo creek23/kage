@@ -72,6 +72,8 @@
 			virtual void onActionActivate();
 			virtual void Undo_onClick();
 			virtual void Redo_onClick();
+			virtual void Copy_onClick();
+			virtual void Paste_onClick();
 			virtual void Delete_onClick();
 			virtual void AddFrame_onClick();
 			virtual void DuplicateFrame_onClick();

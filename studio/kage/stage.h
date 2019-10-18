@@ -90,14 +90,18 @@
 			void handleRect();
 			void handleOval();
 			void handleStroke(); //needed?
+			void handleStrokeMouseMove();
 			void handleStrokeMouseUp();
 			void handleFill(); //needed?
 			void handleFillMouseUp();
 			void handleEyedrop();
+			void handleEyedropMouseMove();
 			void handleEyedropMouseUp();
 			Glib::RefPtr<Gdk::Pixbuf> _bg;
 			Cairo::RefPtr<Cairo::Surface> _bgcr;
 			
+			bool copySelectedShape();
+			bool pasteSelectedShape();
 			bool deleteSelectedShape();
 			bool deleteSelectedNode();
 			
@@ -135,6 +139,10 @@
 			unsigned int selectedNode;
 			unsigned int mouseOnShape;
 			unsigned int selectedShape;
+			
+			unsigned int copyShapeIndexStart;
+			unsigned int copyShapeIndexStop;
+			
 			AnchorData::type mouseOnAnchor;
 			void renderNode(double p_x, double p_y, unsigned int p_state = 5);
 			void renderNodeControl(double p_x, double p_y, bool p_selected);

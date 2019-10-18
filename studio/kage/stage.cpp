@@ -240,6 +240,14 @@ bool KageStage::on_event(GdkEvent *e) {
 				
 				render();
 			}
+		} else if (KageStage::toolMode == MODE_STROKE) {
+			handleStrokeMouseMove();
+			render();
+		} else if (KageStage::toolMode == MODE_EYEDROP) {
+			draw1.x = (e->button.x);
+			draw1.y = (e->button.y);
+			handleEyedropMouseMove();
+			render();
 		} else if (KageStage::toolMode == MODE_MOVE_STAGE) {
 			double distx = e->button.x - KageStage::moveStageXY.x;
 			double disty = e->button.y - KageStage::moveStageXY.y;
@@ -1680,11 +1688,61 @@ void KageStage::handleDrawRectMouseUp() {
 	render();
 }
 
+void KageStage::handleStrokeMouseMove() {
+	handleNodesMouseUp();
+}
+
 void KageStage::handleStrokeMouseUp() {
 	handleNodesMouseUp();
 	
 	win->updateSelectedShapeColor(false, true);
 	initNodeTool();
+}
+
+bool KageStage::copySelectedShape() {
+	unsigned int l_temp = -1;
+	Kage::timestamp();
+	std::cout << " KageStage::copySelectedShape " << selectedShape << std::endl;
+	
+	if (selectedShape == l_temp) {
+		return false;
+	}
+	
+	vector<VectorData> v = win->getFrameData().getVectorData();
+	copyShapeIndexStart = selectedShape;
+	unsigned int vsize = v.size();
+	for (unsigned int i = selectedShape; i < vsize; ++i) {
+		if (v[i].vectorType == VectorData::TYPE_ENDFILL) {
+			copyShapeIndexStop = i;
+			break;
+		}
+	}
+	
+	return true;
+}
+
+bool KageStage::pasteSelectedShape() {
+	unsigned int l_temp = -1;
+	Kage::timestamp();
+	std::cout << " KageStage::pasteSelectedShape " << copyShapeIndexStart << std::endl;
+	
+	if (copyShapeIndexStart == l_temp) {
+		return false;
+	}
+	
+	vector<VectorData> v = win->getFrameData().getVectorData();
+	
+	selectedShape = v.size();
+	for (unsigned int i = copyShapeIndexStart; i <= copyShapeIndexStop; ++i) {
+		v.push_back(v[i]);
+		if (v[i].vectorType == VectorData::TYPE_ENDFILL) {
+			break;
+		}
+	}
+	
+	win->setFrameData(v);
+	
+	return true;
 }
 
 bool KageStage::deleteSelectedShape() {
@@ -1710,6 +1768,9 @@ bool KageStage::deleteSelectedShape() {
 			 v.begin() + l_temp);
 	
 	win->setFrameData(v);
+	
+	copyShapeIndexStart = -1;
+	copyShapeIndexStop = -1;
 	
 	return true;
 }
@@ -1836,6 +1897,13 @@ void KageStage::handleEyedrop() {
 	if (l_move == true) {
 		win->setFrameData(v);
 	}
+}
+
+void KageStage::handleEyedropMouseMove() {
+	Kage::timestamp();
+	std::cout << " KageStage::handleEyedropMouseMove ??? " << std::endl;
+	handleNodesMouseUp();
+	win->updateColors();
 }
 
 void KageStage::handleEyedropMouseUp() {

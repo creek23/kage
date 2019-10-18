@@ -113,6 +113,16 @@ Kage::Kage() : m_KageLayerManager(),
 		sigc::mem_fun(*this, &Kage::Redo_onClick)
 	);
 	m_refActionGroup->add(
+		Gtk::Action::create("Copy", "Copy", "Copy"),
+		Gtk::AccelKey("<control>C"),
+		sigc::mem_fun(*this, &Kage::Copy_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("Paste", "Paste", "Paste"),
+		Gtk::AccelKey("<control>V"),
+		sigc::mem_fun(*this, &Kage::Paste_onClick)
+	);
+	m_refActionGroup->add(
 		Gtk::Action::create("Delete", "Delete", "Delete"),
 //		Gtk::AccelKey("F9"),
 		sigc::mem_fun(*this, &Kage::Delete_onClick)
@@ -250,6 +260,8 @@ Kage::Kage() : m_KageLayerManager(),
 		"			<menuitem action='Undo'/>"
 		"			<menuitem action='Redo'/>"
 		"			<separator/>"
+		"			<menuitem action='Copy'/>"
+		"			<menuitem action='Paste'/>"
 		"			<menuitem action='Delete'/>"
 		"		</menu>"
 		"		<menu action='TimelineMenu'>"
@@ -504,6 +516,36 @@ void Kage::Undo_onClick() {
 }
 void Kage::Redo_onClick() {
 	//
+}
+void Kage::Copy_onClick() {
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		Kage::timestamp();
+		std::cout << " Kage::Copy_onClick SHAPE" << std::endl;
+		if (m_KageStage.copySelectedShape() == true) {
+			forceRenderFrames();
+		}
+	} else if (KageStage::toolMode == KageStage::MODE_NODE) {
+//		Kage::timestamp();
+//		std::cout << " Kage::Copy_onClick NODE" << std::endl;
+//		if (m_KageStage.copySelectedNode() == true) {
+//			forceRenderFrames();
+//		}
+	}
+}
+void Kage::Paste_onClick() {
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		Kage::timestamp();
+		std::cout << " Kage::Paste_onClick SHAPE" << std::endl;
+		if (m_KageStage.pasteSelectedShape() == true) {
+			forceRenderFrames();
+		}
+	} else if (KageStage::toolMode == KageStage::MODE_NODE) {
+//		Kage::timestamp();
+//		std::cout << " Kage::Paste_onClick NODE" << std::endl;
+//		if (m_KageStage.pasteSelectedNode() == true) {
+//			forceRenderFrames();
+//		}
+	}
 }
 void Kage::Delete_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
@@ -845,7 +887,7 @@ void Kage::Save_onClick() {
 				KageFramesManager::currentLayer = l_currentLayer;
 				m_KageFramesManager.setCurrentFrame(l_currentFrame);
 			saveKageStudio(ksfPath, "</KageStudio>");
-			
+			updateStatus("Saved to " + ksfPath);
 			//TODO: zip saved file -- should it be zipped?
 			break;
 //		default:
@@ -887,6 +929,7 @@ void Kage::ExportKS_onClick() {
 			exportKonsolScript(ksfPath, "\t//add variable initialization...");
 			exportKonsolScript(ksfPath, "\tKonsol:RGB(" + intToString(m_KageStage.stageBG.getR()) + ", " + intToString(m_KageStage.stageBG.getG()) + "," + intToString(m_KageStage.stageBG.getB()) + ", bgcolor)");
 			exportKonsolScript(ksfPath, "}");
+			updateStatus("Exported to " + ksfPath);
 			break;
 	}
 }
@@ -955,6 +998,7 @@ void Kage::ExportHTML5_onClick() {
 				KageFramesManager::currentLayer = t;
 			exportHtml5(expPath, "function main() {\n\t//add variable initialization...\n}");
 			exportHtml5(expPath, "</script>\n</head>\n<body align='center' onload='kagestudio();'>\n<canvas id='screen' width='" + uintToString(m_KageStage.wid) + "' height='" + uintToString(m_KageStage.hgt) + "'></canvas>\n</body>\n</html>");
+			updateStatus("Exported to " + expPath);
 			break;
 	}
 }

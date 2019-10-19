@@ -113,19 +113,39 @@ Kage::Kage() : m_KageLayerManager(),
 		sigc::mem_fun(*this, &Kage::Redo_onClick)
 	);
 	m_refActionGroup->add(
-		Gtk::Action::create("Copy", "Copy", "Copy"),
+		Gtk::Action::create("Copy", "_Copy", "Copy"),
 		Gtk::AccelKey("<control>C"),
 		sigc::mem_fun(*this, &Kage::Copy_onClick)
 	);
 	m_refActionGroup->add(
-		Gtk::Action::create("Paste", "Paste", "Paste"),
+		Gtk::Action::create("Paste", "_Paste", "Paste"),
 		Gtk::AccelKey("<control>V"),
 		sigc::mem_fun(*this, &Kage::Paste_onClick)
 	);
 	m_refActionGroup->add(
-		Gtk::Action::create("Delete", "Delete", "Delete"),
+		Gtk::Action::create("Delete", "_Delete", "Delete"),
 //		Gtk::AccelKey("F9"),
 		sigc::mem_fun(*this, &Kage::Delete_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("Raise", "R_aise", "Raise"),
+		Gtk::AccelKey("page_up"),
+		sigc::mem_fun(*this, &Kage::Raise_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("Lower", "_Lower", "Lower"),
+		Gtk::AccelKey("page down"),
+		sigc::mem_fun(*this, &Kage::Lower_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("RaiseToTop", "Raise to _Top", "RaiseToTop"),
+		Gtk::AccelKey("<pgup>"),
+		sigc::mem_fun(*this, &Kage::RaiseToTop_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("LowerToBottom", "Lower to _Bottom", "LowerToBottom"),
+		Gtk::AccelKey("pageup"),
+		sigc::mem_fun(*this, &Kage::LowerToBottom_onClick)
 	);
 	////Add Toggle Actions:
 	//m_refActionGroup->add(
@@ -263,6 +283,11 @@ Kage::Kage() : m_KageLayerManager(),
 		"			<menuitem action='Copy'/>"
 		"			<menuitem action='Paste'/>"
 		"			<menuitem action='Delete'/>"
+		"			<separator/>"
+		"			<menuitem action='Raise'/>"
+		"			<menuitem action='Lower'/>"
+		"			<menuitem action='RaiseToTop'/>"
+		"			<menuitem action='LowerToBottom'/>"
 		"		</menu>"
 		"		<menu action='TimelineMenu'>"
 		"			<menuitem action='Play'/>"
@@ -520,31 +545,55 @@ void Kage::Redo_onClick() {
 void Kage::Copy_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp();
-		std::cout << " Kage::Copy_onClick SHAPE" << std::endl;
+		std::cout << " Kage::Copy_onClick" << std::endl;
 		if (m_KageStage.copySelectedShape() == true) {
 			forceRenderFrames();
 		}
-	} else if (KageStage::toolMode == KageStage::MODE_NODE) {
-//		Kage::timestamp();
-//		std::cout << " Kage::Copy_onClick NODE" << std::endl;
-//		if (m_KageStage.copySelectedNode() == true) {
-//			forceRenderFrames();
-//		}
 	}
 }
 void Kage::Paste_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp();
-		std::cout << " Kage::Paste_onClick SHAPE" << std::endl;
+		std::cout << " Kage::Paste_onClick" << std::endl;
 		if (m_KageStage.pasteSelectedShape() == true) {
 			forceRenderFrames();
 		}
-	} else if (KageStage::toolMode == KageStage::MODE_NODE) {
-//		Kage::timestamp();
-//		std::cout << " Kage::Paste_onClick NODE" << std::endl;
-//		if (m_KageStage.pasteSelectedNode() == true) {
-//			forceRenderFrames();
-//		}
+	}
+}
+void Kage::Raise_onClick() {
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		Kage::timestamp();
+		std::cout << " Kage::Raise_onClick" << std::endl;
+		if (m_KageStage.raiseSelectedShape() == true) {
+			forceRenderFrames();
+		}
+	}
+}
+void Kage::Lower_onClick() {
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		Kage::timestamp();
+		std::cout << " Kage::Lower_onClick" << std::endl;
+		if (m_KageStage.lowerSelectedShape() == true) {
+			forceRenderFrames();
+		}
+	}
+}
+void Kage::RaiseToTop_onClick() {
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		Kage::timestamp();
+		std::cout << " Kage::RaiseToTop_onClick" << std::endl;
+		if (m_KageStage.raiseToTopSelectedShape() == true) {
+			forceRenderFrames();
+		}
+	}
+}
+void Kage::LowerToBottom_onClick() {
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		Kage::timestamp();
+		std::cout << " Kage::LowerToBottom_onClick" << std::endl;
+		if (m_KageStage.lowerToBottomSelectedShape() == true) {
+			forceRenderFrames();
+		}
 	}
 }
 void Kage::Delete_onClick() {

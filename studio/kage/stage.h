@@ -104,12 +104,21 @@
 			bool pasteSelectedShape();
 			bool deleteSelectedShape();
 			bool deleteSelectedNode();
+			bool raiseSelectedShape();
+			bool lowerSelectedShape();
+			bool raiseToTopSelectedShape();
+			bool lowerToBottomSelectedShape();
 			
 			void updateShapeColor(bool p_doFill = true, bool p_doStroke = true);
 			void updateShapeX(double p_value);
 			void updateShapeY(double p_value);
 			void updateShapeWidth(double p_value);
 			void updateShapeHeight(double p_value);
+			
+			vector<VectorData> _vectorDataCopyBuffer;
+			vector<VectorData> _vectorDataZOrderBuffer;
+			vector<VectorData> _vectorDataZOrderBufferB;
+			vector<VectorData> _vectorDataZOrderBufferC;
 			
 		protected:
 			ToolMode prevTool; //used by Hand-tool shortcut [spacebar]
@@ -139,9 +148,6 @@
 			unsigned int selectedNode;
 			unsigned int mouseOnShape;
 			unsigned int selectedShape;
-			
-			unsigned int copyShapeIndexStart;
-			unsigned int copyShapeIndexStop;
 			
 			AnchorData::type mouseOnAnchor;
 			void renderNode(double p_x, double p_y, unsigned int p_state = 5);

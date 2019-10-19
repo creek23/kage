@@ -59,6 +59,29 @@ bool KageStage::on_key_press_event(GdkEventKey *e) {
 	} else if (e->keyval == 44) { //, comma
 		win->switchToPreviousFrame();
 	} else {
+		if (KageStage::toolMode == MODE_SELECT) {
+			if (e->keyval == 65535) { //[DELETE]
+				win->Delete_onClick();
+			} else if (e->keyval == 65360) { //[HOME]
+				win->RaiseToTop_onClick();
+			} else if (e->keyval == 65365) { //[PAGE UP]
+				win->Raise_onClick();
+			} else if (e->keyval == 65366) { //[PAGE DOWN]
+				win->Lower_onClick();
+			} else if (e->keyval == 65367) { //[END]
+				win->LowerToBottom_onClick();
+			}
+			std::cout << "KageStage::::on_key_press_event A " << e->keyval << "_" << e->string << std::endl;
+			render();
+			return true;
+		} else if (KageStage::toolMode == MODE_NODE) {
+			if (e->keyval == 65535) { //[DELETE]
+				win->Delete_onClick();
+			}
+			std::cout << "KageStage::::on_key_press_event B " << e->keyval << "_" << e->string << std::endl;
+			render();
+			return true;
+		}
 		if (KageStage::toolMode == MODE_SELECT
 				|| KageStage::toolMode == MODE_NODE) {
 			if (e->keyval == 65362) { // UP-ARROW
@@ -73,7 +96,11 @@ bool KageStage::on_key_press_event(GdkEventKey *e) {
 				keyShiftDown = true;
 			} else if (e->keyval == 65507 || e->keyval == 65508) { //[CONTROL]
 				keyControlDown = true;
+			} else {
+				std::cout << "KageStage::::on_key_press_event C " << e->keyval << "_" << e->string << std::endl;
+				return true;
 			}
+			
 			double l_diffX = 0;
 			double l_diffY = 0;
 			if (keyUpDown == true) {
@@ -1709,11 +1736,11 @@ bool KageStage::copySelectedShape() {
 	}
 	
 	vector<VectorData> v = win->getFrameData().getVectorData();
-	copyShapeIndexStart = selectedShape;
 	unsigned int vsize = v.size();
+	_vectorDataCopyBuffer.clear();
 	for (unsigned int i = selectedShape; i < vsize; ++i) {
+		_vectorDataCopyBuffer.push_back(v[i]);
 		if (v[i].vectorType == VectorData::TYPE_ENDFILL) {
-			copyShapeIndexStop = i;
 			break;
 		}
 	}
@@ -1722,20 +1749,20 @@ bool KageStage::copySelectedShape() {
 }
 
 bool KageStage::pasteSelectedShape() {
-	unsigned int l_temp = -1;
+	unsigned int l_vectorDataCopyBuffer_size = _vectorDataCopyBuffer.size();
 	Kage::timestamp();
-	std::cout << " KageStage::pasteSelectedShape " << copyShapeIndexStart << std::endl;
+	std::cout << " KageStage::pasteSelectedShape " << l_vectorDataCopyBuffer_size << std::endl;
 	
-	if (copyShapeIndexStart == l_temp) {
+	if (l_vectorDataCopyBuffer_size == 0) {
 		return false;
 	}
 	
 	vector<VectorData> v = win->getFrameData().getVectorData();
 	
 	selectedShape = v.size();
-	for (unsigned int i = copyShapeIndexStart; i <= copyShapeIndexStop; ++i) {
-		v.push_back(v[i]);
-		if (v[i].vectorType == VectorData::TYPE_ENDFILL) {
+	for (unsigned int i = 0; i < l_vectorDataCopyBuffer_size; ++i) {
+		v.push_back(_vectorDataCopyBuffer[i]);
+		if (_vectorDataCopyBuffer[i].vectorType == VectorData::TYPE_ENDFILL) {
 			break;
 		}
 	}
@@ -1769,9 +1796,6 @@ bool KageStage::deleteSelectedShape() {
 	
 	win->setFrameData(v);
 	
-	copyShapeIndexStart = -1;
-	copyShapeIndexStop = -1;
-	
 	return true;
 }
 
@@ -1791,25 +1815,26 @@ bool KageStage::deleteSelectedNode() {
 	unsigned int l_sequence = 0;
 	bool l_closepath = false;
 	if (vsize >= 5) {
-		if (v[selectedShape + 0].vectorType == VectorData::TYPE_FILL       ) ++l_sequence;
-		if (v[selectedShape + 1].vectorType == VectorData::TYPE_STROKE     ) ++l_sequence;
-		if (v[selectedShape + 2].vectorType == VectorData::TYPE_MOVE       ) ++l_sequence;
-		if (v[selectedShape + 3].vectorType == VectorData::TYPE_CURVE_CUBIC) ++l_sequence;
-		if (v[selectedShape + 4].vectorType == VectorData::TYPE_CLOSE_PATH ) {
+		if (v[selectedShape + 0].vectorType == VectorData::TYPE_INIT       ) ++l_sequence;
+		if (v[selectedShape + 1].vectorType == VectorData::TYPE_FILL       ) ++l_sequence;
+		if (v[selectedShape + 2].vectorType == VectorData::TYPE_STROKE     ) ++l_sequence;
+		if (v[selectedShape + 3].vectorType == VectorData::TYPE_MOVE       ) ++l_sequence;
+		if (v[selectedShape + 4].vectorType == VectorData::TYPE_CURVE_CUBIC) ++l_sequence;
+		if (v[selectedShape + 5].vectorType == VectorData::TYPE_CLOSE_PATH ) {
 			++l_sequence;
 			l_closepath = true;
-			if (v[selectedShape + 5].vectorType == VectorData::TYPE_ENDFILL) {
+			if (v[selectedShape + 6].vectorType == VectorData::TYPE_ENDFILL) {
 				++l_sequence;
 			}
-		} else if (v[selectedShape + 4].vectorType == VectorData::TYPE_ENDFILL) {
+		} else if (v[selectedShape + 5].vectorType == VectorData::TYPE_ENDFILL) {
 			++l_sequence;
 		}
 	}
 	
-	if (l_sequence == 5 && l_closepath == false) {
+	if (l_sequence == 6 && l_closepath == false) {
 		v.erase (v.begin() + selectedShape,
 				 v.begin() + selectedShape + l_sequence);
-	} else if (l_sequence == 6 && l_closepath == true) {
+	} else if (l_sequence == 7 && l_closepath == true) {
 		v.erase (v.begin() + selectedShape,
 				 v.begin() + selectedShape + l_sequence);
 	} else {
@@ -1817,6 +1842,201 @@ bool KageStage::deleteSelectedNode() {
 	}
 	
 	win->setFrameData(v);
+	
+	return true;
+}
+
+bool KageStage::raiseSelectedShape() {
+	unsigned int l_temp = -1;
+	Kage::timestamp();
+	std::cout << " KageStage::raiseSelectedShape " << selectedShape << std::endl;
+	
+	if (selectedShape == l_temp) {
+		return false;
+	}
+	
+	vector<VectorData> v = win->getFrameData().getVectorData();
+	unsigned int vsize = v.size();
+	_vectorDataZOrderBuffer.clear();
+	_vectorDataZOrderBufferB.clear();
+	_vectorDataZOrderBufferC.clear();
+	for (unsigned int i = selectedShape; i < vsize; ++i) {
+		_vectorDataZOrderBuffer.push_back(v[i]);
+		if (v[i].vectorType == VectorData::TYPE_ENDFILL) {			
+			l_temp = i;
+			for (i = i+1; i < vsize; ++i) {
+				_vectorDataZOrderBufferB.push_back(v[i]);
+				if (v[i].vectorType == VectorData::TYPE_ENDFILL) {
+					for (i = i+1; i < vsize; ++i) {
+						_vectorDataZOrderBufferC.push_back(v[i]);
+					}
+					l_temp = i;
+					break;
+				}
+			}
+			break;
+		}
+	}
+	
+	v.erase (v.begin() + selectedShape,
+			 v.begin() + l_temp);
+		
+		for (unsigned int i = 0; i < _vectorDataZOrderBufferB.size(); ++i) {
+			v.push_back(_vectorDataZOrderBufferB[i]);
+		}
+			_vectorDataZOrderBufferB.clear();
+		
+		selectedShape = v.size();
+		
+		for (unsigned int i = 0; i < _vectorDataZOrderBuffer.size(); ++i) {
+			v.push_back(_vectorDataZOrderBuffer[i]);
+		}
+			_vectorDataZOrderBuffer.clear();
+		
+		for (unsigned int i = 0; i < _vectorDataZOrderBufferC.size(); ++i) {
+			v.push_back(_vectorDataZOrderBufferC[i]);
+		}
+			_vectorDataZOrderBufferC.clear();
+	
+	win->setFrameData(v);
+	
+	return true;
+}
+
+bool KageStage::lowerSelectedShape() {
+	unsigned int l_temp = -1;
+	Kage::timestamp();
+	std::cout << " KageStage::lowerSelectedShape " << selectedShape << std::endl;
+	
+	if (selectedShape == l_temp || selectedShape == 0) {
+		return false;
+	}
+	
+	vector<VectorData> v = win->getFrameData().getVectorData();
+	unsigned int vsize = v.size();
+	_vectorDataZOrderBuffer.clear();
+	_vectorDataZOrderBufferB.clear();
+	_vectorDataZOrderBufferC.clear();
+	for (unsigned int i = selectedShape; i < vsize; ++i) {
+		_vectorDataZOrderBuffer.push_back(v[i]);
+		if (v[i].vectorType == VectorData::TYPE_ENDFILL) {			
+			for (i = i+1; i < vsize; ++i) {
+				_vectorDataZOrderBufferC.push_back(v[i]);
+			}
+			l_temp = i;		
+			break;
+		}
+	}
+		for (unsigned int i = selectedShape-1; i >= 0; --i) {
+			if (v[i].vectorType == VectorData::TYPE_INIT) {
+				unsigned int l_tempSelectedShape = i;
+				for (i = i; i < selectedShape; ++i) {
+					_vectorDataZOrderBufferB.push_back(v[i]);
+					if (v[i].vectorType == VectorData::TYPE_ENDFILL) {
+						break;
+					}
+				}
+				selectedShape = l_tempSelectedShape;
+				break;
+			}
+		}
+	
+	v.erase (v.begin() + selectedShape,
+			 v.begin() + l_temp);
+		
+		selectedShape = v.size();
+		
+		for (unsigned int i = 0; i < _vectorDataZOrderBuffer.size(); ++i) {
+			v.push_back(_vectorDataZOrderBuffer[i]);
+		}
+			_vectorDataZOrderBuffer.clear();
+		
+		for (unsigned int i = 0; i < _vectorDataZOrderBufferB.size(); ++i) {
+			v.push_back(_vectorDataZOrderBufferB[i]);
+		}
+			_vectorDataZOrderBufferB.clear();
+		
+		for (unsigned int i = 0; i < _vectorDataZOrderBufferC.size(); ++i) {
+			v.push_back(_vectorDataZOrderBufferC[i]);
+		}
+			_vectorDataZOrderBufferC.clear();
+	
+	win->setFrameData(v);
+	
+	return true;
+}
+
+bool KageStage::raiseToTopSelectedShape() {
+	unsigned int l_temp = -1;
+	Kage::timestamp();
+	std::cout << " KageStage::raiseToTopSelectedShape " << selectedShape << std::endl;
+	
+	if (selectedShape == l_temp) {
+		return false;
+	}
+	
+	vector<VectorData> v = win->getFrameData().getVectorData();
+	unsigned int vsize = v.size();
+	_vectorDataZOrderBuffer.clear();
+	for (unsigned int i = selectedShape; i < vsize; ++i) {
+		_vectorDataZOrderBuffer.push_back(v[i]);
+		if (v[i].vectorType == VectorData::TYPE_ENDFILL) {
+			l_temp = i+1; // needs to be i+1
+			break;
+		}
+	}
+	
+	v.erase (v.begin() + selectedShape,
+			 v.begin() + l_temp);
+		
+		selectedShape = v.size();
+		
+		for (unsigned int i = 0; i < _vectorDataZOrderBuffer.size(); ++i) {
+			v.push_back(_vectorDataZOrderBuffer[i]);
+			if (_vectorDataZOrderBuffer[i].vectorType == VectorData::TYPE_ENDFILL) {
+				break;
+			}
+		}
+		
+		_vectorDataZOrderBuffer.clear();
+	
+	win->setFrameData(v);
+	
+	return true;
+}
+
+bool KageStage::lowerToBottomSelectedShape() {
+	unsigned int l_temp = -1;
+	Kage::timestamp();
+	std::cout << " KageStage::lowerToBottomSelectedShape " << selectedShape << std::endl;
+	
+	if (selectedShape == l_temp || selectedShape == 0) {
+		return false;
+	}
+	
+	vector<VectorData> v = win->getFrameData().getVectorData();
+	unsigned int vsize = v.size();
+	_vectorDataZOrderBuffer.clear();
+	for (unsigned int i = selectedShape; i < vsize; ++i) {
+		_vectorDataZOrderBuffer.push_back(v[i]);
+		if (v[i].vectorType == VectorData::TYPE_ENDFILL) {
+			l_temp = i;
+			break;
+		}
+	}
+	
+	v.erase (v.begin() + selectedShape,
+			 v.begin() + l_temp);
+	
+		selectedShape = 0;
+		
+		for (unsigned int i = 0; i < v.size(); ++i) {
+			_vectorDataZOrderBuffer.push_back(v[i]);
+		}
+	
+	win->setFrameData(_vectorDataZOrderBuffer);
+	
+		_vectorDataZOrderBuffer.clear();
 	
 	return true;
 }

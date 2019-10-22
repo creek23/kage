@@ -153,9 +153,9 @@
 					void ColorButtonStroke_onClick();
 			
 			//X/Y Width/Height Shape's properties
-				Gtk::HBox m_Properties;
-				Gtk::VBox m_PropertiesV1;
-				Gtk::VBox m_PropertiesV2;
+				Gtk::HBox m_propLocationSize;
+				Gtk::VBox m_propLocationSizeV1;
+				Gtk::VBox m_propLocationSizeV2;
 				Gtk::Label m_LabelX;
 				Gtk::Entry m_EntryX;
 					void EntryX_onEnter();
@@ -168,6 +168,17 @@
 				Gtk::Label m_LabelHeight;
 				Gtk::Entry m_EntryHeight;
 					void EntryHeight_onEnter();
+					
+			//X/Y Node's properties
+				Gtk::HBox m_propNodeXY;
+				Gtk::VBox m_propNodeXYV1;
+				Gtk::VBox m_propNodeXYV2;
+				Gtk::Label m_LabelNodeX;
+				Gtk::Entry m_EntryNodeX;
+					void EntryNodeX_onEnter();
+				Gtk::Label m_LabelNodeY;
+				Gtk::Entry m_EntryNodeY;
+					void EntryNodeY_onEnter();
 			
 			Gtk::Label m_LblHolder_Toolbar;
 			KageStage m_KageStage;
@@ -247,8 +258,13 @@
 			void switchToPreviousFrame();
 			void switchToNextFrame();
 			
+			void propStageSetVisible(bool p_visible);
+			void propFillStrokeSetVisible(bool p_visible);
+			void propLocationSizeSetVisible(bool p_visible);
+			void propNodeXYSetVisible(bool p_visible);
 			void updateColors();
 			void updateProperties();
+			void updateNodeXY();
 			void updateSelectedShapeColor(bool p_doFill = true, bool p_doStroke = true);
 	};
 

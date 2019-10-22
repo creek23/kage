@@ -45,7 +45,16 @@ bool KageStage::on_key_press_event(GdkEventKey *e) {
 //			get_window()->set_cursor(handcur);
 		}
 	} else if (e->keyval == 65307) { //ESCape key
-		if (KageStage::toolMode == MODE_DRAW_POLY) {
+		if (KageStage::toolMode == MODE_SELECT) {
+			initNodeTool();
+			win->propStageSetVisible(true);
+			win->propFillStrokeSetVisible(false);
+			win->propLocationSizeSetVisible(false);
+		} if (KageStage::toolMode == MODE_NODE) {
+			initNodeTool();
+			win->propStageSetVisible(true);
+			win->propNodeXYSetVisible(false);
+		} else if (KageStage::toolMode == MODE_DRAW_POLY) {
 			vector<VectorData> v = win->getFrameData().getVectorData();
 			unsigned int l_temp;
 			l_temp = getSelectedShapeViaNode(v.size() - 1, v);
@@ -479,6 +488,7 @@ bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
 			win->renderFrames();
 		}
 		
+		///why can't it be loaded when after `window = get_window()'?
 		if (!KageStage::imageSHAPE_000) {
 			KageStage::imageSHAPE_000 = Gdk::Pixbuf::create_from_file("shared/icons/shape_000.png");
 		}
@@ -985,6 +995,88 @@ void KageStage::updateShapeHeight(double p_value) {
 	render();
 }
 
+void KageStage::updateNodeX(double p_value) {
+	unsigned int l_temp = -1;
+	Kage::timestamp();
+	std::cout << " KageStage::updateNodeX " << selectedNode << " " << p_value << std::endl;
+	
+	if (selectedNode == l_temp) {
+		return;
+	}
+	
+	vector<VectorData> v = win->getFrameData().getVectorData();
+	double l_propXdiff = p_value - v[selectedNode].points[2].x;
+		if (v[selectedNode].vectorType == VectorData::TYPE_CURVE_CUBIC) {
+			v[selectedNode].points[1].x += l_propXdiff;
+			v[selectedNode].points[2].x += l_propXdiff;
+			
+			if (v[selectedNode+1].getPoints().size() != 0) {
+				v[selectedNode+1].points[0].x += l_propXdiff;
+			} else {
+			//this part of code is trying to resolve this problematic code
+			// above code is problematic if for last Node; this will use shape's first Node's point 0 instead
+				std::cout << " KageStage::updateNodeX points.size is zero" << std::endl;
+				for (unsigned int i = selectedNode-1; i >= 0; --i) {
+					if (v[i].vectorType == VectorData::TYPE_MOVE) {
+						std::cout << " KageStage::updateNodeX got MOVE" << std::endl;
+						if (i+1 != selectedNode) {
+							std::cout << " KageStage::updateNodeX moving control point :) " << std::endl;
+							v[i].points[0].x += l_propXdiff; // for Node MOVE
+							v[i+1].points[0].x += l_propXdiff; // for Node Curve's control point being used by Node MOVE
+						}
+						break;
+					}
+				}
+			}
+		} else if (v[selectedNode].vectorType == VectorData::TYPE_IMAGE) {
+			//TODO:handle X for images
+		} else if (v[selectedNode].vectorType == VectorData::TYPE_ENDFILL) {
+			//
+		}
+	
+	win->setFrameData(v);
+	
+	render();
+}
+void KageStage::updateNodeY(double p_value) {
+	unsigned int l_temp = -1;
+	Kage::timestamp();
+	std::cout << " KageStage::updateNodeY " << selectedNode << " " << p_value << std::endl;
+	
+	if (selectedNode == l_temp) {
+		return;
+	}
+	
+	vector<VectorData> v = win->getFrameData().getVectorData();
+	double l_propYdiff = p_value - v[selectedNode].points[2].y;
+		if (v[selectedNode].vectorType == VectorData::TYPE_CURVE_CUBIC) {
+			v[selectedNode].points[1].y += l_propYdiff;
+			v[selectedNode].points[2].y += l_propYdiff;
+			
+			if (v[selectedNode+1].getPoints().size() != 0) {
+				v[selectedNode+1].points[0].y += l_propYdiff;
+			} else {
+				for (unsigned int i = selectedNode-1; i >= 0; --i) {
+					if (v[i].vectorType == VectorData::TYPE_MOVE) {
+						if (i+1 != selectedNode) {
+							v[i].points[0].y += l_propYdiff;
+							v[i+1].points[0].y += l_propYdiff;
+						}
+						break;
+					}
+				}
+			}
+		} else if (v[selectedNode].vectorType == VectorData::TYPE_IMAGE) {
+			//TODO:handle Y for images
+		} else if (v[selectedNode].vectorType == VectorData::TYPE_ENDFILL) {
+			//
+		}
+	
+	win->setFrameData(v);
+	
+	render();
+}
+
 void KageStage::handleShapes(bool p_hideAnchor) {
 	unsigned int l_temp = -1;
 	
@@ -1438,6 +1530,9 @@ void KageStage::handleNodesMouseDown() {
 void KageStage::handleNodesMouseUp() {
 	_nodeToMouseDistance = 1080;
 	vector<VectorData> v = win->getFrameData().getVectorData();
+	if (v.size() == 0) {
+		return;
+	}
 	selectedNode = -1;
 	mouseOnNode = -1;
 	unsigned int vsize = v.size();
@@ -1451,6 +1546,24 @@ void KageStage::handleNodesMouseUp() {
 			}
 			if (handleNodes_getNearestShape(v[i].points[2].x + origin.x, v[i].points[2].y + origin.y, i, v)) {
 				selectedNode = i;
+			}
+		}
+	}
+	if (selectedShape != -1) {
+		if (KageStage::toolMode == MODE_SELECT) {
+			win->propStageSetVisible(false);
+			win->propFillStrokeSetVisible(true);
+			win->propLocationSizeSetVisible(true);
+		}
+	}
+	if (selectedNode != -1) {
+		if (KageStage::toolMode == MODE_NODE) {
+			if (v[selectedNode].getPoints().size() == 3) {
+				nodeX = v[selectedNode].points[2].x;
+				nodeY = v[selectedNode].points[2].y;
+				win->updateNodeXY();
+				win->propStageSetVisible(false);
+				win->propNodeXYSetVisible(true);
 			}
 		}
 	}
@@ -1493,6 +1606,8 @@ double KageStage::getSelectedShapeViaNode(unsigned int p_index, vector<VectorDat
 	propYindex2 = -1;
 	propWidth = 0.0;
 	propHeight = 0.0;
+	nodeX = DBL_MAX;
+	nodeY = DBL_MAX;
 	for (unsigned int i = p_index; i >= 0; --i) {
 		switch (p_v[i].vectorType) {
 			case VectorData::TYPE_FILL:

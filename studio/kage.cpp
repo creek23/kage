@@ -39,6 +39,7 @@ Kage::Kage() : m_KageLayerManager(),
 			   m_LabelStageWid("Width"),
 			   m_LabelStageHgt("Height"),
 			   m_LabelStageBG("Background"),
+			   m_LabelStageFPS("FPS"),
 			   m_LabelFill("Fill"),
 			   m_LabelFillAlpha("Fill Alpha"),
 			   m_LabelStroke("Stroke"),
@@ -48,6 +49,8 @@ Kage::Kage() : m_KageLayerManager(),
 			   m_LabelY("Y"),
 			   m_LabelWidth("Width"),
 			   m_LabelHeight("Height"),
+			   m_LabelNodeX("X"),
+			   m_LabelNodeY("Y"),
 			   m_LblHolder_Toolbar("Toolbar"),
 			   m_KageStage(this) {
 	m_ContextId = m_Statusbar.get_context_id(app_title);
@@ -480,45 +483,70 @@ Kage::Kage() : m_KageLayerManager(),
 						m_EntryStrokeThickness.signal_activate().connect(
 							sigc::mem_fun(*this, &Kage::EntryStrokeThickness_onEnter));
 			//X/Y Width/Height
- 			m_Box1.pack_start(m_Properties, Gtk::PACK_SHRINK);
-				m_Properties.set_border_width(10);
-				m_Properties.pack_start(m_PropertiesV1);
-					m_PropertiesV1.set_border_width(4);
-					m_PropertiesV1.set_spacing(4);
-					m_PropertiesV1.pack_start(m_LabelX);
-					m_PropertiesV1.pack_start(m_LabelY);
-					m_PropertiesV1.pack_start(m_LabelWidth);
-					m_PropertiesV1.pack_start(m_LabelHeight);
-				m_Properties.pack_start(m_PropertiesV2);
-					m_PropertiesV2.set_border_width(4);
-					m_PropertiesV2.set_spacing(4);
-					m_PropertiesV2.pack_start(m_EntryX, Gtk::PACK_SHRINK);
+ 			m_Box1.pack_start(m_propLocationSize, Gtk::PACK_SHRINK);
+				m_propLocationSize.set_border_width(10);
+				m_propLocationSize.pack_start(m_propLocationSizeV1);
+					m_propLocationSizeV1.set_border_width(4);
+					m_propLocationSizeV1.set_spacing(4);
+					m_propLocationSizeV1.pack_start(m_LabelX);
+					m_propLocationSizeV1.pack_start(m_LabelY);
+					m_propLocationSizeV1.pack_start(m_LabelWidth);
+					m_propLocationSizeV1.pack_start(m_LabelHeight);
+				m_propLocationSize.pack_start(m_propLocationSizeV2);
+					m_propLocationSizeV2.set_border_width(4);
+					m_propLocationSizeV2.set_spacing(4);
+					m_propLocationSizeV2.pack_start(m_EntryX, Gtk::PACK_SHRINK);
 						m_EntryX.set_size_request(32, 24);
 						m_EntryX.set_max_length(9);
 						m_EntryX.set_text(doubleToString(m_KageStage.propX));
 						m_EntryX.signal_activate().connect(
 							sigc::mem_fun(*this, &Kage::EntryX_onEnter));
-					m_PropertiesV2.pack_start(m_EntryY, Gtk::PACK_SHRINK);
+					m_propLocationSizeV2.pack_start(m_EntryY, Gtk::PACK_SHRINK);
 						m_EntryY.set_size_request(32, 24);
 						m_EntryY.set_max_length(9);
 						m_EntryY.set_text(doubleToString(m_KageStage.propY));
 						m_EntryY.signal_activate().connect(
 							sigc::mem_fun(*this, &Kage::EntryY_onEnter));
-					m_PropertiesV2.pack_start(m_EntryWidth, Gtk::PACK_SHRINK);
+					m_propLocationSizeV2.pack_start(m_EntryWidth, Gtk::PACK_SHRINK);
 						m_EntryWidth.set_size_request(32, 24);
 						m_EntryWidth.set_max_length(9);
 						m_EntryWidth.set_text(doubleToString(m_KageStage.propWidth));
 						m_EntryWidth.signal_activate().connect(
 							sigc::mem_fun(*this, &Kage::EntryWidth_onEnter));
-					m_PropertiesV2.pack_start(m_EntryHeight, Gtk::PACK_SHRINK);
+					m_propLocationSizeV2.pack_start(m_EntryHeight, Gtk::PACK_SHRINK);
 						m_EntryHeight.set_size_request(32, 24);
 						m_EntryHeight.set_max_length(9);
 						m_EntryHeight.set_text(doubleToString(m_KageStage.propHeight));
 						m_EntryHeight.signal_activate().connect(
 							sigc::mem_fun(*this, &Kage::EntryHeight_onEnter));
+			//X/Y of Node
+ 			m_Box1.pack_start(m_propNodeXY, Gtk::PACK_SHRINK);
+				m_propNodeXY.set_border_width(10);
+				m_propNodeXY.pack_start(m_propNodeXYV1);
+					m_propNodeXYV1.set_border_width(4);
+					m_propNodeXYV1.set_spacing(4);
+					m_propNodeXYV1.pack_start(m_LabelNodeX);
+					m_propNodeXYV1.pack_start(m_LabelNodeY);
+				m_propNodeXY.pack_start(m_propNodeXYV2);
+					m_propNodeXYV2.set_border_width(4);
+					m_propNodeXYV2.set_spacing(4);
+					m_propNodeXYV2.pack_start(m_EntryNodeX, Gtk::PACK_SHRINK);
+						m_EntryNodeX.set_size_request(32, 24);
+						m_EntryNodeX.set_max_length(9);
+						m_EntryNodeX.set_text(doubleToString(m_KageStage.nodeX));
+						m_EntryNodeX.signal_activate().connect(
+							sigc::mem_fun(*this, &Kage::EntryNodeX_onEnter));
+					m_propNodeXYV2.pack_start(m_EntryNodeY, Gtk::PACK_SHRINK);
+						m_EntryNodeY.set_size_request(32, 24);
+						m_EntryNodeY.set_max_length(9);
+						m_EntryNodeY.set_text(doubleToString(m_KageStage.nodeY));
+						m_EntryNodeY.signal_activate().connect(
+							sigc::mem_fun(*this, &Kage::EntryNodeY_onEnter));
 	show_all();
-	m_PropFillStroke.set_visible(false);
-	m_Properties.set_visible(false);
+	propStageSetVisible(true);
+	propFillStrokeSetVisible(false);
+	propLocationSizeSetVisible(false);
+	propNodeXYSetVisible(false);
 	m_KageFramesManager.setCurrentFrame(1);
 	m_KageFramesManager.setCurrentLayer(1);
 	
@@ -698,9 +726,10 @@ void Kage::onToolButtonsClick(Gtk::ToggleButton *p_sourceButton) {
 }
 void Kage::ToolSelect_onClick() {
 	toolsButtonToggle("Select Tool");
-	m_PropStage.set_visible(true);
-	m_PropFillStroke.set_visible(true);
-	m_Properties.set_visible(true);
+	propStageSetVisible(true);
+	propFillStrokeSetVisible(false);
+	propLocationSizeSetVisible(false);
+	propNodeXYSetVisible(false);
 	KageStage::toolMode = KageStage::MODE_SELECT;
 	m_KageStage.initNodeTool();
 	forceRenderFrames();
@@ -708,9 +737,10 @@ void Kage::ToolSelect_onClick() {
 
 void Kage::ToolNode_onClick() {
 	toolsButtonToggle("Node Tool");
-	m_PropStage.set_visible(false);
-	m_PropFillStroke.set_visible(false);
-	m_Properties.set_visible(false);
+	propStageSetVisible(false);
+	propFillStrokeSetVisible(false);
+	propLocationSizeSetVisible(false);
+	propNodeXYSetVisible(false);
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
 	KageStage::toolMode = KageStage::MODE_NODE;
@@ -720,9 +750,10 @@ void Kage::ToolNode_onClick() {
 
 void Kage::ToolPoly_onClick() {
 	toolsButtonToggle("Poly Tool");
-	m_PropStage.set_visible(false);
-	m_PropFillStroke.set_visible(true);
-	m_Properties.set_visible(false);
+	propStageSetVisible(false);
+	propFillStrokeSetVisible(true);
+	propLocationSizeSetVisible(false);
+	propNodeXYSetVisible(false);
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
 	KageStage::toolMode = KageStage::MODE_DRAW_POLY;
@@ -731,9 +762,10 @@ void Kage::ToolPoly_onClick() {
 
 void Kage::ToolOval_onClick() {
 	toolsButtonToggle("Oval Tool");
-	m_PropStage.set_visible(false);
-	m_PropFillStroke.set_visible(true);
-	m_Properties.set_visible(false);
+	propStageSetVisible(false);
+	propFillStrokeSetVisible(true);
+	propLocationSizeSetVisible(false);
+	propNodeXYSetVisible(false);
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
 	KageStage::toolMode = KageStage::MODE_DRAW_OVAL;
@@ -742,9 +774,10 @@ void Kage::ToolOval_onClick() {
 
 void Kage::ToolRectangle_onClick() {
 	toolsButtonToggle("Rectangle Tool");
-	m_PropStage.set_visible(false);
-	m_PropFillStroke.set_visible(true);
-	m_Properties.set_visible(false);
+	propStageSetVisible(false);
+	propFillStrokeSetVisible(true);
+	propLocationSizeSetVisible(false);
+	propNodeXYSetVisible(false);
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
 	KageStage::toolMode = KageStage::MODE_DRAW_RECT;
@@ -753,9 +786,10 @@ void Kage::ToolRectangle_onClick() {
 
 void Kage::ToolStroke_onClick() {
 	toolsButtonToggle("Stroke Tool");
-	m_PropStage.set_visible(false);
-	m_PropFillStroke.set_visible(true);
-	m_Properties.set_visible(false);
+	propStageSetVisible(false);
+	propFillStrokeSetVisible(true);
+	propLocationSizeSetVisible(false);
+	propNodeXYSetVisible(false);
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
 	KageStage::toolMode = KageStage::MODE_STROKE;
@@ -765,9 +799,10 @@ void Kage::ToolStroke_onClick() {
 
 void Kage::ToolFill_onClick() {
 	toolsButtonToggle("Fill Tool");
-	m_PropStage.set_visible(false);
-	m_PropFillStroke.set_visible(true);
-	m_Properties.set_visible(false);
+	propStageSetVisible(false);
+	propFillStrokeSetVisible(true);
+	propLocationSizeSetVisible(false);
+	propNodeXYSetVisible(false);
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
 	KageStage::toolMode = KageStage::MODE_FILL;
@@ -779,12 +814,29 @@ void Kage::ToolEyedrop_onClick() {
 	toolsButtonToggle("Eyedrop Tool");
 	m_PropStage.set_visible(false);
 	m_PropFillStroke.set_visible(true);
-	m_Properties.set_visible(false);
+	propLocationSizeSetVisible(false);
+	propNodeXYSetVisible(false);
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
 	KageStage::toolMode = KageStage::MODE_EYEDROP;
 	m_KageStage.initNodeTool();
 	forceRenderFrames();
+}
+
+void Kage::propStageSetVisible(bool p_visible) {
+	m_PropStage.set_visible(p_visible);
+}
+
+void Kage::propFillStrokeSetVisible(bool p_visible) {
+	m_PropFillStroke.set_visible(p_visible);
+}
+
+void Kage::propLocationSizeSetVisible(bool p_visible) {
+	m_propLocationSize.set_visible(p_visible);
+}
+
+void Kage::propNodeXYSetVisible(bool p_visible) {
+	m_propNodeXY.set_visible(p_visible);
 }
 
 void Kage::updateColors() {
@@ -800,6 +852,11 @@ void Kage::updateProperties() {
 	m_EntryY.set_text(doubleToString(m_KageStage.propY));
 	m_EntryWidth.set_text(doubleToString(m_KageStage.propWidth));
 	m_EntryHeight.set_text(doubleToString(m_KageStage.propHeight));
+}
+
+void Kage::updateNodeXY() {
+	m_EntryNodeX.set_text(doubleToString(m_KageStage.nodeX));
+	m_EntryNodeY.set_text(doubleToString(m_KageStage.nodeY));
 }
 
 void Kage::onButtonClick() {
@@ -914,12 +971,11 @@ void Kage::Save_onClick() {
 					unsigned int l_currentFrame;
 			
 			saveKageStudio(ksfPath, "<KageStudio  version=\"2019.10.14\">");
-			saveKageStudio(ksfPath, "stage " + uintToString(m_KageStage.wid) + " " + uintToString(m_KageStage.hgt));
-			saveKageStudio(ksfPath, "background " + intToString(m_KageStage.stageBG.getR()) + " " + intToString(m_KageStage.stageBG.getG()) + " " + intToString(m_KageStage.stageBG.getB()));
-			saveKageStudio(ksfPath, "fps " + intToString(m_KageStage.fps));
-			saveKageStudio(ksfPath, "layers " + intToString(l_lMax));
-			saveKageStudio(ksfPath, "frames " + intToString(l_lMax));
-			
+			saveKageStudio(ksfPath, "<stage width=\"" + uintToString(m_KageStage.wid) + "\" height=\"" + uintToString(m_KageStage.hgt) + "\" " +
+			                        "background=\"rgb(" + intToString(m_KageStage.stageBG.getR()) + ", " + intToString(m_KageStage.stageBG.getG()) + ", " + intToString(m_KageStage.stageBG.getB()) + ")\" " +
+			                        "fps=\"" + intToString(m_KageStage.fps) + "\" " +
+			                        "layers=\"" + intToString(l_lMax) + "\" " +
+			                        "frames=\"" + intToString(l_lMax) + "\" />");
 				l_currentLayer = KageFramesManager::currentLayer;
 				l_currentFrame = m_KageFramesManager.getCurrentFrame();
 					for (i = 1; i <= l_lMax; i++) {
@@ -1137,6 +1193,20 @@ void Kage::EntryHeight_onEnter() {
 	
 	m_EntryHeight.set_text(doubleToString(l_dbl));
 	m_KageStage.updateShapeHeight(l_dbl);
+}
+
+void Kage::EntryNodeX_onEnter() {
+	double l_dbl = stringToDouble(m_EntryNodeX.get_text());
+	
+	m_EntryNodeX.set_text(doubleToString(l_dbl));
+	m_KageStage.updateNodeX(l_dbl);
+}
+
+void Kage::EntryNodeY_onEnter() {
+	double l_dbl = stringToDouble(m_EntryNodeY.get_text());
+	
+	m_EntryNodeY.set_text(doubleToString(l_dbl));
+	m_KageStage.updateNodeY(l_dbl);
 }
 
 void Kage::addToolButton(const Glib::ustring &label) {
@@ -1369,27 +1439,27 @@ string Kage::saveFrame() {
 	StrokeColorData scolorPrev;
 	PointData p;
 	bool doStroke = false;
-	for (unsigned int i = 1; i < vsize; ++i) {
+	for (unsigned int i = 0; i < vsize; ++i) {
 		switch (v[i].vectorType) {
 			case VectorData::TYPE_INIT:
-				l_ostringstream << "init " << v[i].fillColor.toString() << " " << v[i].stroke.toString() << "\n";
+				l_ostringstream << "<init/>\n";// " << "\n";
 				break;
 			case VectorData::TYPE_TEXT: break;
 			case VectorData::TYPE_FILL:
 				fcolor = v[i].fillColor;
-					l_ostringstream << "fill " << v[i].fillColor.toString() << " " << v[i].stroke.toString() << "\n";
+					l_ostringstream << "<fill color=\"rgba" << v[i].fillColor.toString() << "\" />\n";
 				fillCtr++;
 				break;
 			case VectorData::TYPE_ENDFILL:
 				if (fillCtr > 0) {
-						l_ostringstream << "endfill\n";
+						l_ostringstream << "</fill>\n";
 				}
 				if (fillCtr > 0) {
 					fillCtr--;
 				}
 				break;
 			case VectorData::TYPE_STROKE:
-				l_ostringstream << "stroke " << v[i].fillColor.toString() << " " << v[i].stroke.toString() << "\n";
+				l_ostringstream << "<stroke color=\"rgba" << ColorData(v[i].stroke).toString() << "\" thickness=\"" + doubleToString(v[i].stroke.getThickness()) + "\"/>\n";
 				scolor = v[i].stroke;
 					if (!scolorPrev.equalTo(scolor) || scolorPrev.getThickness() != scolor.getThickness()) {
 						doStroke = true;
@@ -1397,7 +1467,7 @@ string Kage::saveFrame() {
 					}
 				break;
 			case VectorData::TYPE_MOVE:
-				l_ostringstream << "move " << v[i].points[0].x << " " << v[i].points[0].y << "\n";
+				l_ostringstream << "<move>" << v[i].points[0].x << " " << v[i].points[0].y << "</move>\n";
 				
 				p.x = v[i].points[0].x;
 				p.y = v[i].points[0].y;
@@ -1415,7 +1485,7 @@ string Kage::saveFrame() {
 				p.y = v[i].points[1].y;
 				break;
 			case VectorData::TYPE_CURVE_CUBIC:
-				l_ostringstream << "ccurve " << v[i].points[0].x << " " << v[i].points[0].y << " " << v[i].points[1].x << " " << v[i].points[1].y << " " << v[i].points[2].x << " " << v[i].points[2].y << "\n";
+				l_ostringstream << "<cubiccurve>" << v[i].points[0].x << " " << v[i].points[0].y << " " << v[i].points[1].x << " " << v[i].points[1].y << " " << v[i].points[2].x << " " << v[i].points[2].y << "</cubiccurve>\n";
 				break;
 			case VectorData::TYPE_IMAGE:
 				//2 '1st is for X/Y, 2nd is for width/height  -- ?!?
@@ -1436,7 +1506,7 @@ string Kage::dumpFrame(bool bKS) {
 	StrokeColorData scolorPrev;
 	PointData p;
 	bool doStroke = false;
-	for (unsigned int i = 1; i < vsize; ++i) {
+	for (unsigned int i = 0; i < vsize; ++i) {
 		switch (v[i].vectorType) {
 			case VectorData::TYPE_INIT: break;
 			case VectorData::TYPE_TEXT: break;

@@ -55,6 +55,8 @@
 			int propYindex2;
 			double propWidth = 0;
 			double propHeight = 0;
+			double nodeX = 0;
+			double nodeY = 0;
 			
 			void printVectors();
 			void render();
@@ -114,6 +116,8 @@
 			void updateShapeY(double p_value);
 			void updateShapeWidth(double p_value);
 			void updateShapeHeight(double p_value);
+			void updateNodeX(double p_value);
+			void updateNodeY(double p_value);
 			
 			vector<VectorData> _vectorDataCopyBuffer;
 			vector<VectorData> _vectorDataZOrderBuffer;

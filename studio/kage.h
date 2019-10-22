@@ -27,7 +27,7 @@
 	//#include "kage/timeline/timeline.h"
 	#include "kage/stage.h"
 	#include "about.h"
-	#include "register.h"
+//	#include "register.h" -- not implemented yet; this is to gather users for support group
 	
 	#include <fstream> //ofstream
 	#include <iostream> //cerr

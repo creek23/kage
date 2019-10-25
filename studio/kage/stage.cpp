@@ -24,10 +24,10 @@ KageStage::KageStage(Kage *p_win) {
 	drawCtr = 0;
 	mouseOnNode = -1;
 	mouseOnNodeIndex = 0;
-	polyX = 0;
-	polyY = 0;
-	polyXprev = 0;
-	polyYprev = 0;
+	polyXhead = 0;
+	polyYhead = 0;
+	polyXtail = 0;
+	polyYtail = 0;
 	
 	mouseOnAnchor = AnchorData::TYPE_NONE;
 }
@@ -71,25 +71,27 @@ bool KageStage::on_key_press_event(GdkEventKey *e) {
 		if (KageStage::toolMode == MODE_SELECT) {
 			if (e->keyval == 65535) { //[DELETE]
 				win->Delete_onClick();
+				render(); return true;
 			} else if (e->keyval == 65360) { //[HOME]
 				win->RaiseToTop_onClick();
+				render(); return true;
 			} else if (e->keyval == 65365) { //[PAGE UP]
 				win->Raise_onClick();
+				render(); return true;
 			} else if (e->keyval == 65366) { //[PAGE DOWN]
 				win->Lower_onClick();
+				render(); return true;
 			} else if (e->keyval == 65367) { //[END]
 				win->LowerToBottom_onClick();
+				render(); return true;
 			}
 			std::cout << "KageStage::::on_key_press_event A " << e->keyval << "_" << e->string << std::endl;
-			render();
-			return true;
 		} else if (KageStage::toolMode == MODE_NODE) {
 			if (e->keyval == 65535) { //[DELETE]
 				win->Delete_onClick();
+				render(); return true;
 			}
 			std::cout << "KageStage::::on_key_press_event B " << e->keyval << "_" << e->string << std::endl;
-			render();
-			return true;
 		}
 		if (KageStage::toolMode == MODE_SELECT
 				|| KageStage::toolMode == MODE_NODE) {
@@ -2249,35 +2251,35 @@ void KageStage::handleEyedropMouseUp() {
 void KageStage::handleDrawPolyMouseUp() {
 	VectorDataManager v;// = v_poly;
 	Kage::timestamp();
-	std::cout << " KageStage::handleDrawPolyMouseUp A " << std::endl;
+	std::cout << " KageStage::handleDrawPolyMouseUp" << std::endl;
 
-	if (       draw2.x-5 <= polyX && draw2.x+5 >= polyX
-			&& draw2.y-5 <= polyY && draw2.y+5 >= polyY) {
-//		v.addLinePoly(PointData(polyX,polyY), polyXprev, polyYprev);
+	if (       draw1.x-5 <= polyXhead && draw1.x+5 >= polyXhead
+			&& draw1.y-5 <= polyYhead && draw1.y+5 >= polyYhead) {
+		v.addLinePoly(PointData(polyXhead,polyYhead), polyXtail, polyYtail);
 		v.addClosePath();
 		v.addEndFill();
 		win->ToolSelect_onClick();
 		drawCtr = 0;
-	} else if (draw2.x-5 <= polyXprev && draw2.x+5 >= polyXprev
-			&& draw2.y-5 <= polyYprev && draw2.y+5 >= polyYprev) {
+	} else if (draw1.x-5 <= polyXtail && draw1.x+5 >= polyXtail
+			&& draw1.y-5 <= polyYtail && draw1.y+5 >= polyYtail) {
 		v.addEndFill();
 		win->ToolSelect_onClick();
 		drawCtr = 0;
 	} else {
 		if (drawCtr > 0) {
-			PointData p2(draw2);
-				v.addLinePoly(p2, polyXprev, polyYprev);
+			PointData p2(draw1);
+				v.addLinePoly(p2, polyXtail, polyYtail);
 		} else {
-			polyX = draw1.x;
-			polyY = draw1.y;
+			polyXhead = draw1.x;
+			polyYhead = draw1.y;
 			PointData p1(draw1);
 				v.addInit();
 				v.addFill(KageStage::fillColor.clone());
 				v.addLineStyle(KageStage::stroke);
 				v.addMove(p1);
 		}
-		polyXprev = draw2.x;
-		polyYprev = draw2.y;
+		polyXtail = draw1.x;
+		polyYtail = draw1.y;
 		++drawCtr;
 	}
 	win->addDataToFrame(v);

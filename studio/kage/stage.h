@@ -130,8 +130,8 @@
 			GdkPoint origin;
 			GdkPoint draw1;
 			GdkPoint draw2;
-			double polyX, polyY;
-			double polyXprev, polyYprev;
+			double polyXhead, polyYhead;
+			double polyXtail, polyYtail;
 			Glib::RefPtr<Gdk::Window> window;
 			Cairo::RefPtr<Cairo::Context> cr;
 			bool gotContext;

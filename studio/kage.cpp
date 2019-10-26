@@ -1441,6 +1441,9 @@ string Kage::saveFrame() {
 	bool doStroke = false;
 	for (unsigned int i = 0; i < vsize; ++i) {
 		switch (v[i].vectorType) {
+			case VectorData::TYPE_CLOSE_PATH:
+				l_ostringstream << "<closepath/>\n";
+				break;
 			case VectorData::TYPE_INIT:
 				l_ostringstream << "<init/>\n";// " << "\n";
 				break;
@@ -1508,6 +1511,9 @@ string Kage::dumpFrame(bool bKS) {
 	bool doStroke = false;
 	for (unsigned int i = 0; i < vsize; ++i) {
 		switch (v[i].vectorType) {
+			case VectorData::TYPE_CLOSE_PATH:
+				l_ostringstream << "screen.closePath();\n";
+				break;
 			case VectorData::TYPE_INIT: break;
 			case VectorData::TYPE_TEXT: break;
 			case VectorData::TYPE_FILL:
@@ -1524,7 +1530,6 @@ string Kage::dumpFrame(bool bKS) {
 					if (bKS == true) {
 						l_ostringstream << "Draw:EndFill(screen)\n";
 					} else {
-						l_ostringstream << "screen.closePath();\n";
 						if (fcolor.getA() == 255) {
 							l_ostringstream << "screen.fillStyle = '#" << int255ToHex(fcolor.getR()) << int255ToHex(fcolor.getG()) << int255ToHex(fcolor.getB()) << "';\n";
 						} else {
@@ -1533,7 +1538,7 @@ string Kage::dumpFrame(bool bKS) {
 						l_ostringstream << "screen.fill();\n";
 					}
 				}
-//					if (scolor.getThickness() > 0) {
+					if (scolor.getThickness() > 0) {
 						if (bKS == false && doStroke == true) {
 							if (!scolorPrev.equalTo(scolor) || scolorPrev.getThickness() != scolor.getThickness()) {
 								if (scolor.getA() == 255) {
@@ -1549,7 +1554,7 @@ string Kage::dumpFrame(bool bKS) {
 							l_ostringstream << "screen.stroke();\n";
 							doStroke = false;
 						}
-//					}
+					}
 				if (fillCtr > 0) {
 					fillCtr--;
 				}

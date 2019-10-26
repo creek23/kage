@@ -582,25 +582,26 @@ void KageStage::renderFrame() {
 			case VectorData::TYPE_FILL:
 				fcolor = v[i].fillColor;
 				fillCtr++;
+				cr->begin_new_path();
 				break;
 			case VectorData::TYPE_ENDFILL:
 				if (fillCtr > 0) {
-					cr->set_source_rgba((double)fcolor.getR()/255,
-										(double)fcolor.getG()/255,
-										(double)fcolor.getB()/255,
-										(double)fcolor.getA()/255);
+					cr->set_source_rgba((double)fcolor.getR()/255.0f,
+										(double)fcolor.getG()/255.0f,
+										(double)fcolor.getB()/255.0f,
+										(double)fcolor.getA()/255.0f);
 					cr->fill_preserve();
 					fillCtr--;
 				}
-//				if (scolor.getThickness() > 0) {
-					cr->set_source_rgba((double)scolor.getR()/255,
-										(double)scolor.getG()/255,
-										(double)scolor.getB()/255,
-										(double)scolor.getA()/255);
+				if (scolor.getThickness() > 0) {
+					cr->set_source_rgba((double)scolor.getR()/255.0f,
+										(double)scolor.getG()/255.0f,
+										(double)scolor.getB()/255.0f,
+										(double)scolor.getA()/255.0f);
 					cr->set_line_width(scolor.getThickness());
 						cr->set_line_cap(Cairo::LINE_CAP_ROUND);
 							cr->stroke();
-//				}
+				}
 				break;
 			case VectorData::TYPE_STROKE:
 				scolor = v[i].stroke;

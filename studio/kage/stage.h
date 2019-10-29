@@ -70,7 +70,7 @@
 			unsigned int stageWidth; //direct use for get only
 			unsigned int stageHeight; //direct use for get only
 			void clearScreen();
-			void renderFrame();
+			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context);
 			void initNodeTool();
 			void handleShapes(bool p_hideAnchor = true);
 			void handleShapes_scaleNorth();
@@ -124,16 +124,21 @@
 			vector<VectorData> _vectorDataZOrderBufferB;
 			vector<VectorData> _vectorDataZOrderBufferC;
 			
+			void renderToPNG(string p_path);
+			
+			Cairo::RefPtr<Cairo::Context> cr;
+			GdkPoint origin;
+			
 		protected:
 			ToolMode prevTool; //used by Hand-tool shortcut [spacebar]
 			Kage *win;
-			GdkPoint origin;
+			//GdkPoint origin;
 			GdkPoint draw1;
 			GdkPoint draw2;
 			double polyXhead, polyYhead;
 			double polyXtail, polyYtail;
 			Glib::RefPtr<Gdk::Window> window;
-			Cairo::RefPtr<Cairo::Context> cr;
+			//Cairo::RefPtr<Cairo::Context> cr;
 			bool gotContext;
 			bool mouseDown;
 			bool draw;

@@ -485,7 +485,7 @@ bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
 		cr = p_cr;
 		if (mouseDown) {
 			win->renderFramesBelowCurrentLayer();
-			renderFrame();
+			renderFrame(cr);
 		} else {
 			win->renderFrames();
 		}
@@ -560,7 +560,30 @@ void KageStage::clearScreen() {
 	}
 }
 
-void KageStage::renderFrame() {
+void KageStage::renderToPNG(string p_path) {
+	#ifdef CAIRO_HAS_PNG_FUNCTIONS
+		Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, stageWidth, stageHeight);
+		
+		Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
+		
+		GdkPoint l_tempOrigin;
+		l_tempOrigin.x = origin.x;
+		l_tempOrigin.y = origin.y;
+		
+		origin.x = 0;
+		origin.y = 0;
+		
+		renderFrame(l_context);
+		surface->write_to_png(p_path);
+		std::cout << "Wrote png file \"" << p_path << "\"" << std::endl;
+		
+		origin.x = l_tempOrigin.x;
+		origin.y = l_tempOrigin.y;
+	#else
+		std::cout << "You must compile cairo with PNG support for this example to work." << std::endl;
+	#endif
+}
+void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context) {
 	vector<VectorData> v = win->getFrameData().getVectorData();
 	
 	unsigned int vsize = v.size();
@@ -577,43 +600,43 @@ void KageStage::renderFrame() {
 	for (unsigned int i = 0; i < vsize; ++i) {
 		switch (v[i].vectorType) {
 			case VectorData::TYPE_CLOSE_PATH:
-				cr->close_path();
+				p_context->close_path();
 				break;
 			case VectorData::TYPE_FILL:
 				fcolor = v[i].fillColor;
 				fillCtr++;
-				cr->begin_new_path();
+				p_context->begin_new_path();
 				break;
 			case VectorData::TYPE_ENDFILL:
 				if (fillCtr > 0) {
-					cr->set_source_rgba((double)fcolor.getR()/255.0f,
-										(double)fcolor.getG()/255.0f,
-										(double)fcolor.getB()/255.0f,
-										(double)fcolor.getA()/255.0f);
-					cr->fill_preserve();
+					p_context->set_source_rgba((double)fcolor.getR()/255.0f,
+											   (double)fcolor.getG()/255.0f,
+											   (double)fcolor.getB()/255.0f,
+											   (double)fcolor.getA()/255.0f);
+					p_context->fill_preserve();
 					fillCtr--;
 				}
 				if (scolor.getThickness() > 0) {
-					cr->set_source_rgba((double)scolor.getR()/255.0f,
-										(double)scolor.getG()/255.0f,
-										(double)scolor.getB()/255.0f,
-										(double)scolor.getA()/255.0f);
-					cr->set_line_width(scolor.getThickness());
-						cr->set_line_cap(Cairo::LINE_CAP_ROUND);
-							cr->stroke();
+					p_context->set_source_rgba((double)scolor.getR()/255.0f,
+											   (double)scolor.getG()/255.0f,
+											   (double)scolor.getB()/255.0f,
+											   (double)scolor.getA()/255.0f);
+					p_context->set_line_width(scolor.getThickness());
+						p_context->set_line_cap(Cairo::LINE_CAP_ROUND);
+							p_context->stroke();
 				}
 				break;
 			case VectorData::TYPE_STROKE:
 				scolor = v[i].stroke;
 				break;
 			case VectorData::TYPE_MOVE:
-				cr->move_to(v[i].points[0].x + origin.x, v[i].points[0].y + origin.y);
+				p_context->move_to(v[i].points[0].x + origin.x, v[i].points[0].y + origin.y);
 				
 				p.x = v[i].points[0].x;
 				p.y = v[i].points[0].y;
 				break;
 			case VectorData::TYPE_LINE:
-				cr->line_to(v[i].points[0].x + origin.x, v[i].points[0].y + origin.y);
+				p_context->line_to(v[i].points[0].x + origin.x, v[i].points[0].y + origin.y);
 				
 				p.x = v[i].points[0].x;
 				p.y = v[i].points[0].y;
@@ -632,7 +655,7 @@ void KageStage::renderFrame() {
 				x1 = p.x + 2 * (x1 - p.x) / 3;
 				y1 = p.y + 2 * (y1 - p.y) / 3;
 				
-				cr->curve_to(
+				p_context->curve_to(
 						x1 + origin.x, y1 + origin.y,
 						x2 + origin.x, y2 + origin.y,
 						x3 + origin.x, y3 + origin.y
@@ -642,19 +665,18 @@ void KageStage::renderFrame() {
 				p.y = y3;
 				break;
 			case VectorData::TYPE_CURVE_CUBIC:
-				cr->curve_to(
+				p_context->curve_to(
 						v[i].points[0].x + origin.x, v[i].points[0].y + origin.y,
 						v[i].points[1].x + origin.x, v[i].points[1].y + origin.y,
 						v[i].points[2].x + origin.x, v[i].points[2].y + origin.y
 				);
 				break;
 			case VectorData::TYPE_TEXT:
-					cr->select_font_face ("Verdana", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_BOLD);
-					cr->set_font_size(32);
-					cr->set_source_rgb(0, 0, 1);
-					cr->move_to(10, 50);
-					cr->show_text("Hello, world");
-					//(surface)cr->write_to_png("hello.png");
+					p_context->select_font_face ("Verdana", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_BOLD);
+					p_context->set_font_size(32);
+					p_context->set_source_rgb(0, 0, 1);
+					p_context->move_to(10, 50);
+					p_context->show_text("Hello, world");
 				break;
 			case VectorData::TYPE_IMAGE:
 				//2 '1st is for X/Y, 2nd is for width/height  -- ?!?
@@ -1041,6 +1063,7 @@ void KageStage::updateNodeX(double p_value) {
 	
 	render();
 }
+
 void KageStage::updateNodeY(double p_value) {
 	unsigned int l_temp = -1;
 	Kage::timestamp();

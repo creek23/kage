@@ -69,6 +69,8 @@ Kage::Kage() : m_KageLayerManager(),
 	
 	//Add normal Actions:
 	m_refActionGroup->add( Gtk::Action::create("FileMenu", "_File") ); 
+	m_refActionGroup->add( Gtk::Action::create("ExportMenu", "_Export...") ); 
+	m_refActionGroup->add( Gtk::Action::create("ExportPNGMenu", "_PNG...") ); 
 	m_refActionGroup->add( Gtk::Action::create("EditMenu", "_Edit") );
 	m_refActionGroup->add( Gtk::Action::create("TimelineMenu", "_Timeline") );
 	m_refActionGroup->add( Gtk::Action::create("ToolsMenu", "T_ools") );
@@ -94,6 +96,21 @@ Kage::Kage() : m_KageLayerManager(),
 		Gtk::Action::create("ExportHTML5", "Export HTML5", "Export to HTML5"),
 		Gtk::AccelKey("<control>5"),
 		sigc::mem_fun(*this, &Kage::ExportHTML5_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("ExportPNGTransparent", "Single PNG (Transparent)", "Export with Single PNG (Transparent Background)"),
+//		Gtk::AccelKey("<control>5"),
+		sigc::mem_fun(*this, &Kage::ExportPNGTransparent_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("ExportPNGSequence", "PNG Sequence", "Export PNG Sequence"),
+//		Gtk::AccelKey("<control>5"),
+		sigc::mem_fun(*this, &Kage::ExportPNGSequence_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("ExportAVI", "Export AVI", "Export to AVI"),
+//		Gtk::AccelKey("<control>5"),
+		sigc::mem_fun(*this, &Kage::ExportAVI_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("Quit", Gtk::Stock::QUIT, "_Quit", "Quit"),
@@ -274,8 +291,15 @@ Kage::Kage() : m_KageLayerManager(),
 		"			<separator/>"
 		"			<menuitem action='Save'/>"
 		"			<separator/>"
-		"			<menuitem action='ExportHTML5'/>"
-		"			<menuitem action='ExportKS'/>"
+		"			<menu action='ExportMenu'>"
+		"				<menuitem action='ExportAVI'/>"
+		"				<menuitem action='ExportHTML5'/>"
+		"				<menuitem action='ExportKS'/>"
+		"				<menu action='ExportPNGMenu'>"
+		"					<menuitem action='ExportPNGTransparent'/>"
+		"					<menuitem action='ExportPNGSequence'/>"
+		"				</menu>"
+		"			</menu>"
 		"			<separator/>"
 		"			<menuitem action='Quit'/>"
 		"		</menu>"
@@ -894,7 +918,7 @@ void Kage::renderFrames() {
 	unsigned int t = KageFramesManager::currentLayer;
 		for (unsigned int i = 1; i <= c; ++i) {
 			m_KageFramesManager.setCurrentLayer(i);
-			m_KageStage.renderFrame();
+			m_KageStage.renderFrame(m_KageStage.cr);
 		}
 	KageFramesManager::currentLayer = t;
 	Kage::timestamp();
@@ -908,7 +932,7 @@ void Kage::renderFramesBelowCurrentLayer() {
 	unsigned int t = KageFramesManager::currentLayer;
 		for (unsigned int i = 1; i < t; ++i) {
 			m_KageFramesManager.setCurrentLayer(i);
-			m_KageStage.renderFrame();
+			m_KageStage.renderFrame(m_KageStage.cr);
 		}
 	KageFramesManager::currentLayer = t;
 	Kage::timestamp();
@@ -921,7 +945,7 @@ void Kage::renderFramesAboveCurrentLayer() {
 	unsigned int t = KageFramesManager::currentLayer;
 		for (unsigned int i = (t + 1); i < c; ++i) {
 			m_KageFramesManager.setCurrentLayer(i);
-			m_KageStage.renderFrame();
+			m_KageStage.renderFrame(m_KageStage.cr);
 		}
 	KageFramesManager::currentLayer = t;
 	Kage::timestamp();
@@ -935,23 +959,10 @@ void Kage::Save_onClick() {
 		dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
 	//Add filters, so that only certain file types can be selected:
 	auto filter_kage = Gtk::FileFilter::create();
-		filter_kage->set_name("KAGE");
+		filter_kage->set_name("Kage Studio Files");
 		filter_kage->add_mime_type("text/x-kage");
+		filter_kage->add_pattern("*.ksf");
 			dialog.add_filter(filter_kage);
-//	Gtk::FileFilter filter_text;
-//		filter_text.set_name("Text files");
-//		filter_text.add_mime_type("text/plain");
-//			dialog.add_filter(filter_text);
-//	Gtk::FileFilter filter_cpp;
-//		filter_cpp.set_name("C/C++ files");
-//		filter_cpp.add_mime_type("text/x-c");
-//		filter_cpp.add_mime_type("text/x-c++");
-//		filter_cpp.add_mime_type("text/x-c-header");
-//			dialog.add_filter(filter_cpp);
-//	Gtk::FileFilter filter_any;
-//		filter_any.set_name("Any files");
-//		filter_any.add_pattern("* ");
-//			dialog.add_filter(filter_any);
 	//Show the dialog and wait for a user response:
 	int result = dialog.run();
 	
@@ -1008,8 +1019,9 @@ void Kage::ExportKS_onClick() {
 		dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
 	
 	auto filter_ks = Gtk::FileFilter::create();
-		filter_ks->set_name("KonsolScript");
-		filter_ks->add_mime_type("text/x-konsolscript");
+		filter_ks->set_name("KonsolScript files");
+		filter_ks->add_mime_type("text/konsolscript");
+		filter_ks->add_pattern("*.ks");
 			dialog.add_filter(filter_ks);
 	int result = dialog.run();
 	
@@ -1091,6 +1103,7 @@ void Kage::ExportHTML5_onClick() {
 				exportHtml5(expPath, "}");
 			}
 				t = KageFramesManager::currentLayer;
+				unsigned int f = KageFramesManager::currentFrame;
 					for (j = 1; j <= l_fMax; ++j) {
 						m_KageFramesManager.setCurrentFrame(j);
 						exportHtml5(expPath, "function ks_f" + uintToString(j) + "() {");
@@ -1100,10 +1113,211 @@ void Kage::ExportHTML5_onClick() {
 						}
 						exportHtml5(expPath, "}\n");
 					}
+				KageFramesManager::currentFrame = f;
 				KageFramesManager::currentLayer = t;
 			exportHtml5(expPath, "function main() {\n\t//add variable initialization...\n}");
-			exportHtml5(expPath, "</script>\n</head>\n<body align='center' onload='kagestudio();'>\n<canvas id='screen' width='" + uintToString(m_KageStage.wid) + "' height='" + uintToString(m_KageStage.hgt) + "'></canvas>\n</body>\n</html>");
+			exportHtml5(expPath, "</script>\n</head>\n<body align='center' onload='kagestudio();' bgcolor='#101010'>\n<canvas id='screen' width='" + uintToString(m_KageStage.wid) + "' height='" + uintToString(m_KageStage.hgt) + "' style='display: block; margin: auto;'></canvas>\n</body>\n</html>");
 			updateStatus("Exported to " + expPath);
+			break;
+	}
+}
+
+void Kage::ExportPNGTransparent_onClick() {
+	Gtk::FileChooserDialog dialog("Export File", Gtk::FILE_CHOOSER_ACTION_SAVE);
+	dialog.set_transient_for( * this);
+		//Add response buttons the the dialog:
+		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+		dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
+	
+	auto filter_png = Gtk::FileFilter::create();
+		filter_png->set_name("Portable Network Graphics");
+		filter_png->add_mime_type("image/png");
+		filter_png->add_pattern("*.png");
+			dialog.add_filter(filter_png);
+	int result = dialog.run();
+	
+	switch (result) {
+		case Gtk::RESPONSE_OK:
+			string l_pngPath = dialog.get_filename();
+			cout << "uri:" << dialog.get_uri() << endl;
+			
+			int l_len = strlen(l_pngPath.c_str()) - 4;
+			if (strToLower(l_pngPath).substr(l_len, 4) != ".png") {
+				l_pngPath = l_pngPath + ".png";
+			}
+			
+			m_KageStage.renderToPNG(l_pngPath);
+			updateStatus("Exported to " + l_pngPath);
+			break;
+	}
+}
+
+void Kage::ExportPNGSequence_onClick() {
+	Gtk::FileChooserDialog dialog("Export File", Gtk::FILE_CHOOSER_ACTION_SAVE);
+	dialog.set_transient_for( * this);
+		//Add response buttons the the dialog:
+		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+		dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
+	
+	auto filter_png = Gtk::FileFilter::create();
+		filter_png->set_name("Portable Network Graphics");
+		filter_png->add_mime_type("image/png");
+		filter_png->add_pattern("*.png");
+			dialog.add_filter(filter_png);
+	int result = dialog.run();
+	
+	switch (result) {
+		case Gtk::RESPONSE_OK:
+			string l_pngPath = dialog.get_filename();
+			cout << "uri:" << dialog.get_uri() << endl;
+			string l_pngSequencePath;
+			int l_len = strlen(l_pngPath.c_str()) - 4;
+			if (strToLower(l_pngPath).substr(l_len, 4) == ".png") {
+				l_pngPath = l_pngPath.substr(0, l_len);
+			}
+			
+			unsigned int l_lMax = m_KageLayerManager.layerCount();
+			unsigned int i;
+				unsigned int l_fMax = m_KageFramesManager.frameCount();
+				unsigned int j;
+					unsigned int t;
+					unsigned int f;
+				
+				
+				GdkPoint l_tempOrigin;
+				l_tempOrigin.x = m_KageStage.origin.x;
+				l_tempOrigin.y = m_KageStage.origin.y;
+				
+				m_KageStage.origin.x = 0;
+				m_KageStage.origin.y = 0;
+						
+				t = KageFramesManager::currentLayer;
+				f = KageFramesManager::currentFrame;
+					
+					for (j = 1; j <= l_fMax; ++j) {
+						m_KageFramesManager.setCurrentFrame(j);
+						
+						Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, m_KageStage.stageWidth, m_KageStage.stageHeight);
+						Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
+						
+							for (i = 1; i <= l_lMax; i++) {
+								m_KageFramesManager.setCurrentLayer(i);
+								m_KageStage.renderFrame(l_context);
+							}
+						
+						if (j < 10) {
+							l_pngSequencePath = l_pngPath + "0000" + uintToString(j) + ".png";
+						} else if (j < 100) {
+							l_pngSequencePath = l_pngPath + "000" + uintToString(j) + ".png";
+						} else if (j < 1000) {
+							l_pngSequencePath = l_pngPath + "00" + uintToString(j) + ".png";
+						} else if (j < 10000) {
+							l_pngSequencePath = l_pngPath + "0" + uintToString(j) + ".png";
+						} else if (j < 100000) {
+							l_pngSequencePath = l_pngPath + uintToString(j) + ".png";
+						}
+						surface->write_to_png(l_pngSequencePath);
+					}
+				KageFramesManager::currentFrame = f;
+				KageFramesManager::currentLayer = t;
+			
+				m_KageStage.origin.x = l_tempOrigin.x;
+				m_KageStage.origin.y = l_tempOrigin.y;
+			
+			updateStatus("Exported to " + l_pngSequencePath);
+			break;
+	}
+}
+
+void Kage::ExportAVI_onClick() {
+	Gtk::FileChooserDialog dialog("Export File", Gtk::FILE_CHOOSER_ACTION_SAVE);
+	dialog.set_transient_for( * this);
+		//Add response buttons the the dialog:
+		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+		dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
+	
+	auto filter_avi = Gtk::FileFilter::create();
+		filter_avi->set_name("Audio Video Interleave files");
+		filter_avi->add_mime_type("video/x-msvideo");
+		filter_avi->add_pattern("*.avi");
+			dialog.add_filter(filter_avi);
+	int result = dialog.run();
+	
+	switch (result) {
+		case Gtk::RESPONSE_OK:
+			string l_pngPath = dialog.get_filename();
+			cout << "uri:" << dialog.get_uri() << endl;
+			string l_pngSequencePath;
+			int l_len = strlen(l_pngPath.c_str()) - 4;
+			if (strToLower(l_pngPath).substr(l_len, 4) == ".avi") {
+				l_pngPath = l_pngPath.substr(0, l_len);
+			}
+			
+			if (runExternal("ffmpeg", "-version") == false) {
+				updateStatus("FFMPEG is not installed.");
+				openWebsite("https://www.ffmpeg.org/download.html");
+					return;
+			}
+			
+			unsigned int l_lMax = m_KageLayerManager.layerCount();
+			unsigned int i;
+				unsigned int l_fMax = m_KageFramesManager.frameCount();
+				unsigned int j;
+					unsigned int t;
+					unsigned int f;
+				
+				
+				GdkPoint l_tempOrigin;
+				l_tempOrigin.x = m_KageStage.origin.x;
+				l_tempOrigin.y = m_KageStage.origin.y;
+				
+				m_KageStage.origin.x = 0;
+				m_KageStage.origin.y = 0;
+						
+				t = KageFramesManager::currentLayer;
+				f = KageFramesManager::currentFrame;
+					
+					for (j = 1; j <= l_fMax; ++j) {
+						m_KageFramesManager.setCurrentFrame(j);
+						
+						Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, m_KageStage.stageWidth, m_KageStage.stageHeight);
+						Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
+						
+							for (i = 1; i <= l_lMax; i++) {
+								m_KageFramesManager.setCurrentLayer(i);
+								m_KageStage.renderFrame(l_context);
+							}
+						
+						if (j < 10) {
+							l_pngSequencePath = l_pngPath + "0000" + uintToString(j) + ".png";
+						} else if (j < 100) {
+							l_pngSequencePath = l_pngPath + "000" + uintToString(j) + ".png";
+						} else if (j < 1000) {
+							l_pngSequencePath = l_pngPath + "00" + uintToString(j) + ".png";
+						} else if (j < 10000) {
+							l_pngSequencePath = l_pngPath + "0" + uintToString(j) + ".png";
+						} else if (j < 100000) {
+							l_pngSequencePath = l_pngPath + uintToString(j) + ".png";
+						}
+						surface->write_to_png(l_pngSequencePath);
+					}
+				KageFramesManager::currentFrame = f;
+				KageFramesManager::currentLayer = t;
+			
+				m_KageStage.origin.x = l_tempOrigin.x;
+				m_KageStage.origin.y = l_tempOrigin.y;
+			
+			if (runExternal("ffmpeg", "-framerate " + uintToString(m_KageStage.fps) + " -i '" + l_pngPath + "%05d.png' '" + l_pngPath + ".avi'")) {
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+				if (runExternal("del", "/f " + l_pngPath + "*.png")) {
+#else
+				if (runExternal("rm", "-f " + l_pngPath + "*.png")) {
+#endif
+					updateStatus("Exported to " + l_pngPath + ".avi");
+					return;
+				}
+			}
+			updateStatus("Unable to export " + l_pngPath + ".avi");
 			break;
 	}
 }
@@ -1235,12 +1449,16 @@ void Kage::CheckUpdate_onClick() {
 }
 
 void Kage::Website_onClick() {
+	openWebsite("http://konsolscript.sf.net/web/?s=kage+studio");
+}
+
+void Kage::openWebsite(string p_url) {
 	GError *error = NULL;
-	gtk_show_uri_on_window(NULL, "http://konsolscript.sf.net/web/?s=kage+studio", gtk_get_current_event_time(), &error);
+	gtk_show_uri_on_window(NULL, p_url.c_str(), gtk_get_current_event_time(), &error);
 	if (error) {
 		cout << error->message << endl;
 		cout << "Launching default web browser..." << endl;
-		runExternal("start", "http://konsolscript.sf.net/web/?s=kage+studio");
+		runExternal("start", p_url);
 	}
 }
 
@@ -1271,8 +1489,6 @@ bool Kage::saveKageStudio(string p_path, string p_msg) {
 	if (strToLower(p_path).substr(l_len, 4) != ".ksf") {
 		p_path = p_path + ".ksf";
 	}
-	
-	
 	
 	return fileWrite(p_path, p_msg, ksfFile, ksfInited);
 }

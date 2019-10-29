@@ -84,6 +84,9 @@
 			virtual void Save_onClick();
 			virtual void ExportKS_onClick();
 			virtual void ExportHTML5_onClick();
+			virtual void ExportPNGTransparent_onClick();
+			virtual void ExportPNGSequence_onClick();
+			virtual void ExportAVI_onClick();
 			
 			unsigned int undoStackCount;
 			unsigned int undoStackPointer;
@@ -191,6 +194,7 @@
 			void btnAbout_onClick();
 			void CheckUpdate_onClick();
 			void Website_onClick();
+			void openWebsite(string p_url);
 			std::vector<Gtk::ToggleButton*> toggleButtons;
 			std::vector<Gtk::Tooltip*> tooltips;
 			Gtk::ToggleButton* currentTool;

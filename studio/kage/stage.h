@@ -44,8 +44,6 @@
 			static StrokeColorData stroke; //direct use for get only
 			static ToolMode toolMode;
 			static GdkPoint moveStageXY;
-			unsigned int wid;
-			unsigned int hgt;
 			unsigned int fps;
 			double propX = 0;
 			int propXindex1;
@@ -69,7 +67,7 @@
 			Gdk::Color getStroke();
 			unsigned int stageWidth; //direct use for get only
 			unsigned int stageHeight; //direct use for get only
-			void clearScreen();
+			void clearScreen(Cairo::RefPtr<Cairo::Context> p_context);
 			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context);
 			void initNodeTool();
 			void handleShapes(bool p_hideAnchor = true);
@@ -124,7 +122,7 @@
 			vector<VectorData> _vectorDataZOrderBufferB;
 			vector<VectorData> _vectorDataZOrderBufferC;
 			
-			void renderToPNG(string p_path);
+			void renderToPNG(string p_path, bool p_transparent);
 			
 			Cairo::RefPtr<Cairo::Context> cr;
 			GdkPoint origin;

@@ -16,6 +16,10 @@ SOURCES = \
 	./kage/timeline/layermanager.cpp \
 	./kage/stage.cpp \
 	./kage/vectordatamanager.cpp \
+	./util/xml/xmltoken.cpp \
+	./util/xml/xmltagproperty.cpp \
+	./util/xml/xmltag.cpp \
+	./util/xml/xml.cpp \
 	kage.cpp \
 	main.cpp
 

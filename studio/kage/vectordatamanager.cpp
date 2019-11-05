@@ -59,11 +59,19 @@ void VectorDataManager::addInit() {
 	add(VectorData::TYPE_INIT, KageStage::fillColor, KageStage::stroke);
 }
 void VectorDataManager::addFill(ColorData p_color) {
+	VectorData l_vectorData;
+	if (vectorData.size() > 0) {
+		l_vectorData = vectorData[vectorData.size()-1];
+	} else {
+		l_vectorData.setType(VectorData::TYPE_INIT);
+		l_vectorData.fillColor = KageStage::fillColor;
+		l_vectorData.stroke = KageStage::stroke;
+	}
 	std::cout << " VectorDataManager::addFill()" << std::endl;
 	std::cout << p_color.getR() << std::endl;
 	std::cout << p_color.getG() << std::endl;
 	std::cout << p_color.getB() << std::endl;
-	add(VectorData::TYPE_FILL, p_color, vectorData[vectorData.size() - 1].stroke);
+	add(VectorData::TYPE_FILL, p_color, l_vectorData.stroke);
 }
 
 void VectorDataManager::addEndFill() {
@@ -155,7 +163,14 @@ void VectorDataManager::addLine(PointData p_point) {
 }
 
 void VectorDataManager::addMove(PointData p_point) {
-	VectorData l_vectorData = vectorData[vectorData.size()-1];
+	VectorData l_vectorData;
+	if (vectorData.size() > 0) {
+		l_vectorData = vectorData[vectorData.size()-1];
+	} else {
+		l_vectorData.setType(VectorData::TYPE_INIT);
+		l_vectorData.fillColor = KageStage::fillColor;
+		l_vectorData.stroke = KageStage::stroke;
+	}
 	add(VectorData::TYPE_MOVE, l_vectorData.fillColor, l_vectorData.stroke);
 	
 	vector<PointData> ps;
@@ -164,7 +179,15 @@ void VectorDataManager::addMove(PointData p_point) {
 }
 
 void VectorDataManager::addLineStyle(StrokeColorData p_stroke) {
-	add(VectorData::TYPE_STROKE, vectorData[vectorData.size() - 1].fillColor, p_stroke);
+	VectorData l_vectorData;
+	if (vectorData.size() > 0) {
+		l_vectorData = vectorData[vectorData.size()-1];
+	} else {
+		l_vectorData.setType(VectorData::TYPE_INIT);
+		l_vectorData.fillColor = KageStage::fillColor;
+		l_vectorData.stroke = KageStage::stroke;
+	}
+	add(VectorData::TYPE_STROKE, l_vectorData.fillColor, p_stroke);
 }
 
 void VectorDataManager::addClosePath() {
@@ -180,7 +203,14 @@ void VectorDataManager::addClosePath() {
 }
 
 void VectorDataManager::addCurve(PointData p_point1, PointData p_point2, PointData p_point3, VectorData::type p_curveType) {
-	VectorData l_vectorData = vectorData[vectorData.size()-1];
+	VectorData l_vectorData;
+	if (vectorData.size() > 0) {
+		l_vectorData = vectorData[vectorData.size()-1];
+	} else {
+		l_vectorData.setType(VectorData::TYPE_INIT);
+		l_vectorData.fillColor = KageStage::fillColor;
+		l_vectorData.stroke = KageStage::stroke;
+	}
 	add(p_curveType, l_vectorData.fillColor, l_vectorData.stroke);
 	
 	vector<PointData> ps;

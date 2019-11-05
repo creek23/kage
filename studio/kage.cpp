@@ -80,8 +80,8 @@ Kage::Kage() : m_KageLayerManager(),
 		sigc::mem_fun(*this, &Kage::onActionActivate)
 	);
 	m_refActionGroup->add(
-		Gtk::Action::create("Open", Gtk::Stock::OPEN, "_Open", "Open a file"),
-		sigc::mem_fun(*this, &Kage::onActionActivate)
+		Gtk::Action::create("OpenKSF", Gtk::Stock::OPEN, "_Open", "Open KSF file"),
+		sigc::mem_fun(*this, &Kage::OpenKSF_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("Save", Gtk::Stock::SAVE, "_Save", "Save current file"),
@@ -96,6 +96,11 @@ Kage::Kage() : m_KageLayerManager(),
 		Gtk::Action::create("ExportHTML5", "Export HTML5", "Export to HTML5"),
 		Gtk::AccelKey("<control>5"),
 		sigc::mem_fun(*this, &Kage::ExportHTML5_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("ExportPNG", "Single PNG", "Export to Single PNG"),
+//		Gtk::AccelKey("<control>5"),
+		sigc::mem_fun(*this, &Kage::ExportPNG_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("ExportPNGTransparent", "Single PNG (Transparent)", "Export with Single PNG (Transparent Background)"),
@@ -287,7 +292,7 @@ Kage::Kage() : m_KageLayerManager(),
 		"	<menubar name='MenuBar'>"
 		"		<menu action='FileMenu'>"
 		"			<menuitem action='New'/>"
-		"			<menuitem action='Open'/>"
+		"			<menuitem action='OpenKSF'/>"
 		"			<separator/>"
 		"			<menuitem action='Save'/>"
 		"			<separator/>"
@@ -296,6 +301,7 @@ Kage::Kage() : m_KageLayerManager(),
 		"				<menuitem action='ExportHTML5'/>"
 		"				<menuitem action='ExportKS'/>"
 		"				<menu action='ExportPNGMenu'>"
+		"					<menuitem action='ExportPNG'/>"
 		"					<menuitem action='ExportPNGTransparent'/>"
 		"					<menuitem action='ExportPNGSequence'/>"
 		"				</menu>"
@@ -914,7 +920,7 @@ void Kage::renderFrames() {
 	Kage::timestamp();
 	std::cout << " Kage::renderFrames <" << std::endl;
 	unsigned int c = m_KageLayerManager.layerCount();
-	m_KageStage.clearScreen();
+	m_KageStage.clearScreen(m_KageStage.cr);
 	unsigned int t = KageFramesManager::currentLayer;
 		for (unsigned int i = 1; i <= c; ++i) {
 			m_KageFramesManager.setCurrentLayer(i);
@@ -928,7 +934,7 @@ void Kage::renderFrames() {
 void Kage::renderFramesBelowCurrentLayer() {
 	Kage::timestamp();
 	std::cout << " Kage::renderFramesBelowCurrentLayer <" << std::endl;
-	m_KageStage.clearScreen();
+	m_KageStage.clearScreen(m_KageStage.cr);
 	unsigned int t = KageFramesManager::currentLayer;
 		for (unsigned int i = 1; i < t; ++i) {
 			m_KageFramesManager.setCurrentLayer(i);
@@ -952,6 +958,36 @@ void Kage::renderFramesAboveCurrentLayer() {
 	std::cout << " Kage::renderFramesAboveCurrentLayer >" << std::endl;
 }
 
+void Kage::OpenKSF_onClick() {
+	Gtk::FileChooserDialog dialog("Open File", Gtk::FILE_CHOOSER_ACTION_OPEN);
+	dialog.set_transient_for( * this);
+		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+		dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
+	auto filter_kage = Gtk::FileFilter::create();
+		filter_kage->set_name("Kage Studio Files");
+		filter_kage->add_mime_type("text/x-kage");
+		filter_kage->add_pattern("*.ksf");
+			dialog.add_filter(filter_kage);
+	//Show the dialog and wait for a user response:
+	int result = dialog.run();
+	
+	//Handle the response:
+	switch (result) {
+		case Gtk::RESPONSE_OK:
+			ksfPath = dialog.get_filename();
+			cout << "uri:" << dialog.get_uri() << endl;
+			
+			string l_ksfContent = BasicXml::openXMLFile(ksfPath);
+			
+			//cout << "Loaded... \n" << l_ksfContent << endl;
+			parseKSF(l_ksfContent);
+			updateStatus("Loaded " + ksfPath);
+			
+			break;
+//		default:
+//			std::cout << "clicked " << result << endl;
+	}
+}
 void Kage::Save_onClick() {
 	Gtk::FileChooserDialog dialog("Save File", Gtk::FILE_CHOOSER_ACTION_SAVE);
 	dialog.set_transient_for( * this);
@@ -981,12 +1017,12 @@ void Kage::Save_onClick() {
 					unsigned int l_currentLayer;
 					unsigned int l_currentFrame;
 			
-			saveKageStudio(ksfPath, "<KageStudio  version=\"2019.10.14\">");
-			saveKageStudio(ksfPath, "<stage width=\"" + uintToString(m_KageStage.wid) + "\" height=\"" + uintToString(m_KageStage.hgt) + "\" " +
+			saveKageStudio(ksfPath, "<KageStudio version=\"2019.10.14\">");
+			saveKageStudio(ksfPath, "<stage width=\"" + uintToString(m_KageStage.stageWidth) + "\" height=\"" + uintToString(m_KageStage.stageHeight) + "\" " +
 			                        "background=\"rgb(" + intToString(m_KageStage.stageBG.getR()) + ", " + intToString(m_KageStage.stageBG.getG()) + ", " + intToString(m_KageStage.stageBG.getB()) + ")\" " +
 			                        "fps=\"" + intToString(m_KageStage.fps) + "\" " +
 			                        "layers=\"" + intToString(l_lMax) + "\" " +
-			                        "frames=\"" + intToString(l_lMax) + "\" />");
+			                        "frames=\"" + intToString(l_fMax) + "\" />");
 				l_currentLayer = KageFramesManager::currentLayer;
 				l_currentFrame = m_KageFramesManager.getCurrentFrame();
 					for (i = 1; i <= l_lMax; i++) {
@@ -1033,7 +1069,7 @@ void Kage::ExportKS_onClick() {
 			
 			exportKonsolScript(ksfPath, "Var:Number bgcolor;\n");
 			exportKonsolScript(ksfPath, "function kagestudio_screencls() {");
-			exportKonsolScript(ksfPath, "\tDraw:RectFill(0, 0, " + uintToString(m_KageStage.wid) + ", " + uintToString(m_KageStage.hgt) + ", bgcolor, screen)");
+			exportKonsolScript(ksfPath, "\tDraw:RectFill(0, 0, " + uintToString(m_KageStage.stageWidth) + ", " + uintToString(m_KageStage.stageHeight) + ", bgcolor, screen)");
 			exportKonsolScript(ksfPath, "}");
 			exportKonsolScript(ksfPath, "function render() {");
 			exportKonsolScript(ksfPath, "\tkagestudio_screencls()");
@@ -1088,7 +1124,7 @@ void Kage::ExportHTML5_onClick() {
 				exportHtml5(expPath, "}");
 				exportHtml5(expPath, "function kagestudio_screencls() {");
 				exportHtml5(expPath, "\tscreen.fillStyle = \"rgb(" + intToString(m_KageStage.stageBG.getR()) + ", " + intToString(m_KageStage.stageBG.getG()) + "," + intToString(m_KageStage.stageBG.getB()) + ")\";");
-				exportHtml5(expPath, "\tscreen.fillRect(0, 0, " + uintToString(m_KageStage.wid) + ", " + uintToString(m_KageStage.hgt) + ");");
+				exportHtml5(expPath, "\tscreen.fillRect(0, 0, " + uintToString(m_KageStage.stageWidth) + ", " + uintToString(m_KageStage.stageHeight) + ");");
 				exportHtml5(expPath, "}");
 				exportHtml5(expPath, "function kagestudio_loop() {");
 				exportHtml5(expPath, "\tkagestudio_screencls()");
@@ -1098,7 +1134,7 @@ void Kage::ExportHTML5_onClick() {
 				exportHtml5(expPath, "}");
 			} else {
 				exportHtml5(expPath, "\tscreen.fillStyle = \"rgb(" + intToString(m_KageStage.stageBG.getR()) + ", " + intToString(m_KageStage.stageBG.getG()) + "," + intToString(m_KageStage.stageBG.getB()) + ")\";");
-				exportHtml5(expPath, "\tscreen.fillRect(0, 0, " + uintToString(m_KageStage.wid) + ", " + uintToString(m_KageStage.hgt) + ");");
+				exportHtml5(expPath, "\tscreen.fillRect(0, 0, " + uintToString(m_KageStage.stageWidth) + ", " + uintToString(m_KageStage.stageHeight) + ");");
 				exportHtml5(expPath, "\tks_f1();");
 				exportHtml5(expPath, "}");
 			}
@@ -1116,8 +1152,38 @@ void Kage::ExportHTML5_onClick() {
 				KageFramesManager::currentFrame = f;
 				KageFramesManager::currentLayer = t;
 			exportHtml5(expPath, "function main() {\n\t//add variable initialization...\n}");
-			exportHtml5(expPath, "</script>\n</head>\n<body align='center' onload='kagestudio();' bgcolor='#101010'>\n<canvas id='screen' width='" + uintToString(m_KageStage.wid) + "' height='" + uintToString(m_KageStage.hgt) + "' style='display: block; margin: auto;'></canvas>\n</body>\n</html>");
+			exportHtml5(expPath, "</script>\n</head>\n<body align='center' onload='kagestudio();' bgcolor='#101010'>\n<canvas id='screen' width='" + uintToString(m_KageStage.stageWidth) + "' height='" + uintToString(m_KageStage.stageHeight) + "' style='display: block; margin: auto;'></canvas>\n</body>\n</html>");
 			updateStatus("Exported to " + expPath);
+			break;
+	}
+}
+
+void Kage::ExportPNG_onClick() {
+	Gtk::FileChooserDialog dialog("Export File", Gtk::FILE_CHOOSER_ACTION_SAVE);
+	dialog.set_transient_for( * this);
+		//Add response buttons the the dialog:
+		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+		dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
+	
+	auto filter_png = Gtk::FileFilter::create();
+		filter_png->set_name("Portable Network Graphics");
+		filter_png->add_mime_type("image/png");
+		filter_png->add_pattern("*.png");
+			dialog.add_filter(filter_png);
+	int result = dialog.run();
+	
+	switch (result) {
+		case Gtk::RESPONSE_OK:
+			string l_pngPath = dialog.get_filename();
+			cout << "uri:" << dialog.get_uri() << endl;
+			
+			int l_len = strlen(l_pngPath.c_str()) - 4;
+			if (strToLower(l_pngPath).substr(l_len, 4) != ".png") {
+				l_pngPath = l_pngPath + ".png";
+			}
+			
+			m_KageStage.renderToPNG(l_pngPath, false);
+			updateStatus("Exported to " + l_pngPath);
 			break;
 	}
 }
@@ -1146,7 +1212,7 @@ void Kage::ExportPNGTransparent_onClick() {
 				l_pngPath = l_pngPath + ".png";
 			}
 			
-			m_KageStage.renderToPNG(l_pngPath);
+			m_KageStage.renderToPNG(l_pngPath, true);
 			updateStatus("Exported to " + l_pngPath);
 			break;
 	}
@@ -1253,7 +1319,11 @@ void Kage::ExportAVI_onClick() {
 				l_pngPath = l_pngPath.substr(0, l_len);
 			}
 			
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+			if (runExternal("./ffmpeg", "-version") == false) {
+#else
 			if (runExternal("ffmpeg", "-version") == false) {
+#endif
 				updateStatus("FFMPEG is not installed.");
 				openWebsite("https://www.ffmpeg.org/download.html");
 					return;
@@ -1266,6 +1336,10 @@ void Kage::ExportAVI_onClick() {
 					unsigned int t;
 					unsigned int f;
 				
+				if (l_fMax < m_KageStage.fps) {
+					updateStatus("Unable to export " + l_pngPath + ".avi; try adding more Frames to your animation.");
+					return;
+				}
 				
 				GdkPoint l_tempOrigin;
 				l_tempOrigin.x = m_KageStage.origin.x;
@@ -1307,10 +1381,11 @@ void Kage::ExportAVI_onClick() {
 				m_KageStage.origin.x = l_tempOrigin.x;
 				m_KageStage.origin.y = l_tempOrigin.y;
 			
-			if (runExternal("ffmpeg", "-framerate " + uintToString(m_KageStage.fps) + " -i '" + l_pngPath + "%05d.png' '" + l_pngPath + ".avi'")) {
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+			if (runExternal("./ffmpeg", "-framerate " + uintToString(m_KageStage.fps) + " -i '" + l_pngPath + "%05d.png' '" + l_pngPath + ".avi'")) {
 				if (runExternal("del", "/f " + l_pngPath + "*.png")) {
 #else
+			if (runExternal("ffmpeg", "-framerate " + uintToString(m_KageStage.fps) + " -i '" + l_pngPath + "%05d.png' '" + l_pngPath + ".avi'")) {
 				if (runExternal("rm", "-f " + l_pngPath + "*.png")) {
 #endif
 					updateStatus("Exported to " + l_pngPath + ".avi");
@@ -1351,7 +1426,7 @@ void Kage::onActionActivate() {
 void Kage::Play_onClick() {
 	std::cout << " Kage::Play_onClick" << std::endl;
 	unsigned int c = m_KageFramesManager.frameCount();
-	m_KageStage.clearScreen();
+	m_KageStage.clearScreen(m_KageStage.cr);
 	for (unsigned int i = 1; i <= c; ++i) {
 		m_KageFramesManager.setCurrentFrame(i);
 		renderFrames();
@@ -1587,11 +1662,11 @@ double Kage::stringToDouble(string strConvert) {
 
 void Kage::EntryStageArea_onEnter() {
 	string t = m_EntryStageWid.get_text();
-		m_KageStage.wid = stringToUInt(t);
-		m_EntryStageWid.set_text(uintToString(m_KageStage.wid));
+		m_KageStage.stageWidth = stringToUInt(t);
+		m_EntryStageWid.set_text(uintToString(m_KageStage.stageWidth));
 	t = m_EntryStageHgt.get_text();
-		m_KageStage.hgt = stringToUInt(t);
-		m_EntryStageHgt.set_text(uintToString(m_KageStage.hgt));
+		m_KageStage.stageHeight = stringToUInt(t);
+		m_EntryStageHgt.set_text(uintToString(m_KageStage.stageHeight));
 	m_KageStage.render();
 }
 void Kage::EntryStageFPS_onEnter() {
@@ -1666,7 +1741,7 @@ string Kage::saveFrame() {
 			case VectorData::TYPE_TEXT: break;
 			case VectorData::TYPE_FILL:
 				fcolor = v[i].fillColor;
-					l_ostringstream << "<fill color=\"rgba" << v[i].fillColor.toString() << "\" />\n";
+					l_ostringstream << "<fill color=\"rgba" << v[i].fillColor.toString() << "\">\n";
 				fillCtr++;
 				break;
 			case VectorData::TYPE_ENDFILL:
@@ -1875,12 +1950,210 @@ char Kage::int15ToHex(unsigned int p) {
 	return '\0';
 }
 
+string Kage::openTextFile(string p_path) {
+	char ch;
+	string l_string = "";
+	fstream fin(p_path, fstream::in);
+	while (fin >> noskipws >> ch) {
+		l_string += ch;
+	}
+	return l_string;
+}
+
+string Trim(string p_source) {
+	string l_source = "";
+	int i;
+	int l_len;
+	//remove "space" before
+	l_len = strlen(p_source.c_str());
+	for (i = 0; i < l_len; ++i) {
+		if (p_source[i] == ' ') {
+			//skip to next...
+		}
+		else {
+			l_source = p_source.substr(i, l_len - i);
+			break;
+		}
+	}
+
+	//remove "space" after
+	l_len = strlen(l_source.c_str());
+	for (i = l_len - 1; i > 0; --i) {
+		if (l_source[i] == ' ') {
+			//skip to next...
+		}
+		else {
+			l_source = l_source.substr(0, i + 1);
+			break;
+		}
+	}
+	return l_source;
+}
+
+vector<string> split(const string &s, const string &delim, const bool keep_empty) {
+	vector<string> l_rets;
+	if (delim.empty()) {
+		l_rets.push_back(s);
+		return l_rets;
+	}
+	string::const_iterator substart = s.begin(), subend;
+	while (true) {
+		subend = search(substart, s.end(), delim.begin(), delim.end());
+		string temp(substart, subend);
+		if (!temp.empty()) {
+			l_rets.push_back(Trim(temp));
+		}
+		if (subend == s.end()) {
+			break;
+		}
+		substart = subend + delim.size();
+	}
+	return l_rets;
+}
+vector<double> Kage::parseNumbers(string p_numbers) {
+	vector<string> l_XYs = split(p_numbers, " ", false);
+	vector<double> l_numbers;
+	for (unsigned int i = 0; i < l_XYs.size(); ++i) {
+		l_numbers.push_back(stringToDouble(l_XYs[i]));
+	}
+	return l_numbers;
+}
+vector<int> Kage::parseColorString(string p_color) {
+	vector<int> l_colors;
+	if (p_color.length() > 4 && p_color.substr(0, 5) == "rgba(") {
+		vector<string> l_rgba = split(p_color.substr(5), ", ", false);
+		cout << l_rgba.size() << endl;
+		l_colors.push_back(stringToInt(l_rgba[0]));
+		l_colors.push_back(stringToInt(l_rgba[1]));
+		l_colors.push_back(stringToInt(l_rgba[2]));
+		l_colors.push_back(stringToInt(split(l_rgba[3], ")", false)[0]));
+	} else if (p_color.length() > 3 && p_color.substr(0, 4) == "rgb(") {
+		vector<string> l_rgb = split(p_color.substr(4), ", ", false);
+		cout << l_rgb.size() << endl;
+		l_colors.push_back(stringToInt(l_rgb[0]));
+		l_colors.push_back(stringToInt(l_rgb[1]));
+		l_colors.push_back(stringToInt(split(l_rgb[2], ")", false)[0]));
+	} else {
+		cout << "?!?" << p_color << "\n";
+	}
+	return l_colors;
+}
+
+void Kage::parseKSF_Children(vector<XmlTag> p_children) {
+	for (unsigned int i = 0; i < p_children.size(); ++i) {
+		string l_tagname = p_children[i].getName();
+		vector<XmlTagProperty> l_properties = p_children[i].getProperties();
+		if (l_tagname.substr(0, 5) == "layer") {
+			unsigned int l_layer = stringToUInt(l_tagname.substr(5));
+			cout << "\t\t\t\t\tl_tagname LAYER\t" << l_layer << endl;
+			while (l_layer > m_KageFramesManager.layerCount()) {
+				m_KageLayerManager.addLayer();
+				m_KageFramesManager.addFrameManager(m_KageLayerManager.layerCount());
+			}
+			m_KageFramesManager.setCurrentLayer(l_layer);
+		} else if (l_tagname.substr(0, 5) == "frame") {
+			unsigned int l_frame = stringToUInt(l_tagname.substr(5));
+			while (l_frame > m_KageFramesManager.frameCount()) {
+				m_KageFramesManager.addFrame();
+			}
+			m_KageFramesManager.setCurrentFrame(l_frame);
+		} else if (l_tagname == "init") {
+			VectorDataManager v;
+				v.addInit();
+			addDataToFrame(v);
+		} else if (l_tagname == "fill") {
+			VectorDataManager v;
+			vector<int> l_colors = parseColorString(l_properties[0].getValue()); //color
+				v.addFill(ColorData(l_colors[0], l_colors[1], l_colors[2], l_colors[3]));
+			addDataToFrame(v);
+		} else if (l_tagname == "stroke") {
+			VectorDataManager v;
+			vector<int> l_colors = parseColorString(l_properties[0].getValue()); //color
+				StrokeColorData l_stroke = StrokeColorData(l_colors[0], l_colors[1], l_colors[2], l_colors[3]);
+				l_stroke.setThickness(stringToDouble(l_properties[1].getValue()));//thickness
+				v.addLineStyle(l_stroke);
+			addDataToFrame(v);
+		} else if (l_tagname == "move") {
+			VectorDataManager v;
+			vector<double> l_numbers = parseNumbers(p_children[i]._value); //XYs
+				v.addMove(PointData(l_numbers[0], l_numbers[1]));
+			addDataToFrame(v);
+		} else if (l_tagname == "cubiccurve") {
+			VectorDataManager v;
+			vector<double> l_numbers = parseNumbers(p_children[i]._value); //XYs
+				v.addCubic(
+					PointData(l_numbers[0], l_numbers[1]),
+					PointData(l_numbers[2], l_numbers[3]),
+					PointData(l_numbers[4], l_numbers[5]));
+			addDataToFrame(v);
+		} else if (l_tagname == "closepath") {
+			VectorDataManager v;
+				v.addClosePath();
+			addDataToFrame(v);
+		} else if (l_tagname == "stage") {
+			for (unsigned int j = 0; j < l_properties.size(); ++j) {
+				if (l_properties[j].getName() == "width") {
+					m_KageStage.stageWidth = stringToUInt(l_properties[j].getValue());
+					m_EntryStageWid.set_text(uintToString(m_KageStage.stageWidth));
+				} else if (l_properties[j].getName() == "height") {
+					m_KageStage.stageHeight = stringToUInt(l_properties[j].getValue());
+					m_EntryStageHgt.set_text(uintToString(m_KageStage.stageHeight));
+				} else if (l_properties[j].getName() == "fps") {
+					m_KageStage.fps = stringToUInt(l_properties[j].getValue());
+					m_EntryStageFPS.set_text(uintToString(m_KageStage.fps));
+				} else if (l_properties[j].getName() == "background") {
+					vector<int> l_colors = parseColorString(l_properties[j].getValue());
+					m_KageStage.stageBG = ColorData(l_colors[0], l_colors[1], l_colors[2]);
+					m_ColorButtonStage.set_color(m_KageStage.getStageBG());
+				}
+			}
+		}
+		parseKSF_Children(p_children[i]._children);
+		if (l_tagname == "fill") {
+			VectorDataManager v;
+				v.addEndFill();
+			addDataToFrame(v);
+		}
+	}
+	m_KageStage.render();
+	show_all();
+}
+void Kage::parseKSF(string p_content) {
+	BasicXml _xml;
+	std::cout << "parsing... " << p_content.length() << std::endl;
+	if (_xml.parse(p_content)) {
+		if (_xml.tokenize()) {
+			XmlTag l_root = _xml.getRoot();
+			if (l_root.getName() == "KageStudio") {
+				vector<XmlTagProperty> l_xmlTagProperties = l_root.getProperties();
+				if (l_xmlTagProperties.size() > 0
+						&& l_xmlTagProperties[0].getName() == "version"
+						&& l_xmlTagProperties[0].getValue() == "2019.10.14") {					
+					parseKSF_Children(l_root._children);
+				}
+			}
+		} else {
+		//unable to tokenize KSF
+		std::cout << "unable to tokenize KSF " << std::endl;
+		}
+	} else {
+		//unable to parse KSF
+		std::cout << "unable to parse KSF " << std::endl;
+	}
+}
 bool Kage::runExternal(string p_cmd, string p_param) {
 	string l_cmd = p_cmd + " " + p_param;
 	
 	if (system(NULL)) {
 		int i = system(l_cmd.c_str());
-		if (i == 0) { /*command does not exists*/}
+		std::cout << "\n\n\nKage::runExternal i " << i << std::endl;
+		std::cout << "\n\n\nl_cmd " << l_cmd << std::endl;
+		if (i == 0) {
+			// no problem
+//			return false; /*command does not exists*/
+		} else if (i == 32512) { //GNU
+			return false; /* p_cmd not found */
+		}
 		return true;
 	}
 	return false;

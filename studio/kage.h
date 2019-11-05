@@ -29,6 +29,11 @@
 	#include "about.h"
 //	#include "register.h" -- not implemented yet; this is to gather users for support group
 	
+	#include "util/xml/xmltoken.h"
+	#include "util/xml/xmltagproperty.h"
+	#include "util/xml/xmltag.h"
+	#include "util/xml/xml.h"
+	
 	#include <fstream> //ofstream
 	#include <iostream> //cerr
 
@@ -81,9 +86,11 @@
 //			virtual void LowerToBottom_onClick();
 			virtual void AddFrame_onClick();
 			virtual void DuplicateFrame_onClick();
+			virtual void OpenKSF_onClick();
 			virtual void Save_onClick();
 			virtual void ExportKS_onClick();
 			virtual void ExportHTML5_onClick();
+			virtual void ExportPNG_onClick();
 			virtual void ExportPNGTransparent_onClick();
 			virtual void ExportPNGSequence_onClick();
 			virtual void ExportAVI_onClick();
@@ -234,6 +241,11 @@
 			long stringToLong(string strConvert);
 			double stringToDouble(string strConvert);
 			
+			string openTextFile(string p_path);
+			vector<double> parseNumbers(string p_numbers);
+			vector<int> parseColorString(string p_color);
+			void parseKSF_Children(vector<XmlTag> p_children);
+			void parseKSF(string p_content);
 			bool runExternal(string p_cmd, string p_param);
 			
 			void Play_onClick();

@@ -1,5 +1,5 @@
 # Makefile for KageStudio
-BIN = kage
+BIN = kage.exe
 CXX = g++
 CXXFLAGS = -c -I./ `pkg-config gtkmm-3.0 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -fmax-errors=5 -Wfatal-errors
 CXXLINKS = `pkg-config gtkmm-3.0 --libs | sed 's/ -I/ -isystem /g'`
@@ -19,6 +19,10 @@ SOURCES = \
 	./kage/timeline/layermanager.cpp \
 	./kage/stage.cpp \
 	./kage/vectordatamanager.cpp \
+	./util/xml/xmltoken.cpp \
+	./util/xml/xmltagproperty.cpp \
+	./util/xml/xmltag.cpp \
+	./util/xml/xml.cpp \
 	kage.cpp \
 	main.cpp
 

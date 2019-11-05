@@ -14,6 +14,9 @@ KageFramesManager::~KageFramesManager() {
 	//
 }
 
+unsigned int KageFramesManager::layerCount() {
+	return framemanager.size();
+}
 unsigned int KageFramesManager::frameCount() {
 	unsigned int l_count = 1;
 	if (framemanager.size() > 0) {

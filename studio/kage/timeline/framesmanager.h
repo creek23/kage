@@ -22,6 +22,7 @@
 			unsigned int getCurrentFrame();
 			void setCurrentLayer(unsigned int p_currentLayer);
 			unsigned int getCurrentLayer();
+			unsigned int layerCount();
 			unsigned int frameCount();
 			void selectAll(bool p_selectAll); //used by KageFrame
 			KageFrame *getFrame();

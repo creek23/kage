@@ -6,8 +6,8 @@
 KageStage::KageStage(Kage *p_win) {
 	origin.x = 50;
 	origin.y = 50;
-	wid = 800;
-	hgt = 600;
+	stageWidth = 800;
+	stageHeight = 600;
 	fps = 12;
 	win = p_win;
 //	set_flags(Gtk::CAN_FOCUS);
@@ -18,8 +18,6 @@ KageStage::KageStage(Kage *p_win) {
 	add_events(Gdk::POINTER_MOTION_MASK);
 	gotContext = false;
 	mouseDown = false;
-	stageWidth = wid;
-	stageHeight = hgt;
 	stroke.setThickness(3.0);
 	drawCtr = 0;
 	mouseOnNode = -1;
@@ -529,38 +527,38 @@ bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
 	return true;
 }
 
-void KageStage::clearScreen() {
-	if (!cr) return;
+void KageStage::clearScreen(Cairo::RefPtr<Cairo::Context> p_context) {
+	if (!p_context) return;
 	if (window) {
 		Gtk::Allocation allocation = get_allocation();
 		const int width = allocation.get_width();
 		const int height = allocation.get_height();
 		
 		//draw stage area
-			cr->move_to(0, 0);
-			cr->line_to(width, 0);
-			cr->line_to(width, height);
-			cr->line_to(0, height);
-			cr->close_path();
-		cr->set_source_rgb(0.8, 0.8, 0.8);
-		cr->fill();
+			p_context->move_to(0, 0);
+			p_context->line_to(width, 0);
+			p_context->line_to(width, height);
+			p_context->line_to(0, height);
+			p_context->close_path();
+		p_context->set_source_rgb(0.8, 0.8, 0.8);
+		p_context->fill();
 		
 		//draw viewable area
-		cr->move_to(      origin.x, origin.y);
-		cr->line_to(wid + origin.x, origin.y);
-		cr->line_to(wid + origin.x, origin.y + hgt);
-		cr->line_to(      origin.x, origin.y + hgt);
-		cr->close_path();
-			cr->set_source_rgb((double)KageStage::stageBG.getR()/255, (double)KageStage::stageBG.getG()/255, (double)KageStage::stageBG.getB()/255);
-	//		cr->fill_preserve();
-			cr->fill();
-				cr->set_line_width(0.2);
-				cr->set_source_rgb(0.0, 0.0, 0.0);
-				cr->stroke();
+		p_context->move_to(             origin.x, origin.y);
+		p_context->line_to(stageWidth + origin.x, origin.y);
+		p_context->line_to(stageWidth + origin.x, origin.y + stageHeight);
+		p_context->line_to(             origin.x, origin.y + stageHeight);
+		p_context->close_path();
+			p_context->set_source_rgb((double)KageStage::stageBG.getR()/255, (double)KageStage::stageBG.getG()/255, (double)KageStage::stageBG.getB()/255);
+	//		p_context->fill_preserve();
+			p_context->fill();
+				p_context->set_line_width(0.2);
+				p_context->set_source_rgb(0.0, 0.0, 0.0);
+				p_context->stroke();
 	}
 }
 
-void KageStage::renderToPNG(string p_path) {
+void KageStage::renderToPNG(string p_path, bool p_transparent) {
 	#ifdef CAIRO_HAS_PNG_FUNCTIONS
 		Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, stageWidth, stageHeight);
 		
@@ -572,6 +570,10 @@ void KageStage::renderToPNG(string p_path) {
 		
 		origin.x = 0;
 		origin.y = 0;
+		
+		if (p_transparent == false) {
+			clearScreen(l_context);
+		}
 		
 		renderFrame(l_context);
 		surface->write_to_png(p_path);

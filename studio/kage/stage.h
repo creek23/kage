@@ -38,7 +38,7 @@
 				MODE_DRAW_OVAL,
 				MODE_DRAW_LINE
 			};
-			
+			const unsigned int _NO_SELECTION = -1;
 			static ColorData stageBG; //direct use for get only
 			static ColorData fillColor; //direct use for get only
 			static StrokeColorData stroke; //direct use for get only
@@ -109,6 +109,14 @@
 			bool raiseToTopSelectedShape();
 			bool lowerToBottomSelectedShape();
 			
+			void addSelectedNode(unsigned int p_index);
+			void addSelectedShape(unsigned int p_index);
+			void trySingleSelectShape();
+			void tryMultiSelectShapes();
+			void tryMultiSelectShapes_populateShapes();
+			unsigned int getShape(unsigned int p_index, vector<VectorData> p_v);
+
+			
 			void updateShapeColor(bool p_doFill = true, bool p_doStroke = true);
 			void updateShapeX(double p_value);
 			void updateShapeY(double p_value);
@@ -155,11 +163,19 @@
 			unsigned int selectedNode;
 			unsigned int mouseOnShape;
 			unsigned int selectedShape;
+			vector<unsigned int> selectedNodes;
+			vector<unsigned int> selectedShapes;
 			
 			AnchorData::type mouseOnAnchor;
 			void renderNode(double p_x, double p_y, unsigned int p_state = 5);
 			void renderNodeControl(double p_x, double p_y, bool p_selected);
 			bool isMouseOnNode(double p_x, double p_y, unsigned int p_buffer = 5);
+			
+			GdkPoint selectionBox1;
+			GdkPoint selectionBox2;
+			bool isSelectionBoxNormalized();
+			void normalizeSelectionBox();
+			bool isNodeOnSelectionBox(double p_nodeX, double p_nodeY);
 			
 			double getSelectedShapeViaNode(unsigned int p_index, vector<VectorData> p_v);
 			double _nodeToMouseDistance;

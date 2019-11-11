@@ -72,12 +72,13 @@ Kage::Kage() : m_KageLayerManager(),
 	m_refActionGroup->add( Gtk::Action::create("ExportMenu", "_Export...") ); 
 	m_refActionGroup->add( Gtk::Action::create("ExportPNGMenu", "_PNG...") ); 
 	m_refActionGroup->add( Gtk::Action::create("EditMenu", "_Edit") );
+	m_refActionGroup->add( Gtk::Action::create("ObjectMenu", "_Object") );
 	m_refActionGroup->add( Gtk::Action::create("TimelineMenu", "_Timeline") );
 	m_refActionGroup->add( Gtk::Action::create("ToolsMenu", "T_ools") );
 	m_refActionGroup->add( Gtk::Action::create("HelpMenu", "_Help") );
 	m_refActionGroup->add(
 		Gtk::Action::create("New", Gtk::Stock::NEW, "_New", "Create a new file"),
-		sigc::mem_fun(*this, &Kage::onActionActivate)
+		sigc::mem_fun(*this, &Kage::New_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("OpenKSF", Gtk::Stock::OPEN, "_Open", "Open KSF file"),
@@ -149,27 +150,37 @@ Kage::Kage() : m_KageLayerManager(),
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("Delete", "_Delete", "Delete"),
-//		Gtk::AccelKey("F9"),
+		Gtk::AccelKey("Delete"),
 		sigc::mem_fun(*this, &Kage::Delete_onClick)
 	);
 	m_refActionGroup->add(
+		Gtk::Action::create("ShapeGroup", "_Group Objects", "Group Selected Objects"),
+		Gtk::AccelKey("<control>G"),
+		sigc::mem_fun(*this, &Kage::ShapeGroup_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("ShapeUngroup", "_Ungroup Object", "Ungroup Selected Object"),
+		Gtk::AccelKey("<control>B"),
+		sigc::mem_fun(*this, &Kage::ShapeUngroup_onClick)
+	);
+	m_refActionGroup->add(
 		Gtk::Action::create("Raise", "R_aise", "Raise"),
-		Gtk::AccelKey("page_up"),
+		Gtk::AccelKey("Page_Up"),
 		sigc::mem_fun(*this, &Kage::Raise_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("Lower", "_Lower", "Lower"),
-		Gtk::AccelKey("page down"),
+		Gtk::AccelKey("Page_Down"),
 		sigc::mem_fun(*this, &Kage::Lower_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("RaiseToTop", "Raise to _Top", "RaiseToTop"),
-		Gtk::AccelKey("<pgup>"),
+		Gtk::AccelKey("Home"),
 		sigc::mem_fun(*this, &Kage::RaiseToTop_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("LowerToBottom", "Lower to _Bottom", "LowerToBottom"),
-		Gtk::AccelKey("pageup"),
+		Gtk::AccelKey("End"),
 		sigc::mem_fun(*this, &Kage::LowerToBottom_onClick)
 	);
 	////Add Toggle Actions:
@@ -185,12 +196,12 @@ Kage::Kage() : m_KageLayerManager(),
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("PreviousFrame", "_Previous", "Previous Frame"),
-//		Gtk::AccelKey("["),
+		Gtk::AccelKey(","),
 		sigc::mem_fun(*this, &Kage::switchToPreviousFrame)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("NextFrame", "_Next", "Next Frame"),
-//		Gtk::AccelKey("]"),
+		Gtk::AccelKey("."),
 		sigc::mem_fun(*this, &Kage::switchToNextFrame)
 	);
 	m_refActionGroup->add(
@@ -316,6 +327,10 @@ Kage::Kage() : m_KageLayerManager(),
 		"			<menuitem action='Copy'/>"
 		"			<menuitem action='Paste'/>"
 		"			<menuitem action='Delete'/>"
+		"		</menu>"
+		"		<menu action='ObjectMenu'>"
+		"			<menuitem action='ShapeGroup'/>"
+		"			<menuitem action='ShapeUngroup'/>"
 		"			<separator/>"
 		"			<menuitem action='Raise'/>"
 		"			<menuitem action='Lower'/>"
@@ -617,6 +632,12 @@ void Kage::Paste_onClick() {
 			forceRenderFrames();
 		}
 	}
+}
+void Kage::ShapeGroup_onClick() {
+	//
+}
+void Kage::ShapeUngroup_onClick() {
+	//
 }
 void Kage::Raise_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
@@ -958,6 +979,10 @@ void Kage::renderFramesAboveCurrentLayer() {
 	std::cout << " Kage::renderFramesAboveCurrentLayer >" << std::endl;
 }
 
+void Kage::New_onClick() {
+	VectorDataManager v;
+	setFrameData(v);
+}
 void Kage::OpenKSF_onClick() {
 	Gtk::FileChooserDialog dialog("Open File", Gtk::FILE_CHOOSER_ACTION_OPEN);
 	dialog.set_transient_for( * this);

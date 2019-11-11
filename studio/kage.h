@@ -79,13 +79,16 @@
 			virtual void Redo_onClick();
 			virtual void Copy_onClick();
 			virtual void Paste_onClick();
-//			virtual void Delete_onClick();
-//			virtual void Raise_onClick();
-//			virtual void Lower_onClick();
-//			virtual void RaiseToTop_onClick();
-//			virtual void LowerToBottom_onClick();
+			virtual void Delete_onClick();
+			virtual void ShapeGroup_onClick();
+			virtual void ShapeUngroup_onClick();
+			virtual void Raise_onClick();
+			virtual void Lower_onClick();
+			virtual void RaiseToTop_onClick();
+			virtual void LowerToBottom_onClick();
 			virtual void AddFrame_onClick();
 			virtual void DuplicateFrame_onClick();
+			virtual void New_onClick();
 			virtual void OpenKSF_onClick();
 			virtual void Save_onClick();
 			virtual void ExportKS_onClick();
@@ -261,12 +264,6 @@
 			void toolsButtonToggle(string p_toolTip);
 			
 		public:
-			virtual void Delete_onClick();
-			virtual void Raise_onClick();
-			virtual void Lower_onClick();
-			virtual void RaiseToTop_onClick();
-			virtual void LowerToBottom_onClick();
-
 			void ToolSelect_onClick();
 			
 			static void timestamp();

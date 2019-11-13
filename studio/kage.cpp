@@ -619,7 +619,7 @@ void Kage::Copy_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp();
 		std::cout << " Kage::Copy_onClick" << std::endl;
-		if (m_KageStage.copySelectedShape() == true) {
+		if (m_KageStage.copySelectedShapes() == true) {
 			forceRenderFrames();
 		}
 	}
@@ -628,13 +628,19 @@ void Kage::Paste_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp();
 		std::cout << " Kage::Paste_onClick" << std::endl;
-		if (m_KageStage.pasteSelectedShape() == true) {
+		if (m_KageStage.pasteSelectedShapes() == true) {
 			forceRenderFrames();
 		}
 	}
 }
 void Kage::ShapeGroup_onClick() {
-	//
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		Kage::timestamp();
+		std::cout << " Kage::ShapeGroup_onClick" << std::endl;
+		if (m_KageStage.groupSelectedShapes() == true) {
+			forceRenderFrames();
+		}
+	}
 }
 void Kage::ShapeUngroup_onClick() {
 	//
@@ -679,7 +685,7 @@ void Kage::Delete_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp();
 		std::cout << " Kage::Delete_onClick SHAPE" << std::endl;
-		if (m_KageStage.deleteSelectedShape() == true) {
+		if (m_KageStage.deleteSelectedShapes() == true) {
 			forceRenderFrames();
 		}
 	} else if (KageStage::toolMode == KageStage::MODE_NODE) {

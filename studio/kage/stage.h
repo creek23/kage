@@ -100,9 +100,10 @@
 			Glib::RefPtr<Gdk::Pixbuf> _bg;
 			Cairo::RefPtr<Cairo::Surface> _bgcr;
 			
-			bool copySelectedShape();
-			bool pasteSelectedShape();
-			bool deleteSelectedShape();
+			bool groupSelectedShapes();
+			bool copySelectedShapes();
+			bool pasteSelectedShapes();
+			bool deleteSelectedShapes();
 			bool deleteSelectedNode();
 			bool raiseSelectedShape();
 			bool lowerSelectedShape();
@@ -134,6 +135,8 @@
 			
 			Cairo::RefPtr<Cairo::Context> cr;
 			GdkPoint origin;
+			
+			bool _isModifyingShape;
 			
 		protected:
 			ToolMode prevTool; //used by Hand-tool shortcut [spacebar]

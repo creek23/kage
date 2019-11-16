@@ -1202,7 +1202,7 @@ void KageStage::handleShapes(bool p_hideAnchor) {
 						cr->stroke();
 		cr->unset_dash();
 	}
-	if (selectedShape == _NO_SELECTION) {
+	if (selectedShapes.size() == _NO_SELECTION) {
 		return;
 	}
 	
@@ -1263,14 +1263,14 @@ void KageStage::handleShapes(bool p_hideAnchor) {
 			} else if (isMouseOnNode( anchor_upperLeft.x - 7, anchor_lowerRight.y + 7, 7) == true) {
 				mouseOnAnchor = AnchorData::TYPE_SOUTH_WEST;
 			} else {
-//				double l_X = anchor_lowerRight.x - anchor_center.x;
-//				double l_Y = anchor_lowerRight.y - anchor_center.y;
+				double l_X = anchor_lowerRight.x - anchor_center.x;
+				double l_Y = anchor_lowerRight.y - anchor_center.y;
 				double l_distance = 7;
-//				if (l_X > l_Y) {
-//					l_distance = l_Y;
-//				} else {
-//					l_distance = l_X;
-//				}
+				if (l_X > l_Y) {
+					l_distance = l_Y;
+				} else {
+					l_distance = l_X;
+				}
 				if (isMouseOnNode(    anchor_center.x    ,     anchor_center.y    , l_distance) == true) {
 					mouseOnAnchor = AnchorData::TYPE_MOVE;
 				}
@@ -2109,36 +2109,22 @@ bool KageStage::groupSelectedShapes() {
 		return false;
 	}
 	if (copySelectedShapes() == true) {
-		_vectorDataZOrderBuffer.clear();
-		unsigned int l_vectorDataCopyBuffer_size = _vectorDataCopyBuffer.size();
-		for (unsigned int i = 0; i < l_vectorDataCopyBuffer_size; ++i) {
-			std::cout << "\t\t\tgroupSelectedShapes " << i << "? " << _vectorDataCopyBuffer[i].vectorType << " " << VectorData::TYPE_INIT << std::endl;
-			if (_vectorDataCopyBuffer[i].vectorType == VectorData::TYPE_INIT
-					&& i != 0) {
-				//skip all INIT in between first INIT and last ENDFILL
-			} else {
-				std::cout << "\t\t\t\t\t " << i << std::endl;
-				_vectorDataZOrderBuffer.push_back(_vectorDataCopyBuffer[i]);
+		if (deleteSelectedShapes() == true) {			
+			///erase index if vectorType is TYPE INIT
+			_vectorDataZOrderBuffer.clear();
+			for (unsigned int i = 0; i < _vectorDataCopyBuffer.size(); ++i) {
+				if (_vectorDataCopyBuffer[i].vectorType == VectorData::TYPE_INIT
+						&& i != 0) {
+					_vectorDataCopyBuffer.erase( _vectorDataCopyBuffer.begin() + i );
+				}
+			}
+			if (pasteSelectedShapes() == true) {
+				return true;
 			}
 		}
-		_vectorDataCopyBuffer.clear();
-		for (unsigned int i = 0; i < _vectorDataZOrderBuffer.size(); ++i) {
-			std::cout << "\t\t\t " << _vectorDataCopyBuffer.size() << std::endl;
-			_vectorDataCopyBuffer.push_back(_vectorDataZOrderBuffer[i]);
-		}
-			std::cout << "\t _vectorDataCopyBuffer.size() " << _vectorDataCopyBuffer.size() << std::endl;
-		if (pasteSelectedShapes() == true) {
-			if (deleteSelectedShapes() == true) {
-				std::cout << " KageStage::groupSelectedShapes DELETING SHAPE SUCCESS!!! " << selectedShapes.size() << std::endl;
-			} else {
-				std::cout << " KageStage::groupSelectedShapes DELETING SHAPE FAILED " << selectedShapes.size() << std::endl;
-			}
-		} else {
-			std::cout << " KageStage::groupSelectedShapes PASTING SHAPE FAILED " << selectedShapes.size() << std::endl;
-		}
-	} else {
-		std::cout << " KageStage::groupSelectedShapes COPYING SHAPE FAILED " << selectedShapes.size() << std::endl;
 	}
+	
+	return false;
 }
 bool KageStage::pasteSelectedShapes() {
 	unsigned int l_vectorDataCopyBuffer_size = _vectorDataCopyBuffer.size();
@@ -2161,10 +2147,10 @@ bool KageStage::pasteSelectedShapes() {
 		selectedNodes.push_back(v.size()-1);
 	}
 	
+	win->setFrameData(v);
+	
 	tryMultiSelectShapes_populateShapes();
 	selectedNodes.clear();
-	
-	win->setFrameData(v);
 	
 	return true;
 }
@@ -2181,9 +2167,9 @@ bool KageStage::deleteSelectedShapes() {
 	vector<VectorData> v = win->getFrameData().getVectorData();
 	
 	unsigned int vsize = v.size();
-	l_temp = vsize;
 	unsigned int l_selectedShapes_size = selectedShapes.size();
 	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
+		l_temp = vsize;
 		for (unsigned int i = selectedShapes[l_shapeIndex]; i < vsize; ++i) {
 			if (v[i].vectorType == VectorData::TYPE_INIT
 					&& i != selectedShapes[l_shapeIndex]) {
@@ -2194,8 +2180,11 @@ bool KageStage::deleteSelectedShapes() {
 		
 		v.erase (v.begin() + selectedShapes[l_shapeIndex],
 				 v.begin() + l_temp);
-		for (unsigned int i = l_shapeIndex+1; i < vsize; ++i) {
-			selectedShapes[i] -= (l_temp-selectedShapes[l_shapeIndex]);
+		
+		for (unsigned int i = l_shapeIndex+1; i < l_selectedShapes_size; ++i) {
+			if (l_temp != vsize && l_temp < selectedShapes[i]) {
+				selectedShapes[i] -= (l_temp-selectedShapes[l_shapeIndex]);
+			}
 		}
 	}
 	selectedShapes.clear();

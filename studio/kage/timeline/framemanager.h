@@ -18,6 +18,9 @@
 			void setCurrentFrame(unsigned int p_frame);
 			void focusFrame(unsigned int p_frame);
 			
+			void removeFrame(unsigned int p_frameID);
+			void removeAllFrames();
+			
 			KageFramesManager *getFsm();
 			KageFrame *getFrameAt(unsigned int p_frame);
 		protected:

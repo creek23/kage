@@ -27,6 +27,29 @@ void KageFrameManager::extendFrame(unsigned int p_frameID) {
 		pack_start(*frames.back(), Gtk::PACK_SHRINK);
 }
 
+void KageFrameManager::removeFrame(unsigned int p_frameID) {
+	for (unsigned int i = 0; i < frameCtr; ++i) {
+		if (frames[i]->frameID == p_frameID) {
+			remove(*frames[i]);
+			--frameCtr;
+			for (unsigned int j = i; j < frameCtr; ++j) {
+				frames[j]->frameID -= 1;
+			}
+			break;
+		}
+	}
+	pack_start(*frames.back(), Gtk::PACK_SHRINK);
+}
+
+void KageFrameManager::removeAllFrames() {
+	for (unsigned int i = 0; i < frameCtr; ++i) {
+		remove(*frames[i]);
+	}
+	frameCtr = 0;
+	frames.clear();
+//	pack_start(*frames.back(), Gtk::PACK_SHRINK);
+}
+
 unsigned int KageFrameManager::getID() {
 	return layerID;
 }

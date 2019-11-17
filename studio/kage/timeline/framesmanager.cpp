@@ -55,6 +55,24 @@ bool KageFramesManager::extendFrame(unsigned int p_frameID) {
 	return true;
 }
 
+bool KageFramesManager::removeFrame(unsigned int p_frameID) {
+	unsigned int l_count = framemanager.size();
+	
+	for (unsigned int i = 0; i < l_count; ++i) {
+		framemanager[i]->removeFrame(p_frameID);
+	}
+	return true;
+}
+
+bool KageFramesManager::removeAllFrames() {
+	unsigned int l_count = framemanager.size();
+	
+	for (unsigned int i = 0; i < l_count; ++i) {
+		framemanager[i]->removeAllFrames();
+	}
+	return true;
+}
+
 ///Use KageFramesManager::currentLayer instead of calling this function
 unsigned int KageFramesManager::getCurrentLayer() {
 	//filter and make sure value is valid

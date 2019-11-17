@@ -29,6 +29,9 @@
 			
 			void renderStage(); //used by KageFrame
 			
+			bool removeFrame(unsigned int p_frameID);
+			bool removeAllFrames();
+			
 		protected:
 			Kage *win;
 			Gtk::Label place_holder;

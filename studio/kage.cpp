@@ -986,8 +986,8 @@ void Kage::renderFramesAboveCurrentLayer() {
 }
 
 void Kage::New_onClick() {
-	VectorDataManager v;
-	setFrameData(v);
+	m_KageFramesManager.removeAllFrames();
+	m_KageFramesManager.addFrame();
 }
 void Kage::OpenKSF_onClick() {
 	Gtk::FileChooserDialog dialog("Open File", Gtk::FILE_CHOOSER_ACTION_OPEN);
@@ -1005,6 +1005,7 @@ void Kage::OpenKSF_onClick() {
 	//Handle the response:
 	switch (result) {
 		case Gtk::RESPONSE_OK:
+			New_onClick();
 			ksfPath = dialog.get_filename();
 			cout << "uri:" << dialog.get_uri() << endl;
 			

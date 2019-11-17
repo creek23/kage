@@ -643,7 +643,13 @@ void Kage::ShapeGroup_onClick() {
 	}
 }
 void Kage::ShapeUngroup_onClick() {
-	//
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		Kage::timestamp();
+		std::cout << " Kage::ShapeUngroup_onClick" << std::endl;
+		if (m_KageStage.ungroupSelectedShapes() == true) {
+			forceRenderFrames();
+		}
+	}
 }
 void Kage::Raise_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {

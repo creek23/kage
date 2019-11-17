@@ -101,6 +101,7 @@
 			Cairo::RefPtr<Cairo::Surface> _bgcr;
 			
 			bool groupSelectedShapes();
+			bool ungroupSelectedShapes();
 			bool copySelectedShapes();
 			bool pasteSelectedShapes();
 			bool deleteSelectedShapes();

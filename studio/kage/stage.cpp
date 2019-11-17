@@ -2111,12 +2111,48 @@ bool KageStage::groupSelectedShapes() {
 	if (copySelectedShapes() == true) {
 		if (deleteSelectedShapes() == true) {			
 			///erase index if vectorType is TYPE INIT
-			_vectorDataZOrderBuffer.clear();
 			for (unsigned int i = 0; i < _vectorDataCopyBuffer.size(); ++i) {
 				if (_vectorDataCopyBuffer[i].vectorType == VectorData::TYPE_INIT
 						&& i != 0) {
 					_vectorDataCopyBuffer.erase( _vectorDataCopyBuffer.begin() + i );
 				}
+			}
+			if (pasteSelectedShapes() == true) {
+				return true;
+			}
+		}
+	}
+	
+	return false;
+}
+
+bool KageStage::ungroupSelectedShapes() {
+	Kage::timestamp();
+	std::cout << " KageStage::ungroupSelectedShapes " << selectedShapes.size() << std::endl;
+	
+	if (selectedShapes.size() == 0) {
+		return false;
+	}
+	if (copySelectedShapes() == true) {
+		if (deleteSelectedShapes() == true) {			
+			///erase index if vectorType is TYPE INIT
+			_vectorDataZOrderBuffer.clear();
+			for (unsigned int i = 0; i < _vectorDataCopyBuffer.size(); ++i) {
+				_vectorDataZOrderBuffer.push_back(_vectorDataCopyBuffer[i]);
+				if (_vectorDataCopyBuffer[i].vectorType == VectorData::TYPE_ENDFILL
+						&& i+1 != _vectorDataCopyBuffer.size()
+						&& _vectorDataCopyBuffer[i+1].vectorType == VectorData::TYPE_FILL) {
+					//_vectorDataCopyBuffer.erase( _vectorDataCopyBuffer.begin() + i );
+					VectorData l_vectorData;
+						l_vectorData.vectorType = VectorData::TYPE_INIT;
+						l_vectorData.stroke = StrokeColorData();
+						l_vectorData.fillColor = ColorData();
+					_vectorDataZOrderBuffer.push_back(l_vectorData);
+				}
+			}
+			_vectorDataCopyBuffer.clear();
+			for (unsigned int i = 0; i < _vectorDataZOrderBuffer.size(); ++i) {
+				_vectorDataCopyBuffer.push_back(_vectorDataZOrderBuffer[i]);
 			}
 			if (pasteSelectedShapes() == true) {
 				return true;

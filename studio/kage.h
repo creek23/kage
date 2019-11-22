@@ -77,9 +77,13 @@
 			virtual void onActionActivate();
 			virtual void Undo_onClick();
 			virtual void Redo_onClick();
+			virtual void Cut_onClick();
 			virtual void Copy_onClick();
 			virtual void Paste_onClick();
 			virtual void Delete_onClick();
+			virtual void Duplicate_onClick();
+			virtual void SelectAll_onClick();
+			virtual void Deselect_onClick();
 			virtual void ShapeGroup_onClick();
 			virtual void ShapeUngroup_onClick();
 			virtual void Raise_onClick();

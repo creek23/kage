@@ -139,6 +139,11 @@ Kage::Kage() : m_KageLayerManager(),
 		sigc::mem_fun(*this, &Kage::Redo_onClick)
 	);
 	m_refActionGroup->add(
+		Gtk::Action::create("Cut", "Cu_t", "Cut"),
+		Gtk::AccelKey("<control>X"),
+		sigc::mem_fun(*this, &Kage::Cut_onClick)
+	);
+	m_refActionGroup->add(
 		Gtk::Action::create("Copy", "_Copy", "Copy"),
 		Gtk::AccelKey("<control>C"),
 		sigc::mem_fun(*this, &Kage::Copy_onClick)
@@ -154,13 +159,28 @@ Kage::Kage() : m_KageLayerManager(),
 		sigc::mem_fun(*this, &Kage::Delete_onClick)
 	);
 	m_refActionGroup->add(
+		Gtk::Action::create("Duplicate", "Duplic_ate", "Duplicate"),
+		Gtk::AccelKey("<control>D"),
+		sigc::mem_fun(*this, &Kage::Duplicate_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("SelectAll", "Select Al_l", "Select All"),
+		Gtk::AccelKey("<control>A"),
+		sigc::mem_fun(*this, &Kage::SelectAll_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("Deselect", "D_eselect", "Deselect"),
+		Gtk::AccelKey("Escape"),
+		sigc::mem_fun(*this, &Kage::Deselect_onClick)
+	);
+	m_refActionGroup->add(
 		Gtk::Action::create("ShapeGroup", "_Group Objects", "Group Selected Objects"),
 		Gtk::AccelKey("<control>G"),
 		sigc::mem_fun(*this, &Kage::ShapeGroup_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("ShapeUngroup", "_Ungroup Object", "Ungroup Selected Object"),
-		Gtk::AccelKey("<control>B"),
+		Gtk::AccelKey("<shift><control>G"),
 		sigc::mem_fun(*this, &Kage::ShapeUngroup_onClick)
 	);
 	m_refActionGroup->add(
@@ -324,9 +344,16 @@ Kage::Kage() : m_KageLayerManager(),
 		"			<menuitem action='Undo'/>"
 		"			<menuitem action='Redo'/>"
 		"			<separator/>"
+		"			<menuitem action='Cut'/>"
 		"			<menuitem action='Copy'/>"
 		"			<menuitem action='Paste'/>"
+		"			<separator/>"
+		"			<menuitem action='Duplicate'/>"
+		"			<separator/>"
 		"			<menuitem action='Delete'/>"
+		"			<separator/>"
+		"			<menuitem action='SelectAll'/>"
+		"			<menuitem action='Deselect'/>"
 		"		</menu>"
 		"		<menu action='ObjectMenu'>"
 		"			<menuitem action='ShapeGroup'/>"
@@ -436,7 +463,7 @@ Kage::Kage() : m_KageLayerManager(),
 					
 		m_VPane_Timeline.add2(m_HPane_DrawingArea);
 			m_HPane_DrawingArea.add1(m_KageStage);
-			m_KageStage.set_size_request(1280, 800);
+			m_KageStage.set_size_request(1280, 700);
 			m_KageStage.show();
 			m_HPane_DrawingArea.add2(m_Box1);
 			
@@ -615,6 +642,15 @@ void Kage::Undo_onClick() {
 void Kage::Redo_onClick() {
 	//
 }
+void Kage::Cut_onClick() {
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		Kage::timestamp();
+		std::cout << " Kage::Cut_onClick" << std::endl;
+		if (m_KageStage.cutSelectedShapes() == true) {
+			forceRenderFrames();
+		}
+	}
+}
 void Kage::Copy_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp();
@@ -629,6 +665,41 @@ void Kage::Paste_onClick() {
 		Kage::timestamp();
 		std::cout << " Kage::Paste_onClick" << std::endl;
 		if (m_KageStage.pasteSelectedShapes() == true) {
+			forceRenderFrames();
+		}
+	}
+}
+void Kage::Duplicate_onClick() {
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		Kage::timestamp();
+		std::cout << " Kage::Duplicate_onClick" << std::endl;
+		if (m_KageStage.duplicateShapes() == true) {
+			forceRenderFrames();
+		}
+	}
+}
+void Kage::SelectAll_onClick() {
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		Kage::timestamp();
+		std::cout << " Kage::SelectAll_onClick" << std::endl;
+		if (m_KageStage.selectAllShapes() == true) {
+			forceRenderFrames();
+		}
+	}
+}
+void Kage::Deselect_onClick() {
+	Kage::timestamp();
+	std::cout << " Kage::Deselect_onClick" << std::endl;
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		if (m_KageStage.deselectSelectedShapes() == true) {
+			forceRenderFrames();
+		}
+	} else if (KageStage::toolMode == KageStage::MODE_NODE) {
+		if (m_KageStage.deselectSelectedNodes() == true) {
+			forceRenderFrames();
+		}
+	} else if (KageStage::toolMode == KageStage::MODE_DRAW_POLY) {
+		if (m_KageStage.cancelDrawingPoly() == true) {
 			forceRenderFrames();
 		}
 	}
@@ -994,6 +1065,10 @@ void Kage::renderFramesAboveCurrentLayer() {
 void Kage::New_onClick() {
 	m_KageFramesManager.removeAllFrames();
 	m_KageFramesManager.addFrame();
+	
+	m_KageFramesManager.setCurrentFrame(m_KageFramesManager.frameCount());
+	m_KageStage.render();
+	show_all();
 }
 void Kage::OpenKSF_onClick() {
 	Gtk::FileChooserDialog dialog("Open File", Gtk::FILE_CHOOSER_ACTION_OPEN);

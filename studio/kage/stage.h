@@ -70,7 +70,8 @@
 			void clearScreen(Cairo::RefPtr<Cairo::Context> p_context);
 			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context);
 			void initNodeTool();
-			void handleShapes(bool p_hideAnchor = true);
+			void handleShapes();
+			void handleShapes_modifyingShape();
 			void handleShapes_scaleNorth();
 			void handleShapes_scaleEast();
 			void handleShapes_scaleWest();
@@ -100,8 +101,14 @@
 			Glib::RefPtr<Gdk::Pixbuf> _bg;
 			Cairo::RefPtr<Cairo::Surface> _bgcr;
 			
+			bool duplicateShapes();
+			bool selectAllShapes();
+			bool deselectSelectedShapes();
+			bool deselectSelectedNodes();
+			bool cancelDrawingPoly();
 			bool groupSelectedShapes();
 			bool ungroupSelectedShapes();
+			bool cutSelectedShapes();
 			bool copySelectedShapes();
 			bool pasteSelectedShapes();
 			bool deleteSelectedShapes();
@@ -151,6 +158,7 @@
 			//Cairo::RefPtr<Cairo::Context> cr;
 			bool gotContext;
 			bool mouseDown;
+			GdkPoint _copyBufferMouse;
 			bool draw;
 			unsigned int drawCtr;
 			//Override default signal handler:
@@ -181,6 +189,8 @@
 			void normalizeSelectionBox();
 			bool isNodeOnSelectionBox(double p_nodeX, double p_nodeY);
 			
+			void drawSelectionArea();
+			
 			double getSelectedShapeViaNode(unsigned int p_index, vector<VectorData> p_v);
 			double _nodeToMouseDistance;
 			
@@ -194,5 +204,8 @@
 			bool keyDownDown;
 			bool keyLeftDown;
 			bool keyRightDown;
+			
+			int _registerWidth;
+			int _registerHeight;
 	};
 #endif // GTKMM_KAGE_STAGE_H

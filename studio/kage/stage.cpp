@@ -743,7 +743,7 @@ void KageStage::handleShapes_scaleNorth() {
 	double diffNew = anchor_lowerRight.y - draw2.y;
 	double diffRatio = diffNew / diffOld;
 	if (diffRatio == 0.0) {
-		diffRatio == 0.01;
+		return;
 	}
 	
 	vector<VectorData> v = win->getFrameData().getVectorData();
@@ -792,7 +792,7 @@ void KageStage::handleShapes_scaleEast() {
 	double diffNew = draw2.x - anchor_upperLeft.x;
 	double diffRatio = diffNew / diffOld;
 	if (diffRatio == 0.0) {
-		diffRatio == 0.01;
+		return;
 	}
 	
 	vector<VectorData> v = win->getFrameData().getVectorData();
@@ -841,7 +841,7 @@ void KageStage::handleShapes_scaleWest() {
 	double diffNew = draw2.x - anchor_lowerRight.x;
 	double diffRatio = diffNew / diffOld;
 	if (diffRatio == 0.0) {
-		diffRatio == 0.01;
+		return;
 	}
 	
 	vector<VectorData> v = win->getFrameData().getVectorData();
@@ -890,7 +890,7 @@ void KageStage::handleShapes_scaleSouth() {
 	double diffNew = draw2.y - anchor_upperLeft.y;
 	double diffRatio = diffNew / diffOld;
 	if (diffRatio == 0.0) {
-		diffRatio == 0.01;
+		return;
 	}
 	
 	vector<VectorData> v = win->getFrameData().getVectorData();

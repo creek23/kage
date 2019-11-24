@@ -135,7 +135,7 @@
 			void updateNodeY(double p_value);
 			
 			vector<VectorData> _vectorDataCopyBuffer;
-			vector<VectorData> _vectorDataZOrderBuffer;
+			vector<VectorData> _vectorDataZOrderBufferA;
 			vector<VectorData> _vectorDataZOrderBufferB;
 			vector<VectorData> _vectorDataZOrderBufferC;
 			
@@ -158,6 +158,8 @@
 			//Cairo::RefPtr<Cairo::Context> cr;
 			bool gotContext;
 			bool mouseDown;
+			GdkPoint _mouseLocation;
+			unsigned int _mouseLocationShapeIndex;
 			GdkPoint _copyBufferMouse;
 			bool draw;
 			unsigned int drawCtr;

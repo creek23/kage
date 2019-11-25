@@ -1448,6 +1448,14 @@ void KageStage::trySingleSelectShape() {
 			selectedShapes.clear();
 		}
 		addSelectedShape(_mouseLocationShapeIndex);
+		
+		win->propStageSetVisible(false);
+		win->propFillStrokeSetVisible(true);
+		win->propLocationSizeSetVisible(true);
+		win->propNodeXYSetVisible(false);
+		
+		win->updateColors();
+		win->updateProperties();
 	}
 }
 void KageStage::tryMultiSelectShapes_populateShapes() {
@@ -1514,6 +1522,7 @@ void KageStage::handleShapesMouseUp() {
 	/// check if still be used; as of 2019 Nov 24, nothing is calling it
 	mouseOnAnchor = AnchorData::TYPE_NONE;
 	handleNodesMouseUp();
+	
 	win->updateColors();
 	win->updateProperties();
 }

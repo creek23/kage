@@ -1070,6 +1070,7 @@ void Kage::New_onClick() {
 	m_KageFramesManager.addFrame();
 	
 	_undoRedoManager.clear();
+	stackDo();
 	
 	m_KageFramesManager.setCurrentFrame(m_KageFramesManager.frameCount());
 	m_KageStage.render();
@@ -1099,6 +1100,7 @@ void Kage::OpenKSF_onClick() {
 			
 			//cout << "Loaded... \n" << l_ksfContent << endl;
 			parseKSF(l_ksfContent);
+			_undoRedoManager.clear();
 			stackDo();
 			updateStatus("Loaded " + ksfPath);
 			

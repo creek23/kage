@@ -995,7 +995,7 @@ void KageStage::handleShapes_updateAnchors(double p_x, double p_y) {
 }
 
 void KageStage::updateShapeColor(bool p_doFill, bool p_doStroke) {
-	if (selectedShape == _NO_SELECTION) {
+	if (selectedShapes.size() == 0) {
 		return;
 	}
 	
@@ -1027,18 +1027,23 @@ void KageStage::updateShapeColor(bool p_doFill, bool p_doStroke) {
 
 void KageStage::updateShapeX(double p_value) {
 	Kage::timestamp();
-	std::cout << " KageStage::updateShapeX " << selectedShape << " " << p_value << std::endl;
+	std::cout << " KageStage::updateShapeX " << selectedShapes.size() << " " << p_value << std::endl;
 	
-	if (selectedShape == _NO_SELECTION) {
+	if (selectedShapes.size() == 0) {
 		return;
 	}
 	
 	vector<VectorData> v = win->getFrameData().getVectorData();
-	double l_propXprev = v[propXindex1].points[propXindex2].x;
-	double l_propXdiff = p_value - l_propXprev;
+	
 	unsigned int vsize = v.size();
 	unsigned int l_selectedShapes_size = selectedShapes.size();
 	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
+		//no use for l_temp, we only need to call getSelectedShapeViaNode nothing else
+		unsigned int l_temp = getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+3, v);
+		
+		double l_propXprev = v[propXindex1].points[propXindex2].x;
+		double l_propXdiff = p_value - l_propXprev;
+		
 		for (unsigned int i = selectedShapes[l_shapeIndex]; i < vsize; ++i) {
 			if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC) {
 				v[i].points[0].x += l_propXdiff;
@@ -1063,18 +1068,23 @@ void KageStage::updateShapeX(double p_value) {
 }
 void KageStage::updateShapeY(double p_value) {
 	Kage::timestamp();
-	std::cout << " KageStage::updateShapeY " << selectedShape << " " << p_value << std::endl;
+	std::cout << " KageStage::updateShapeY " << selectedShapes.size() << " " << p_value << std::endl;
 	
-	if (selectedShape == _NO_SELECTION) {
+	if (selectedShapes.size() == 0) {
 		return;
 	}
 	
 	vector<VectorData> v = win->getFrameData().getVectorData();
-	double l_propYprev = v[propYindex1].points[propYindex2].y;
-	double l_propYdiff = p_value - l_propYprev;
+	
 	unsigned int vsize = v.size();
 	unsigned int l_selectedShapes_size = selectedShapes.size();
 	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
+		//no use for l_temp, we only need to call getSelectedShapeViaNode nothing else
+		unsigned int l_temp = getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+3, v);
+		
+		double l_propYprev = v[propYindex1].points[propYindex2].y;
+		double l_propYdiff = p_value - l_propYprev;
+		
 		for (unsigned int i = selectedShapes[l_shapeIndex]; i < vsize; ++i) {
 			if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC) {
 				v[i].points[0].y += l_propYdiff;

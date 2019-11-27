@@ -58,19 +58,6 @@ bool KageStage::on_key_press_event(GdkEventKey *e) {
 	} else if (e->keyval == GDK_KEY_comma) {
 		win->switchToPreviousFrame();
 	} else {
-/*		if (KageStage::toolMode == MODE_SELECT) {
-			if (e->keyval == GDK_KEY_Delete || e->keyval == GDK_KEY_KP_Delete) {
-				win->Delete_onClick();
-				render(); return true;
-			}
-			std::cout << "KageStage::::on_key_press_event A " << e->keyval << "_" << e->string << std::endl;
-		} else if (KageStage::toolMode == MODE_NODE) {
-			if (e->keyval == GDK_KEY_Delete || e->keyval == GDK_KEY_KP_Delete) {
-				win->Delete_onClick();
-				render(); return true;
-			}
-			std::cout << "KageStage::::on_key_press_event B " << e->keyval << "_" << e->string << std::endl;
-		}*/
 		if (KageStage::toolMode == MODE_SELECT
 				|| KageStage::toolMode == MODE_NODE) {
 			if (e->keyval == GDK_KEY_Up || e->keyval == GDK_KEY_KP_Up) {
@@ -173,7 +160,7 @@ bool KageStage::on_event(GdkEvent *e) {
 		on_key_press_event((GdkEventKey*) e);
 	} else if (e->type == GDK_KEY_RELEASE) {
 		on_key_release_event((GdkEventKey*) e);
-	} else if (e->type == GDK_BUTTON_PRESS) { ///mousedown
+	} else if (e->type == GDK_BUTTON_PRESS) { ///mouse down
 		mouseDown = true;
 		draw1.x = e->button.x;
 		draw1.y = e->button.y;
@@ -185,6 +172,8 @@ bool KageStage::on_event(GdkEvent *e) {
 			draw2.x = e->button.x;
 			draw2.y = e->button.y;
 		} else if (KageStage::toolMode == MODE_NODE) {
+			draw2.x = e->button.x; //added because of multi/single-selection of shape/s
+			draw2.y = e->button.y;
 		} else if (KageStage::toolMode == MODE_DRAW_POLY) {
 			//
 		} else {
@@ -211,6 +200,8 @@ bool KageStage::on_event(GdkEvent *e) {
 					selectionBox2 = draw2;
 						tryMultiSelectShapes();
 				}
+			} else {
+				win->stackDo();
 			}
 			_isModifyingShape = false;
 			render();
@@ -225,6 +216,8 @@ bool KageStage::on_event(GdkEvent *e) {
 					selectionBox2 = draw2;
 						tryMultiSelectShapes();
 				}
+			} else {
+				win->stackDo();
 			}
 			_isModifyingShape = false;
 			render();
@@ -497,22 +490,26 @@ bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
 		
 		///why can't it be loaded when after `window = get_window()'?
 		if (!KageStage::imageSHAPE_000) {
-			KageStage::imageSHAPE_000 = Gdk::Pixbuf::create_from_file("shared/icons/shape_000.png");
-			KageStage::imageSHAPE_045 = Gdk::Pixbuf::create_from_file("shared/icons/shape_045.png");
-			KageStage::imageSHAPE_090 = Gdk::Pixbuf::create_from_file("shared/icons/shape_090.png");
-			KageStage::imageSHAPE_135 = Gdk::Pixbuf::create_from_file("shared/icons/shape_135.png");
-			KageStage::imageSHAPE_MOVE = Gdk::Pixbuf::create_from_file("shared/icons/shape_move.png");
+			#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+				string _SLASH_ = "\\";
+			#else
+				string _SLASH_ = "/";
+			#endif
+			
+			KageStage::imageSHAPE_000 = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_000.png");
+			KageStage::imageSHAPE_045 = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_045.png");
+			KageStage::imageSHAPE_090 = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_090.png");
+			KageStage::imageSHAPE_135 = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_135.png");
+			KageStage::imageSHAPE_MOVE = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_move.png");
 		}
 		
 		if (_registerWidth != get_width()) {
 			_registerWidth = get_width();
 			origin.x = (_registerWidth - stageWidth) / 2;
-			cout << "origin.x " <<  origin.x << " _registerWidth " << _registerWidth << " stageWidth " << stageWidth << endl;
 		}
 		if (_registerHeight != get_height()) {
 			_registerHeight = get_height();
 			origin.y = (_registerHeight - stageHeight) / 2;
-			cout << "origin.y " <<  origin.y << " _registerHeight " << _registerHeight << " stageHeight " << stageHeight << endl;
 		}
 		
 		//draw user-drawn object
@@ -1023,6 +1020,8 @@ void KageStage::updateShapeColor(bool p_doFill, bool p_doStroke) {
 	
 	win->setFrameData(v);
 	
+	win->stackDo();
+	
 	render();
 }
 
@@ -1058,6 +1057,8 @@ void KageStage::updateShapeX(double p_value) {
 	
 	win->setFrameData(v);
 	
+	win->stackDo();
+	
 	render();
 }
 void KageStage::updateShapeY(double p_value) {
@@ -1091,6 +1092,8 @@ void KageStage::updateShapeY(double p_value) {
 	}
 	
 	win->setFrameData(v);
+	
+	win->stackDo();
 	
 	render();
 }
@@ -1171,6 +1174,8 @@ void KageStage::updateNodeX(double p_value) {
 	
 	win->setFrameData(v);
 	
+	win->stackDo();
+	
 	render();
 }
 
@@ -1210,6 +1215,8 @@ void KageStage::updateNodeY(double p_value) {
 	}
 	
 	win->setFrameData(v);
+	
+	win->stackDo();
 	
 	render();
 }
@@ -1531,7 +1538,8 @@ void KageStage::handleNodes() {
 	if (mouseDown == true && _isModifyingShape == false) {
 		drawSelectionArea();
 	}
-	if (selectedNodes.size() == 0 || selectedShapes.size() == 0) {
+	
+	if (selectedShapes.size() == 0) {
 		return;
 	}
 	
@@ -1774,6 +1782,7 @@ void KageStage::handleNodes() {
 	if (l_move == true) {
 		win->setFrameData(v);
 	}
+	_isModifyingShape = l_move;
 }
 void KageStage::handleNodesMouseDown() {
 //	handleNodesMouseUp();
@@ -2118,6 +2127,9 @@ void KageStage::handleDrawOvalMouseUp(){
 		v.addClosePath();
 		v.addEndFill();
 	win->addDataToFrame(v);
+	
+	win->stackDo();
+	
 	render();
 }
 
@@ -2141,6 +2153,9 @@ void KageStage::handleDrawRectMouseUp() {
 		v.addClosePath();
 		v.addEndFill();
 	win->addDataToFrame(v);
+	
+	win->stackDo();
+	
 	render();
 }
 
@@ -2348,6 +2363,8 @@ bool KageStage::pasteSelectedShapes() {
 	
 	win->setFrameData(v);
 	
+	win->stackDo();
+	
 	tryMultiSelectShapes_populateShapes();
 	selectedNodes.clear();
 	
@@ -2389,6 +2406,8 @@ bool KageStage::deleteSelectedShapes() {
 	selectedShapes.clear();
 	
 	win->setFrameData(v);
+	
+	win->stackDo();
 	
 	return true;
 }
@@ -2433,6 +2452,8 @@ bool KageStage::deleteSelectedNode() {
 	}
 	
 	win->setFrameData(v);
+	
+	win->stackDo();
 	
 	return true;
 }
@@ -2507,6 +2528,8 @@ bool KageStage::raiseSelectedShape() {
 	
 	win->setFrameData(v);
 	
+	win->stackDo();
+	
 	return true;
 }
 
@@ -2575,6 +2598,8 @@ bool KageStage::lowerSelectedShape() {
 	
 	win->setFrameData(v);
 	
+	win->stackDo();
+	
 	return true;
 }
 
@@ -2627,6 +2652,8 @@ bool KageStage::raiseToTopSelectedShape() {
 	
 	win->setFrameData(v);
 	
+	win->stackDo();
+	
 	return true;
 }
 
@@ -2674,6 +2701,8 @@ bool KageStage::lowerToBottomSelectedShape() {
 	}
 	
 	win->setFrameData(_vectorDataZOrderBufferA);
+	
+	win->stackDo();
 	
 		_vectorDataZOrderBufferA.clear();
 	
@@ -2755,14 +2784,16 @@ void KageStage::handleEyedrop() {
 
 	if (l_move == true) {
 		win->setFrameData(v);
+		
+		win->stackDo();
 	}
 }
 
 void KageStage::handleEyedropMouseMove() {
-	Kage::timestamp();
-	std::cout << " KageStage::handleEyedropMouseMove ??? " << std::endl;
-	handleNodesMouseUp();
-	win->updateColors();
+//	Kage::timestamp();
+//	std::cout << " KageStage::handleEyedropMouseMove ??? " << std::endl;
+//	handleNodesMouseUp();
+//	win->updateColors();
 }
 
 void KageStage::handleEyedropMouseUp() {
@@ -2805,6 +2836,12 @@ void KageStage::handleDrawPolyMouseUp() {
 		++drawCtr;
 	}
 	win->addDataToFrame(v);
+	
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		//above is true after calling Kage::ToolSelect_onClick()
+		win->stackDo();
+	}
+	
 	render();
 }
 

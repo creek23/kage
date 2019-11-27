@@ -14,6 +14,8 @@ SOURCES = \
 	./kage/timeline/framemanager.cpp \
 	./kage/timeline/framesmanager.cpp \
 	./kage/timeline/layermanager.cpp \
+	./kage/unre/kagedo.cpp \
+	./kage/unre/unre.cpp \
 	./kage/stage.cpp \
 	./kage/vectordatamanager.cpp \
 	./util/xml/xmltoken.cpp \

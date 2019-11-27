@@ -98,8 +98,6 @@ void KageFrame::forceRender() {
 	render();
 }
 bool KageFrame::render() {
-	Kage::timestamp();
-	std::cout << " KageFrame(F " << frameID << " L " << layerID << ") render < " << std::endl;
 	if (!window) {
 		window = get_window();
 	}
@@ -107,43 +105,31 @@ bool KageFrame::render() {
 	// force our program to redraw the entire stage
 	Gdk::Rectangle r(0, 0, get_allocation().get_width(),
 			get_allocation().get_height());
-	Kage::timestamp();
-	std::cout << " KageFrame(F " << frameID << " L " << layerID << ") render > " << std::endl;
 	window->invalidate_rect(r, false);
 	
 	return true;
 }
 
 bool KageFrame::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
-	Kage::timestamp();
-	std::cout << " KageFrame(F " << frameID << " L " << layerID << ") on_draw" << std::endl;
 	if (!window) {
 		window = get_window();
 	}
 	if (window) {
 		if (!KageFrame::imageNULL) {
-			KageFrame::imageNULL     = Gdk::Pixbuf::create_from_file("shared/frame/null.png");
-		}
-		if (!KageFrame::imageNULL_CUR) {
-			KageFrame::imageNULL_CUR = Gdk::Pixbuf::create_from_file("shared/frame/null_cur.png");
-		}
-		if (!KageFrame::imageBLANK) {
-			KageFrame::imageBLANK     = Gdk::Pixbuf::create_from_file("shared/frame/blank.png");
-		}
-		if (!KageFrame::imageBLANK_CUR) {
-			KageFrame::imageBLANK_CUR = Gdk::Pixbuf::create_from_file("shared/frame/blank_cur.png");
-		}
-		if (!KageFrame::imageDRAWN) {
-			KageFrame::imageDRAWN     = Gdk::Pixbuf::create_from_file("shared/frame/drawn.png");
-		}
-		if (!KageFrame::imageDRAWN_CUR) {
-			KageFrame::imageDRAWN_CUR = Gdk::Pixbuf::create_from_file("shared/frame/drawn_cur.png");
-		}
-		if (!KageFrame::imageSELECTED) {
-			KageFrame::imageSELECTED     = Gdk::Pixbuf::create_from_file("shared/frame/selected.png");
-		}
-		if (!KageFrame::imageSELECTED_CUR) {
-			KageFrame::imageSELECTED_CUR = Gdk::Pixbuf::create_from_file("shared/frame/selected_cur.png");
+			#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+				string _SLASH_ = "\\";
+			#else
+				string _SLASH_ = "/";
+			#endif
+			
+			KageFrame::imageNULL         = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "frame" + _SLASH_ + "null.png");
+			KageFrame::imageNULL_CUR     = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "frame" + _SLASH_ + "null_cur.png");
+			KageFrame::imageBLANK        = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "frame" + _SLASH_ + "blank.png");
+			KageFrame::imageBLANK_CUR    = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "frame" + _SLASH_ + "blank_cur.png");
+			KageFrame::imageDRAWN        = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "frame" + _SLASH_ + "drawn.png");
+			KageFrame::imageDRAWN_CUR    = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "frame" + _SLASH_ + "drawn_cur.png");
+			KageFrame::imageSELECTED     = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "frame" + _SLASH_ + "selected.png");
+			KageFrame::imageSELECTED_CUR = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "frame" + _SLASH_ + "selected_cur.png");
 		}
 		if (isSelected() == true) {
 			if (KageFramesManager::currentFrame == frameID) {

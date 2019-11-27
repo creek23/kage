@@ -32,8 +32,6 @@ void VectorDataManager::push(VectorDataManager p_vectorsData) {
 	vector<VectorData> l_v = p_vectorsData.getVectorData();
 	int isrc = l_v.size();
 	
-	////NOTE: start i at 0 to avoid TYPE_INIT from VectorDataManager::init()
-	// ^ previous note when i was 1 -- now i is 0
 	for (int i = 0; i < isrc; ++i) {
 		vectorData.push_back(l_v[i]);
 	}
@@ -48,12 +46,7 @@ void VectorDataManager::add(VectorData::type p_type, ColorData p_fill, StrokeCol
 	
 	vectorData.push_back(l_vectorData);
 }
-/* deprecated: TYPE_INIT to be used as SHAPE identifier
-void VectorDataManager::init(ColorData p_fill, StrokeColorData p_stroke) {
-	if (vectorData.size() == 0) {
-		add(VectorData::TYPE_INIT, p_fill, p_stroke);
-	}
-}*/
+
 void VectorDataManager::addInit() {
 	std::cout << " VectorDataManager::addInit()" << std::endl;
 	add(VectorData::TYPE_INIT, KageStage::fillColor, KageStage::stroke);
@@ -68,9 +61,6 @@ void VectorDataManager::addFill(ColorData p_color) {
 		l_vectorData.stroke = KageStage::stroke;
 	}
 	std::cout << " VectorDataManager::addFill()" << std::endl;
-	std::cout << p_color.getR() << std::endl;
-	std::cout << p_color.getG() << std::endl;
-	std::cout << p_color.getB() << std::endl;
 	add(VectorData::TYPE_FILL, p_color, l_vectorData.stroke);
 }
 
@@ -91,17 +81,6 @@ VectorDataManager VectorDataManager::clone() {
 	
 	return l_vectorDataManager;
 }
-/*
-const VectorDataManager& VectorDataManager::operator=( const VectorDataManager& s ) {
-	vector<VectorData> l_vectorData;
-	unsigned int count = vectorData.size();
-		for (unsigned int i = 1; i < count; ++i) {
-			l_vectorData.push_back(vectorData[i-1]);
-		}
-	VectorDataManager l_vectorDataManager(l_vectorData);
-	
-	return l_vectorDataManager;
-}*/
 
 void VectorDataManager::addCubic(PointData p_point1, PointData p_point2, PointData p_point3) {
 	addCurve(p_point1, p_point2, p_point3, VectorData::TYPE_CURVE_CUBIC);

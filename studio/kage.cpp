@@ -52,7 +52,8 @@ Kage::Kage() : m_KageLayerManager(),
 			   m_LabelNodeX("X"),
 			   m_LabelNodeY("Y"),
 			   m_LblHolder_Toolbar("Toolbar"),
-			   m_KageStage(this) {
+			   m_KageStage(this),
+			   _undoRedoManager() {
 	m_ContextId = m_Statusbar.get_context_id(app_title);
 	
 	set_title("Kage Studio");
@@ -637,10 +638,24 @@ void Kage::updateStatus(Glib::ustring status_msg) {
 }
 
 void Kage::Undo_onClick() {
-	//
+	KageDo l_kageDo = _undoRedoManager.undo();
+	if (l_kageDo._layer != -1 && l_kageDo._frame != -1) {
+		m_KageFramesManager.setCurrentLayer(l_kageDo._layer);
+		m_KageFramesManager.setCurrentFrame(l_kageDo._frame);
+		setFrameData(l_kageDo.getVectorData());
+		
+		forceRenderFrames();
+	}
 }
 void Kage::Redo_onClick() {
-	//
+	KageDo l_kageDo = _undoRedoManager.redo();
+	if (l_kageDo._layer != -1 && l_kageDo._frame != -1) {
+		m_KageFramesManager.setCurrentLayer(l_kageDo._layer);
+		m_KageFramesManager.setCurrentFrame(l_kageDo._frame);
+		setFrameData(l_kageDo.getVectorData());
+		
+		forceRenderFrames();
+	}
 }
 void Kage::Cut_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
@@ -993,6 +1008,9 @@ void Kage::updateNodeXY() {
 	m_EntryNodeY.set_text(doubleToString(m_KageStage.nodeY));
 }
 
+void Kage::stackDo() {
+	_undoRedoManager.stackDo(KageFramesManager::currentLayer, KageFramesManager::currentFrame, getFrameData().getVectorData());
+}
 void Kage::onButtonClick() {
 	hide();
 }
@@ -1002,13 +1020,10 @@ void Kage::addDataToFrame(VectorDataManager v) {
 	m_KageFramesManager.getFrame()->forceRender();
 }
 VectorDataManager Kage::getFrameData() {
-	Kage::timestamp();
-	cout << " Kage::getFrameData F " << KageFramesManager::currentFrame << " L " << KageFramesManager::currentLayer << endl;
 	return m_KageFramesManager.getFrame()->vectorsData;
 }
 
 void Kage::setFrameData(VectorDataManager p_vectorsData) {
-	Kage::timestamp();
 	m_KageFramesManager.getFrame()->vectorsData.clear();
 	m_KageFramesManager.getFrame()->vectorsData = p_vectorsData.clone();
 }
@@ -1021,8 +1036,6 @@ void Kage::forceRenderFrames() {
 	renders all frameN in all layers, where frameN is the currentFrame
 */
 void Kage::renderFrames() {
-	Kage::timestamp();
-	std::cout << " Kage::renderFrames <" << std::endl;
 	unsigned int c = m_KageLayerManager.layerCount();
 	m_KageStage.clearScreen(m_KageStage.cr);
 	unsigned int t = KageFramesManager::currentLayer;
@@ -1031,13 +1044,9 @@ void Kage::renderFrames() {
 			m_KageStage.renderFrame(m_KageStage.cr);
 		}
 	KageFramesManager::currentLayer = t;
-	Kage::timestamp();
-	std::cout << " Kage::renderFrames > " << c << std::endl;
 }
 
 void Kage::renderFramesBelowCurrentLayer() {
-	Kage::timestamp();
-	std::cout << " Kage::renderFramesBelowCurrentLayer <" << std::endl;
 	m_KageStage.clearScreen(m_KageStage.cr);
 	unsigned int t = KageFramesManager::currentLayer;
 		for (unsigned int i = 1; i < t; ++i) {
@@ -1045,12 +1054,8 @@ void Kage::renderFramesBelowCurrentLayer() {
 			m_KageStage.renderFrame(m_KageStage.cr);
 		}
 	KageFramesManager::currentLayer = t;
-	Kage::timestamp();
-	std::cout << " Kage::renderFramesBelowCurrentLayer >" << std::endl;
 }
 void Kage::renderFramesAboveCurrentLayer() {
-	Kage::timestamp();
-	std::cout << " Kage::renderFramesAboveCurrentLayer <" << std::endl;
 	unsigned int c = m_KageLayerManager.layerCount();
 	unsigned int t = KageFramesManager::currentLayer;
 		for (unsigned int i = (t + 1); i < c; ++i) {
@@ -1058,13 +1063,13 @@ void Kage::renderFramesAboveCurrentLayer() {
 			m_KageStage.renderFrame(m_KageStage.cr);
 		}
 	KageFramesManager::currentLayer = t;
-	Kage::timestamp();
-	std::cout << " Kage::renderFramesAboveCurrentLayer >" << std::endl;
 }
 
 void Kage::New_onClick() {
 	m_KageFramesManager.removeAllFrames();
 	m_KageFramesManager.addFrame();
+	
+	_undoRedoManager.clear();
 	
 	m_KageFramesManager.setCurrentFrame(m_KageFramesManager.frameCount());
 	m_KageStage.render();
@@ -1094,6 +1099,7 @@ void Kage::OpenKSF_onClick() {
 			
 			//cout << "Loaded... \n" << l_ksfContent << endl;
 			parseKSF(l_ksfContent);
+			stackDo();
 			updateStatus("Loaded " + ksfPath);
 			
 			break;
@@ -1433,7 +1439,7 @@ void Kage::ExportAVI_onClick() {
 			}
 			
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-			if (runExternal("./ffmpeg", "-version") == false) {
+			if (runExternal(".\\ffmpeg", "-version") == false) {
 #else
 			if (runExternal("ffmpeg", "-version") == false) {
 #endif
@@ -1495,7 +1501,7 @@ void Kage::ExportAVI_onClick() {
 				m_KageStage.origin.y = l_tempOrigin.y;
 			
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-			if (runExternal("./ffmpeg", "-framerate " + uintToString(m_KageStage.fps) + " -i '" + l_pngPath + "%05d.png' '" + l_pngPath + ".avi'")) {
+			if (runExternal(".\\ffmpeg", "-framerate " + uintToString(m_KageStage.fps) + " -i '" + l_pngPath + "%05d.png' '" + l_pngPath + ".avi'")) {
 				if (runExternal("del", "/f " + l_pngPath + "*.png")) {
 #else
 			if (runExternal("ffmpeg", "-framerate " + uintToString(m_KageStage.fps) + " -i '" + l_pngPath + "%05d.png' '" + l_pngPath + ".avi'")) {

@@ -29,6 +29,9 @@
 	#include "about.h"
 //	#include "register.h" -- not implemented yet; this is to gather users for support group
 	
+	#include "kage/unre/kagedo.h"
+	#include "kage/unre/unre.h"
+	
 	#include "util/xml/xmltoken.h"
 	#include "util/xml/xmltagproperty.h"
 	#include "util/xml/xmltag.h"
@@ -283,6 +286,9 @@
 			void updateProperties();
 			void updateNodeXY();
 			void updateSelectedShapeColor(bool p_doFill = true, bool p_doStroke = true);
+			
+			UnRe _undoRedoManager;
+			void stackDo();
 	};
 
 #endif //GTKMM_KAGE_H

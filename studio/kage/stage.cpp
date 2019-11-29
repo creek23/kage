@@ -4,11 +4,6 @@
 #include <cairomm/context.h>
 
 KageStage::KageStage(Kage *p_win) {
-	origin.x = 50;
-	origin.y = 50;
-	stageWidth = 800;
-	stageHeight = 600;
-	fps = 12;
 	win = p_win;
 //	set_flags(Gtk::CAN_FOCUS);
 	set_can_focus(true); //to accept key_press
@@ -16,29 +11,6 @@ KageStage::KageStage(Kage *p_win) {
 	add_events(Gdk::ENTER_NOTIFY_MASK | Gdk::LEAVE_NOTIFY_MASK);
 	add_events(Gdk::FOCUS_CHANGE_MASK);
 	add_events(Gdk::POINTER_MOTION_MASK);
-	gotContext = false;
-	mouseDown = false;
-	stroke.setThickness(3.0);
-	drawCtr = 0;
-	mouseOnNode = -1;
-	mouseOnNodeIndex = 0;
-	polyXhead = 0;
-	polyYhead = 0;
-	polyXtail = 0;
-	polyYtail = 0;
-	
-	keyControlDown = false;
-	keyShiftDown = false;
-	keyUpDown = false;
-	keyDownDown = false;
-	keyLeftDown = false;
-	keyRightDown = false;
-	
-	_isModifyingShape = false;
-	
-	initNodeTool();
-	
-	mouseOnAnchor = AnchorData::TYPE_NONE;
 }
 
 KageStage::~KageStage() {
@@ -253,13 +225,13 @@ bool KageStage::on_event(GdkEvent *e) {
 		_mouseLocation.y = e->button.y;
 		
 		if (KageStage::toolMode == MODE_NODE) {
-			draw1.x = (e->button.x);
-			draw1.y = (e->button.y);
+			draw1.x = e->button.x;
+			draw1.y = e->button.y;
 			
 			render();
 		} else if (KageStage::toolMode == MODE_SELECT) {
-			draw2.x = (e->button.x);
-			draw2.y = (e->button.y);
+			draw2.x = e->button.x;
+			draw2.y = e->button.y;
 			render();
 		} else if (KageStage::toolMode == MODE_DRAW_OVAL
 				|| KageStage::toolMode == MODE_DRAW_RECT) {
@@ -461,6 +433,35 @@ void KageStage::printVectors() {
 	}
 	Kage::timestamp();
 	std::cout << " KageStage::printVectors >" << std::endl;
+}
+void KageStage::cleanSlate() {
+	origin.x = 50;
+	origin.y = 50;
+	stageWidth = 800;
+	stageHeight = 600;
+	fps = 12;
+	mouseDown = false;
+	stroke.setThickness(3.0);
+	drawCtr = 0;
+	mouseOnNode = -1;
+	mouseOnNodeIndex = 0;
+	polyXhead = 0;
+	polyYhead = 0;
+	polyXtail = 0;
+	polyYtail = 0;
+	
+	keyControlDown = false;
+	keyShiftDown = false;
+	keyUpDown = false;
+	keyDownDown = false;
+	keyLeftDown = false;
+	keyRightDown = false;
+	
+	_isModifyingShape = false;
+	
+	initNodeTool();
+	
+	mouseOnAnchor = AnchorData::TYPE_NONE;
 }
 void KageStage::render() {
 	if (!window) {
@@ -1699,6 +1700,7 @@ void KageStage::handleNodes() {
 						if (mouseDown == true) {
 							l_move = true;
 								mouseOnNode = i;
+								addSelectedNode(i);
 								mouseOnNodeIndex = 3;
 								//move control B of current curve
 								v[i].points[1].x += ((draw1.x - origin.x) - v[i].points[2].x);
@@ -1720,11 +1722,15 @@ void KageStage::handleNodes() {
 						}
 						renderNode(l_x, l_y, 1);
 					} else {
-						for (unsigned int j = 0; j < selectedNodes.size(); ++j) {
-							if (selectedNodes[j] == i) {
-								renderNode(l_x, l_y, 2);
-							} else {
-								renderNode(l_x, l_y, 0);
+						if (selectedNodes.size() == 0) {
+							renderNode(l_x, l_y, 0);
+						} else {
+							for (unsigned int j = 0; j < selectedNodes.size(); ++j) {
+								if (selectedNodes[j] == i) {
+									renderNode(l_x, l_y, 2);
+								} else {
+									renderNode(l_x, l_y, 0);
+								}
 							}
 						}
 					}

@@ -615,18 +615,8 @@ Kage::Kage() : m_KageLayerManager(),
 						m_EntryNodeY.set_text(doubleToString(m_KageStage.nodeY));
 						m_EntryNodeY.signal_activate().connect(
 							sigc::mem_fun(*this, &Kage::EntryNodeY_onEnter));
-	show_all();
-	propStageSetVisible(true);
-	propFillStrokeSetVisible(false);
-	propLocationSizeSetVisible(false);
-	propNodeXYSetVisible(false);
-	m_KageFramesManager.setCurrentFrame(1);
-	m_KageFramesManager.setCurrentLayer(1);
 	
-	currentTool = toggleButtons[0];
-	currentTool->set_active(true);
-	
-	updateStatus("Ready");
+	New_onClick();
 }
 
 Kage::~Kage() {
@@ -1066,15 +1056,29 @@ void Kage::renderFramesAboveCurrentLayer() {
 }
 
 void Kage::New_onClick() {
+	propStageSetVisible(true);
+	propFillStrokeSetVisible(false);
+	propLocationSizeSetVisible(false);
+	propNodeXYSetVisible(false);
+
 	m_KageFramesManager.removeAllFrames();
 	m_KageFramesManager.addFrame();
 	
 	_undoRedoManager.clear();
 	stackDo();
 	
-	m_KageFramesManager.setCurrentFrame(m_KageFramesManager.frameCount());
-	m_KageStage.render();
 	show_all();
+	
+	m_KageFramesManager.setCurrentFrame(1);
+	m_KageFramesManager.setCurrentLayer(1);
+	
+	currentTool = toggleButtons[0];
+	currentTool->set_active(true);
+	
+	m_KageStage.cleanSlate();
+	m_KageStage.render();
+	
+	updateStatus("Ready");
 }
 void Kage::OpenKSF_onClick() {
 	Gtk::FileChooserDialog dialog("Open File", Gtk::FILE_CHOOSER_ACTION_OPEN);
@@ -2143,14 +2147,12 @@ vector<int> Kage::parseColorString(string p_color) {
 	vector<int> l_colors;
 	if (p_color.length() > 4 && p_color.substr(0, 5) == "rgba(") {
 		vector<string> l_rgba = split(p_color.substr(5), ", ", false);
-		cout << l_rgba.size() << endl;
 		l_colors.push_back(stringToInt(l_rgba[0]));
 		l_colors.push_back(stringToInt(l_rgba[1]));
 		l_colors.push_back(stringToInt(l_rgba[2]));
 		l_colors.push_back(stringToInt(split(l_rgba[3], ")", false)[0]));
 	} else if (p_color.length() > 3 && p_color.substr(0, 4) == "rgb(") {
 		vector<string> l_rgb = split(p_color.substr(4), ", ", false);
-		cout << l_rgb.size() << endl;
 		l_colors.push_back(stringToInt(l_rgb[0]));
 		l_colors.push_back(stringToInt(l_rgb[1]));
 		l_colors.push_back(stringToInt(split(l_rgb[2], ")", false)[0]));

@@ -57,6 +57,7 @@
 			double nodeY = 0;
 			
 			void printVectors();
+			void cleanSlate();
 			void render();
 			
 			void setStageBG(Gdk::Color p_Color);
@@ -155,8 +156,6 @@
 			double polyXhead, polyYhead;
 			double polyXtail, polyYtail;
 			Glib::RefPtr<Gdk::Window> window;
-			//Cairo::RefPtr<Cairo::Context> cr;
-			bool gotContext;
 			bool mouseDown;
 			GdkPoint _mouseLocation;
 			unsigned int _mouseLocationShapeIndex;

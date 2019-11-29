@@ -48,7 +48,6 @@ void VectorDataManager::add(VectorData::type p_type, ColorData p_fill, StrokeCol
 }
 
 void VectorDataManager::addInit() {
-	std::cout << " VectorDataManager::addInit()" << std::endl;
 	add(VectorData::TYPE_INIT, KageStage::fillColor, KageStage::stroke);
 }
 void VectorDataManager::addFill(ColorData p_color) {
@@ -60,7 +59,6 @@ void VectorDataManager::addFill(ColorData p_color) {
 		l_vectorData.fillColor = KageStage::fillColor;
 		l_vectorData.stroke = KageStage::stroke;
 	}
-	std::cout << " VectorDataManager::addFill()" << std::endl;
 	add(VectorData::TYPE_FILL, p_color, l_vectorData.stroke);
 }
 

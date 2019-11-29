@@ -39,6 +39,8 @@
 	
 	#include <fstream> //ofstream
 	#include <iostream> //cerr
+	
+	#include <gdkmm/cursor.h>
 
 	class Kage : public Gtk::Window {
 		public:
@@ -95,7 +97,7 @@
 			virtual void LowerToBottom_onClick();
 			virtual void AddFrame_onClick();
 			virtual void DuplicateFrame_onClick();
-			virtual void New_onClick();
+//			virtual void New_onClick();
 			virtual void OpenKSF_onClick();
 			virtual void Save_onClick();
 			virtual void ExportKS_onClick();
@@ -289,6 +291,8 @@
 			
 			UnRe _undoRedoManager;
 			void stackDo();
+			
+			virtual void New_onClick();
 	};
 
 #endif //GTKMM_KAGE_H

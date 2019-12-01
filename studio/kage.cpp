@@ -491,12 +491,14 @@ Kage::Kage() : m_KageLayerManager(),
 					m_PropStageV2.pack_start(m_EntryStageHgt, Gtk::PACK_SHRINK);
 					m_PropStageV2.pack_start(m_ColorButtonStage, Gtk::PACK_SHRINK);
 					m_PropStageV2.pack_start(m_EntryStageFPS, Gtk::PACK_SHRINK);
-						m_EntryStageWid.set_size_request(50, 24);
+						m_EntryStageWid.set_size_request(20, 24);
+						m_EntryStageWid.set_width_chars(4);
 						m_EntryStageWid.set_max_length(4);
 						m_EntryStageWid.set_text(uintToString(m_KageStage.stageWidth));
 							m_EntryStageWid.signal_activate().connect(
 								sigc::mem_fun(*this, &Kage::EntryStageArea_onEnter) );
-						m_EntryStageHgt.set_size_request(50, 24);
+						m_EntryStageHgt.set_size_request(20, 24);
+						m_EntryStageHgt.set_width_chars(4);
 						m_EntryStageHgt.set_max_length(4);
 						m_EntryStageHgt.set_text(uintToString(m_KageStage.stageHeight));
 							m_EntryStageHgt.signal_activate().connect(
@@ -506,7 +508,8 @@ Kage::Kage() : m_KageLayerManager(),
 						m_ColorButtonStage.set_title("Choose Stage Background Color");
 						m_ColorButtonStage.set_color(m_KageStage.getStageBG());
 							m_ColorButtonStage.signal_color_set().connect(sigc::mem_fun(* this, &Kage::ColorButtonStage_onClick) );
-						m_EntryStageFPS.set_size_request(50, 24);
+						m_EntryStageFPS.set_size_request(20, 24);
+						m_EntryStageFPS.set_width_chars(3);
 						m_EntryStageFPS.set_max_length(3);
 						m_EntryStageFPS.set_text(uintToString(m_KageStage.fps));
 							m_EntryStageFPS.signal_activate().connect(
@@ -532,7 +535,8 @@ Kage::Kage() : m_KageLayerManager(),
 							m_ColorButtonFill.set_color(m_KageStage.getStageBG());
 						m_ColorButtonFill.signal_color_set().connect(sigc::mem_fun(* this, &Kage::ColorButtonFill_onClick) );
 					m_PropFillStrokeV2.pack_start(m_EntryFillAlpha, Gtk::PACK_SHRINK);
-						m_EntryFillAlpha.set_size_request(32, 24);
+						m_EntryFillAlpha.set_size_request(20, 24);
+						m_EntryFillAlpha.set_width_chars(3);
 						m_EntryFillAlpha.set_max_length(3);
 						m_EntryFillAlpha.set_text(intToString((int)KageStage::fillColor.getA()));
 						m_EntryFillAlpha.signal_activate().connect(
@@ -544,13 +548,15 @@ Kage::Kage() : m_KageLayerManager(),
 							m_ColorButtonStroke.set_color(m_KageStage.getStageBG());
 						m_ColorButtonStroke.signal_color_set().connect(sigc::mem_fun(* this, &Kage::ColorButtonStroke_onClick) );
 					m_PropFillStrokeV2.pack_start(m_EntryStrokeAlpha, Gtk::PACK_SHRINK);
-						m_EntryStrokeAlpha.set_size_request(32, 24);
+						m_EntryStrokeAlpha.set_size_request(20, 24);
+						m_EntryStrokeAlpha.set_width_chars(3);
 						m_EntryStrokeAlpha.set_max_length(3);
 						m_EntryStrokeAlpha.set_text(intToString((int)KageStage::stroke.getA()));
 						m_EntryStrokeAlpha.signal_activate().connect(
 							sigc::mem_fun(*this, &Kage::EntryStrokeAlpha_onEnter));
 					m_PropFillStrokeV2.pack_start(m_EntryStrokeThickness, Gtk::PACK_SHRINK);
-						m_EntryStrokeThickness.set_size_request(32, 24);
+						m_EntryStrokeThickness.set_size_request(20, 24);
+						m_EntryStrokeThickness.set_width_chars(2);
 						m_EntryStrokeThickness.set_max_length(2);
 						m_EntryStrokeThickness.set_text(intToString((int)KageStage::stroke.getThickness()));
 						m_EntryStrokeThickness.signal_activate().connect(
@@ -569,25 +575,29 @@ Kage::Kage() : m_KageLayerManager(),
 					m_propLocationSizeV2.set_border_width(4);
 					m_propLocationSizeV2.set_spacing(4);
 					m_propLocationSizeV2.pack_start(m_EntryX, Gtk::PACK_SHRINK);
-						m_EntryX.set_size_request(32, 24);
+						m_EntryX.set_size_request(20, 24);
+						m_EntryX.set_width_chars(9);
 						m_EntryX.set_max_length(9);
 						m_EntryX.set_text(doubleToString(m_KageStage.propX));
 						m_EntryX.signal_activate().connect(
 							sigc::mem_fun(*this, &Kage::EntryX_onEnter));
 					m_propLocationSizeV2.pack_start(m_EntryY, Gtk::PACK_SHRINK);
-						m_EntryY.set_size_request(32, 24);
+						m_EntryY.set_size_request(20, 24);
+						m_EntryY.set_width_chars(9);
 						m_EntryY.set_max_length(9);
 						m_EntryY.set_text(doubleToString(m_KageStage.propY));
 						m_EntryY.signal_activate().connect(
 							sigc::mem_fun(*this, &Kage::EntryY_onEnter));
 					m_propLocationSizeV2.pack_start(m_EntryWidth, Gtk::PACK_SHRINK);
-						m_EntryWidth.set_size_request(32, 24);
+						m_EntryWidth.set_size_request(20, 24);
+						m_EntryWidth.set_width_chars(9);
 						m_EntryWidth.set_max_length(9);
 						m_EntryWidth.set_text(doubleToString(m_KageStage.propWidth));
 						m_EntryWidth.signal_activate().connect(
 							sigc::mem_fun(*this, &Kage::EntryWidth_onEnter));
 					m_propLocationSizeV2.pack_start(m_EntryHeight, Gtk::PACK_SHRINK);
-						m_EntryHeight.set_size_request(32, 24);
+						m_EntryHeight.set_size_request(20, 24);
+						m_EntryHeight.set_width_chars(9);
 						m_EntryHeight.set_max_length(9);
 						m_EntryHeight.set_text(doubleToString(m_KageStage.propHeight));
 						m_EntryHeight.signal_activate().connect(
@@ -604,13 +614,15 @@ Kage::Kage() : m_KageLayerManager(),
 					m_propNodeXYV2.set_border_width(4);
 					m_propNodeXYV2.set_spacing(4);
 					m_propNodeXYV2.pack_start(m_EntryNodeX, Gtk::PACK_SHRINK);
-						m_EntryNodeX.set_size_request(32, 24);
+						m_EntryNodeX.set_size_request(20, 24);
+						m_EntryNodeX.set_width_chars(9);
 						m_EntryNodeX.set_max_length(9);
 						m_EntryNodeX.set_text(doubleToString(m_KageStage.nodeX));
 						m_EntryNodeX.signal_activate().connect(
 							sigc::mem_fun(*this, &Kage::EntryNodeX_onEnter));
 					m_propNodeXYV2.pack_start(m_EntryNodeY, Gtk::PACK_SHRINK);
-						m_EntryNodeY.set_size_request(32, 24);
+						m_EntryNodeY.set_size_request(20, 24);
+						m_EntryNodeY.set_width_chars(9);
 						m_EntryNodeY.set_max_length(9);
 						m_EntryNodeY.set_text(doubleToString(m_KageStage.nodeY));
 						m_EntryNodeY.signal_activate().connect(
@@ -1076,10 +1088,16 @@ void Kage::New_onClick() {
 	currentTool->set_active(true);
 	
 	m_KageStage.cleanSlate();
+	
+	m_EntryStageWid.set_text(uintToString(m_KageStage.stageWidth));
+	m_EntryStageHgt.set_text(uintToString(m_KageStage.stageHeight));
+	m_EntryStageFPS.set_text(uintToString(m_KageStage.fps));
+	
 	m_KageStage.render();
 	
 	updateStatus("Ready");
 }
+
 void Kage::OpenKSF_onClick() {
 	Gtk::FileChooserDialog dialog("Open File", Gtk::FILE_CHOOSER_ACTION_OPEN);
 	dialog.set_transient_for( * this);
@@ -1484,6 +1502,7 @@ void Kage::ExportAVI_onClick() {
 						
 							for (i = 1; i <= l_lMax; i++) {
 								m_KageFramesManager.setCurrentLayer(i);
+								m_KageStage.clearScreen(l_context);
 								m_KageStage.renderFrame(l_context);
 							}
 						

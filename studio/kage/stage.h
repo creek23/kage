@@ -82,6 +82,8 @@
 			void handleShapesMouseDown();
 			void handleShapesMouseUp();
 			void handleNodes();
+			void handleNodes_selection();
+			void handleNodes_relocation();
 			void handleNodesMouseDown();
 			void handleNodesMouseUp();
 			bool handleNodes_getNearestShape(double p_x, double p_y, unsigned int p_index, vector<VectorData> p_v);

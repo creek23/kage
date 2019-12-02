@@ -121,6 +121,7 @@
 			bool raiseToTopSelectedShape();
 			bool lowerToBottomSelectedShape();
 			
+			bool isSelectedNode(unsigned int p_index);
 			void addSelectedNode(unsigned int p_index);
 			void addSelectedShape(unsigned int p_index);
 			void trySingleSelectShape();

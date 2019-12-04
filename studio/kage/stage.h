@@ -84,6 +84,7 @@
 			void handleNodes();
 			void handleNodes_selection();
 			void handleNodes_relocation();
+			void handleNodes_rendering();
 			void handleNodesMouseDown();
 			void handleNodesMouseUp();
 			bool handleNodes_getNearestShape(double p_x, double p_y, unsigned int p_index, vector<VectorData> p_v);
@@ -115,7 +116,7 @@
 			bool copySelectedShapes();
 			bool pasteSelectedShapes();
 			bool deleteSelectedShapes();
-			bool deleteSelectedNode();
+			bool deleteSelectedNodes();
 			bool raiseSelectedShape();
 			bool lowerSelectedShape();
 			bool raiseToTopSelectedShape();
@@ -175,6 +176,8 @@
 			
 			bool on_timeout();
 			unsigned int mouseOnNode;
+			GdkPoint mouseOnNodeOffset;
+			unsigned int mouseOnNodeHover;
 			unsigned int mouseOnNodeIndex;
 			unsigned int selectedNode;
 			unsigned int mouseOnShape;
@@ -195,7 +198,9 @@
 			
 			void drawSelectionArea();
 			
-			double getSelectedShapeViaNode(unsigned int p_index, vector<VectorData> p_v);
+			bool deleteSelectedNode(unsigned int p_index);
+			
+			unsigned int getSelectedShapeViaNode(unsigned int p_index, vector<VectorData> p_v);
 			double _nodeToMouseDistance;
 			
 			AnchorData anchor_upperLeft;

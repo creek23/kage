@@ -785,7 +785,7 @@ void Kage::Delete_onClick() {
 	} else if (KageStage::toolMode == KageStage::MODE_NODE) {
 		Kage::timestamp();
 		std::cout << " Kage::Delete_onClick NODE" << std::endl;
-		if (m_KageStage.deleteSelectedNode() == true) {
+		if (m_KageStage.deleteSelectedNodes() == true) {
 			forceRenderFrames();
 		}
 	}

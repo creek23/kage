@@ -202,6 +202,20 @@ bool KageStage::on_event(GdkEvent *e) {
 			draw1.x = e->button.x;
 			draw1.y = e->button.y;
 				handleFillMouseUp();
+		} else if (KageStage::toolMode == MODE_ZOOM) {
+			if (e->button.button == 1) {
+				_zoomRatio = 1.1;
+				_zoomValue = _zoomValue * 1.1f;
+			} else if (e->button.button == 3) {
+				_zoomRatio = 0.909090909f;
+				_zoomValue = _zoomValue / 1.1f;
+			}
+			e->button.button = 0;
+			_zoomReference.x = e->button.x;
+			_zoomReference.y = e->button.y;
+			
+			applyZoom();
+			render();
 		} else if (KageStage::toolMode == MODE_EYEDROP) {
 			draw1.x = e->button.x;
 			draw1.y = e->button.y;
@@ -279,6 +293,136 @@ bool KageStage::on_event(GdkEvent *e) {
 	}
 	
 	return true;
+}
+
+PointData KageStage::applyZoomRatio(PointData p_value) {
+	if (_zoomRatio == 0.0f) { return p_value; }
+	
+	double l_value;
+	
+	if (p_value.x < _zoomReference.x) {
+		l_value = (_zoomReference.x - p_value.x) * _zoomRatio;
+		p_value.x = _zoomReference.x - l_value;
+	} else if (p_value.x > _zoomReference.x) {
+		l_value = (p_value.x - _zoomReference.x) * _zoomRatio;
+		p_value.x = _zoomReference.x + l_value;
+	}
+	if (p_value.y < _zoomReference.y) {
+		l_value = (_zoomReference.y - p_value.y) * _zoomRatio;
+		p_value.y = _zoomReference.y - l_value;
+	} else if (p_value.y > _zoomReference.y) {
+		l_value = (p_value.y - _zoomReference.y) * _zoomRatio;
+		p_value.y = _zoomReference.y + l_value;
+	}
+	
+	return p_value.clone();
+}
+
+double KageStage::applyZoomRatioX(double p_value) {
+	if (_zoomRatio == 0.0f) { return p_value; }
+	
+	double l_value;
+	
+	if (p_value < _zoomReference.x) {
+		l_value = (_zoomReference.x - p_value) * _zoomRatio;
+		return _zoomReference.x - l_value;
+	} else if (p_value > _zoomReference.x) {
+		l_value = (p_value - _zoomReference.x) * _zoomRatio;
+		return _zoomReference.x + l_value;
+	}
+	
+	return p_value;
+}
+
+double KageStage::applyZoomRatioY(double p_value) {
+	if (_zoomRatio == 0.0f) { return p_value; }
+	
+	double l_value;
+	
+	if (p_value < _zoomReference.y) {
+		l_value = (_zoomReference.y - p_value) * _zoomRatio;
+		return _zoomReference.y - l_value;
+	} else if (p_value > _zoomReference.y) {
+		l_value = (p_value - _zoomReference.y) * _zoomRatio;
+		return _zoomReference.y + l_value;
+	}
+	
+	return p_value;
+}
+
+double KageStage::getZoomRatioX(double p_value) {
+	if (_zoomRatio == 0.0f) { return p_value; }
+	
+	double l_value;
+	
+	if (p_value < _zoomReference.x) {
+		l_value = (_zoomReference.x - p_value) * _zoomValue;
+		return _zoomReference.x - l_value;
+	} else if (p_value > _zoomReference.x) {
+		l_value = (p_value - _zoomReference.x) * _zoomValue;
+		return _zoomReference.x + l_value;
+	}
+	
+	return p_value;
+}
+
+double KageStage::getZoomRatioY(double p_value) {
+	if (_zoomRatio == 0.0f) { return p_value; }
+	
+	double l_value;
+	
+	if (p_value < _zoomReference.y) {
+		l_value = (_zoomReference.y - p_value) * _zoomValue;
+		return _zoomReference.y - l_value;
+	} else if (p_value > _zoomReference.y) {
+		l_value = (p_value - _zoomReference.y) * _zoomValue;
+		return _zoomReference.y + l_value;
+	}
+	
+	return p_value;
+}
+
+vector<VectorData> KageStage::applyZoom(vector<VectorData> v) {
+	return v;
+}
+void KageStage::applyZoom() {
+	vector<VectorData> v = win->getFrameData().getVectorData();
+	
+	PointData __stageArea(stageWidth  + origin.x, stageHeight  + origin.y);
+	__stageArea = applyZoomRatio(__stageArea);
+	
+	__origin = applyZoomRatio(origin);
+	
+		__stageArea.x -= __origin.x;
+		__stageArea.y -= __origin.y;
+	
+	win->stackDoZoom(origin, __origin, _zoomReference, _zoomRatio);
+	
+	for (unsigned int i = 0; i < v.size(); ++i) {
+		if (v[i].vectorType == VectorData::TYPE_MOVE
+				|| v[i].vectorType == VectorData::TYPE_LINE) {
+			v[i].points[0].x += origin.x;
+			v[i].points[0].y += origin.y;
+				v[i].points[0] = applyZoomRatio(v[i].points[0]);
+			v[i].points[0].x -= __origin.x;
+			v[i].points[0].y -= __origin.y;
+		} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
+				|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
+			for (unsigned int j = 0; j < 3; ++j) {
+				v[i].points[j].x += origin.x;
+				v[i].points[j].y += origin.y;
+					v[i].points[j] = applyZoomRatio(v[i].points[j]);
+				v[i].points[j].x -= __origin.x;
+				v[i].points[j].y -= __origin.y;
+			}
+		}
+	}
+	
+	origin = __origin.clone();
+	stageWidth  = __stageArea.x;
+	stageHeight = __stageArea.y;
+	
+	win->setFrameData(v);
 }
 
 void KageStage::setStageBG(Gdk::Color p_c) {
@@ -439,8 +583,8 @@ void KageStage::printVectors() {
 void KageStage::cleanSlate() {
 	origin.x = 50;
 	origin.y = 50;
-	stageWidth = 800;
-	stageHeight = 600;
+	stageWidth = 800.0f;
+	stageHeight = 600.0f;
 	fps = 12;
 	mouseDown = false;
 	stroke.setThickness(3.0);
@@ -463,6 +607,11 @@ void KageStage::cleanSlate() {
 	keyRightDown = false;
 	
 	_isModifyingShape = false;
+	
+	_zoomValue = 1.0f;
+	_zoomRatio = 1.0f;
+	__stageArea.x = stageWidth;
+	__stageArea.y = stageHeight;
 	
 	initNodeTool();
 	
@@ -559,19 +708,25 @@ void KageStage::clearScreen(Cairo::RefPtr<Cairo::Context> p_context) {
 			p_context->line_to(width, height);
 			p_context->line_to(0, height);
 			p_context->close_path();
-		p_context->set_source_rgb(0.8, 0.8, 0.8);
+		p_context->set_source_rgb(0.75, 0.75, 0.75);
 		p_context->fill();
 		
 		//draw viewable area
-		p_context->move_to(             origin.x, origin.y);
-		p_context->line_to(stageWidth + origin.x, origin.y);
+		p_context->move_to(             origin.x, origin.y              );
+		p_context->line_to(stageWidth + origin.x, origin.y              );
 		p_context->line_to(stageWidth + origin.x, origin.y + stageHeight);
 		p_context->line_to(             origin.x, origin.y + stageHeight);
+		
+		bool l_mouseLocationOnFill = p_context->in_fill(_mouseLocation.x, _mouseLocation.y);
+			if (l_mouseLocationOnFill != 0) {
+				_mouseLocationShapeIndex = _NO_SELECTION;
+			}
+		
 		p_context->close_path();
 			p_context->set_source_rgb((double)KageStage::stageBG.getR()/255, (double)KageStage::stageBG.getG()/255, (double)KageStage::stageBG.getB()/255);
 	//		p_context->fill_preserve();
 			p_context->fill();
-				p_context->set_line_width(0.2);
+				p_context->set_line_width(0.2f);
 				p_context->set_source_rgb(0.0, 0.0, 0.0);
 				p_context->stroke();
 	}
@@ -648,7 +803,7 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context) {
 											   (double)scolor.getG()/255.0f,
 											   (double)scolor.getB()/255.0f,
 											   (double)scolor.getA()/255.0f);
-					p_context->set_line_width(scolor.getThickness());
+					p_context->set_line_width(scolor.getThickness() * _zoomValue);
 						p_context->set_line_cap(Cairo::LINE_CAP_ROUND);
 							p_context->stroke();
 				}
@@ -1684,7 +1839,7 @@ void KageStage::handleNodes_relocation() {
 								v[typeMovesIndex].points[0].y = v[i-1].points[typeEndsPointSize].y;
 							}/*
 							typeMovesIndex = UINT_MAX;*///*
-						} else {
+						} else {/*
 							typeEndsPointSize = v[i-1].points.size()-1;
 							if (v[typeCubicCurvesIndex].points[0].x != v[typeCubicCurvesIndex].points[typeEndsPointSize].x
 									|| v[typeCubicCurvesIndex].points[0].y != v[typeCubicCurvesIndex].points[typeEndsPointSize].y) {

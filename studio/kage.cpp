@@ -292,6 +292,11 @@ Kage::Kage() : m_KageLayerManager(),
 		sigc::mem_fun(*this, &Kage::ToolEyedrop_onClick)
 	);
 	m_refActionGroup->add(
+		Gtk::RadioAction::create(group_tools, "ToolZoom", "_Zoom", "Zoom Tool"),
+		Gtk::AccelKey("Z"),
+		sigc::mem_fun(*this, &Kage::ToolZoom_onClick)
+	);
+	m_refActionGroup->add(
 		Gtk::Action::create("HelpTopic", "_Topic", "Topic"),
 		Gtk::AccelKey("F1"),
 		sigc::mem_fun(*this, &Kage::onActionActivate)
@@ -386,6 +391,7 @@ Kage::Kage() : m_KageLayerManager(),
 		"			<menuitem action='ToolStroke'/>"
 		"			<menuitem action='ToolFill'/>"
 		"			<menuitem action='ToolEyedrop'/>"
+		"			<menuitem action='ToolZoom'/>"
 		"		</menu>"
 		"		<menu action='HelpMenu'>"
 		"			<menuitem action='HelpTopic'/>"
@@ -428,7 +434,7 @@ Kage::Kage() : m_KageLayerManager(),
 		addToolButton("Eyedrop"); //TODO: use gtk-color-picker
 //		addToolButton("Eraser"); //TODO: implement tool
 //		m_VBoxToolbar_Holder.pack_start(m_Separator_Toolbar4, Gtk::PACK_SHRINK);
-//		addToolButton("Zoom"); //TODO: implement tool //gtk-zoom-in
+		addToolButton("Zoom"); //TODO: use gtk-zoom-in
 		
 	m_HBoxToolbar.pack_start(m_VPane_Timeline, Gtk::PACK_EXPAND_WIDGET);
 		m_VPane_Timeline.add1(m_Timeline_HBox);
@@ -494,13 +500,13 @@ Kage::Kage() : m_KageLayerManager(),
 						m_EntryStageWid.set_size_request(20, 24);
 						m_EntryStageWid.set_width_chars(4);
 						m_EntryStageWid.set_max_length(4);
-						m_EntryStageWid.set_text(uintToString(m_KageStage.stageWidth));
+						m_EntryStageWid.set_text(doubleToString(m_KageStage.stageWidth));
 							m_EntryStageWid.signal_activate().connect(
 								sigc::mem_fun(*this, &Kage::EntryStageArea_onEnter) );
 						m_EntryStageHgt.set_size_request(20, 24);
 						m_EntryStageHgt.set_width_chars(4);
 						m_EntryStageHgt.set_max_length(4);
-						m_EntryStageHgt.set_text(uintToString(m_KageStage.stageHeight));
+						m_EntryStageHgt.set_text(doubleToString(m_KageStage.stageHeight));
 							m_EntryStageHgt.signal_activate().connect(
 								sigc::mem_fun(*this, &Kage::EntryStageArea_onEnter) );
 						m_ColorButtonStage.set_size_request(32, 32);
@@ -637,6 +643,10 @@ Kage::~Kage() {
 
 void Kage::updateStatus(Glib::ustring status_msg) {
 	m_Statusbar.push(status_msg, m_ContextId);
+}
+
+void Kage::stackDoZoom(PointData p_originBefore, PointData p_originAfter, PointData p_zoomReference, double p_zoomRatio) {
+	_undoRedoManager.applyZoom(p_originBefore, p_originAfter, p_zoomReference, p_zoomRatio);
 }
 
 void Kage::Undo_onClick() {
@@ -868,6 +878,8 @@ void Kage::onToolButtonsClick(Gtk::ToggleButton *p_sourceButton) {
 			ToolFill_onClick();
 		} else if (p_sourceButton->get_tooltip_text() == "Eyedrop Tool") {
 			ToolEyedrop_onClick();
+		} else if (p_sourceButton->get_tooltip_text() == "Zoom Tool") {
+			ToolZoom_onClick();
 //		} else if (p_sourceButton->get_tooltip_text() == "Stroke Tool") {
 //			KageStage::toolMode = KageStage::MODE_MOVE_STAGE;
 		} else {
@@ -970,6 +982,19 @@ void Kage::ToolEyedrop_onClick() {
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
 	KageStage::toolMode = KageStage::MODE_EYEDROP;
+	m_KageStage.initNodeTool();
+	forceRenderFrames();
+}
+
+void Kage::ToolZoom_onClick() {
+	toolsButtonToggle("Zoom Tool");
+	m_PropStage.set_visible(true);
+	m_PropFillStroke.set_visible(false);
+	propLocationSizeSetVisible(false);
+	propNodeXYSetVisible(false);
+	m_ColorButtonFill.set_color(m_KageStage.getFill());
+	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
+	KageStage::toolMode = KageStage::MODE_ZOOM;
 	m_KageStage.initNodeTool();
 	forceRenderFrames();
 }
@@ -1089,8 +1114,8 @@ void Kage::New_onClick() {
 	
 	m_KageStage.cleanSlate();
 	
-	m_EntryStageWid.set_text(uintToString(m_KageStage.stageWidth));
-	m_EntryStageHgt.set_text(uintToString(m_KageStage.stageHeight));
+	m_EntryStageWid.set_text(doubleToString(m_KageStage.stageWidth));
+	m_EntryStageHgt.set_text(doubleToString(m_KageStage.stageHeight));
 	m_EntryStageFPS.set_text(uintToString(m_KageStage.fps));
 	
 	m_KageStage.render();
@@ -1161,7 +1186,7 @@ void Kage::Save_onClick() {
 					unsigned int l_currentFrame;
 			
 			saveKageStudio(ksfPath, "<KageStudio version=\"2019.10.14\">");
-			saveKageStudio(ksfPath, "<stage width=\"" + uintToString(m_KageStage.stageWidth) + "\" height=\"" + uintToString(m_KageStage.stageHeight) + "\" " +
+			saveKageStudio(ksfPath, "<stage width=\"" + doubleToString(m_KageStage.stageWidth) + "\" height=\"" + doubleToString(m_KageStage.stageHeight) + "\" " +
 			                        "background=\"rgb(" + intToString(m_KageStage.stageBG.getR()) + ", " + intToString(m_KageStage.stageBG.getG()) + ", " + intToString(m_KageStage.stageBG.getB()) + ")\" " +
 			                        "fps=\"" + intToString(m_KageStage.fps) + "\" " +
 			                        "layers=\"" + intToString(l_lMax) + "\" " +
@@ -1212,7 +1237,7 @@ void Kage::ExportKS_onClick() {
 			
 			exportKonsolScript(ksfPath, "Var:Number bgcolor;\n");
 			exportKonsolScript(ksfPath, "function kagestudio_screencls() {");
-			exportKonsolScript(ksfPath, "\tDraw:RectFill(0, 0, " + uintToString(m_KageStage.stageWidth) + ", " + uintToString(m_KageStage.stageHeight) + ", bgcolor, screen)");
+			exportKonsolScript(ksfPath, "\tDraw:RectFill(0, 0, " + doubleToString(m_KageStage.stageWidth) + ", " + doubleToString(m_KageStage.stageHeight) + ", bgcolor, screen)");
 			exportKonsolScript(ksfPath, "}");
 			exportKonsolScript(ksfPath, "function render() {");
 			exportKonsolScript(ksfPath, "\tkagestudio_screencls()");
@@ -1267,7 +1292,7 @@ void Kage::ExportHTML5_onClick() {
 				exportHtml5(expPath, "}");
 				exportHtml5(expPath, "function kagestudio_screencls() {");
 				exportHtml5(expPath, "\tscreen.fillStyle = \"rgb(" + intToString(m_KageStage.stageBG.getR()) + ", " + intToString(m_KageStage.stageBG.getG()) + "," + intToString(m_KageStage.stageBG.getB()) + ")\";");
-				exportHtml5(expPath, "\tscreen.fillRect(0, 0, " + uintToString(m_KageStage.stageWidth) + ", " + uintToString(m_KageStage.stageHeight) + ");");
+				exportHtml5(expPath, "\tscreen.fillRect(0, 0, " + doubleToString(m_KageStage.stageWidth) + ", " + doubleToString(m_KageStage.stageHeight) + ");");
 				exportHtml5(expPath, "}");
 				exportHtml5(expPath, "function kagestudio_loop() {");
 				exportHtml5(expPath, "\tkagestudio_screencls()");
@@ -1277,7 +1302,7 @@ void Kage::ExportHTML5_onClick() {
 				exportHtml5(expPath, "}");
 			} else {
 				exportHtml5(expPath, "\tscreen.fillStyle = \"rgb(" + intToString(m_KageStage.stageBG.getR()) + ", " + intToString(m_KageStage.stageBG.getG()) + "," + intToString(m_KageStage.stageBG.getB()) + ")\";");
-				exportHtml5(expPath, "\tscreen.fillRect(0, 0, " + uintToString(m_KageStage.stageWidth) + ", " + uintToString(m_KageStage.stageHeight) + ");");
+				exportHtml5(expPath, "\tscreen.fillRect(0, 0, " + doubleToString(m_KageStage.stageWidth) + ", " + doubleToString(m_KageStage.stageHeight) + ");");
 				exportHtml5(expPath, "\tks_f1();");
 				exportHtml5(expPath, "}");
 			}
@@ -1295,7 +1320,7 @@ void Kage::ExportHTML5_onClick() {
 				KageFramesManager::currentFrame = f;
 				KageFramesManager::currentLayer = t;
 			exportHtml5(expPath, "function main() {\n\t//add variable initialization...\n}");
-			exportHtml5(expPath, "</script>\n</head>\n<body align='center' onload='kagestudio();' bgcolor='#101010'>\n<canvas id='screen' width='" + uintToString(m_KageStage.stageWidth) + "' height='" + uintToString(m_KageStage.stageHeight) + "' style='display: block; margin: auto;'></canvas>\n</body>\n</html>");
+			exportHtml5(expPath, "</script>\n</head>\n<body align='center' onload='kagestudio();' bgcolor='#101010'>\n<canvas id='screen' width='" + doubleToString(m_KageStage.stageWidth) + "' height='" + doubleToString(m_KageStage.stageHeight) + "' style='display: block; margin: auto;'></canvas>\n</body>\n</html>");
 			updateStatus("Exported to " + expPath);
 			break;
 	}
@@ -1570,7 +1595,6 @@ void Kage::onActionActivate() {
 void Kage::Play_onClick() {
 	std::cout << " Kage::Play_onClick" << std::endl;
 	unsigned int c = m_KageFramesManager.frameCount();
-	m_KageStage.clearScreen(m_KageStage.cr);
 	for (unsigned int i = 1; i <= c; ++i) {
 		m_KageFramesManager.setCurrentFrame(i);
 		renderFrames();
@@ -1806,11 +1830,11 @@ double Kage::stringToDouble(string strConvert) {
 
 void Kage::EntryStageArea_onEnter() {
 	string t = m_EntryStageWid.get_text();
-		m_KageStage.stageWidth = stringToUInt(t);
-		m_EntryStageWid.set_text(uintToString(m_KageStage.stageWidth));
+		m_KageStage.stageWidth = stringToDouble(t);
+		m_EntryStageWid.set_text(doubleToString(m_KageStage.stageWidth));
 	t = m_EntryStageHgt.get_text();
-		m_KageStage.stageHeight = stringToUInt(t);
-		m_EntryStageHgt.set_text(uintToString(m_KageStage.stageHeight));
+		m_KageStage.stageHeight = stringToDouble(t);
+		m_EntryStageHgt.set_text(doubleToString(m_KageStage.stageHeight));
 	m_KageStage.render();
 }
 void Kage::EntryStageFPS_onEnter() {

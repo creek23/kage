@@ -31,6 +31,7 @@
 				MODE_STROKE,
 				MODE_FILL,
 				MODE_EYEDROP,
+				MODE_ZOOM,
 				MODE_MOVE_STAGE,
 				MODE_DRAW_RECT,
 				MODE_DRAW_TEXT,
@@ -66,8 +67,8 @@
 			Gdk::Color getFill();
 			void setStroke(Gdk::Color p_Color);
 			Gdk::Color getStroke();
-			unsigned int stageWidth; //direct use for get only
-			unsigned int stageHeight; //direct use for get only
+			double stageWidth; //direct use for get only
+			double stageHeight; //direct use for get only
 			void clearScreen(Cairo::RefPtr<Cairo::Context> p_context);
 			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context);
 			void initNodeTool();
@@ -147,9 +148,23 @@
 			void renderToPNG(string p_path, bool p_transparent);
 			
 			Cairo::RefPtr<Cairo::Context> cr;
-			GdkPoint origin;
+			PointData origin;
 			
 			bool _isModifyingShape;
+			
+			double _zoomRatio;
+			double _zoomValue;
+			PointData _zoomReference;
+			PointData __origin;
+			PointData __stageArea;
+			
+			PointData applyZoomRatio(PointData p_value);
+			double applyZoomRatioX(double p_value);
+			double applyZoomRatioY(double p_value);
+			double getZoomRatioX(double p_value);
+			double getZoomRatioY(double p_value);
+			void applyZoom();
+			vector<VectorData> applyZoom(vector<VectorData> p_v);
 			
 		protected:
 			ToolMode prevTool; //used by Hand-tool shortcut [spacebar]

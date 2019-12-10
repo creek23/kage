@@ -6,6 +6,7 @@
 	#include <iostream>
 	
 	#include "../data/vectordata.h"
+	#include "../data/point.h"
 	
 	#include "kagedo.h"
 	
@@ -21,8 +22,13 @@
 			KageDo redo();
 			
 			void clear();
+			
+			void applyZoom(PointData p_originBefore, PointData p_originAfter, PointData p_zoomReference, double p_zoomRatio);
 		protected:
 			unsigned int _stackIndex;
 			vector<KageDo> _undoStack;
+			
+			///for use of applyZoom
+			PointData applyZoomRatio(PointData p_zoomReference, double p_zoomRatio, PointData p_value);
 	};
 #endif //GTKMM_KAGE_MANAGER_UNRE_UNRE_H

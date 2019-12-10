@@ -21,6 +21,7 @@
 	#include <gtkmm/scrolledwindow.h>
 	#include <gtkmm/filechooserdialog.h>
 	#include <gtkmm/colorbutton.h>
+	#include <gtkmm/colorselection.h>
 	#include "kage/timeline/layermanager.h"
 	//#include "kage/timeline/layer.h"
 	#include "kage/timeline/framesmanager.h"
@@ -149,6 +150,7 @@
 				Gtk::Entry m_EntryStageHgt;
 					void EntryStageArea_onEnter();
 				Gtk::ColorButton m_ColorButtonStage;
+				Gtk::ColorSelection m_ColorSelectionStage;
 					void ColorButtonStage_onClick();
 				Gtk::Entry m_EntryStageFPS;
 					void EntryStageFPS_onEnter();
@@ -269,6 +271,7 @@
 			void ToolStroke_onClick();
 			void ToolFill_onClick();
 			void ToolEyedrop_onClick();
+			void ToolZoom_onClick();
 			
 			void toolsButtonToggle(string p_toolTip);
 			
@@ -291,6 +294,7 @@
 			
 			UnRe _undoRedoManager;
 			void stackDo();
+			void stackDoZoom(PointData p_originBefore, PointData p_originAfter, PointData p_zoomReference, double p_zoomRatio);
 			
 			virtual void New_onClick();
 	};

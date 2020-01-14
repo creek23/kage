@@ -28,6 +28,11 @@ Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_045;
 Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_090;
 Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_135;
 Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_MOVE;
+Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_NE;
+Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_NW;
+Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_SW;
+Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_SE;
+Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_ROTATE;
 
 unsigned int KageFramesManager::currentFrame;
 unsigned int KageFramesManager::currentLayer;

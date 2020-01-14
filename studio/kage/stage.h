@@ -2,7 +2,6 @@
 	#define GTKMM_KAGE_STAGE_H
 	
 	#include <gtkmm/drawingarea.h>
-	#include <gdkmm/general.h>
 	#include <iostream>
 	
 	#include "data/anchor.h"
@@ -10,6 +9,7 @@
 	#include "data/strokecolor.h"
 	#include "data/vectordata.h"
 	#include <cairomm/context.h>
+	#include <gdkmm/general.h> // set_source_pixbuf()
 	
 	class Kage; //forward declaration
 	
@@ -20,6 +20,11 @@
 			static Glib::RefPtr<Gdk::Pixbuf> imageSHAPE_090;
 			static Glib::RefPtr<Gdk::Pixbuf> imageSHAPE_135;
 			static Glib::RefPtr<Gdk::Pixbuf> imageSHAPE_MOVE;
+			static Glib::RefPtr<Gdk::Pixbuf> imageSHAPE_NE;
+			static Glib::RefPtr<Gdk::Pixbuf> imageSHAPE_NW;
+			static Glib::RefPtr<Gdk::Pixbuf> imageSHAPE_SW;
+			static Glib::RefPtr<Gdk::Pixbuf> imageSHAPE_SE;
+			static Glib::RefPtr<Gdk::Pixbuf> imageSHAPE_ROTATE;
 			
 			KageStage(Kage *p_win);
 			virtual ~KageStage();
@@ -40,9 +45,9 @@
 				MODE_DRAW_LINE
 			};
 			const unsigned int _NO_SELECTION = -1;
-			static ColorData stageBG; //direct use for get only
-			static ColorData fillColor; //direct use for get only
-			static StrokeColorData stroke; //direct use for get only
+			static ColorData stageBG; ///direct use for get only
+			static ColorData fillColor; ///direct use for get only
+			static StrokeColorData stroke; ///direct use for get only
 			static ToolMode toolMode;
 			static GdkPoint moveStageXY;
 			unsigned int fps;
@@ -71,8 +76,10 @@
 			double stageHeight; //direct use for get only
 			void clearScreen(Cairo::RefPtr<Cairo::Context> p_context);
 			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context);
+			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> v);
 			void initNodeTool();
 			void handleShapes();
+			void handleShapes_modifyingShapeRotate();
 			void handleShapes_modifyingShape();
 			void handleShapes_scaleNorth();
 			void handleShapes_scaleEast();
@@ -125,6 +132,7 @@
 			
 			bool isSelectedNode(unsigned int p_index);
 			void addSelectedNode(unsigned int p_index);
+			bool isSelectedShape(unsigned int p_index);
 			void addSelectedShape(unsigned int p_index);
 			void trySingleSelectShape();
 			void tryMultiSelectShapes();
@@ -158,6 +166,8 @@
 			PointData __origin;
 			PointData __stageArea;
 			
+			PointData _rotateReference;
+			
 			PointData applyZoomRatio(PointData p_value);
 			double applyZoomRatioX(double p_value);
 			double applyZoomRatioY(double p_value);
@@ -166,6 +176,8 @@
 			void applyZoom();
 			vector<VectorData> applyZoom(vector<VectorData> p_v);
 			
+			bool _rotateMode;
+			bool _rotateApply;
 		protected:
 			ToolMode prevTool; //used by Hand-tool shortcut [spacebar]
 			Kage *win;

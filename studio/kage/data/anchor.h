@@ -17,7 +17,8 @@
 				TYPE_NORTH_WEST,
 				TYPE_SOUTH_EAST,
 				TYPE_SOUTH_WEST,
-				TYPE_MOVE
+				TYPE_MOVE,
+				TYPE_ROTATE
 			};
 			AnchorData();
 			AnchorData(GdkPoint p);

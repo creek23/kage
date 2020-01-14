@@ -174,6 +174,20 @@ bool KageStage::on_event(GdkEvent *e) {
 						tryMultiSelectShapes();
 				}
 			} else {
+				if (_rotateApply == true) {
+					draw1.x = (draw1.x + origin.x);
+					draw1.y = (draw1.y + origin.y);
+						draw2.x = (draw2.x + origin.x);
+						draw2.y = (draw2.y + origin.y);
+					
+					handleShapes_modifyingShapeRotate();
+					
+					draw1.x = (draw1.x - origin.x);
+					draw1.y = (draw1.y - origin.y);
+						draw2.x = (draw2.x - origin.x);
+						draw2.y = (draw2.y - origin.y);
+				}
+				
 				win->stackDo();
 			}
 			_isModifyingShape = false;
@@ -247,6 +261,9 @@ bool KageStage::on_event(GdkEvent *e) {
 		} else if (KageStage::toolMode == MODE_SELECT) {
 			draw2.x = e->button.x;
 			draw2.y = e->button.y;
+			
+			_zoomReference.x = e->button.x;
+			_zoomReference.y = e->button.y;
 			render();
 		} else if (KageStage::toolMode == MODE_DRAW_OVAL
 				|| KageStage::toolMode == MODE_DRAW_RECT) {
@@ -639,7 +656,9 @@ bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
 		cr = p_cr;
 		if (mouseDown) {
 			win->renderFramesBelowCurrentLayer();
-			renderFrame(cr);
+			if (_rotateMode == false) {
+				renderFrame(cr);
+			}
 		} else {
 			win->renderFrames();
 		}
@@ -657,6 +676,12 @@ bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
 			KageStage::imageSHAPE_090 = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_090.png");
 			KageStage::imageSHAPE_135 = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_135.png");
 			KageStage::imageSHAPE_MOVE = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_move.png");
+			
+			KageStage::imageSHAPE_NE = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_ne.png");
+			KageStage::imageSHAPE_NW = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_nw.png");
+			KageStage::imageSHAPE_SW = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_sw.png");
+			KageStage::imageSHAPE_SE = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_se.png");
+			KageStage::imageSHAPE_ROTATE = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_rotate.png");
 		}
 		
 		if (_registerWidth != get_width()) {
@@ -761,7 +786,9 @@ void KageStage::renderToPNG(string p_path, bool p_transparent) {
 }
 void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context) {
 	vector<VectorData> v = win->getFrameData().getVectorData();
-	
+	renderFrame(p_context, v);
+}
+void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> v) {
 	unsigned int vsize = v.size();
 	unsigned int fillCtr = 0;
 	ColorData fcolor;
@@ -878,6 +905,8 @@ void KageStage::initNodeTool() {
 	selectedNodes.clear();
 	selectedShapes.clear();
 	_mouseLocationShapeIndex = _NO_SELECTION;
+	
+	_rotateMode = false;
 }
 
 bool KageStage::isSelectedNode(unsigned int p_index) {
@@ -892,12 +921,13 @@ bool KageStage::isSelectedNode(unsigned int p_index) {
 	return l_gotit;
 }
 void KageStage::addSelectedNode(unsigned int p_index) {
+	if (p_index == _NO_SELECTION) return;
 	if (isSelectedNode(p_index) == false) {
 		selectedNodes.push_back(p_index);
 	}
 }
-void KageStage::addSelectedShape(unsigned int p_index) {
-	if (p_index == _NO_SELECTION) return;
+
+bool KageStage::isSelectedShape(unsigned int p_index) {
 	bool l_gotit = false;
 	unsigned int ssize = selectedShapes.size();
 	for (unsigned int i = 0; i < ssize; ++i) {
@@ -906,7 +936,12 @@ void KageStage::addSelectedShape(unsigned int p_index) {
 			break;
 		}
 	}
-	if (l_gotit == false) {
+	
+	return l_gotit;
+}
+void KageStage::addSelectedShape(unsigned int p_index) {
+	if (p_index == _NO_SELECTION) return;
+	if (isSelectedShape(p_index) == false) {
 		selectedShapes.push_back(p_index);
 	}
 }
@@ -1414,6 +1449,70 @@ void KageStage::drawSelectionArea() {
 					cr->stroke();
 	cr->unset_dash();
 }
+void KageStage::handleShapes_modifyingShapeRotate() {
+	///TODO: replace anchor_center.x with shape's anchor point
+	PointData l_rotateNew;
+		l_rotateNew.x = draw2.x - anchor_center.x;
+		l_rotateNew.y = draw2.y - anchor_center.y;
+	double l_angleNew = atan2(l_rotateNew.y, l_rotateNew.x);
+	
+	PointData l_rotateOld;
+		l_rotateOld.x = draw1.x - anchor_center.x;
+		l_rotateOld.y = draw1.y - anchor_center.y;
+	double l_angleOld = atan2(l_rotateOld.y, l_rotateOld.x);
+	
+	double l_angleDiff;
+	
+	vector<VectorData> v = win->getFrameData().getVectorData();
+	if (selectedShapes.size() > 0) {
+		for (unsigned int i = selectedShapes[0]; i < v.size(); ++i) {
+			if (v[i].vectorType == VectorData::TYPE_MOVE) {
+				unsigned int j = 0;
+				l_angleDiff = l_angleNew - l_angleOld;
+				
+				v[i].points[j].x += origin.x;
+				v[i].points[j].y += origin.y;
+				
+					PointData l_pointRotate;
+						l_pointRotate.x = v[i].points[j].x - anchor_center.x;
+						l_pointRotate.y = v[i].points[j].y - anchor_center.y;
+					double l_pointAngle = atan2(l_pointRotate.y, l_pointRotate.x) + l_angleDiff;
+					
+					//apply new angle
+					double l_hyp = sqrtf((l_pointRotate.x * l_pointRotate.x) + (l_pointRotate.y * l_pointRotate.y));
+					v[i].points[j].x = cos(l_pointAngle) * l_hyp + anchor_center.x;
+					v[i].points[j].y = sin(l_pointAngle) * l_hyp + anchor_center.y;
+				
+				v[i].points[j].x -= origin.x;
+				v[i].points[j].y -= origin.y;
+			} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
+					|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
+				l_angleDiff = l_angleNew - l_angleOld;
+				for (unsigned int j = 0; j < 3; ++j) {
+					v[i].points[j].x += origin.x;
+					v[i].points[j].y += origin.y;
+					
+						PointData l_pointRotate;
+							l_pointRotate.x = v[i].points[j].x - anchor_center.x;
+							l_pointRotate.y = v[i].points[j].y - anchor_center.y;
+						double l_hyp = sqrtf((l_pointRotate.x * l_pointRotate.x) + (l_pointRotate.y * l_pointRotate.y));
+						
+						double l_pointAngle = atan2(l_pointRotate.y, l_pointRotate.x) + l_angleDiff;
+						//apply new angle
+						v[i].points[j].x = cos(l_pointAngle) * l_hyp + anchor_center.x;
+						v[i].points[j].y = sin(l_pointAngle) * l_hyp + anchor_center.y;
+					
+					v[i].points[j].x -= origin.x;
+					v[i].points[j].y -= origin.y;
+				}
+			}
+		}
+		win->setFrameData(v);
+	}
+	
+	//win->stackDo();
+	_rotateApply = false;
+}
 void KageStage::handleShapes_modifyingShape() {
 	if (_isModifyingShape == false) {
 		drawSelectionArea();
@@ -1450,6 +1549,9 @@ void KageStage::handleShapes_modifyingShape() {
 			}
 			if (isMouseOnNode(    anchor_center.x    ,     anchor_center.y    , l_distance) == true) {
 				mouseOnAnchor = AnchorData::TYPE_MOVE;
+				if (_rotateMode == true) {
+					mouseOnAnchor = AnchorData::TYPE_ROTATE;
+				}
 			}
 		}
 	}
@@ -1458,7 +1560,8 @@ void KageStage::handleShapes_modifyingShape() {
 	}
 	/// NOTE: don't use ELSE-IF to apply changes ASAP
 	if (mouseOnAnchor != AnchorData::TYPE_NONE
-			&& mouseOnAnchor != AnchorData::TYPE_MOVE) {
+			&& mouseOnAnchor != AnchorData::TYPE_MOVE
+			&& _rotateMode == false) {
 		if (mouseOnAnchor == AnchorData::TYPE_NORTH
 				|| mouseOnAnchor == AnchorData::TYPE_NORTH_EAST
 				|| mouseOnAnchor == AnchorData::TYPE_NORTH_WEST) {
@@ -1482,8 +1585,6 @@ void KageStage::handleShapes_modifyingShape() {
 		anchor_center.x = (anchor_upperLeft.x + anchor_lowerRight.x) / 2;
 		anchor_center.y = (anchor_upperLeft.y + anchor_lowerRight.y) / 2;
 		
-//		//update vector data
-//		v = win->getFrameData().getVectorData();
 	} else if (mouseOnAnchor == AnchorData::TYPE_MOVE) {
 		//move the whole shape around
 		handleShapes_moveShape(
@@ -1492,8 +1593,87 @@ void KageStage::handleShapes_modifyingShape() {
 		
 		anchor_center.x = draw2.x;
 		anchor_center.y = draw2.y;
-//		//update vector data
-//		v = win->getFrameData().getVectorData();
+	} else if (mouseOnAnchor == AnchorData::TYPE_ROTATE) {
+		//temporarily, move the whole shape around
+		//TODO: move shape's anchor point instead
+		handleShapes_moveShape(
+			draw2.x - anchor_center.x,
+			draw2.y - anchor_center.y);
+		
+		anchor_center.x = draw2.x;
+		anchor_center.y = draw2.y;
+		
+		vector<VectorData> v = win->getFrameData().getVectorData();
+		renderFrame(cr, v);
+	} else if (mouseOnAnchor != AnchorData::TYPE_NONE
+			&& mouseOnAnchor != AnchorData::TYPE_MOVE
+			&& _rotateMode == true) {
+		///TODO: replace anchor_center.x with shape's anchor point
+		PointData l_rotateNew;
+			l_rotateNew.x = draw2.x - anchor_center.x;
+			l_rotateNew.y = draw2.y - anchor_center.y;
+		double l_angleNew = atan2(l_rotateNew.y, l_rotateNew.x);
+		
+		PointData l_rotateOld;
+			l_rotateOld.x = draw1.x - anchor_center.x;
+			l_rotateOld.y = draw1.y - anchor_center.y;
+		double l_angleOld = atan2(l_rotateOld.y, l_rotateOld.x);
+		
+		double l_angleDiff;
+		
+		vector<VectorData> v = win->getFrameData().getVectorData();
+		if (selectedShapes.size() > 0) {
+			for (unsigned int i = selectedShapes[0]; i < v.size(); ++i) {
+				if (v[i].vectorType == VectorData::TYPE_MOVE) {
+					unsigned int j = 0;
+					l_angleDiff = l_angleNew - l_angleOld;
+					
+					v[i].points[j].x += origin.x;
+					v[i].points[j].y += origin.y;
+					
+						PointData l_pointRotate;
+							l_pointRotate.x = v[i].points[j].x - anchor_center.x;
+							l_pointRotate.y = v[i].points[j].y - anchor_center.y;
+						double l_pointAngle = atan2(l_pointRotate.y, l_pointRotate.x) + l_angleDiff;
+						
+						//apply new angle
+						double l_hyp = sqrtf((l_pointRotate.x * l_pointRotate.x) + (l_pointRotate.y * l_pointRotate.y));
+						v[i].points[j].x = cos(l_pointAngle) * l_hyp + anchor_center.x;
+						v[i].points[j].y = sin(l_pointAngle) * l_hyp + anchor_center.y;
+					
+					v[i].points[j].x -= origin.x;
+					v[i].points[j].y -= origin.y;
+				} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
+						|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
+					l_angleDiff = l_angleNew - l_angleOld;
+					for (unsigned int j = 0; j < 3; ++j) {
+						v[i].points[j].x += origin.x;
+						v[i].points[j].y += origin.y;
+						
+							PointData l_pointRotate;
+								l_pointRotate.x = v[i].points[j].x - anchor_center.x;
+								l_pointRotate.y = v[i].points[j].y - anchor_center.y;
+							double l_hyp = sqrtf((l_pointRotate.x * l_pointRotate.x) + (l_pointRotate.y * l_pointRotate.y));
+							
+							double l_pointAngle = atan2(l_pointRotate.y, l_pointRotate.x) + l_angleDiff;
+							//apply new angle
+							v[i].points[j].x = cos(l_pointAngle) * l_hyp + anchor_center.x;
+							v[i].points[j].y = sin(l_pointAngle) * l_hyp + anchor_center.y;
+						
+						v[i].points[j].x -= origin.x;
+						v[i].points[j].y -= origin.y;
+					}
+				}
+			}
+			//win->setFrameData(v);
+			renderFrame(cr, v);
+			_rotateApply = true;
+		}
+	} else {
+		if (_rotateMode == true) {
+			vector<VectorData> v = win->getFrameData().getVectorData();
+			renderFrame(cr, v);
+		}
 	}
 	
 	vector<double> dashes;
@@ -1552,8 +1732,6 @@ void KageStage::handleShapes() {
 			}
 		}
 	}
-	anchor_center.x = (anchor_upperLeft.x + anchor_lowerRight.x) / 2;
-	anchor_center.y = (anchor_upperLeft.y + anchor_lowerRight.y) / 2;
 	
 	vector<double> dashes;
 		dashes.push_back(4.0); /* ink */
@@ -1580,56 +1758,114 @@ void KageStage::handleShapes() {
 		cr->set_source_rgba(0.0, 0.0, 0.0, 1.0);
 			cr->stroke();*/
 	
-	//draw 4 corners anchors
-	Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_135,
-			 anchor_upperLeft.x - 13,
-			 anchor_upperLeft.y - 13);
-		cr->paint();
-	
-	Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_045,
-			anchor_lowerRight.x     ,
-			 anchor_upperLeft.y - 13);
-		cr->paint();
-	Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_135,
-			anchor_lowerRight.x     ,
-			anchor_lowerRight.y     );
-		cr->paint();
-	Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_045,
-			 anchor_upperLeft.x - 13,
-			anchor_lowerRight.y     );
-		cr->paint();
-	
-	//draw mid anchors
-	Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_090,
-				anchor_center.x -  7,
-			 anchor_upperLeft.y - 13);
-		cr->paint();
-	Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_090,
-				anchor_center.x -  7,
-			anchor_lowerRight.y     );
-		cr->paint();
-	Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_000,
-			 anchor_upperLeft.x - 13,
-				anchor_center.y -  7);
-		cr->paint();
-	Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_000,
-			anchor_lowerRight.x     ,
-				anchor_center.y -  7);
-		cr->paint();
-	
-	//draw move anchors
-	Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_MOVE,
-				anchor_center.x -  7,
-				anchor_center.y -  7);
-		cr->paint();
+	if (_rotateMode == true) {
+		///temporarily use anchor_center as rotation anchor point
+		anchor_center.x = (anchor_upperLeft.x + anchor_lowerRight.x) / 2;
+		anchor_center.y = (anchor_upperLeft.y + anchor_lowerRight.y) / 2;
+		
+		//draw 4 corner rotate-anchors
+		Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_SE,
+				 anchor_upperLeft.x - 13,
+				 anchor_upperLeft.y - 13);
+			cr->paint();
+		
+		Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_SW,
+				anchor_lowerRight.x     ,
+				 anchor_upperLeft.y - 13);
+			cr->paint();
+		Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_NW,
+				anchor_lowerRight.x     ,
+				anchor_lowerRight.y     );
+			cr->paint();
+		Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_NE,
+				 anchor_upperLeft.x - 13,
+				anchor_lowerRight.y     );
+			cr->paint();
+		
+		//draw mid anchors
+		Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_090,
+					anchor_center.x -  7,
+				 anchor_upperLeft.y - 13);
+			cr->paint();
+		Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_090,
+					anchor_center.x -  7,
+				anchor_lowerRight.y     );
+			cr->paint();
+		Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_000,
+				 anchor_upperLeft.x - 13,
+					anchor_center.y -  7);
+			cr->paint();
+		Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_000,
+				anchor_lowerRight.x     ,
+					anchor_center.y -  7);
+			cr->paint();
+		
+		//draw move anchors
+		Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_ROTATE,
+					anchor_center.x -  7,
+					anchor_center.y -  7);
+			cr->paint();
+	} else {
+		anchor_center.x = (anchor_upperLeft.x + anchor_lowerRight.x) / 2;
+		anchor_center.y = (anchor_upperLeft.y + anchor_lowerRight.y) / 2;
+		
+		//draw 4 corners anchors
+		Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_135,
+				 anchor_upperLeft.x - 13,
+				 anchor_upperLeft.y - 13);
+			cr->paint();
+		
+		Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_045,
+				anchor_lowerRight.x     ,
+				 anchor_upperLeft.y - 13);
+			cr->paint();
+		Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_135,
+				anchor_lowerRight.x     ,
+				anchor_lowerRight.y     );
+			cr->paint();
+		Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_045,
+				 anchor_upperLeft.x - 13,
+				anchor_lowerRight.y     );
+			cr->paint();
+		
+		//draw mid anchors
+		Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_090,
+					anchor_center.x -  7,
+				 anchor_upperLeft.y - 13);
+			cr->paint();
+		Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_090,
+					anchor_center.x -  7,
+				anchor_lowerRight.y     );
+			cr->paint();
+		Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_000,
+				 anchor_upperLeft.x - 13,
+					anchor_center.y -  7);
+			cr->paint();
+		Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_000,
+				anchor_lowerRight.x     ,
+					anchor_center.y -  7);
+			cr->paint();
+		
+		//draw move anchors
+		Gdk::Cairo::set_source_pixbuf(cr, KageStage::imageSHAPE_MOVE,
+					anchor_center.x -  7,
+					anchor_center.y -  7);
+			cr->paint();
+	}
 }
 
 void KageStage::trySingleSelectShape() {
 	if (_mouseLocationShapeIndex != _NO_SELECTION) {
-		if (keyShiftDown == false) {
-			selectedShapes.clear();
+		if (isSelectedShape(_mouseLocationShapeIndex) == true) {
+			_rotateMode = !_rotateMode;
+		} else {
+			if (keyShiftDown == false) {
+				selectedShapes.clear();
+			}
+			addSelectedShape(_mouseLocationShapeIndex);
+			_rotateMode = false;
 		}
-		addSelectedShape(_mouseLocationShapeIndex);
+		
 		//this should be able to update Property pane's X/Y Width Height
 		getSelectedShapeViaNode(_mouseLocationShapeIndex+3, win->getFrameData().getVectorData());
 		
@@ -1640,6 +1876,8 @@ void KageStage::trySingleSelectShape() {
 		
 		win->updateColors();
 		win->updateProperties();
+	} else if (keyShiftDown == false) {
+		selectedShapes.clear();
 	}
 }
 void KageStage::tryMultiSelectShapes_populateShapes() {

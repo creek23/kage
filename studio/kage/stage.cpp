@@ -1465,45 +1465,49 @@ void KageStage::handleShapes_modifyingShapeRotate() {
 	
 	vector<VectorData> v = win->getFrameData().getVectorData();
 	if (selectedShapes.size() > 0) {
-		for (unsigned int i = selectedShapes[0]; i < v.size(); ++i) {
-			if (v[i].vectorType == VectorData::TYPE_MOVE) {
-				unsigned int j = 0;
-				l_angleDiff = l_angleNew - l_angleOld;
-				
-				v[i].points[j].x += origin.x;
-				v[i].points[j].y += origin.y;
-				
-					PointData l_pointRotate;
-						l_pointRotate.x = v[i].points[j].x - anchor_center.x;
-						l_pointRotate.y = v[i].points[j].y - anchor_center.y;
-					double l_pointAngle = atan2(l_pointRotate.y, l_pointRotate.x) + l_angleDiff;
+		for (unsigned int l_selectedShape = 0; l_selectedShape < selectedShapes.size(); ++l_selectedShape) {
+			for (unsigned int i = selectedShapes[l_selectedShape]; i < v.size(); ++i) {
+				if (v[i].vectorType == VectorData::TYPE_ENDFILL) {
+					break;
+				} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
+					unsigned int j = 0;
+					l_angleDiff = l_angleNew - l_angleOld;
 					
-					//apply new angle
-					double l_hyp = sqrtf((l_pointRotate.x * l_pointRotate.x) + (l_pointRotate.y * l_pointRotate.y));
-					v[i].points[j].x = cos(l_pointAngle) * l_hyp + anchor_center.x;
-					v[i].points[j].y = sin(l_pointAngle) * l_hyp + anchor_center.y;
-				
-				v[i].points[j].x -= origin.x;
-				v[i].points[j].y -= origin.y;
-			} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
-					|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
-				l_angleDiff = l_angleNew - l_angleOld;
-				for (unsigned int j = 0; j < 3; ++j) {
 					v[i].points[j].x += origin.x;
 					v[i].points[j].y += origin.y;
 					
 						PointData l_pointRotate;
 							l_pointRotate.x = v[i].points[j].x - anchor_center.x;
 							l_pointRotate.y = v[i].points[j].y - anchor_center.y;
-						double l_hyp = sqrtf((l_pointRotate.x * l_pointRotate.x) + (l_pointRotate.y * l_pointRotate.y));
-						
 						double l_pointAngle = atan2(l_pointRotate.y, l_pointRotate.x) + l_angleDiff;
+						
 						//apply new angle
+						double l_hyp = sqrtf((l_pointRotate.x * l_pointRotate.x) + (l_pointRotate.y * l_pointRotate.y));
 						v[i].points[j].x = cos(l_pointAngle) * l_hyp + anchor_center.x;
 						v[i].points[j].y = sin(l_pointAngle) * l_hyp + anchor_center.y;
 					
 					v[i].points[j].x -= origin.x;
 					v[i].points[j].y -= origin.y;
+				} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
+						|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
+					l_angleDiff = l_angleNew - l_angleOld;
+					for (unsigned int j = 0; j < 3; ++j) {
+						v[i].points[j].x += origin.x;
+						v[i].points[j].y += origin.y;
+						
+							PointData l_pointRotate;
+								l_pointRotate.x = v[i].points[j].x - anchor_center.x;
+								l_pointRotate.y = v[i].points[j].y - anchor_center.y;
+							double l_hyp = sqrtf((l_pointRotate.x * l_pointRotate.x) + (l_pointRotate.y * l_pointRotate.y));
+							
+							double l_pointAngle = atan2(l_pointRotate.y, l_pointRotate.x) + l_angleDiff;
+							//apply new angle
+							v[i].points[j].x = cos(l_pointAngle) * l_hyp + anchor_center.x;
+							v[i].points[j].y = sin(l_pointAngle) * l_hyp + anchor_center.y;
+						
+						v[i].points[j].x -= origin.x;
+						v[i].points[j].y -= origin.y;
+					}
 				}
 			}
 		}
@@ -1623,45 +1627,49 @@ void KageStage::handleShapes_modifyingShape() {
 		
 		vector<VectorData> v = win->getFrameData().getVectorData();
 		if (selectedShapes.size() > 0) {
-			for (unsigned int i = selectedShapes[0]; i < v.size(); ++i) {
-				if (v[i].vectorType == VectorData::TYPE_MOVE) {
-					unsigned int j = 0;
-					l_angleDiff = l_angleNew - l_angleOld;
-					
-					v[i].points[j].x += origin.x;
-					v[i].points[j].y += origin.y;
-					
-						PointData l_pointRotate;
-							l_pointRotate.x = v[i].points[j].x - anchor_center.x;
-							l_pointRotate.y = v[i].points[j].y - anchor_center.y;
-						double l_pointAngle = atan2(l_pointRotate.y, l_pointRotate.x) + l_angleDiff;
+			for (unsigned int l_selectedShape = 0; l_selectedShape < selectedShapes.size(); ++l_selectedShape) {
+				for (unsigned int i = selectedShapes[l_selectedShape]; i < v.size(); ++i) {
+					if (v[i].vectorType == VectorData::TYPE_ENDFILL) {
+						break;
+					} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
+						unsigned int j = 0;
+						l_angleDiff = l_angleNew - l_angleOld;
 						
-						//apply new angle
-						double l_hyp = sqrtf((l_pointRotate.x * l_pointRotate.x) + (l_pointRotate.y * l_pointRotate.y));
-						v[i].points[j].x = cos(l_pointAngle) * l_hyp + anchor_center.x;
-						v[i].points[j].y = sin(l_pointAngle) * l_hyp + anchor_center.y;
-					
-					v[i].points[j].x -= origin.x;
-					v[i].points[j].y -= origin.y;
-				} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
-						|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
-					l_angleDiff = l_angleNew - l_angleOld;
-					for (unsigned int j = 0; j < 3; ++j) {
 						v[i].points[j].x += origin.x;
 						v[i].points[j].y += origin.y;
 						
 							PointData l_pointRotate;
 								l_pointRotate.x = v[i].points[j].x - anchor_center.x;
 								l_pointRotate.y = v[i].points[j].y - anchor_center.y;
-							double l_hyp = sqrtf((l_pointRotate.x * l_pointRotate.x) + (l_pointRotate.y * l_pointRotate.y));
-							
 							double l_pointAngle = atan2(l_pointRotate.y, l_pointRotate.x) + l_angleDiff;
+							
 							//apply new angle
+							double l_hyp = sqrtf((l_pointRotate.x * l_pointRotate.x) + (l_pointRotate.y * l_pointRotate.y));
 							v[i].points[j].x = cos(l_pointAngle) * l_hyp + anchor_center.x;
 							v[i].points[j].y = sin(l_pointAngle) * l_hyp + anchor_center.y;
 						
 						v[i].points[j].x -= origin.x;
 						v[i].points[j].y -= origin.y;
+					} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
+							|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
+						l_angleDiff = l_angleNew - l_angleOld;
+						for (unsigned int j = 0; j < 3; ++j) {
+							v[i].points[j].x += origin.x;
+							v[i].points[j].y += origin.y;
+							
+								PointData l_pointRotate;
+									l_pointRotate.x = v[i].points[j].x - anchor_center.x;
+									l_pointRotate.y = v[i].points[j].y - anchor_center.y;
+								double l_hyp = sqrtf((l_pointRotate.x * l_pointRotate.x) + (l_pointRotate.y * l_pointRotate.y));
+								
+								double l_pointAngle = atan2(l_pointRotate.y, l_pointRotate.x) + l_angleDiff;
+								//apply new angle
+								v[i].points[j].x = cos(l_pointAngle) * l_hyp + anchor_center.x;
+								v[i].points[j].y = sin(l_pointAngle) * l_hyp + anchor_center.y;
+							
+							v[i].points[j].x -= origin.x;
+							v[i].points[j].y -= origin.y;
+						}
 					}
 				}
 			}

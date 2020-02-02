@@ -1556,7 +1556,7 @@ void Kage::ExportAVI_onClick() {
 				m_KageStage.origin.y = l_tempOrigin.y;
 			
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-			if (runExternal(".\\ffmpeg", "-framerate " + uintToString(m_KageStage.fps) + " -i '" + l_pngPath + "%05d.png' '" + l_pngPath + ".avi'")) {
+			if (runExternal(".\\ffmpeg", "-framerate " + uintToString(m_KageStage.fps) + " -i \"" + l_pngPath + "%05d.png\" \"" + l_pngPath + ".avi\"")) {
 				if (runExternal("del", "/f " + l_pngPath + "*.png")) {
 #else
 			if (runExternal("ffmpeg", "-framerate " + uintToString(m_KageStage.fps) + " -i '" + l_pngPath + "%05d.png' '" + l_pngPath + ".avi'")) {

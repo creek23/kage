@@ -1465,9 +1465,10 @@ void KageStage::handleShapes_modifyingShapeRotate() {
 	
 	vector<VectorData> v = win->getFrameData().getVectorData();
 	if (selectedShapes.size() > 0) {
-		for (unsigned int l_selectedShape = 0; l_selectedShape < selectedShapes.size(); ++l_selectedShape) {
-			for (unsigned int i = selectedShapes[l_selectedShape]; i < v.size(); ++i) {
-				if (v[i].vectorType == VectorData::TYPE_ENDFILL) {
+		for (unsigned int l_shapeIndex = 0; l_shapeIndex < selectedShapes.size(); ++l_shapeIndex) {
+			for (unsigned int i = selectedShapes[l_shapeIndex]; i < v.size(); ++i) {
+				if (v[i].vectorType == VectorData::TYPE_INIT
+					&& i != selectedShapes[l_shapeIndex]) {
 					break;
 				} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
 					unsigned int j = 0;
@@ -1627,9 +1628,10 @@ void KageStage::handleShapes_modifyingShape() {
 		
 		vector<VectorData> v = win->getFrameData().getVectorData();
 		if (selectedShapes.size() > 0) {
-			for (unsigned int l_selectedShape = 0; l_selectedShape < selectedShapes.size(); ++l_selectedShape) {
-				for (unsigned int i = selectedShapes[l_selectedShape]; i < v.size(); ++i) {
-					if (v[i].vectorType == VectorData::TYPE_ENDFILL) {
+			for (unsigned int l_shapeIndex = 0; l_shapeIndex < selectedShapes.size(); ++l_shapeIndex) {
+				for (unsigned int i = selectedShapes[l_shapeIndex]; i < v.size(); ++i) {
+					if (v[i].vectorType == VectorData::TYPE_INIT
+						&& i != selectedShapes[l_shapeIndex]) {
 						break;
 					} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
 						unsigned int j = 0;

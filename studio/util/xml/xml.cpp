@@ -1,7 +1,7 @@
 /*
  * xml.cpp
  * 
- * Copyright 2019 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
+ * Copyright 2019-2020 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -449,6 +449,10 @@ unsigned int BasicXml::createTag(unsigned int p_index, XmlTag &p_xmlTagParent) {
 						XmlTag l_xmlTagChild;
 						p_xmlTagParent._children.push_back(l_xmlTagChild);
 						i = createTag(i, p_xmlTagParent._children[p_xmlTagParent._children.size()-1]);
+						if (i == -1) {
+							cout << "unable to create child Tag for " << p_xmlTagParent.getName() << endl;
+							return i;
+						}
 					}
 				} else {
 					p_xmlTagParent._value = "";
@@ -492,6 +496,10 @@ unsigned int BasicXml::createTag(unsigned int p_index, XmlTag &p_xmlTagParent) {
 							XmlTag l_xmlTagChild;
 							p_xmlTagParent._children.push_back(l_xmlTagChild);
 							i = createTag(i, p_xmlTagParent._children[p_xmlTagParent._children.size()-1]);
+							if (i == -1) {
+								cout << "unable to create Child Tag for " << p_xmlTagParent.getName();
+								return i;
+							}
 						}
 					} else {
 						return i; //DONE?

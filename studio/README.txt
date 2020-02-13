@@ -1,7 +1,13 @@
-HOW TO COMPILE Kage Studio (on Windows 7)
-=========================================
+Current version is v0.2.20200213
+Kage Studio is a simple, Free and Open Source 2D Animation Software
+written by Mj Mendoza IV <mj.mendoza.iv at gmail dot com>
+
+
+HOW TO COMPILE Kage Studio (on Windows)
+=======================================
 1 install MSYS2 if you haven't already
-2 open MSYS and install 'gtkmm3', 'toolchain', and 'make' via pacman
+2 open MSYS and install 'gtkmm3', 'gcc', 'pkg-config', and 'make' via pacman
+	MSYS2: pacman -S mingw-w64-x86_64-gtkmm3 mingw-w64-x86_64-gcc mingw-w64-x86_64-pkg-config mingw-w64-x86_64-make
 3 cd to this path
 4 then type: 'make -f Makefile.win'
 

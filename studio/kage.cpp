@@ -1154,7 +1154,6 @@ void Kage::OpenKSF_onClick() {
 			parseKSF(l_ksfContent);
 			_undoRedoManager.clear();
 			stackDo();
-			updateStatus("Loaded " + ksfPath);
 			
 			break;
 //		default:
@@ -1918,9 +1917,9 @@ string Kage::saveFrame() {
 				fillCtr++;
 				break;
 			case VectorData::TYPE_ENDFILL:
-				if (fillCtr > 0) {
+//				if (fillCtr > 0) {
 						l_ostringstream << "</fill>\n";
-				}
+//				}
 				if (fillCtr > 0) {
 					fillCtr--;
 				}
@@ -2301,15 +2300,16 @@ void Kage::parseKSF(string p_content) {
 						&& l_xmlTagProperties[0].getName() == "version"
 						&& l_xmlTagProperties[0].getValue() == "2019.10.14") {					
 					parseKSF_Children(l_root._children);
+					updateStatus("Loaded " + ksfPath);
 				}
 			}
 		} else {
 		//unable to tokenize KSF
-		std::cout << "unable to tokenize KSF " << std::endl;
+		updateStatus("Loading Error 1: Unabe to load " + ksfPath);
 		}
 	} else {
 		//unable to parse KSF
-		std::cout << "unable to parse KSF " << std::endl;
+		updateStatus("Loading Error 2: Unabe to load " + ksfPath);
 	}
 }
 bool Kage::runExternal(string p_cmd, string p_param) {

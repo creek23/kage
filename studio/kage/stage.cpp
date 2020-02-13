@@ -3044,33 +3044,40 @@ bool KageStage::raiseSelectedShape() {
 		return false;
 	}
 	
-	sort(selectedShapes.begin(), selectedShapes.end(), greater <unsigned int>());
+	vector<unsigned int> l_selectedShapesOld;
+	vector<unsigned int> l_selectedShapesNew;
+	l_selectedShapesOld.clear();
+	l_selectedShapesNew.clear();
+	for (unsigned int i = 0; i < selectedShapes.size(); ++i) {
+		l_selectedShapesOld.push_back(selectedShapes[i]);
+	}
+	sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater <unsigned int>());
 	
 	vector<VectorData> v = win->getFrameData().getVectorData();
-	unsigned int vsize = v.size();
 	_vectorDataZOrderBufferA.clear();
 	_vectorDataZOrderBufferB.clear();
 	_vectorDataZOrderBufferC.clear();
 	
-	for (unsigned int l_selectedShape = 0; l_selectedShape < selectedShapes.size(); ++l_selectedShape) {
+	for (unsigned int l_selectedShape = 0; l_selectedShape < l_selectedShapesOld.size(); ++l_selectedShape) {
+		unsigned int vsize = v.size();
 		unsigned int l_temp = _NO_SELECTION;
 		unsigned int l_shapeBstart = _NO_SELECTION;
-		for (unsigned int i = selectedShapes[l_selectedShape]; i < vsize; ++i) {
+		for (unsigned int i = l_selectedShapesOld[l_selectedShape]; i < vsize; ++i) {
 			if (v[i].vectorType == VectorData::TYPE_INIT
-					&& i != selectedShapes[l_selectedShape]) {			
+					&& i != l_selectedShapesOld[l_selectedShape]) {			
 				l_shapeBstart = i;
-				l_temp = i-1;
+				l_temp = i;
 				for (i = i; i < vsize; ++i) {
 					if (v[i].vectorType == VectorData::TYPE_INIT
 							&& i != l_shapeBstart) {
 						for (i = i; i < vsize; ++i) {
 							_vectorDataZOrderBufferC.push_back(v[i]);
 						}
-						l_temp = vsize-1;
+						l_temp = vsize;
 						break;
 					} else {
 						_vectorDataZOrderBufferB.push_back(v[i]);
-						l_temp = i-1;
+						l_temp = i+1;
 					}
 				}
 				break;
@@ -3080,17 +3087,16 @@ bool KageStage::raiseSelectedShape() {
 		}
 		if (l_temp == _NO_SELECTION) {
 			_vectorDataZOrderBufferA.clear();
-			//return false;
+			l_selectedShapesNew.push_back(l_selectedShapesOld[l_selectedShape]);
 		} else {
-			v.erase (v.begin() + selectedShapes[l_selectedShape],
+			v.erase (v.begin() + l_selectedShapesOld[l_selectedShape],
 					 v.begin() + l_temp);
-				
 				for (unsigned int i = 0; i < _vectorDataZOrderBufferB.size(); ++i) {
 					v.push_back(_vectorDataZOrderBufferB[i]);
 				}
 					_vectorDataZOrderBufferB.clear();
 				
-	//			selectedShapes[l_selectedShape] = v.size();
+				l_selectedShapesNew.push_back(v.size());
 				
 				for (unsigned int i = 0; i < _vectorDataZOrderBufferA.size(); ++i) {
 					v.push_back(_vectorDataZOrderBufferA[i]);
@@ -3103,6 +3109,12 @@ bool KageStage::raiseSelectedShape() {
 					_vectorDataZOrderBufferC.clear();
 		}
 	}
+	if (l_selectedShapesNew.size() > 0) {
+		selectedShapes.clear();
+		for (unsigned int i = 0; i < l_selectedShapesNew.size(); ++i) {
+			selectedShapes.push_back(l_selectedShapesNew[i]);
+		}
+	}
 	
 	win->setFrameData(v);
 	
@@ -3112,67 +3124,86 @@ bool KageStage::raiseSelectedShape() {
 }
 
 bool KageStage::lowerSelectedShape() {
-	unsigned int l_temp = -1;
 	Kage::timestamp();
-	std::cout << " KageStage::lowerSelectedShape " << selectedShape << std::endl;
+	std::cout << " KageStage::lowerSelectedShape " << selectedShapes.size() << std::endl;
 	
-	if (selectedShape == _NO_SELECTION || selectedShape == 0) {
+	if (selectedShapes.size() == 0) {
 		return false;
 	}
 	
+	vector<unsigned int> l_selectedShapesOld;
+	vector<unsigned int> l_selectedShapesNew;
+	l_selectedShapesOld.clear();
+	l_selectedShapesNew.clear();
+	for (unsigned int i = 0; i < selectedShapes.size(); ++i) {
+		l_selectedShapesOld.push_back(selectedShapes[i]);
+	}
+	sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater <unsigned int>());
+	
 	vector<VectorData> v = win->getFrameData().getVectorData();
-	unsigned int vsize = v.size();
 	_vectorDataZOrderBufferA.clear();
 	_vectorDataZOrderBufferB.clear();
 	_vectorDataZOrderBufferC.clear();
-	l_temp = vsize;
-	for (unsigned int i = selectedShape; i < vsize; ++i) {
-		if (v[i].vectorType == VectorData::TYPE_INIT
-				&& i != selectedShape) {
-			for (i = i; i < vsize; ++i) {
-				_vectorDataZOrderBufferC.push_back(v[i]);
+	
+	for (unsigned int l_selectedShape = 0; l_selectedShape < l_selectedShapesOld.size(); ++l_selectedShape) {
+		unsigned int vsize = v.size();
+		unsigned int l_temp = vsize;
+		for (unsigned int i = l_selectedShapesOld[l_selectedShape]; i < vsize; ++i) {
+			if (v[i].vectorType == VectorData::TYPE_INIT
+					&& i != l_selectedShapesOld[l_selectedShape]) {
+				for (i = i; i < vsize; ++i) {
+					_vectorDataZOrderBufferC.push_back(v[i]);
+				}
+				l_temp = i;
+				break;
+			} else {
+				_vectorDataZOrderBufferA.push_back(v[i]);
 			}
-			l_temp = i;
-			break;
-		} else {
-			_vectorDataZOrderBufferA.push_back(v[i]);
+		}
+			for (unsigned int i = l_selectedShapesOld[l_selectedShape]-1; i >= 0 && i != UINT_MAX; --i) {
+				if (v[i].vectorType == VectorData::TYPE_INIT) {
+					unsigned int l_tempSelectedShape = i;
+					for (i = i; i < l_selectedShapesOld[l_selectedShape]; ++i) {
+						if (v[i].vectorType == VectorData::TYPE_INIT
+								&& i != l_tempSelectedShape) {
+							break;
+						} else {
+							_vectorDataZOrderBufferB.push_back(v[i]);
+						}
+					}
+					l_selectedShapesOld[l_selectedShape] = l_tempSelectedShape;
+					break;
+				}
+			}
+		
+		v.erase (v.begin() + l_selectedShapesOld[l_selectedShape],
+				 v.begin() + l_temp);
+			
+			l_selectedShapesOld[l_selectedShape] = v.size();
+			
+			l_selectedShapesNew.push_back(v.size());
+			
+			for (unsigned int i = 0; i < _vectorDataZOrderBufferA.size(); ++i) {
+				v.push_back(_vectorDataZOrderBufferA[i]);
+			}
+				_vectorDataZOrderBufferA.clear();
+			
+			for (unsigned int i = 0; i < _vectorDataZOrderBufferB.size(); ++i) {
+				v.push_back(_vectorDataZOrderBufferB[i]);
+			}
+				_vectorDataZOrderBufferB.clear();
+			
+			for (unsigned int i = 0; i < _vectorDataZOrderBufferC.size(); ++i) {
+				v.push_back(_vectorDataZOrderBufferC[i]);
+			}
+				_vectorDataZOrderBufferC.clear();
+	}
+	if (l_selectedShapesNew.size() > 0) {
+		selectedShapes.clear();
+		for (unsigned int i = 0; i < l_selectedShapesNew.size(); ++i) {
+			selectedShapes.push_back(l_selectedShapesNew[i]);
 		}
 	}
-		for (unsigned int i = selectedShape-1; i >= 0 && i != UINT_MAX; --i) {
-			if (v[i].vectorType == VectorData::TYPE_INIT) {
-				unsigned int l_tempSelectedShape = i;
-				for (i = i; i < selectedShape; ++i) {
-					if (v[i].vectorType == VectorData::TYPE_INIT
-							&& i != l_tempSelectedShape) {
-						break;
-					} else {
-						_vectorDataZOrderBufferB.push_back(v[i]);
-					}
-				}
-				selectedShape = l_tempSelectedShape;
-				break;
-			}
-		}
-	
-	v.erase (v.begin() + selectedShape,
-			 v.begin() + l_temp);
-		
-		selectedShape = v.size();
-		
-		for (unsigned int i = 0; i < _vectorDataZOrderBufferA.size(); ++i) {
-			v.push_back(_vectorDataZOrderBufferA[i]);
-		}
-			_vectorDataZOrderBufferA.clear();
-		
-		for (unsigned int i = 0; i < _vectorDataZOrderBufferB.size(); ++i) {
-			v.push_back(_vectorDataZOrderBufferB[i]);
-		}
-			_vectorDataZOrderBufferB.clear();
-		
-		for (unsigned int i = 0; i < _vectorDataZOrderBufferC.size(); ++i) {
-			v.push_back(_vectorDataZOrderBufferC[i]);
-		}
-			_vectorDataZOrderBufferC.clear();
 	
 	win->setFrameData(v);
 	
@@ -3194,12 +3225,25 @@ bool KageStage::raiseToTopSelectedShape() {
 	sort(selectedShapes.begin(), selectedShapes.end(), greater <unsigned int>());
 	
 	for (unsigned int l_selectedShape = 0; l_selectedShape < selectedShapes.size(); ++l_selectedShape) {
-		unsigned int l_temp = -1;
+		unsigned int l_temp = _NO_SELECTION;
 		unsigned int vsize = v.size();
 		_vectorDataZOrderBufferA.clear();
+		_vectorDataZOrderBufferB.clear();
+		_vectorDataZOrderBufferC.clear();
 		for (unsigned int i = selectedShapes[l_selectedShape]; i < vsize; ++i) {
 			if (v[i].vectorType == VectorData::TYPE_INIT
 					&& i != selectedShapes[l_selectedShape]) {
+				for (i = i; i < vsize; ++i) {
+					if (v[i].vectorType == VectorData::TYPE_INIT
+							&& isSelectedShape(i) == true) {
+						for (i = i; i < vsize; ++i) {
+							_vectorDataZOrderBufferC.push_back(v[i]);
+						}
+						break;
+					} else {
+						_vectorDataZOrderBufferB.push_back(v[i]);
+					}
+				}
 				l_temp = i;
 				break;
 			} else {
@@ -3213,19 +3257,28 @@ bool KageStage::raiseToTopSelectedShape() {
 		v.erase (v.begin() + selectedShapes[l_selectedShape],
 				 v.begin() + l_temp);
 			
-			selectedShapes[l_selectedShape] = v.size();
-			
-			if (l_selectedShape > 0) {
+/*			if (l_selectedShape > 0) {
 				for (unsigned int i = 0; i < l_selectedShape; --i) {
 					selectedShapes[i] -= _vectorDataZOrderBufferA.size();
 				}
+			}*/
+			
+			for (unsigned int i = 0; i < _vectorDataZOrderBufferB.size(); ++i) {
+				v.push_back(_vectorDataZOrderBufferB[i]);
 			}
+				_vectorDataZOrderBufferB.clear();
+			
+			selectedShapes[l_selectedShape] = v.size();
 			
 			for (unsigned int i = 0; i < _vectorDataZOrderBufferA.size(); ++i) {
 				v.push_back(_vectorDataZOrderBufferA[i]);
 			}
+				_vectorDataZOrderBufferA.clear();
 			
-			_vectorDataZOrderBufferA.clear();
+			for (unsigned int i = 0; i < _vectorDataZOrderBufferC.size(); ++i) {
+				v.push_back(_vectorDataZOrderBufferC[i]);
+			}
+				_vectorDataZOrderBufferC.clear();
 	}
 	
 	win->setFrameData(v);
@@ -3236,7 +3289,6 @@ bool KageStage::raiseToTopSelectedShape() {
 }
 
 bool KageStage::lowerToBottomSelectedShape() {
-	unsigned int l_temp = -1;
 	Kage::timestamp();
 	std::cout << " KageStage::lowerToBottomSelectedShape " << selectedShapes.size() << std::endl;
 	
@@ -3251,7 +3303,7 @@ bool KageStage::lowerToBottomSelectedShape() {
 	_vectorDataZOrderBufferA.clear();
 	for (unsigned int l_selectedShape = 0; l_selectedShape < selectedShapes.size(); ++l_selectedShape) {
 		unsigned int vsize = v.size();
-		l_temp = vsize;
+		unsigned int l_temp = vsize;
 		for (unsigned int i = selectedShapes[l_selectedShape]; i < vsize; ++i) {
 			if (v[i].vectorType == VectorData::TYPE_INIT
 					&& i != selectedShapes[l_selectedShape]) {

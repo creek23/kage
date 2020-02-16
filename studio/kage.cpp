@@ -795,6 +795,7 @@ void Kage::Delete_onClick() {
 		Kage::timestamp();
 		std::cout << " Kage::Delete_onClick SHAPE" << std::endl;
 		if (m_KageStage.deleteSelectedShapes() == true) {
+			stackDo();
 			forceRenderFrames();
 		}
 	} else if (KageStage::toolMode == KageStage::MODE_NODE) {

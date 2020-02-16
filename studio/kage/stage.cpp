@@ -2714,14 +2714,17 @@ bool KageStage::copySelectedShapes() {
 		return false;
 	}
 	
+	vector<unsigned int> l_selectedShapesOld(selectedShapes);
+		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end());
+	
 	vector<VectorData> v = win->getFrameData().getVectorData();
 	unsigned int vsize = v.size();
 	_vectorDataCopyBuffer.clear();
-	unsigned int l_selectedShapes_size = selectedShapes.size();
+	unsigned int l_selectedShapes_size = l_selectedShapesOld.size();
 	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
-		for (unsigned int i = selectedShapes[l_shapeIndex]; i < vsize; ++i) {
+		for (unsigned int i = l_selectedShapesOld[l_shapeIndex]; i < vsize; ++i) {
 			if (v[i].vectorType == VectorData::TYPE_INIT
-					&& i != selectedShapes[l_shapeIndex]) {
+					&& i != l_selectedShapesOld[l_shapeIndex]) {
 				break;
 			} else {
 				_vectorDataCopyBuffer.push_back(v[i]);
@@ -2895,42 +2898,36 @@ bool KageStage::pasteSelectedShapes() {
 }
 
 bool KageStage::deleteSelectedShapes() {
-	unsigned int l_temp = -1;
+	unsigned int l_selectedShapes_size = selectedShapes.size();
 	Kage::timestamp();
-	std::cout << " KageStage::deleteSelectedShapes " << selectedShapes.size() << std::endl;
+	std::cout << " KageStage::deleteSelectedShapes " << l_selectedShapes_size << std::endl;
 	
-	if (selectedShapes.size() == 0) {
+	if (l_selectedShapes_size == 0) {
 		return false;
 	}
+	
+	vector<unsigned int> l_selectedShapesOld(selectedShapes);
+		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater  <unsigned int>());
 	
 	vector<VectorData> v = win->getFrameData().getVectorData();
 	
 	unsigned int vsize = v.size();
-	unsigned int l_selectedShapes_size = selectedShapes.size();
 	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
-		l_temp = vsize;
-		for (unsigned int i = selectedShapes[l_shapeIndex]; i < vsize; ++i) {
+		unsigned int l_temp = vsize;
+		for (unsigned int i = l_selectedShapesOld[l_shapeIndex]; i < vsize; ++i) {
 			if (v[i].vectorType == VectorData::TYPE_INIT
-					&& i != selectedShapes[l_shapeIndex]) {
+					&& i != l_selectedShapesOld[l_shapeIndex]) {
 				l_temp = i;
 				break;
 			}
 		}
 		
-		v.erase (v.begin() + selectedShapes[l_shapeIndex],
+		v.erase (v.begin() + l_selectedShapesOld[l_shapeIndex],
 				 v.begin() + l_temp);
-		
-		for (unsigned int i = l_shapeIndex+1; i < l_selectedShapes_size; ++i) {
-			if (l_temp != vsize && l_temp < selectedShapes[i]) {
-				selectedShapes[i] -= (l_temp-selectedShapes[l_shapeIndex]);
-			}
-		}
 	}
 	selectedShapes.clear();
 	
 	win->setFrameData(v);
-	
-	win->stackDo();
 	
 	return true;
 }
@@ -3036,6 +3033,17 @@ bool KageStage::deleteSelectedNode(unsigned int p_index) {
 	return true;
 }
 
+/** Multiple selected Shapes can be raised one step above its z-ordering by
+ *  splicing the VectorData array into group of four.
+ *  1.) Whatever shape is behind the selected Shape
+ *  2.) The selected Shape itself
+ *  3.) The one directly infront of the selected Shape
+ *  4.) All others infront of selected Shape less the one infront of it
+ * These four groups will be merged back to one in this exact order:
+ *  1 + 3 + 2 + 4
+  \return True if it successfully lowered back selected Shape
+  \sa lowerSelectedShape(), raiseToTopSelectedShape() and lowerToBottomSelectedShape()
+*/
 bool KageStage::raiseSelectedShape() {
 	Kage::timestamp();
 	std::cout << " KageStage::raiseSelectedShape " << selectedShapes.size() << std::endl;
@@ -3044,14 +3052,10 @@ bool KageStage::raiseSelectedShape() {
 		return false;
 	}
 	
-	vector<unsigned int> l_selectedShapesOld;
+	vector<unsigned int> l_selectedShapesOld(selectedShapes);
+		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater <unsigned int>());
 	vector<unsigned int> l_selectedShapesNew;
-	l_selectedShapesOld.clear();
-	l_selectedShapesNew.clear();
-	for (unsigned int i = 0; i < selectedShapes.size(); ++i) {
-		l_selectedShapesOld.push_back(selectedShapes[i]);
-	}
-	sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater <unsigned int>());
+		l_selectedShapesNew.clear();
 	
 	vector<VectorData> v = win->getFrameData().getVectorData();
 	_vectorDataZOrderBufferA.clear();
@@ -3123,6 +3127,17 @@ bool KageStage::raiseSelectedShape() {
 	return true;
 }
 
+/** Multiple selected Shapes can be lowered one step below its z-ordering by
+ *  splicing the VectorData array into group of four.
+ *  1.) Whatever shape is behind the selected Shape less the one behind selected Shape
+ *  2.) The one behind the selected Shape
+ *  3.) The selected Shape itself
+ *  4.) All others infront of selected Shape
+ * These four groups will be merged back to one in this exact order:
+ *  1 + 3 + 2 + 4
+  \return True if it successfully lowered back selected Shape
+  \sa raiseSelectedShape(), raiseToTopSelectedShape() and lowerToBottomSelectedShape()
+*/
 bool KageStage::lowerSelectedShape() {
 	Kage::timestamp();
 	std::cout << " KageStage::lowerSelectedShape " << selectedShapes.size() << std::endl;
@@ -3131,14 +3146,10 @@ bool KageStage::lowerSelectedShape() {
 		return false;
 	}
 	
-	vector<unsigned int> l_selectedShapesOld;
+	vector<unsigned int> l_selectedShapesOld(selectedShapes);
+		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater <unsigned int>());
 	vector<unsigned int> l_selectedShapesNew;
-	l_selectedShapesOld.clear();
-	l_selectedShapesNew.clear();
-	for (unsigned int i = 0; i < selectedShapes.size(); ++i) {
-		l_selectedShapesOld.push_back(selectedShapes[i]);
-	}
-	sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater <unsigned int>());
+		l_selectedShapesNew.clear();
 	
 	vector<VectorData> v = win->getFrameData().getVectorData();
 	_vectorDataZOrderBufferA.clear();
@@ -3212,6 +3223,13 @@ bool KageStage::lowerSelectedShape() {
 	return true;
 }
 
+/** To move selected item to the top of z-ordering,<br/>
+ *  1. Copy selected shapes to Buffer<br/>
+ *  2. Delete selected shapes<br/>
+ *  3. Paste Buffer<br/>
+ *  \return True if it successfully raised selected Shape on top of z-ordering
+ *  \sa raiseSelectedShape(), lowerSelectedShape() and lowerToBottomSelectedShape()
+ */
 bool KageStage::raiseToTopSelectedShape() {
 	Kage::timestamp();
 	std::cout << " KageStage::raiseToTopSelectedShape " << selectedShapes.size() << std::endl;
@@ -3220,74 +3238,25 @@ bool KageStage::raiseToTopSelectedShape() {
 		return false;
 	}
 	
-	vector<VectorData> v = win->getFrameData().getVectorData();
-	
-	sort(selectedShapes.begin(), selectedShapes.end(), greater <unsigned int>());
-	
-	for (unsigned int l_selectedShape = 0; l_selectedShape < selectedShapes.size(); ++l_selectedShape) {
-		unsigned int l_temp = _NO_SELECTION;
-		unsigned int vsize = v.size();
-		_vectorDataZOrderBufferA.clear();
-		_vectorDataZOrderBufferB.clear();
-		_vectorDataZOrderBufferC.clear();
-		for (unsigned int i = selectedShapes[l_selectedShape]; i < vsize; ++i) {
-			if (v[i].vectorType == VectorData::TYPE_INIT
-					&& i != selectedShapes[l_selectedShape]) {
-				for (i = i; i < vsize; ++i) {
-					if (v[i].vectorType == VectorData::TYPE_INIT
-							&& isSelectedShape(i) == true) {
-						for (i = i; i < vsize; ++i) {
-							_vectorDataZOrderBufferC.push_back(v[i]);
-						}
-						break;
-					} else {
-						_vectorDataZOrderBufferB.push_back(v[i]);
-					}
-				}
-				l_temp = i;
-				break;
-			} else {
-				_vectorDataZOrderBufferA.push_back(v[i]);
+	if (copySelectedShapes() == true) {
+		if (deleteSelectedShapes() == true) {
+			if (pasteSelectedShapes() == true) {
+				return true;
 			}
 		}
-		if (l_temp == _NO_SELECTION) {
-			_vectorDataZOrderBufferA.clear();
-			return false;
-		}
-		v.erase (v.begin() + selectedShapes[l_selectedShape],
-				 v.begin() + l_temp);
-			
-/*			if (l_selectedShape > 0) {
-				for (unsigned int i = 0; i < l_selectedShape; --i) {
-					selectedShapes[i] -= _vectorDataZOrderBufferA.size();
-				}
-			}*/
-			
-			for (unsigned int i = 0; i < _vectorDataZOrderBufferB.size(); ++i) {
-				v.push_back(_vectorDataZOrderBufferB[i]);
-			}
-				_vectorDataZOrderBufferB.clear();
-			
-			selectedShapes[l_selectedShape] = v.size();
-			
-			for (unsigned int i = 0; i < _vectorDataZOrderBufferA.size(); ++i) {
-				v.push_back(_vectorDataZOrderBufferA[i]);
-			}
-				_vectorDataZOrderBufferA.clear();
-			
-			for (unsigned int i = 0; i < _vectorDataZOrderBufferC.size(); ++i) {
-				v.push_back(_vectorDataZOrderBufferC[i]);
-			}
-				_vectorDataZOrderBufferC.clear();
 	}
-	
-	win->setFrameData(v);
-	
-	win->stackDo();
-	
-	return true;
+	return false;
 }
 
+/** To move selected item to the bottom of z-ordering,<br/>
+ *  1. Copy selected shapes to Buffer<br/>
+ *  2. Delete selected shapes<br/>
+ *  3. Append remaining shapes to Buffer<br/>
+ *  4. Delete all remaining shapes<br/>
+ *  5. Paste Buffer
+ *  \return True if it successfully lowered selected Shape to bottom of z-ordering
+ *  \sa raiseSelectedShape(), lowerSelectedShape() and raiseToTopSelectedShape()
+ */
 bool KageStage::lowerToBottomSelectedShape() {
 	Kage::timestamp();
 	std::cout << " KageStage::lowerToBottomSelectedShape " << selectedShapes.size() << std::endl;
@@ -3296,47 +3265,29 @@ bool KageStage::lowerToBottomSelectedShape() {
 		return false;
 	}
 	
-	vector<VectorData> v = win->getFrameData().getVectorData();
-	
-	sort(selectedShapes.begin(), selectedShapes.end(), greater <unsigned int>());
-	
-	_vectorDataZOrderBufferA.clear();
-	for (unsigned int l_selectedShape = 0; l_selectedShape < selectedShapes.size(); ++l_selectedShape) {
-		unsigned int vsize = v.size();
-		unsigned int l_temp = vsize;
-		for (unsigned int i = selectedShapes[l_selectedShape]; i < vsize; ++i) {
-			if (v[i].vectorType == VectorData::TYPE_INIT
-					&& i != selectedShapes[l_selectedShape]) {
-				l_temp = i;
-				break;
-			} else {
-				_vectorDataZOrderBufferA.push_back(v[i]);
+	if (copySelectedShapes() == true) {
+		if (deleteSelectedShapes() == true) {
+			selectedNodes.clear();
+			for (unsigned int i = 0; i < _vectorDataCopyBuffer.size(); ++i) {
+				if (_vectorDataCopyBuffer[i].vectorType == VectorData::TYPE_INIT) {
+					selectedNodes.push_back(i);
+				}
 			}
+			vector<VectorData> v = win->getFrameData().getVectorData();
+				for (unsigned int i = 0; i < v.size(); ++i) {
+					_vectorDataCopyBuffer.push_back(v[i]);
+				}
+			win->setFrameData(_vectorDataCopyBuffer);
+			
+			win->stackDo();
+			
+			tryMultiSelectShapes_populateShapes();
+			
+			_vectorDataCopyBuffer.clear();
+			return true;
 		}
-		
-		v.erase (v.begin() + selectedShapes[l_selectedShape],
-				 v.begin() + l_temp);
-		
-		if (l_selectedShape > 0) {
-			for (unsigned int i = 0; i < l_selectedShape; ++i) {
-				selectedShapes[i] += (l_temp - selectedShapes[l_selectedShape]);
-			}
-		}
-		
-		selectedShapes[l_selectedShape] = 0;
 	}
-	
-	for (unsigned int i = 0; i < v.size(); ++i) {
-		_vectorDataZOrderBufferA.push_back(v[i]);
-	}
-	
-	win->setFrameData(_vectorDataZOrderBufferA);
-	
-	win->stackDo();
-	
-		_vectorDataZOrderBufferA.clear();
-	
-	return true;
+	return false;
 }
 
 void KageStage::handleFill() {

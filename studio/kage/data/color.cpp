@@ -32,10 +32,10 @@ ColorData ColorData::clone() {
 }
 
 bool ColorData::equalTo(ColorData p_color) {
-	return (getR() != p_color.getR()
-				|| getG() != p_color.getG()
-				|| getB() != p_color.getB()
-				|| getA() != p_color.getA());
+	return (getR() == p_color.getR()
+				&& getG() == p_color.getG()
+				&& getB() == p_color.getB()
+				&& getA() == p_color.getA());
 }
 
 void ColorData::copy(ColorData p_color) {

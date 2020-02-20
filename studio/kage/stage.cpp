@@ -403,8 +403,7 @@ vector<VectorData> KageStage::applyZoom(vector<VectorData> v) {
 	return v;
 }
 void KageStage::applyZoom() {
-	vector<VectorData> v = win->getFrameData().getVectorData();
-	
+		
 	PointData __stageArea(stageWidth  + origin.x, stageHeight  + origin.y);
 	__stageArea = applyZoomRatio(__stageArea);
 	
@@ -413,33 +412,50 @@ void KageStage::applyZoom() {
 		__stageArea.x -= __origin.x;
 		__stageArea.y -= __origin.y;
 	
-	win->stackDoZoom(origin, __origin, _zoomReference, _zoomRatio);
+		win->stackDoZoom(origin, __origin, _zoomReference, _zoomRatio);
 	
-	for (unsigned int i = 0; i < v.size(); ++i) {
-		if (v[i].vectorType == VectorData::TYPE_MOVE
-				|| v[i].vectorType == VectorData::TYPE_LINE) {
-			v[i].points[0].x += origin.x;
-			v[i].points[0].y += origin.y;
-				v[i].points[0] = applyZoomRatio(v[i].points[0]);
-			v[i].points[0].x -= __origin.x;
-			v[i].points[0].y -= __origin.y;
-		} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
-				|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
-			for (unsigned int j = 0; j < 3; ++j) {
-				v[i].points[j].x += origin.x;
-				v[i].points[j].y += origin.y;
-					v[i].points[j] = applyZoomRatio(v[i].points[j]);
-				v[i].points[j].x -= __origin.x;
-				v[i].points[j].y -= __origin.y;
+	unsigned int l_currentFrame = win->m_KageFramesManager.getCurrentFrame();
+	unsigned int l_currentLayer = win->m_KageFramesManager.getCurrentLayer();
+	
+	for (unsigned int l_frame = 1; l_frame <= win->m_KageFramesManager.frameCount(); ++l_frame) {
+		win->m_KageFramesManager.setCurrentFrame(l_frame);
+		
+		for (unsigned int l_layer = 1; l_layer <= win->m_KageFramesManager.layerCount(); ++l_layer) {
+			win->m_KageFramesManager.setCurrentLayer(l_layer);
+			
+			vector<VectorData> v = win->getFrameData().getVectorData();
+			
+			
+			for (unsigned int i = 0; i < v.size(); ++i) {
+				if (v[i].vectorType == VectorData::TYPE_MOVE
+						|| v[i].vectorType == VectorData::TYPE_LINE) {
+					v[i].points[0].x += origin.x;
+					v[i].points[0].y += origin.y;
+						v[i].points[0] = applyZoomRatio(v[i].points[0]);
+					v[i].points[0].x -= __origin.x;
+					v[i].points[0].y -= __origin.y;
+				} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
+						|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
+					for (unsigned int j = 0; j < 3; ++j) {
+						v[i].points[j].x += origin.x;
+						v[i].points[j].y += origin.y;
+							v[i].points[j] = applyZoomRatio(v[i].points[j]);
+						v[i].points[j].x -= __origin.x;
+						v[i].points[j].y -= __origin.y;
+					}
+				}
 			}
+			
+			win->setFrameData(v);
 		}
 	}
+	win->m_KageFramesManager.setCurrentFrame(l_currentFrame);
+	win->m_KageFramesManager.setCurrentLayer(l_currentLayer);
 	
 	origin = __origin.clone();
 	stageWidth  = __stageArea.x;
 	stageHeight = __stageArea.y;
 	
-	win->setFrameData(v);
 }
 
 void KageStage::setStageBG(Gdk::Color p_c) {

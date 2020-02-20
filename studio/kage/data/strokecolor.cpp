@@ -2,17 +2,15 @@
 #include "strokecolor.h"
 
 StrokeColorData::StrokeColorData() {
-	//
+	thickness = 0;
 }
 
-StrokeColorData::StrokeColorData(unsigned int p_r, unsigned int p_g, unsigned int p_b) :
-	ColorData(p_r, p_g, p_b) {
-	//
+StrokeColorData::StrokeColorData(unsigned int p_r, unsigned int p_g, unsigned int p_b) : ColorData(p_r, p_g, p_b) {
+	thickness = 0;
 }
 
-StrokeColorData::StrokeColorData(unsigned int p_r, unsigned int p_g, unsigned int p_b, unsigned int p_a) :
-	ColorData(p_r, p_g, p_b, p_a) {
-	//
+StrokeColorData::StrokeColorData(unsigned int p_r, unsigned int p_g, unsigned int p_b, unsigned int p_a) : ColorData(p_r, p_g, p_b, p_a) {
+	thickness = 0;
 }
 
 StrokeColorData StrokeColorData::clone() {

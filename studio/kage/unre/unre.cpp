@@ -24,6 +24,7 @@ void UnRe::stackDo(unsigned int p_layer, unsigned int p_frame, vector<VectorData
 	}
 	
 	_undoStack.push_back(p_kageDo.clone());
+	cout << "UNDO SIZE: " << _undoStack.size() << endl;
 	
 	++_stackIndex;
 }

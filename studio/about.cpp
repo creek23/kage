@@ -5,7 +5,7 @@ AboutDialog::AboutDialog(Gtk::Window& parent)
 		: Gtk::Dialog("About Kage Studio", parent, true),
 		m_HBox(false, 8),
 		m_Table(2, 2, false),
-		m_Label1("Kage Studio v0.2.200216", true),
+		m_Label1("Kage Studio v0.2.200220", true),
 		m_Label2("A Simple Free and Open Source 2D Animation Software.\n\nhttp://konsolscript.sourceforge.net\nCopyright 2020 Mj Mendoza IV <mj.mendoza.iv@gmail.com>\nAll Rights Reversed", true),
 		m_Image(Gtk::Stock::DIALOG_INFO, Gtk::ICON_SIZE_DIALOG) {
 	add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);

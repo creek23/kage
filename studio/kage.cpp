@@ -1969,10 +1969,16 @@ string Kage::dumpFrame(bool bKS) {
 	unsigned int vsize = v.size();//-1;
 	unsigned int fillCtr = 0;
 	ColorData fcolor;
+	ColorData fcolorPrev(0, 0, 0);
 	StrokeColorData scolor;
-	StrokeColorData scolorPrev;
+	StrokeColorData scolorPrev(0, 0, 0);
+		scolorPrev.setThickness(0);
 	PointData p;
-	bool doStroke = false;
+	bool l_donePrevFColor = false;
+	bool l_initPrevFColor = false;
+	bool l_donePrevSColor = false;
+	bool l_initPrevSColor = false;
+	bool l_donePrevLine = false;
 	for (unsigned int i = 0; i < vsize; ++i) {
 		switch (v[i].vectorType) {
 			case VectorData::TYPE_CLOSE_PATH:
@@ -1987,6 +1993,7 @@ string Kage::dumpFrame(bool bKS) {
 				} else {
 					l_ostringstream << "\nscreen.beginPath();\n";
 				}
+				l_donePrevFColor = false;
 				fillCtr++;
 				break;
 			case VectorData::TYPE_ENDFILL:
@@ -1994,29 +2001,37 @@ string Kage::dumpFrame(bool bKS) {
 					if (bKS == true) {
 						l_ostringstream << "Draw:EndFill(screen)\n";
 					} else {
-						if (fcolor.getA() == 255) {
-							l_ostringstream << "screen.fillStyle = '#" << int255ToHex(fcolor.getR()) << int255ToHex(fcolor.getG()) << int255ToHex(fcolor.getB()) << "';\n";
-						} else {
-							l_ostringstream << "screen.fillStyle = 'rgba(" << fcolor.getR() << "," << fcolor.getG() << "," << fcolor.getB() << "," << (fcolor.getA()/255.0f) << ")';\n";
+						if (l_initPrevFColor == false || fcolorPrev.equalTo(fcolor) == false && l_donePrevFColor == false) {
+							if (fcolor.getA() == 255) {
+								l_ostringstream << "screen.fillStyle = '#" << int255ToHex(fcolor.getR()) << int255ToHex(fcolor.getG()) << int255ToHex(fcolor.getB()) << "';\n";
+							} else {
+								l_ostringstream << "screen.fillStyle = 'rgba(" << fcolor.getR() << "," << fcolor.getG() << "," << fcolor.getB() << "," << (fcolor.getA()/255.0f) << ")';\n";
+							}
+							l_donePrevFColor = true;
+							l_initPrevFColor = true;
 						}
 						l_ostringstream << "screen.fill();\n";
+						fcolorPrev = fcolor.clone();
 					}
 				}
 					if (scolor.getThickness() > 0) {
-						if (bKS == false && doStroke == true) {
-							if (!scolorPrev.equalTo(scolor) || scolorPrev.getThickness() != scolor.getThickness()) {
+						if (bKS == false) {
+							if (l_initPrevSColor == false || scolorPrev.equalTo(scolor) == false && l_donePrevSColor == false) {
 								if (scolor.getA() == 255) {
 									l_ostringstream << "screen.strokeStyle = '#" << int255ToHex(scolor.getR()) << int255ToHex(scolor.getG()) << int255ToHex(scolor.getB()) << "';\n";
 								} else {
 									l_ostringstream << "screen.strokeStyle = 'rgba(" << scolor.getR() << "," << scolor.getG() << "," << scolor.getB() << "," << (scolor.getA()/255.0f) << ")';\n";
 								}
+								l_donePrevSColor = true;
+								l_initPrevSColor = true;
+							}
+							if (scolorPrev.getThickness() != scolor.getThickness() && l_donePrevLine == false) {
 								l_ostringstream << "screen.lineWidth = " << scolor.getThickness() << ";\n";
 								l_ostringstream << "screen.lineCap = 'round';\n";
-								
-								scolorPrev = scolor.clone();
+								l_donePrevLine = true;
 							}
 							l_ostringstream << "screen.stroke();\n";
-							doStroke = false;
+							scolorPrev = scolor.clone();
 						}
 					}
 				if (fillCtr > 0) {
@@ -2024,15 +2039,15 @@ string Kage::dumpFrame(bool bKS) {
 				}
 				break;
 			case VectorData::TYPE_STROKE:
-				scolor = v[i].stroke;
+				scolor = v[i].stroke.clone();
 				if (bKS == true) {
 					l_ostringstream << "Draw:LineStyle(" << scolor.getThickness() << ", 0x" << int255ToHex(scolor.getR()) << int255ToHex(scolor.getG()) << int255ToHex(scolor.getB()) << ", " << scolor.getA() << ", screen)\n";
 				} else {
-					if (!scolorPrev.equalTo(scolor) || scolorPrev.getThickness() != scolor.getThickness()) {
-//						l_ostringstream << "screen.beginPath();\n";
-						doStroke = true;
-						
-						scolorPrev = scolor.clone();
+					if (scolorPrev.equalTo(scolor) == false) {
+						l_donePrevSColor = false;
+					}
+					if (scolorPrev.getThickness() != scolor.getThickness()) {
+						l_donePrevLine = false;
 					}
 				}
 				break;

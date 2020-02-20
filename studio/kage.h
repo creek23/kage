@@ -61,6 +61,9 @@
 			string int255ToHex(unsigned int p);
 			char int15ToHex(unsigned int p);
 			
+			KageLayerManager m_KageLayerManager;
+			KageFramesManager m_KageFramesManager;
+			
 		protected:
 			enum color {
 				COLOR_RED,
@@ -114,8 +117,6 @@
 			
 			
 			//Member widgets:
-			KageLayerManager m_KageLayerManager;
-			KageFramesManager m_KageFramesManager;
 			Gtk::VBox m_VBoxRoot;
 			Gtk::HBox m_HBoxToolbar;
 			Gtk::VBox m_VBoxTimelineLayer;

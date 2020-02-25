@@ -147,6 +147,7 @@ void KageFramesManager::setCurrentFrame(unsigned int p_currentFrame) {
 		}
 		
 		KageFramesManager::currentFrame = p_currentFrame;
+		win->updateFrameLabel();
 		win->forceRenderFrames();
 	}
 }

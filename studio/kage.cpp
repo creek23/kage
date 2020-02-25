@@ -209,6 +209,16 @@ Kage::Kage() : m_KageLayerManager(),
 		Gtk::AccelKey("End"),
 		sigc::mem_fun(*this, &Kage::LowerToBottom_onClick)
 	);
+	m_refActionGroup->add(
+		Gtk::Action::create("FlipHorizontal", "Flip _Vertical", "FlipHorizontal"),
+		Gtk::AccelKey("H"),
+		sigc::mem_fun(*this, &Kage::FlipHorizontal_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("FlipVertical", "Flip _Vertical", "FlipVertical"),
+		Gtk::AccelKey("V"),
+		sigc::mem_fun(*this, &Kage::FlipVertical_onClick)
+	);
 	////Add Toggle Actions:
 	//m_refActionGroup->add(
 		//Gtk::ToggleAction::create("Bold", Gtk::Stock::BOLD, "_Bold", "Bold", true /* is_active */),
@@ -258,7 +268,7 @@ Kage::Kage() : m_KageLayerManager(),
 	Gtk::RadioAction::Group group_tools;
 	m_refActionGroup->add(
 		Gtk::RadioAction::create(group_tools, "ToolSelect", "_Select", "Select Tool"),
-		Gtk::AccelKey("V"),
+		Gtk::AccelKey("S"),
 		sigc::mem_fun(*this, &Kage::ToolSelect_onClick)
 	);
 	m_refActionGroup->add(
@@ -374,6 +384,9 @@ Kage::Kage() : m_KageLayerManager(),
 		"			<menuitem action='Lower'/>"
 		"			<menuitem action='RaiseToTop'/>"
 		"			<menuitem action='LowerToBottom'/>"
+		"			<separator/>"
+		"			<menuitem action='FlipHorizontal'/>"
+		"			<menuitem action='FlipVertical'/>"
 		"		</menu>"
 		"		<menu action='TimelineMenu'>"
 		"			<menuitem action='Play'/>"
@@ -460,6 +473,9 @@ Kage::Kage() : m_KageLayerManager(),
 							m_Timeline_Del_Button.set_label("-");
 							m_Timeline_Del_Button.set_size_request(20, 20);
 							m_Timeline_Del_Button.signal_clicked().connect(sigc::mem_fun(*this, &Kage::LayerDel_onClick));
+						m_Timeline_Layer_Add_HBox.pack_start(m_Timeline_CurrentFrame, Gtk::PACK_SHRINK);
+							m_Timeline_CurrentFrame.set_label("L 1 F 1");
+							m_Timeline_CurrentFrame.set_size_request(20, 20);
 				m_Timeline_HPaned.add2(m_Timeline_Frame_VBox);
 					m_Timeline_Frame_VBox.pack_start(m_Timeline_Frame_ScrolledWindow);//, Gtk::PACK_SHRINK);
 						m_Timeline_Frame_ScrolledWindow.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_NEVER);
@@ -790,6 +806,24 @@ void Kage::LowerToBottom_onClick() {
 		}
 	}
 }
+void Kage::FlipHorizontal_onClick() {
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		Kage::timestamp();
+		std::cout << " Kage::FlipHorizontal_onClick" << std::endl;
+		if (m_KageStage.flipHorizontalSelectedShape() == true) {
+			forceRenderFrames();
+		}
+	}
+}
+void Kage::FlipVertical_onClick() {
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		Kage::timestamp();
+		std::cout << " Kage::FlipVertical_onClick" << std::endl;
+		if (m_KageStage.flipVerticalSelectedShape() == true) {
+			forceRenderFrames();
+		}
+	}
+}
 void Kage::Delete_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp();
@@ -837,6 +871,13 @@ void Kage::switchToNextFrame() {
 		m_KageFramesManager.setCurrentFrame(KageFramesManager::currentFrame + 1);
 		show_all();
 	}
+}
+
+/**
+ * Called by KageFramesManager::setCurrentFrame
+ */
+void Kage::updateFrameLabel() {
+	m_Timeline_CurrentFrame.set_label("L " + uintToString(KageFramesManager::currentLayer) + " F " + uintToString(KageFramesManager::currentFrame));
 }
 
 void Kage::LayerAdd_onClick() {
@@ -1549,6 +1590,30 @@ void Kage::ExportAVI_onClick() {
 						}
 						surface->write_to_png(l_pngSequencePath);
 					}
+					//workaround to FFMPEG-bug: see https://sourceforge.net/p/kage/tickets/25/
+						for (j = 1; j <= (m_KageStage.fps); ++j) {
+							m_KageFramesManager.setCurrentFrame(l_fMax);
+							
+							Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, m_KageStage.stageWidth, m_KageStage.stageHeight);
+							Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
+							
+								m_KageStage.clearScreen(l_context);
+								m_KageStage.renderFrame(l_context);
+							
+							if (l_fMax+j < 10) {
+								l_pngSequencePath = l_pngPath + "0000" + uintToString(l_fMax+j) + ".png";
+							} else if (l_fMax+j < 100) {
+								l_pngSequencePath = l_pngPath + "000" + uintToString(l_fMax+j) + ".png";
+							} else if (l_fMax+j < 1000) {
+								l_pngSequencePath = l_pngPath + "00" + uintToString(l_fMax+j) + ".png";
+							} else if (l_fMax+j < 10000) {
+								l_pngSequencePath = l_pngPath + "0" + uintToString(l_fMax+j) + ".png";
+							} else if (l_fMax+j < 100000) {
+								l_pngSequencePath = l_pngPath + uintToString(l_fMax+j) + ".png";
+							}
+							surface->write_to_png(l_pngSequencePath);
+						}
+					//end of workaround
 				KageFramesManager::currentFrame = f;
 				KageFramesManager::currentLayer = t;
 			
@@ -1557,10 +1622,10 @@ void Kage::ExportAVI_onClick() {
 			
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 			if (runExternal(".\\ffmpeg", "-framerate " + uintToString(m_KageStage.fps) + " -i \"" + l_pngPath + "%05d.png\" \"" + l_pngPath + ".avi\"")) {
-				if (runExternal("del", "/f " + l_pngPath + "*.png")) {
+				if (runExternal("del", "/f \"" + l_pngPath + "*.png\"")) {
 #else
 			if (runExternal("ffmpeg", "-framerate " + uintToString(m_KageStage.fps) + " -i '" + l_pngPath + "%05d.png' '" + l_pngPath + ".avi'")) {
-				if (runExternal("rm", "-f " + l_pngPath + "*.png")) {
+				if (runExternal("rm", "-f '" + l_pngPath + "*.png'")) {
 #endif
 					updateStatus("Exported to " + l_pngPath + ".avi");
 					return;

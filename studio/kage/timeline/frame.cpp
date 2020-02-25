@@ -33,10 +33,10 @@ KageFrame::~KageFrame() {
 bool KageFrame::on_key_press_event(GdkEventKey *e) {
 	Kage::timestamp();
 	std::cout << " KageFrame(F " << frameID << " L " << layerID << ") on_key_press_event" << std::endl;
-	if (e->keyval == 46) { //. dot
+	if (e->keyval == GDK_KEY_period) {
 		fm->getFsm()->setCurrentFrame(frameID+1);
 		fm->focusFrame(frameID+1);
-	} else if (e->keyval == 44) { //, comma
+	} else if (e->keyval == GDK_KEY_comma) {
 		fm->getFsm()->setCurrentFrame(frameID-1);
 		fm->focusFrame(frameID-1);
 	}

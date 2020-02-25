@@ -99,6 +99,8 @@
 			virtual void Lower_onClick();
 			virtual void RaiseToTop_onClick();
 			virtual void LowerToBottom_onClick();
+			virtual void FlipHorizontal_onClick();
+			virtual void FlipVertical_onClick();
 			virtual void AddFrame_onClick();
 			virtual void DuplicateFrame_onClick();
 //			virtual void New_onClick();
@@ -126,6 +128,7 @@
 			Gtk::Label m_Timeline_Label;
 			Gtk::Button m_Timeline_Add_Button;
 			Gtk::Button m_Timeline_Del_Button;
+			Gtk::Label m_Timeline_CurrentFrame;
 			Gtk::VBox m_Timeline_Frame_VBox;
 			Gtk::VBox m_VBoxTimelineFrame; //to be deleted
 			Gtk::ScrolledWindow m_Timeline_Layer_ScrolledWindow;
@@ -283,6 +286,7 @@
 			
 			void switchToPreviousFrame();
 			void switchToNextFrame();
+			void updateFrameLabel();
 			
 			void propStageSetVisible(bool p_visible);
 			void propFillStrokeSetVisible(bool p_visible);

@@ -2928,6 +2928,10 @@ bool KageStage::deleteSelectedShapes() {
 	vector<VectorData> v = win->getFrameData().getVectorData();
 	
 	unsigned int vsize = v.size();
+	if (vsize < l_selectedShapes_size) { //attempt to fix https://sourceforge.net/p/kage/tickets/15/
+		initNodeTool();
+		return false;
+	}
 	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
 		unsigned int l_temp = vsize;
 		for (unsigned int i = l_selectedShapesOld[l_shapeIndex]; i < vsize; ++i) {
@@ -3254,7 +3258,7 @@ bool KageStage::raiseToTopSelectedShape() {
 		return false;
 	}
 	
-	if (copySelectedShapes() == true) {
+	if (copySelectedShapes() == true) { ///avoid spoiling user's CopyBuffer, create a different copySelectedShape using different CopyBuffer
 		if (deleteSelectedShapes() == true) {
 			if (pasteSelectedShapes() == true) {
 				return true;
@@ -3281,7 +3285,7 @@ bool KageStage::lowerToBottomSelectedShape() {
 		return false;
 	}
 	
-	if (copySelectedShapes() == true) {
+	if (copySelectedShapes() == true) { ///avoid spoiling user's CopyBuffer, create a different copySelectedShape using different CopyBuffer
 		if (deleteSelectedShapes() == true) {
 			selectedNodes.clear();
 			for (unsigned int i = 0; i < _vectorDataCopyBuffer.size(); ++i) {
@@ -3304,6 +3308,186 @@ bool KageStage::lowerToBottomSelectedShape() {
 		}
 	}
 	return false;
+}
+
+bool KageStage::flipHorizontalSelectedShape() {
+	if (selectedShapes.size() == 0) {
+		return false;
+	}
+	
+	vector<unsigned int> l_selectedShapesOld(selectedShapes);
+		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater <unsigned int>());
+	
+	vector<VectorData> v = win->getFrameData().getVectorData();
+	
+	double l_leftPoint = DBL_MAX;
+	double l_rightPoint = DBL_MIN;
+	double l_midPoint = 0;
+	
+	/// 1. get left-most, right-most, mid-point
+	for (unsigned int l_selectedShape = 0; l_selectedShape < l_selectedShapesOld.size(); ++l_selectedShape) {
+		unsigned int vsize = v.size();
+		for (unsigned int i = l_selectedShapesOld[l_selectedShape]; i < vsize; ++i) {
+			if (v[i].vectorType == VectorData::TYPE_INIT
+					&& i != l_selectedShapesOld[l_selectedShape]) {
+				break;
+			} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
+					|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
+				if (v[i].points[0].x < l_leftPoint) {
+					l_leftPoint = v[i].points[0].x;
+				} else if (v[i].points[0].x > l_rightPoint) {
+					l_rightPoint = v[i].points[0].x;
+				}
+				if (v[i].points[1].x < l_leftPoint) {
+					l_leftPoint = v[i].points[1].x;
+				} else if (v[i].points[1].x > l_rightPoint) {
+					l_rightPoint = v[i].points[1].x;
+				}
+				if (v[i].points[2].x < l_leftPoint) {
+					l_leftPoint = v[i].points[2].x;
+				} else if (v[i].points[2].x > l_rightPoint) {
+					l_rightPoint = v[i].points[2].x;
+				}
+			} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
+				if (v[i].points[0].x < l_leftPoint) {
+					l_leftPoint = v[i].points[0].x;
+				} else if (v[i].points[0].x > l_rightPoint) {
+					l_rightPoint = v[i].points[0].x;
+				}
+			}
+		}
+	}
+	l_midPoint = (l_leftPoint + l_rightPoint) / 2;
+	
+	/// 2. loop among selected shapes' points and invert point against location in left-mid-right
+	for (unsigned int l_selectedShape = 0; l_selectedShape < l_selectedShapesOld.size(); ++l_selectedShape) {
+		unsigned int vsize = v.size();
+		for (unsigned int i = l_selectedShapesOld[l_selectedShape]; i < vsize; ++i) {
+			if (v[i].vectorType == VectorData::TYPE_INIT
+					&& i != l_selectedShapesOld[l_selectedShape]) {
+				break;
+			} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
+					|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
+				if (v[i].points[0].x < l_midPoint) {
+					v[i].points[0].x += ((l_midPoint-v[i].points[0].x) * 2);
+				} else if (v[i].points[0].x > l_midPoint) {
+					v[i].points[0].x -= ((v[i].points[0].x-l_midPoint) * 2);
+				}
+				if (v[i].points[1].x < l_midPoint) {
+					v[i].points[1].x += ((l_midPoint-v[i].points[1].x) * 2);
+				} else if (v[i].points[1].x > l_midPoint) {
+					v[i].points[1].x -= ((v[i].points[1].x-l_midPoint) * 2);
+				}
+				if (v[i].points[2].x < l_midPoint) {
+					v[i].points[2].x += ((l_midPoint-v[i].points[2].x) * 2);
+				} else if (v[i].points[2].x > l_midPoint) {
+					v[i].points[2].x -= ((v[i].points[2].x-l_midPoint) * 2);
+				}
+			} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
+				if (v[i].points[0].x < l_midPoint) {
+					v[i].points[0].x += ((l_midPoint-v[i].points[0].x) * 2);
+				} else if (v[i].points[0].x > l_midPoint) {
+					v[i].points[0].x -= ((v[i].points[0].x-l_midPoint) * 2);
+				}
+			}
+		}
+	}
+	
+	win->setFrameData(v);
+	
+	win->stackDo();
+	
+	return true;
+}
+
+bool KageStage::flipVerticalSelectedShape() {
+	if (selectedShapes.size() == 0) {
+		return false;
+	}
+	
+	vector<unsigned int> l_selectedShapesOld(selectedShapes);
+		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater <unsigned int>());
+	
+	vector<VectorData> v = win->getFrameData().getVectorData();
+	
+	double l_upperPoint = DBL_MAX;
+	double l_lowerPoint = DBL_MIN;
+	double l_midPoint = 0;
+	
+	/// 1. get upper-most, lower-most, mid-point
+	for (unsigned int l_selectedShape = 0; l_selectedShape < l_selectedShapesOld.size(); ++l_selectedShape) {
+		unsigned int vsize = v.size();
+		for (unsigned int i = l_selectedShapesOld[l_selectedShape]; i < vsize; ++i) {
+			if (v[i].vectorType == VectorData::TYPE_INIT
+					&& i != l_selectedShapesOld[l_selectedShape]) {
+				break;
+			} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
+					|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
+				if (v[i].points[0].y < l_upperPoint) {
+					l_upperPoint = v[i].points[0].y;
+				} else if (v[i].points[0].y > l_lowerPoint) {
+					l_lowerPoint = v[i].points[0].y;
+				}
+				if (v[i].points[1].y < l_upperPoint) {
+					l_upperPoint = v[i].points[1].y;
+				} else if (v[i].points[1].y > l_lowerPoint) {
+					l_lowerPoint = v[i].points[1].y;
+				}
+				if (v[i].points[2].y < l_upperPoint) {
+					l_upperPoint = v[i].points[2].y;
+				} else if (v[i].points[2].y > l_lowerPoint) {
+					l_lowerPoint = v[i].points[2].y;
+				}
+			} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
+				if (v[i].points[0].y < l_upperPoint) {
+					l_upperPoint = v[i].points[0].y;
+				} else if (v[i].points[0].y > l_lowerPoint) {
+					l_lowerPoint = v[i].points[0].y;
+				}
+			}
+		}
+	}
+	l_midPoint = (l_upperPoint + l_lowerPoint) / 2;
+	
+	/// 2. loop among selected shapes' points and invert point against location in upper-mid-lower
+	for (unsigned int l_selectedShape = 0; l_selectedShape < l_selectedShapesOld.size(); ++l_selectedShape) {
+		unsigned int vsize = v.size();
+		for (unsigned int i = l_selectedShapesOld[l_selectedShape]; i < vsize; ++i) {
+			if (v[i].vectorType == VectorData::TYPE_INIT
+					&& i != l_selectedShapesOld[l_selectedShape]) {
+				break;
+			} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
+					|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
+				if (v[i].points[0].y < l_midPoint) {
+					v[i].points[0].y += ((l_midPoint-v[i].points[0].y) * 2);
+				} else if (v[i].points[0].y > l_midPoint) {
+					v[i].points[0].y -= ((v[i].points[0].y-l_midPoint) * 2);
+				}
+				if (v[i].points[1].y < l_midPoint) {
+					v[i].points[1].y += ((l_midPoint-v[i].points[1].y) * 2);
+				} else if (v[i].points[1].y > l_midPoint) {
+					v[i].points[1].y -= ((v[i].points[1].y-l_midPoint) * 2);
+				}
+				if (v[i].points[2].y < l_midPoint) {
+					v[i].points[2].y += ((l_midPoint-v[i].points[2].y) * 2);
+				} else if (v[i].points[2].y > l_midPoint) {
+					v[i].points[2].y -= ((v[i].points[2].y-l_midPoint) * 2);
+				}
+			} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
+				if (v[i].points[0].y < l_midPoint) {
+					v[i].points[0].y += ((l_midPoint-v[i].points[0].y) * 2);
+				} else if (v[i].points[0].y > l_midPoint) {
+					v[i].points[0].y -= ((v[i].points[0].y-l_midPoint) * 2);
+				}
+			}
+		}
+	}
+	
+	win->setFrameData(v);
+	
+	win->stackDo();
+	
+	return true;
 }
 
 void KageStage::handleFill() {

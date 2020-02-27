@@ -56,6 +56,7 @@ Kage::Kage() : m_KageLayerManager(),
 			   m_LabelHeight("Height"),
 			   m_LabelNodeX("X"),
 			   m_LabelNodeY("Y"),
+			   m_LabelToggleLine("Straighten"),
 			   m_LblHolder_Toolbar("Toolbar"),
 			   m_KageStage(this),
 			   _undoRedoManager() {
@@ -127,11 +128,6 @@ Kage::Kage() : m_KageLayerManager(),
 	m_refActionGroup->add(
 		Gtk::Action::create("Quit", Gtk::Stock::QUIT, "_Quit", "Quit"),
 		sigc::mem_fun(*this, &Kage::onButtonClick)
-	);
-	//TODO: This StockID does not seem to be registered in the C version either, but it is in appwindow.c:
-	m_refActionGroup->add(
-		Gtk::Action::create("Logo", Gtk::StockID("demo-gtk-logo"), "", "GTK+"),
-		sigc::mem_fun(*this, &Kage::onActionActivate)
 	);
 	
 	m_refActionGroup->add(
@@ -637,6 +633,7 @@ Kage::Kage() : m_KageLayerManager(),
 					m_propNodeXYV1.set_spacing(4);
 					m_propNodeXYV1.pack_start(m_LabelNodeX);
 					m_propNodeXYV1.pack_start(m_LabelNodeY);
+					m_propNodeXYV1.pack_start(m_LabelToggleLine);
 				m_propNodeXY.pack_start(m_propNodeXYV2);
 					m_propNodeXYV2.set_border_width(4);
 					m_propNodeXYV2.set_spacing(4);
@@ -654,6 +651,10 @@ Kage::Kage() : m_KageLayerManager(),
 						m_EntryNodeY.set_text(doubleToString(m_KageStage.nodeY));
 						m_EntryNodeY.signal_activate().connect(
 							sigc::mem_fun(*this, &Kage::EntryNodeY_onEnter));
+					m_propNodeXYV2.pack_start(m_ToggleLine, Gtk::PACK_SHRINK);
+						m_ToggleLine.add_pixlabel("shared/icons/straighten.png","");
+						m_ToggleLine.set_focus_on_click(false);
+						m_ToggleLine.signal_clicked().connect(sigc::mem_fun(*this, &Kage::ToggleLine_onClick));
 	
 	New_onClick();
 }
@@ -950,7 +951,7 @@ void Kage::ToolNode_onClick() {
 	propStageSetVisible(false);
 	propFillStrokeSetVisible(false);
 	propLocationSizeSetVisible(false);
-	propNodeXYSetVisible(false);
+	propNodeXYSetVisible(true);
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
 	KageStage::toolMode = KageStage::MODE_NODE;
@@ -1621,10 +1622,10 @@ void Kage::ExportAVI_onClick() {
 				m_KageStage.origin.y = l_tempOrigin.y;
 			
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-			if (runExternal(".\\ffmpeg", "-framerate " + uintToString(m_KageStage.fps) + " -i \"" + l_pngPath + "%05d.png\" \"" + l_pngPath + ".avi\"")) {
+			if (runExternal(".\\ffmpeg", "-framerate " + uintToString(m_KageStage.fps) + " -i \"" + l_pngPath + "%05d.png\" -b:v 2048k \"" + l_pngPath + ".avi\"")) {
 				if (runExternal("del", "/f \"" + l_pngPath + "*.png\"")) {
 #else
-			if (runExternal("ffmpeg", "-framerate " + uintToString(m_KageStage.fps) + " -i '" + l_pngPath + "%05d.png' '" + l_pngPath + ".avi'")) {
+			if (runExternal("ffmpeg", "-framerate " + uintToString(m_KageStage.fps) + " -i '" + l_pngPath + "%05d.png' -b:v 2048k '" + l_pngPath + ".avi'")) {
 				if (runExternal("rm", "-f '" + l_pngPath + "*.png'")) {
 #endif
 					updateStatus("Exported to " + l_pngPath + ".avi");
@@ -1734,6 +1735,14 @@ void Kage::EntryNodeY_onEnter() {
 	
 	m_EntryNodeY.set_text(doubleToString(l_dbl));
 	m_KageStage.updateNodeY(l_dbl);
+}
+
+void Kage::ToggleLine_onClick() {
+	Kage::timestamp();
+	std::cout << " Kage::ToggleLine_onClick" << std::endl;
+	if (m_KageStage.toggleLineSelectedNodes() == true) {
+		forceRenderFrames();
+	}
 }
 
 void Kage::addToolButton(const Glib::ustring &label) {

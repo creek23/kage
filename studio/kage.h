@@ -207,6 +207,9 @@
 				Gtk::Label m_LabelNodeY;
 				Gtk::Entry m_EntryNodeY;
 					void EntryNodeY_onEnter();
+				Gtk::Label m_LabelToggleLine;
+				Gtk::Button m_ToggleLine;
+					void ToggleLine_onClick();
 			
 			Gtk::Label m_LblHolder_Toolbar;
 			KageStage m_KageStage;
@@ -277,9 +280,9 @@
 			void ToolEyedrop_onClick();
 			void ToolZoom_onClick();
 			
+		public:
 			void toolsButtonToggle(string p_toolTip);
 			
-		public:
 			void ToolSelect_onClick();
 			
 			static void timestamp();

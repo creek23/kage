@@ -131,6 +131,7 @@
 			bool lowerToBottomSelectedShape();
 			bool flipHorizontalSelectedShape();
 			bool flipVerticalSelectedShape();
+			bool toggleLineSelectedNodes();
 			
 			bool isSelectedNode(unsigned int p_index);
 			void addSelectedNode(unsigned int p_index);

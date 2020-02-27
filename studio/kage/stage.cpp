@@ -132,7 +132,12 @@ bool KageStage::on_event(GdkEvent *e) {
 		on_key_press_event((GdkEventKey*) e);
 	} else if (e->type == GDK_KEY_RELEASE) {
 		on_key_release_event((GdkEventKey*) e);
-	} else if (e->type == GDK_BUTTON_PRESS) { ///mouse down
+	} else if (e->type == GDK_DOUBLE_BUTTON_PRESS) {
+		if (KageStage::toolMode == MODE_SELECT) {
+			KageStage::toolMode = MODE_NODE;
+			win->toolsButtonToggle("Node Tool");
+		}
+	} else if (e->type == GDK_BUTTON_PRESS) { //mouse down
 		mouseDown = true;
 		draw1.x = e->button.x;
 		draw1.y = e->button.y;
@@ -152,7 +157,7 @@ bool KageStage::on_event(GdkEvent *e) {
 		} else {
 			//
 		}
-	} else if (e->type == GDK_BUTTON_RELEASE) { ///mouse up
+	} else if (e->type == GDK_BUTTON_RELEASE) { //mouse up
 		mouseOnAnchor = AnchorData::TYPE_NONE;
 		mouseDown = false;
 		grab_focus();
@@ -203,6 +208,9 @@ bool KageStage::on_event(GdkEvent *e) {
 					selectionBox2 = draw2;
 						tryMultiSelectShapes();
 				}
+				win->propFillStrokeSetVisible(false);
+				win->propLocationSizeSetVisible(false);
+				win->propNodeXYSetVisible(true);
 			} else {
 				win->stackDo();
 			}
@@ -928,6 +936,10 @@ void KageStage::initNodeTool() {
 bool KageStage::isSelectedNode(unsigned int p_index) {
 	bool l_gotit = false;
 	unsigned int nsize = selectedNodes.size();
+	if (nsize == 0) {
+		return false;
+	}
+	
 	for (unsigned int i = 0; i < nsize; ++i) {
 		if (selectedNodes[i] == p_index) {
 			l_gotit = true;
@@ -3488,6 +3500,60 @@ bool KageStage::flipVerticalSelectedShape() {
 	win->stackDo();
 	
 	return true;
+}
+
+bool KageStage::toggleLineSelectedNodes() {
+	vector<VectorData> v = win->getFrameData().getVectorData();
+	
+	unsigned int nsize = selectedNodes.size();
+	
+	bool l_gotit = false;
+	unsigned int l_currentNode;
+	unsigned int l_nextNode;
+	for (unsigned int i = 0; i < nsize; ++i) {
+		l_currentNode = selectedNodes[i];
+		l_nextNode = l_currentNode+1;
+		if (l_currentNode < v.size()
+				&& isSelectedNode(l_nextNode) == true) {
+			if (       (v[l_nextNode   ].vectorType == VectorData::TYPE_CURVE_CUBIC || v[l_nextNode   ].vectorType == VectorData::TYPE_CURVE_QUADRATIC)
+					&& (v[l_currentNode].vectorType == VectorData::TYPE_CURVE_CUBIC || v[l_currentNode].vectorType == VectorData::TYPE_CURVE_QUADRATIC)) {
+				v[l_nextNode].points[0].x = (v[l_currentNode].points[2].x + v[l_nextNode].points[2].x) / 2;
+				v[l_nextNode].points[0].y = (v[l_currentNode].points[2].y + v[l_nextNode].points[2].y) / 2;
+				
+				v[l_nextNode].points[1].x = v[l_nextNode].points[0].x;
+				v[l_nextNode].points[1].y = v[l_nextNode].points[0].y;
+				l_gotit = true;
+			}
+		} else if (v[l_nextNode].vectorType == VectorData::TYPE_CLOSE_PATH) {
+			//The user just selected the very end of an enclosed shape and the very first node
+			//so, search for very first curve/line if also currently selected
+			for (unsigned int l_firstNode = l_currentNode-1; l_firstNode > 0; --l_firstNode) {
+				if (v[l_firstNode].vectorType == VectorData::TYPE_MOVE) {
+					++l_firstNode;
+					if (isSelectedNode(l_firstNode) == true) {
+						if (       (v[l_firstNode  ].vectorType == VectorData::TYPE_CURVE_CUBIC || v[l_firstNode  ].vectorType == VectorData::TYPE_CURVE_QUADRATIC)
+								&& (v[l_currentNode].vectorType == VectorData::TYPE_CURVE_CUBIC || v[l_currentNode].vectorType == VectorData::TYPE_CURVE_QUADRATIC)) {
+							v[l_firstNode].points[0].x = (v[l_currentNode].points[2].x + v[l_firstNode].points[2].x) / 2;
+							v[l_firstNode].points[0].y = (v[l_currentNode].points[2].y + v[l_firstNode].points[2].y) / 2;
+							
+							v[l_firstNode].points[1].x = v[l_firstNode].points[0].x;
+							v[l_firstNode].points[1].y = v[l_firstNode].points[0].y;
+							l_gotit = true;
+						}
+					}
+					break;
+				}
+			}
+		}
+	}
+	
+	if (l_gotit == true) {
+		win->setFrameData(v);
+		
+		win->stackDo();
+	}
+	
+	return l_gotit;
 }
 
 void KageStage::handleFill() {

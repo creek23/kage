@@ -1,0 +1,67 @@
+<KageStudio version="2019.10.14">
+<stage width="600" height="600" background="rgb(255, 255, 255)" fps="12" layers="1" frames="1" />
+<layer1>
+<frame1>
+<init/>
+<fill color="rgba(186, 189, 182, 255)">
+<stroke color="rgba(0, 0, 0, 255)" thickness="10"/>
+<move>126 225</move>
+<cubiccurve>122 -36.5 471 -26.5 467 224</cubiccurve>
+<cubiccurve>430 225 430 225 393 226</cubiccurve>
+<cubiccurve>390 80.5 193 72.5 195 223</cubiccurve>
+<cubiccurve>160.5 224 160.5 224 126 225</cubiccurve>
+<closepath/>
+</fill>
+<init/>
+<fill color="rgba(211, 215, 207, 255)">
+<stroke color="rgba(0, 0, 0, 255)" thickness="0.0"/>
+<move>135 219</move>
+<cubiccurve>138 154.5 151 129.5 203 72</cubiccurve>
+<cubiccurve>168 126.5 158 138.5 156 221</cubiccurve>
+<cubiccurve>145.5 220 145.5 220 135 219</cubiccurve>
+<closepath/>
+</fill>
+<init/>
+<fill color="rgba(136, 138, 133, 255)">
+<stroke color="rgba(0, 0, 0, 255)" thickness="0.0"/>
+<move>337 110</move>
+<cubiccurve>386 138.5 415 166.5 435 146</cubiccurve>
+<cubiccurve>444 163.5 454 193.5 454 229</cubiccurve>
+<cubiccurve>431 227 431 227 408 225</cubiccurve>
+<cubiccurve>401 173.5 401 155.5 337 110</cubiccurve>
+<closepath/>
+</fill>
+<init/>
+<fill color="rgba(237, 212, 0, 255)">
+<stroke color="rgba(0, 0, 0, 255)" thickness="10"/>
+<move>125 223.5</move>
+<cubiccurve>295.5 222.5 295.5 222.5 466 221.5</cubiccurve>
+<cubiccurve>484 222.5 483 239.5 484 488</cubiccurve>
+<cubiccurve>295 488 295 488 106 488</cubiccurve>
+<cubiccurve>104 236.5 103 226.5 125 223.5</cubiccurve>
+<closepath/>
+</fill>
+<init/>
+<fill color="rgba(252, 233, 79, 255)">
+<stroke color="rgba(0, 0, 0, 255)" thickness="0.0"/>
+<move>236 239</move>
+<cubiccurve>179 239.5 179 239.5 122 240</cubiccurve>
+<cubiccurve>121.5 355 121.5 355 121 470</cubiccurve>
+<cubiccurve>172.5 470.5 172.5 470.5 224 471</cubiccurve>
+<cubiccurve>122 463.5 89 267.5 236 239</cubiccurve>
+<closepath/>
+</fill>
+<init/>
+<fill color="rgba(196, 160, 0, 255)">
+<stroke color="rgba(0, 0, 0, 255)" thickness="0.0"/>
+<move>365 243</move>
+<cubiccurve>416 243 416 243 467 243</cubiccurve>
+<cubiccurve>426 261.5 428 452.5 467 471</cubiccurve>
+<cubiccurve>415 470.5 415 470.5 363 470</cubiccurve>
+<cubiccurve>430 467.5 423 244.5 365 243</cubiccurve>
+<closepath/>
+</fill>
+
+</frame1>
+</layer1>
+</KageStudio>

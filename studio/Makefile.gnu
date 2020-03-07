@@ -1,8 +1,8 @@
 # Makefile for KageStudio
-BIN = kagebin
+BIN = kagestudio
 CXX = g++
-CXXFLAGS = -c -I./ `pkg-config gtkmm-3.0 gdkmm-3.0 cairo --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -fmax-errors=5 -Wfatal-errors -g
-CXXLINKS = `pkg-config gtkmm-3.0 gdkmm-3.0 cairo --libs | sed 's/ -I/ -isystem /g'`
+CXXFLAGS = -c -I./ `pkg-config gtkmm-3.0 gdkmm-3.0 glibmm-2.4 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -fmax-errors=5 -Wfatal-errors
+CXXLINKS = `pkg-config gtkmm-3.0 gdkmm-3.0 glibmm-2.4 --libs | sed 's/ -I/ -isystem /g'`
 
 SOURCES = \
 	./kage/data/anchor.cpp \
@@ -11,8 +11,10 @@ SOURCES = \
 	./kage/data/strokecolor.cpp \
 	./kage/data/vectordata.cpp \
 	./kage/timeline/frame.cpp \
+	./kage/timeline/frame_padding.cpp \
 	./kage/timeline/framemanager.cpp \
 	./kage/timeline/framesmanager.cpp \
+	./kage/timeline/layer.cpp \
 	./kage/timeline/layermanager.cpp \
 	./kage/unre/kagedo.cpp \
 	./kage/unre/unre.cpp \
@@ -22,7 +24,9 @@ SOURCES = \
 	./util/xml/xmltagproperty.cpp \
 	./util/xml/xmltag.cpp \
 	./util/xml/xml.cpp \
+	./util/string/stringhelper.cpp \
 	kage.cpp \
+	resources.cpp \
 	main.cpp
 
 OBJECTS = $(SOURCES:.cpp=.o)
@@ -31,6 +35,9 @@ OBJECTS = $(SOURCES:.cpp=.o)
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 all: kagestudio
+
+resource:
+	glib-compile-resources --generate-source --target=resources.cpp image.gresource.xml
 
 kagestudio: $(OBJECTS)
 	@echo creating $(BIN)

@@ -5,12 +5,20 @@
 
 KageStage::KageStage(Kage *p_win) {
 	win = p_win;
-//	set_flags(Gtk::CAN_FOCUS);
 	set_can_focus(true); //to accept key_press
 	add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
 	add_events(Gdk::ENTER_NOTIFY_MASK | Gdk::LEAVE_NOTIFY_MASK);
 	add_events(Gdk::FOCUS_CHANGE_MASK);
 	add_events(Gdk::POINTER_MOTION_MASK);
+	
+	keyUpDown = false;
+	keyDownDown =  false;
+	keyLeftDown =  false;
+	keyRightDown =  false;
+	keyShiftDown = false;
+	keyControlDown = false;
+	
+	_gotFocus = false;
 }
 
 KageStage::~KageStage() {
@@ -126,8 +134,10 @@ bool KageStage::on_expose_event(GdkEventExpose* e) {
 bool KageStage::on_event(GdkEvent *e) {
 	if (e->type == GDK_ENTER_NOTIFY) {
 		render();
+		//mouse hover in
 	} else if (e->type == GDK_LEAVE_NOTIFY) {
 		render();
+		//mouse hover out
 	} else if (e->type == GDK_KEY_PRESS) {
 		on_key_press_event((GdkEventKey*) e);
 	} else if (e->type == GDK_KEY_RELEASE) {
@@ -311,8 +321,24 @@ bool KageStage::on_event(GdkEvent *e) {
 		on_expose_event((GdkEventExpose*) e);
 	} else if (e->type == GDK_FOCUS_CHANGE) {
 		//filter out from echos
+		cout << "GDK_FOCUS_CHANGE e->send_event " << ((GdkEventFocus*)e)->send_event << " e->in " << ((GdkEventFocus*)e)->in << endl;
+		if (((GdkEventFocus*)e)->in) {
+			_gotFocus = true;
+		} else {
+			_gotFocus = false;
+		}
 	} else if (e->type == GDK_CONFIGURE) {
-		//filter out from echos 
+		//filter out from echos
+		/**
+		 * struct _GdkEventConfigure {
+		 * 	GdkEventType type;
+		 * 	GdkWindow *window;
+		 * 	gint8 send_event;
+		 * 	gint16 x, y;
+		 * 	gint16 width;
+		 * 	gint16 height;
+		 * };
+		 */
 	} else {
 		//
 	}
@@ -423,7 +449,7 @@ void KageStage::applyZoom() {
 		win->stackDoZoom(origin, __origin, _zoomReference, _zoomRatio);
 	
 	unsigned int l_currentFrame = win->m_KageFramesManager.getCurrentFrame();
-	unsigned int l_currentLayer = win->m_KageFramesManager.getCurrentLayer();
+	unsigned int l_currentLayer = win->getCurrentLayer();
 	
 	for (unsigned int l_frame = 1; l_frame <= win->m_KageFramesManager.frameCount(); ++l_frame) {
 		win->m_KageFramesManager.setCurrentFrame(l_frame);
@@ -689,23 +715,17 @@ bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
 		
 		///why can't it be loaded when after `window = get_window()'?
 		if (!KageStage::imageSHAPE_000) {
-			#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-				string _SLASH_ = "\\";
-			#else
-				string _SLASH_ = "/";
-			#endif
+			KageStage::imageSHAPE_000 = Gdk::Pixbuf::create_from_resource("/kage/share/icons/shape_000.png");
+			KageStage::imageSHAPE_045 = Gdk::Pixbuf::create_from_resource("/kage/share/icons/shape_045.png");
+			KageStage::imageSHAPE_090 = Gdk::Pixbuf::create_from_resource("/kage/share/icons/shape_090.png");
+			KageStage::imageSHAPE_135 = Gdk::Pixbuf::create_from_resource("/kage/share/icons/shape_135.png");
+			KageStage::imageSHAPE_MOVE = Gdk::Pixbuf::create_from_resource("/kage/share/icons/shape_move.png");
 			
-			KageStage::imageSHAPE_000 = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_000.png");
-			KageStage::imageSHAPE_045 = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_045.png");
-			KageStage::imageSHAPE_090 = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_090.png");
-			KageStage::imageSHAPE_135 = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_135.png");
-			KageStage::imageSHAPE_MOVE = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_move.png");
-			
-			KageStage::imageSHAPE_NE = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_ne.png");
-			KageStage::imageSHAPE_NW = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_nw.png");
-			KageStage::imageSHAPE_SW = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_sw.png");
-			KageStage::imageSHAPE_SE = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_se.png");
-			KageStage::imageSHAPE_ROTATE = Gdk::Pixbuf::create_from_file("shared" + _SLASH_ + "icons" + _SLASH_ + "shape_rotate.png");
+			KageStage::imageSHAPE_NE = Gdk::Pixbuf::create_from_resource("/kage/share/icons/shape_ne.png");
+			KageStage::imageSHAPE_NW = Gdk::Pixbuf::create_from_resource("/kage/share/icons/shape_nw.png");
+			KageStage::imageSHAPE_SW = Gdk::Pixbuf::create_from_resource("/kage/share/icons/shape_sw.png");
+			KageStage::imageSHAPE_SE = Gdk::Pixbuf::create_from_resource("/kage/share/icons/shape_se.png");
+			KageStage::imageSHAPE_ROTATE = Gdk::Pixbuf::create_from_resource("/kage/share/icons/shape_rotate.png");
 		}
 		
 		if (_registerWidth != get_width()) {
@@ -975,6 +995,9 @@ void KageStage::addSelectedShape(unsigned int p_index) {
 }
 
 void KageStage::handleShapes_scaleNorth() {
+	if (win->isLayerLocked() == true) {
+		return;
+	}
 	double diffOld = anchor_lowerRight.y - anchor_upperLeft.y;
 	double diffNew = anchor_lowerRight.y - draw2.y;
 	double diffRatio = diffNew / diffOld;
@@ -1024,6 +1047,9 @@ void KageStage::handleShapes_scaleNorth() {
 	win->setFrameData(v);
 }
 void KageStage::handleShapes_scaleEast() {
+	if (win->isLayerLocked() == true) {
+		return;
+	}
 	double diffOld = anchor_lowerRight.x - anchor_upperLeft.x;
 	double diffNew = draw2.x - anchor_upperLeft.x;
 	double diffRatio = diffNew / diffOld;
@@ -1073,6 +1099,9 @@ void KageStage::handleShapes_scaleEast() {
 	win->setFrameData(v);
 }
 void KageStage::handleShapes_scaleWest() {
+	if (win->isLayerLocked() == true) {
+		return;
+	}
 	double diffOld = anchor_upperLeft.x - anchor_lowerRight.x;
 	double diffNew = draw2.x - anchor_lowerRight.x;
 	double diffRatio = diffNew / diffOld;
@@ -1122,6 +1151,9 @@ void KageStage::handleShapes_scaleWest() {
 	win->setFrameData(v);
 }
 void KageStage::handleShapes_scaleSouth() {
+	if (win->isLayerLocked() == true) {
+		return;
+	}
 	double diffOld = anchor_lowerRight.y - anchor_upperLeft.y;
 	double diffNew = draw2.y - anchor_upperLeft.y;
 	double diffRatio = diffNew / diffOld;
@@ -2639,7 +2671,10 @@ bool KageStage::isMouseOnNode(double p_x, double p_y, unsigned int p_buffer) {
 	return false;
 }
 
-void KageStage::handleDrawOvalMouseUp(){
+void KageStage::handleDrawOvalMouseUp() {
+	if (win->isLayerLocked() == true) {
+		return;
+	}
 	if (draw1.x == draw2.x && draw1.y == draw2.y) { return; }
 	
 	double l_x1, l_y1;
@@ -2683,6 +2718,9 @@ void KageStage::handleDrawOvalMouseUp(){
 }
 
 void KageStage::handleDrawRectMouseUp() {
+	if (win->isLayerLocked() == true) {
+		return;
+	}
 	if (draw1.x == draw2.x && draw1.y == draw2.y) { return; }
 	
 	PointData p1(draw1);
@@ -2720,6 +2758,9 @@ void KageStage::handleStrokeMouseUp() {
 }
 
 bool KageStage::cutSelectedShapes() {
+	if (win->isLayerLocked() == true) {
+		return false;
+	}
 	Kage::timestamp();
 	std::cout << " KageStage::cutSelectedShapes " << selectedShapes.size() << std::endl;
 	
@@ -2802,6 +2843,9 @@ bool KageStage::selectAllShapes() {
 }
 
 bool KageStage::deselectSelectedShapes() {
+	if (win->isLayerLocked() == true) {
+		return false;
+	}
 	Kage::timestamp();
 	std::cout << " KageStage::deselectSelectedShapes " << selectedShapes.size() << std::endl;
 	
@@ -2817,6 +2861,9 @@ bool KageStage::deselectSelectedShapes() {
 	return true;
 }
 bool KageStage::cancelDrawingPoly() {
+	if (win->isLayerLocked() == true) {
+		return false;
+	}
 	vector<VectorData> v = win->getFrameData().getVectorData();
 	unsigned int l_temp;
 	l_temp = getSelectedShapeViaNode(v.size() - 1, v);
@@ -2842,6 +2889,9 @@ bool KageStage::deselectSelectedNodes() {
 	return true;
 }
 bool KageStage::groupSelectedShapes() {
+	if (win->isLayerLocked() == true) {
+		return false;
+	}
 	Kage::timestamp();
 	std::cout << " KageStage::groupSelectedShapes " << selectedShapes.size() << std::endl;
 	
@@ -2865,6 +2915,9 @@ bool KageStage::groupSelectedShapes() {
 }
 
 bool KageStage::ungroupSelectedShapes() {
+	if (win->isLayerLocked() == true) {
+		return false;
+	}
 	Kage::timestamp();
 	std::cout << " KageStage::ungroupSelectedShapes " << selectedShapes.size() << std::endl;
 	
@@ -2898,6 +2951,9 @@ bool KageStage::ungroupSelectedShapes() {
 	return false;
 }
 bool KageStage::pasteSelectedShapes() {
+	if (win->isLayerLocked() == true) {
+		return false;
+	}
 	unsigned int l_vectorDataCopyBuffer_size = _vectorDataCopyBuffer.size();
 	Kage::timestamp();
 	std::cout << " KageStage::pasteSelectedShapes " << l_vectorDataCopyBuffer_size << std::endl;
@@ -2926,6 +2982,9 @@ bool KageStage::pasteSelectedShapes() {
 }
 
 bool KageStage::deleteSelectedShapes() {
+	if (win->isLayerLocked() == true) {
+		return false;
+	}
 	unsigned int l_selectedShapes_size = selectedShapes.size();
 	Kage::timestamp();
 	std::cout << " KageStage::deleteSelectedShapes " << l_selectedShapes_size << std::endl;
@@ -2940,6 +2999,7 @@ bool KageStage::deleteSelectedShapes() {
 	vector<VectorData> v = win->getFrameData().getVectorData();
 	
 	unsigned int vsize = v.size();
+	std::cout << " vectordata size " << vsize << std::endl;
 	if (vsize < l_selectedShapes_size) { //attempt to fix https://sourceforge.net/p/kage/tickets/15/
 		initNodeTool();
 		return false;
@@ -2953,7 +3013,9 @@ bool KageStage::deleteSelectedShapes() {
 				break;
 			}
 		}
-		
+		if (l_selectedShapesOld[l_shapeIndex] > l_temp) {
+			cout << "predicting a crash!!!" << endl;
+		}
 		v.erase (v.begin() + l_selectedShapesOld[l_shapeIndex],
 				 v.begin() + l_temp);
 	}
@@ -2965,6 +3027,9 @@ bool KageStage::deleteSelectedShapes() {
 }
 
 bool KageStage::deleteSelectedNodes() {
+	if (win->isLayerLocked() == true) {
+		return false;
+	}
 	bool l_return = false;
 	
 	if (selectedNodes.size() == 0) {
@@ -2991,6 +3056,9 @@ bool KageStage::deleteSelectedNodes() {
 	return l_return;
 }
 bool KageStage::deleteSelectedNode(unsigned int p_index) {
+	if (win->isLayerLocked() == true) {
+		return false;
+	}
 	vector<VectorData> v = win->getFrameData().getVectorData();
 	
 	selectedShape = getSelectedShapeViaNode(p_index, v);
@@ -3077,6 +3145,9 @@ bool KageStage::deleteSelectedNode(unsigned int p_index) {
   \sa lowerSelectedShape(), raiseToTopSelectedShape() and lowerToBottomSelectedShape()
 */
 bool KageStage::raiseSelectedShape() {
+	if (win->isLayerLocked() == true) {
+		return false;
+	}
 	Kage::timestamp();
 	std::cout << " KageStage::raiseSelectedShape " << selectedShapes.size() << std::endl;
 	
@@ -3171,6 +3242,9 @@ bool KageStage::raiseSelectedShape() {
   \sa raiseSelectedShape(), raiseToTopSelectedShape() and lowerToBottomSelectedShape()
 */
 bool KageStage::lowerSelectedShape() {
+	if (win->isLayerLocked() == true) {
+		return false;
+	}
 	Kage::timestamp();
 	std::cout << " KageStage::lowerSelectedShape " << selectedShapes.size() << std::endl;
 	
@@ -3263,6 +3337,9 @@ bool KageStage::lowerSelectedShape() {
  *  \sa raiseSelectedShape(), lowerSelectedShape() and lowerToBottomSelectedShape()
  */
 bool KageStage::raiseToTopSelectedShape() {
+	if (win->isLayerLocked() == true) {
+		return false;
+	}
 	Kage::timestamp();
 	std::cout << " KageStage::raiseToTopSelectedShape " << selectedShapes.size() << std::endl;
 	
@@ -3290,6 +3367,9 @@ bool KageStage::raiseToTopSelectedShape() {
  *  \sa raiseSelectedShape(), lowerSelectedShape() and raiseToTopSelectedShape()
  */
 bool KageStage::lowerToBottomSelectedShape() {
+	if (win->isLayerLocked() == true) {
+		return false;
+	}
 	Kage::timestamp();
 	std::cout << " KageStage::lowerToBottomSelectedShape " << selectedShapes.size() << std::endl;
 	
@@ -3323,6 +3403,9 @@ bool KageStage::lowerToBottomSelectedShape() {
 }
 
 bool KageStage::flipHorizontalSelectedShape() {
+	if (win->isLayerLocked() == true) {
+		return false;
+	}
 	if (selectedShapes.size() == 0) {
 		return false;
 	}
@@ -3413,6 +3496,9 @@ bool KageStage::flipHorizontalSelectedShape() {
 }
 
 bool KageStage::flipVerticalSelectedShape() {
+	if (win->isLayerLocked() == true) {
+		return false;
+	}
 	if (selectedShapes.size() == 0) {
 		return false;
 	}
@@ -3647,6 +3733,9 @@ void KageStage::handleEyedropMouseUp() {
 }
 
 void KageStage::handleDrawPolyMouseUp() {
+	if (win->isLayerLocked() == true) {
+		return;
+	}
 	VectorDataManager v;// = v_poly;
 	Kage::timestamp();
 	std::cout << " KageStage::handleDrawPolyMouseUp" << std::endl;
@@ -3691,6 +3780,9 @@ void KageStage::handleDrawPolyMouseUp() {
 }
 
 void KageStage::handlePoly() {
+	if (win->isLayerLocked() == true) {
+		return;
+	}
 	if (drawCtr == 0) return;
 	
 //	cr->move_to(draw1.x, draw1.y);
@@ -3709,6 +3801,9 @@ void KageStage::handlePoly() {
 }
 
 void KageStage::handleRect() {
+	if (win->isLayerLocked() == true) {
+		return;
+	}
 	cr->move_to(draw1.x                      , draw1.y                      );
 		cr->line_to(draw1.x + (draw2.x - draw1.x), draw1.y                      );
 		cr->line_to(draw1.x + (draw2.x - draw1.x), draw1.y + (draw2.y - draw1.y));
@@ -3722,6 +3817,9 @@ void KageStage::handleRect() {
 }
 
 void KageStage::handleOval() {
+	if (win->isLayerLocked() == true) {
+		return;
+	}
 	double l_x1, l_y1;
 	double l_x2, l_y2;
 	double l_x3, l_y3;

@@ -37,11 +37,13 @@
 	#include "util/xml/xmltagproperty.h"
 	#include "util/xml/xmltag.h"
 	#include "util/xml/xml.h"
+	#include "util/string/stringhelper.h"
 	
 	#include <fstream> //ofstream
 	#include <iostream> //cerr
 	
 	#include <gdkmm/cursor.h>
+	#include <gdkmm/frameclock.h>
 
 	class Kage : public Gtk::Window {
 		public:
@@ -117,7 +119,6 @@
 			unsigned int undoStackPointer;
 			std::vector<unsigned int> undoStack;
 			
-			
 			//Member widgets:
 			Gtk::VBox m_VBoxRoot;
 			Gtk::HBox m_HBoxToolbar;
@@ -127,9 +128,15 @@
 			Gtk::HBox m_Timeline_Layer_Add_HBox;
 			Gtk::Label m_Timeline_Label;
 			Gtk::Button m_Timeline_Add_Button;
+				Gtk::Image                m_Timeline_Add_Button_img;
+				Glib::RefPtr<Gdk::Pixbuf> m_Timeline_Add_Button_pixbuf;
 			Gtk::Button m_Timeline_Del_Button;
+				Gtk::Image                m_Timeline_Del_Button_img;
+				Glib::RefPtr<Gdk::Pixbuf> m_Timeline_Del_Button_pixbuf;
 			Gtk::Label m_Timeline_CurrentFrame;
-			Gtk::VBox m_Timeline_Frame_VBox;
+			Gtk::VBox m_Timeline_Frame_VBox1;
+			Gtk::Label m_TimelineFrame_Label;
+			Gtk::VBox m_Timeline_Frame_VBox2;
 			Gtk::VBox m_VBoxTimelineFrame; //to be deleted
 			Gtk::ScrolledWindow m_Timeline_Layer_ScrolledWindow;
 			Gtk::ScrolledWindow m_Timeline_Frame_ScrolledWindow;
@@ -224,6 +231,8 @@
 			void Website_onClick();
 			void openWebsite(string p_url);
 			std::vector<Gtk::ToggleButton*> toggleButtons;
+				std::vector<Glib::RefPtr<Gdk::Pixbuf>> toggleButtons_pixbuf;
+				std::vector<Gtk::Image>                toggleButtons_img;
 			std::vector<Gtk::Tooltip*> tooltips;
 			Gtk::ToggleButton* currentTool;
 			
@@ -252,15 +261,6 @@
 			bool fileWrite(string p_path, string p_msg, std::ofstream &p_file, bool &p_flag);
 			
 			Gdk::Color m_Color;
-			string strToUpper(string p_str);
-			string strToLower(string p_str);
-			string intToString(int p_src);
-			string uintToString(unsigned int p_src);
-			string doubleToString(double p_src);
-			int stringToInt(string strConvert);
-			int stringToUInt(string strConvert);
-			long stringToLong(string strConvert);
-			double stringToDouble(string strConvert);
 			
 			string openTextFile(string p_path);
 			vector<double> parseNumbers(string p_numbers);
@@ -279,6 +279,13 @@
 			void ToolFill_onClick();
 			void ToolEyedrop_onClick();
 			void ToolZoom_onClick();
+			
+			bool on_tick(const Glib::RefPtr<Gdk::FrameClock>& frame_clock);
+			guint m_tick_id = 0;
+			gint64 m_start_time = 0;
+			const gint64 cycle_time = 3000000; // microseconds
+			guint tickCounter;
+			guint frameCounter;
 			
 		public:
 			void toolsButtonToggle(string p_toolTip);
@@ -305,6 +312,12 @@
 			void stackDoZoom(PointData p_originBefore, PointData p_originAfter, PointData p_zoomReference, double p_zoomRatio);
 			
 			virtual void New_onClick();
+			
+			bool isLayerLocked();
+			unsigned int getCurrentLayer();
+			void setCurrentLayer(unsigned int p_layer);
+			unsigned int getCurrentFrame();
+			void setCurrentFrame(unsigned int p_layer);
 	};
 
 #endif //GTKMM_KAGE_H

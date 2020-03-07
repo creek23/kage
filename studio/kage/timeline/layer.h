@@ -1,0 +1,76 @@
+/*
+ * layer.h
+ * 
+ * Copyright 2020 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301, USA.
+ * 
+ * 
+ */
+ 
+#ifndef GTKMM_KAGE_LAYER_H
+	#define GTKMM_KAGE_LAYER_H
+	
+	#include <gtkmm/drawingarea.h>
+	#include <gtkmm/entry.h>
+	#include <time.h>
+	#include "../../util/string/stringhelper.h"
+	
+	class KageLayerManager; ///forward declaration
+	
+	class KageLayer : public Gtk::DrawingArea {
+		public:
+			static bool mouseIsDown;
+			static Glib::RefPtr<Gdk::Pixbuf> imageVISIBLE_TRUE;
+			static Glib::RefPtr<Gdk::Pixbuf> imageVISIBLE_FALSE;
+			static Glib::RefPtr<Gdk::Pixbuf> imageLOCKED_TRUE;
+			static Glib::RefPtr<Gdk::Pixbuf> imageLOCKED_FALSE;
+			
+			Glib::RefPtr<Gdk::Window> window;
+			
+			KageLayer(KageLayerManager *p_layerManager, unsigned p_layerID);
+			virtual ~KageLayer();
+			
+			void setLabel(string p_label);
+			void setSelected(bool p_selected);
+			bool isSelected();
+			unsigned int getFrameSource(); //?!?
+			void setFocus();
+			bool isVisible();
+			bool isLocked();
+			
+			unsigned int layerID;
+			
+			void forceRender();
+			virtual bool render();
+			Gtk::Entry _txtLabel;
+			void txtLabel_onEnter();
+		protected:
+			//Override default signal handler:
+			virtual bool on_expose_event(GdkEventExpose *e);
+			virtual bool on_key_press_event(GdkEventKey *e);
+			virtual bool on_event(GdkEvent *e);
+			
+			bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
+			
+			bool _selected;
+			bool _visible;
+			bool _lock;
+			string _label;
+			
+			KageLayerManager *_layerManager;
+	};
+#endif // GTKMM_KAGE_LAYER_H

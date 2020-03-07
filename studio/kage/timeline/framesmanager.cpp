@@ -7,7 +7,7 @@ KageFramesManager::KageFramesManager(Kage *p_win) {
 	pack_start(place_holder, Gtk::PACK_SHRINK);
 		place_holder.set_label(" ");
 		place_holder.set_size_request(100, 20);
-	addFrameManager(1);
+	//addFrameManager(1);
 }
 
 KageFramesManager::~KageFramesManager() {
@@ -69,31 +69,21 @@ bool KageFramesManager::removeAllFrames() {
 	
 	for (unsigned int i = 0; i < l_count; ++i) {
 		framemanager[i]->removeAllFrames();
+		remove(*framemanager[i]);
 	}
+	
+	framemanager.clear();
+	addFrameManager(0);
+	
 	return true;
 }
 
-///Use KageFramesManager::currentLayer instead of calling this function
 unsigned int KageFramesManager::getCurrentLayer() {
-	//filter and make sure value is valid
-	unsigned int l_count = 1;
-	if (framemanager.size() > 0) {
-		l_count = framemanager.size();
-	}
-	if (KageFramesManager::currentLayer > l_count) {
-		KageFramesManager::currentLayer = l_count;
-	}
-	if (KageFramesManager::currentLayer < 1) {
-		KageFramesManager::currentLayer = 1;
-	}
-	
-	return KageFramesManager::currentLayer;
+	return win->getCurrentLayer();
 }
 void KageFramesManager::setCurrentLayer(unsigned int p_currentLayer) {
-	unsigned int l_count = 1;
-	if (framemanager.size() > 0) {
-		l_count = framemanager.size();
-	}
+	unsigned int l_count = framemanager.size();
+	
 	if (p_currentLayer > l_count) {
 		p_currentLayer = l_count;
 	}
@@ -101,21 +91,15 @@ void KageFramesManager::setCurrentLayer(unsigned int p_currentLayer) {
 		p_currentLayer = 1;
 	}
 	
-	KageFramesManager::currentLayer = p_currentLayer;
+	win->setCurrentLayer(p_currentLayer);
 }
 
-///Use KageFramesManager::currentFrame instead of calling this function
 unsigned int KageFramesManager::getCurrentFrame() {
 	//filter and make sure value is valid
 	//NOTE: do NOT call setCurrentFrame to avoid recursive call to Kage::renderFrames()
-	unsigned int l_count = 1;
-	unsigned int l_fcount = 1;
-	if (framemanager.size() > 0) {
-		l_count = framemanager.size();
-	}
-	
+	unsigned int l_count = framemanager.size();
 	if (l_count > 0) {
-		l_fcount = framemanager[0]->getFrameCount();
+		unsigned int l_fcount = framemanager[0]->getFrameCount();
 		if (KageFramesManager::currentFrame > l_fcount) {
 			KageFramesManager::currentFrame = l_fcount;
 		}
@@ -127,14 +111,9 @@ unsigned int KageFramesManager::getCurrentFrame() {
 	return KageFramesManager::currentFrame;
 }
 void KageFramesManager::setCurrentFrame(unsigned int p_currentFrame) {
-	unsigned int l_count = 1;
-	unsigned int l_fcount = 1;
-	if (framemanager.size() > 0) {
-		l_count = framemanager.size();
-	}
-	
+	unsigned int l_count = framemanager.size();
 	if (l_count > 0) {
-		l_fcount = framemanager[0]->getFrameCount();
+		unsigned int l_fcount = framemanager[0]->getFrameCount();
 		if (p_currentFrame > l_fcount) {
 			p_currentFrame = l_fcount;
 		}
@@ -146,6 +125,14 @@ void KageFramesManager::setCurrentFrame(unsigned int p_currentFrame) {
 			framemanager[i]->setCurrentFrame(p_currentFrame);
 		}
 		
+		selectAll(false); //should it be here?
+		unsigned int l_currentLayer = win->getCurrentLayer();
+		if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+			//do nothing
+		} else {
+			framemanager[l_currentLayer-1]->getFrameAt(p_currentFrame)->setSelected(true);
+		}
+		
 		KageFramesManager::currentFrame = p_currentFrame;
 		win->updateFrameLabel();
 		win->forceRenderFrames();
@@ -154,10 +141,10 @@ void KageFramesManager::setCurrentFrame(unsigned int p_currentFrame) {
 
 void KageFramesManager::renderStage() {
 	Kage::timestamp();
-	cout << "KageFramesManager::renderStage <" << endl;
+	cout << " KageFramesManager::renderStage <" << endl;
 	win->forceRenderFrames();
 	Kage::timestamp();
-	cout << "KageFramesManager::renderStage >" << endl;
+	cout << " KageFramesManager::renderStage >" << endl;
 }
 
 void KageFramesManager::selectAll(bool p_selectAll) {
@@ -171,5 +158,15 @@ void KageFramesManager::selectAll(bool p_selectAll) {
 }
 
 KageFrame *KageFramesManager::getFrame() {
-	return framemanager[getCurrentLayer()-1]->getFrameAt(getCurrentFrame());
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+		return NULL;
+	} else {
+		KageFrameManager *l_frameManager = framemanager[l_currentLayer-1];
+		if (l_frameManager) {
+			return l_frameManager->getFrameAt(getCurrentFrame());
+		} else {
+			return framemanager[l_currentLayer-1]->getFrameAt(getCurrentFrame());
+		}
+	}
 }

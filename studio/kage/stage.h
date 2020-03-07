@@ -51,6 +51,7 @@
 			static ToolMode toolMode;
 			static GdkPoint moveStageXY;
 			unsigned int fps;
+			double fpsElapse;
 			double propX = 0;
 			int propXindex1;
 			int propXindex2;
@@ -181,6 +182,8 @@
 			
 			bool _rotateMode;
 			bool _rotateApply;
+			
+			bool _gotFocus;
 		protected:
 			ToolMode prevTool; //used by Hand-tool shortcut [spacebar]
 			Kage *win;

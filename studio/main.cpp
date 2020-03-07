@@ -4,11 +4,9 @@
 #include "kage.h"
 
 int main(int argc, char *argv[]) {
-	Gtk::Main kit(argc, argv);
+	auto app = Gtk::Application::create(argc, argv, "com.krixware.kage");
 	
 	Kage kage;
 	
-	Gtk::Main::run(kage);
-	
-	return EXIT_SUCCESS;
+	return app->run(kage); //EXIT_SUCCESS;
 }

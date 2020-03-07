@@ -3,6 +3,7 @@
 	
 	#include <gtkmm/box.h>
 	#include "frame.h"
+	#include "frame_padding.h"
 	
 	class KageFramesManager; //forward declaration
 	
@@ -23,12 +24,17 @@
 			
 			KageFramesManager *getFsm();
 			KageFrame *getFrameAt(unsigned int p_frame);
+			
+			void setSelected(KageFrame *p_frame);
 		protected:
 			unsigned int layerID;
 //			unsigned int layerCtr;
 			unsigned int frameCtr;
 			std::vector<KageFrame*> frames;
+			KageFramePadding frame_padding;
 			
 			KageFramesManager *fsm;
+			unsigned int _currentFrameID;
+			unsigned int _currentFrameIndex;
 	};
 #endif // GTKMM_KAGE_MANAGER_FRAME_H

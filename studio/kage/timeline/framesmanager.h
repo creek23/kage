@@ -11,7 +11,6 @@
 	class KageFramesManager : public Gtk::VBox {
 		public:
 			static unsigned int currentFrame;
-			static unsigned int currentLayer;
 			
 			KageFramesManager(Kage *p_win);
 			virtual ~KageFramesManager();
@@ -21,7 +20,7 @@
 			void setCurrentFrame(unsigned int p_currentFrame);
 			unsigned int getCurrentFrame();
 			void setCurrentLayer(unsigned int p_currentLayer);
-			unsigned int getCurrentLayer();
+			unsigned int getCurrentLayer(); //currently used by getFrame()
 			unsigned int layerCount();
 			unsigned int frameCount();
 			void selectAll(bool p_selectAll); //used by KageFrame

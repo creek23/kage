@@ -3,6 +3,7 @@
 #include "framesmanager.h"
 
 KageFrameManager::KageFrameManager(KageFramesManager *p_fsm, unsigned int p_layerID, unsigned int p_frameCount) {
+	pack_start(frame_padding, Gtk::PACK_SHRINK);
 	fsm = p_fsm;
 	layerID = p_layerID;
 	frameCtr = 0;
@@ -28,6 +29,7 @@ void KageFrameManager::extendFrame(unsigned int p_frameID) {
 }
 
 void KageFrameManager::removeFrame(unsigned int p_frameID) {
+	frameCtr = getFrameCount();
 	for (unsigned int i = 0; i < frameCtr; ++i) {
 		if (frames[i]->frameID == p_frameID) {
 			remove(*frames[i]);
@@ -42,7 +44,7 @@ void KageFrameManager::removeFrame(unsigned int p_frameID) {
 }
 
 void KageFrameManager::removeAllFrames() {
-	for (unsigned int i = 0; i < frameCtr; ++i) {
+	for (unsigned int i = 0; i < getFrameCount(); ++i) {
 		remove(*frames[i]);
 	}
 	frameCtr = 0;
@@ -55,11 +57,11 @@ unsigned int KageFrameManager::getID() {
 }
 
 unsigned int KageFrameManager::getFrameCount() {
-	return frameCtr;
+	return frames.size();
 }
 
 bool KageFrameManager::selectAll(bool p_selectAll) {
-	for (unsigned int i = 0; i < frameCtr; ++i) {
+	for (unsigned int i = 0; i < getFrameCount(); ++i) {
 		frames[i]->setSelected(p_selectAll);
 	}
 	return true;
@@ -69,14 +71,36 @@ KageFramesManager *KageFrameManager::getFsm() {
 	return fsm;
 }
 
+/** For use of Kage.  When a KageLayer is clicked, KageLayerManager will
+ * call this function via Kage then sets currently active Frame along Layer
+ * \param p_layer is index of Layer known to KageFrame
+ * \sa getCurrentLayer()
+*/
 void KageFrameManager::setCurrentFrame(unsigned int p_frame) {
-	if (p_frame < 1 || p_frame > getFrameCount()) {
-		return;
+	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
+		frames[_currentFrameIndex]->setSelected(false);
+		frames[_currentFrameIndex]->setCurrent(false);
+	} else {
+		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+			if (frames[i]->frameID == _currentFrameID) {
+				frames[i]->setSelected(false);
+				frames[i]->setCurrent(false);
+				break;
+			}
+		}
 	}
-	for (unsigned int i = 0; i < frameCtr; ++i) {
-		frames[i]->setCurrent(false);
+	
+	unsigned int l_count = getFrameCount();
+	if (p_frame > l_count) {
+		p_frame = l_count;
 	}
-	frames[p_frame-1]->setCurrent(true);
+	if (p_frame < 1) {
+		p_frame = 1;
+	}
+	_currentFrameIndex = p_frame-1;
+	_currentFrameID = frames[_currentFrameIndex]->frameID;
+	frames[_currentFrameIndex]->setSelected(true);
+	frames[_currentFrameIndex]->setCurrent(true);
 }
 
 void KageFrameManager::focusFrame(unsigned int p_frame) {
@@ -92,4 +116,27 @@ KageFrame *KageFrameManager::getFrameAt(unsigned int p_frame) {
 	}
 	
 	return frames[p_frame-1];
+}
+
+
+/** For use of KageFrame.  When a KageFrame is clicked, previously clicked
+ * KageFrame should be un-selected.
+ * \param p_frame is pointer to KageFrame who called this function
+*/
+void KageFrameManager::setSelected(KageFrame *p_frame) {
+	fsm->selectAll(false);
+	fsm->setCurrentLayer(p_frame->layerID);
+	fsm->setCurrentFrame(p_frame->frameID);
+/*	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
+		frames[_currentFrameIndex]->setSelected(false);
+	} else {
+		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+			if (frames[i]->frameID == _currentFrameID) {
+				frames[i]->setSelected(false);
+				break;
+			}
+		}
+	}*/
+	p_frame->setSelected(true);
+	_currentFrameID = p_frame->frameID;
 }

@@ -1167,7 +1167,7 @@ void Kage::renderFrames() {
 void Kage::renderFramesBelowCurrentLayer() {
 	m_KageStage.clearScreen(m_KageStage.cr);
 	unsigned int l_currentLayer = getCurrentLayer();
-		for (unsigned int i = 1; i < t; ++i) {
+		for (unsigned int i = 1; i < l_currentLayer; ++i) {
 			m_KageFramesManager.setCurrentLayer(i);
 			m_KageStage.renderFrame(m_KageStage.cr);
 		}
@@ -1176,7 +1176,7 @@ void Kage::renderFramesBelowCurrentLayer() {
 void Kage::renderFramesAboveCurrentLayer() {
 	unsigned int l_layerCount = m_KageLayerManager.layerCount();
 	unsigned int l_currentLayer = getCurrentLayer();
-		for (unsigned int i = (t + 1); i < l_layerCount; ++i) {
+		for (unsigned int i = (l_currentLayer + 1); i < l_layerCount; ++i) {
 			m_KageFramesManager.setCurrentLayer(i);
 			m_KageStage.renderFrame(m_KageStage.cr);
 		}

@@ -15,6 +15,7 @@
 			KageFramesManager(Kage *p_win);
 			virtual ~KageFramesManager();
 			void addFrameManager(unsigned int p_layer);
+			void deleteFrameManager(unsigned int p_layer);
 			bool addFrame();
 			bool extendFrame(unsigned int p_frameID);
 			void setCurrentFrame(unsigned int p_currentFrame);

@@ -45,12 +45,18 @@
 			virtual ~KageLayer();
 			
 			void setLabel(string p_label);
+			string getLabel();
 			void setSelected(bool p_selected);
 			bool isSelected();
 			unsigned int getFrameSource(); //?!?
 			void setFocus();
 			bool isVisible();
 			bool isLocked();
+			void toggleVisibility();
+			void toggleLock();
+			
+			void setVisible(bool p_visible);
+			void setLock(bool p_lock);
 			
 			unsigned int layerID;
 			

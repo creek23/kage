@@ -30,6 +30,8 @@ SOURCES = \
 	./util/string/stringhelper.cpp \
 	kage.cpp \
 	resources.cpp \
+	about.cpp \
+	layer_rename.cpp \
 	main.cpp
 
 OBJECTS = $(SOURCES:.cpp=.o)

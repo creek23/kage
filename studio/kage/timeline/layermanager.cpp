@@ -48,6 +48,37 @@ void KageLayerManager::addLayer(Glib::ustring p_name) {
 	_currentLayerIndex = layers.size()-1;
 }
 
+void KageLayerManager::deleteLayer() {
+	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
+		if (layers[_currentLayerIndex]->isSelected()) {
+			cout << " deleting; index " << _currentLayerIndex << endl;
+			remove(*layers[_currentLayerIndex]);
+		//	delete layers[_currentLayerIndex];
+			layers.erase (layers.begin() + (_currentLayerIndex-1));
+			_currentLayerIndex = layerCount();
+			_currentLayerID = UINT_MAX;
+		} else {
+			cout << " layer not selected" << endl;
+		}
+	} else {
+		cout << " unknown layer; identifying..." << endl;
+		for (unsigned int i = 0; i < layerCount(); ++i) {
+			if (layers[i]->layerID == _currentLayerID) {
+				if (layers[i]->isSelected()) {
+					cout << " deleting; index " << i << endl;
+					remove(*layers[i]);
+				//	delete layers[i];
+					layers.erase (layers.begin() + (i-1));
+					_currentLayerIndex = layerCount();
+					_currentLayerID = UINT_MAX;
+					return;
+				}
+				break;
+			}
+		}
+	}
+}
+
 bool KageLayerManager::removeAllLayers() {
 	for (unsigned int i = 0; i < layerCount(); ++i) {
 		remove(*layers[i]);
@@ -60,7 +91,7 @@ bool KageLayerManager::removeAllLayers() {
 /** For use of KageLayer.  When a KageLayer is clicked, previously clicked
  * KageLayer should be un-selected.
  * \param p_layer is pointer to KageLayer who called this function
-*/
+ */
 void KageLayerManager::setSelected(KageLayer *p_layer) {
 	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
 		layers[_currentLayerIndex]->setSelected(false);
@@ -81,7 +112,7 @@ void KageLayerManager::setSelected(KageLayer *p_layer) {
 /** Not to be confused of getCurrentLayer().  This function returns the
  * pointer to active KageLayer Object to caller
  * \return pointer to registered active layer
-*/
+ */
 KageLayer *KageLayerManager::getLayer() {
 	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
 		return layers[_currentLayerIndex];
@@ -96,6 +127,19 @@ KageLayer *KageLayerManager::getLayer() {
 	return NULL;
 }
 
+bool KageLayerManager::isLayerVisible() {
+	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
+		return layers[_currentLayerIndex]->isVisible();
+	} else {
+		for (unsigned int i = 0; i < layerCount(); ++i) {
+			if (layers[i]->layerID == _currentLayerID) {
+				_currentLayerIndex = i;
+				return layers[i]->isVisible();
+			}
+		}
+	}
+	return true;
+}
 bool KageLayerManager::isLayerLocked() {
 	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
 		return layers[_currentLayerIndex]->isLocked();
@@ -114,7 +158,7 @@ bool KageLayerManager::isLayerLocked() {
  * layers in KageLayerManager.
  * \return index of registered active layer
  * \sa setCurrentLayer()
-*/
+ */
 unsigned int KageLayerManager::getCurrentLayer() {
 	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
 		return _currentLayerIndex+1;
@@ -132,7 +176,7 @@ unsigned int KageLayerManager::getCurrentLayer() {
  * call this function via Kage then sets currently active Layer
  * \param p_layer is index of Layer known to KageFrame
  * \sa getCurrentLayer()
-*/
+ */
 void KageLayerManager::setCurrentLayer(unsigned int p_layer) {
 	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
 		layers[_currentLayerIndex]->setSelected(false);
@@ -159,7 +203,7 @@ void KageLayerManager::setCurrentLayer(unsigned int p_layer) {
 
 /** For use of KageLayer.  When a KageLayer's visibility is clicked,
  * this function will be called to reflect Layer's visibility on stage.
-*/
+ */
 void KageLayerManager::renderStage() {
 	Kage::timestamp();
 	cout << " KageLayerManager::renderStage <" << endl;
@@ -170,7 +214,121 @@ void KageLayerManager::renderStage() {
 
 /** For use of Kage when exporting/saving to file.
  * \return size of array of KageLayer
-*/
+ */
 unsigned int KageLayerManager::layerCount() {
 	return layers.size();
+}
+
+/** For use of KageLayer when User double-clicked Layer
+ * \sa renameLayer()
+ */
+void KageLayerManager::renameLayer(KageLayer *p_layer) {
+	setSelected(p_layer);
+	
+	LayerRenameDialog* pDialog = new LayerRenameDialog(*win, p_layer);
+		pDialog->run();
+	delete pDialog;
+}
+
+/** For use of Kage when User clicked Layer->Rename
+ * \sa renameLayer(KageLayer)
+ */
+void KageLayerManager::renameLayer() {
+	KageLayer *l_layer = NULL;
+	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
+		l_layer = layers[_currentLayerIndex];
+	} else {
+		for (unsigned int i = 0; i < layerCount(); ++i) {
+			if (layers[i]->layerID == _currentLayerID) {
+				l_layer = layers[i];
+				break;
+			}
+		}
+	}
+	
+	if (l_layer) {
+		LayerRenameDialog* pDialog = new LayerRenameDialog(*win, l_layer);
+			pDialog->run();
+		delete pDialog;
+	}
+}
+void KageLayerManager::setLabel(string p_label) {
+	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
+		layers[_currentLayerIndex]->setLabel(p_label);
+	} else {
+		for (unsigned int i = 0; i < layerCount(); ++i) {
+			if (layers[i]->layerID == _currentLayerID) {
+				layers[i]->setLabel(p_label);
+				break;
+			}
+		}
+	}
+}
+
+string KageLayerManager::getLabel() {
+	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
+		return layers[_currentLayerIndex]->getLabel();
+	} else {
+		for (unsigned int i = 0; i < layerCount(); ++i) {
+			if (layers[i]->layerID == _currentLayerID) {
+				return layers[i]->getLabel();
+				break;
+			}
+		}
+	}
+	
+	return "(blank)";
+}
+void KageLayerManager::toggleVisibility() {
+	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
+		layers[_currentLayerIndex]->toggleVisibility();
+	} else {
+		for (unsigned int i = 0; i < layerCount(); ++i) {
+			if (layers[i]->layerID == _currentLayerID) {
+				_currentLayerIndex = i;
+				layers[i]->toggleVisibility();
+			}
+		}
+	}
+	renderStage();
+}
+void KageLayerManager::toggleLock() {
+	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
+		layers[_currentLayerIndex]->toggleLock();
+	} else {
+		for (unsigned int i = 0; i < layerCount(); ++i) {
+			if (layers[i]->layerID == _currentLayerID) {
+				_currentLayerIndex = i;
+				layers[i]->toggleLock();
+			}
+		}
+	}
+	renderStage();
+}
+
+void KageLayerManager::setVisible(bool p_visible) {
+	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
+		layers[_currentLayerIndex]->setVisible(p_visible);
+	} else {
+		for (unsigned int i = 0; i < layerCount(); ++i) {
+			if (layers[i]->layerID == _currentLayerID) {
+				_currentLayerIndex = i;
+				layers[i]->setVisible(p_visible);
+			}
+		}
+	}
+	renderStage();
+}
+void KageLayerManager::setLock(bool p_lock) {
+	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
+		layers[_currentLayerIndex]->setLock(p_lock);
+	} else {
+		for (unsigned int i = 0; i < layerCount(); ++i) {
+			if (layers[i]->layerID == _currentLayerID) {
+				_currentLayerIndex = i;
+				layers[i]->setLock(p_lock);
+			}
+		}
+	}
+	renderStage();
 }

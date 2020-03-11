@@ -95,7 +95,8 @@ bool KageLayer::on_event(GdkEvent *e) {
 		std::cout << " KageLayer(L " << layerID << ") on_event leave" << std::endl;
 		render();
 	} else if (e->type == GDK_DOUBLE_BUTTON_PRESS) {
-		_txtLabel.show();
+		_layerManager->renameLayer(this);
+		//_txtLabel.show();
 	} else if (e->type == GDK_BUTTON_RELEASE) {
 		KageLayer::mouseIsDown = false;
 		grab_focus();
@@ -103,21 +104,9 @@ bool KageLayer::on_event(GdkEvent *e) {
 	} else if (e->type == GDK_BUTTON_PRESS) {
 		KageLayer::mouseIsDown = true;
 		if (e->button.x < 18) {
-			//toggle visibility
-			if (_visible == true) {
-				_visible = false;
-			} else {
-				_visible = true;
-			}
-			forceRender();
+			toggleVisibility();
 		} else if (e->button.x < 36) {
-			//toggle lock
-			if (_lock == true) {
-				_lock = false;
-			} else {
-				_lock = true;
-			}
-			forceRender();
+			toggleLock();
 		} else {
 			_layerManager->setSelected(this);
 		}
@@ -226,6 +215,9 @@ void KageLayer::setLabel(string p_label) {
 	_label = p_label;
 	render();
 }
+string KageLayer::getLabel() {
+	return _label;
+}
 void KageLayer::setSelected(bool p_selected) {
 	_selected = p_selected;
 	render();
@@ -244,4 +236,32 @@ bool KageLayer::isLocked() {
 
 void KageLayer::setFocus() {
 	grab_focus();
+}
+
+void KageLayer::toggleVisibility() {
+	if (_visible == true) {
+		_visible = false;
+	} else {
+		_visible = true;
+	}
+	forceRender();
+}
+
+void KageLayer::toggleLock() {
+	if (_lock == true) {
+		_lock = false;
+	} else {
+		_lock = true;
+	}
+	forceRender();
+}
+
+void KageLayer::setVisible(bool p_visible) {
+	_visible = p_visible;
+	forceRender();
+}
+
+void KageLayer::setLock(bool p_lock) {
+	_lock = p_lock;
+	forceRender();
 }

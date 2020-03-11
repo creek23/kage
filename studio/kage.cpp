@@ -1,6 +1,5 @@
 
 #include "kage.h"
-#include "about.cpp"
 
 const Glib::ustring app_title = "Kage Studio";
 
@@ -84,6 +83,7 @@ Kage::Kage() : m_KageLayerManager(this),
 	m_refActionGroup->add( Gtk::Action::create("ExportMenu", "_Export...") ); 
 	m_refActionGroup->add( Gtk::Action::create("ExportPNGMenu", "_PNG...") ); 
 	m_refActionGroup->add( Gtk::Action::create("EditMenu", "_Edit") );
+	m_refActionGroup->add( Gtk::Action::create("LayerMenu", "_Layer") );
 	m_refActionGroup->add( Gtk::Action::create("ObjectMenu", "_Object") );
 	m_refActionGroup->add( Gtk::Action::create("TimelineMenu", "_Timeline") );
 	m_refActionGroup->add( Gtk::Action::create("ToolsMenu", "T_ools") );
@@ -179,6 +179,26 @@ Kage::Kage() : m_KageLayerManager(this),
 		Gtk::Action::create("Deselect", "D_eselect", "Deselect"),
 		Gtk::AccelKey("Escape"),
 		sigc::mem_fun(*this, &Kage::Deselect_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("LayerAdd", "_Add Layer", "Add New Layer"),
+		Gtk::AccelKey("<shift><control>N"),
+		sigc::mem_fun(*this, &Kage::LayerAdd_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("LayerRename", "Re_name Layer", "Rename Current Layer"),
+		Gtk::AccelKey("F2"),
+		sigc::mem_fun(*this, &Kage::LayerRename_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("ShowHideLayer", "_Show/Hide Current Layer", "Toggle Layer Visibility"),
+//		Gtk::AccelKey("F2"),
+		sigc::mem_fun(*this, &Kage::ShowHideLayer_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("LockUnlockLayer", "_Lock/Unlock Current Layer", "Toggle Access to Layer"),
+//		Gtk::AccelKey("F2"),
+		sigc::mem_fun(*this, &Kage::LockUnlockLayer_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("ShapeGroup", "_Group Objects", "Group Selected Objects"),
@@ -376,6 +396,13 @@ Kage::Kage() : m_KageLayerManager(this),
 		"			<separator/>"
 		"			<menuitem action='SelectAll'/>"
 		"			<menuitem action='Deselect'/>"
+		"		</menu>"
+		"		<menu action='LayerMenu'>"
+		"			<menuitem action='LayerAdd'/>"
+		"			<menuitem action='LayerRename'/>"
+		"			<separator/>"
+		"			<menuitem action='ShowHideLayer'/>"
+		"			<menuitem action='LockUnlockLayer'/>"
 		"		</menu>"
 		"		<menu action='ObjectMenu'>"
 		"			<menuitem action='ShapeGroup'/>"
@@ -910,6 +937,15 @@ void Kage::LayerAdd_onClick() {
 	show_all();
 	updateStatus("New Layer Added");
 }
+void Kage::LayerRename_onClick() {
+	m_KageLayerManager.renameLayer();
+}
+void Kage::ShowHideLayer_onClick() {
+	m_KageLayerManager.toggleVisibility();
+}
+void Kage::LockUnlockLayer_onClick() {
+	m_KageLayerManager.toggleLock();
+}
 void Kage::LayerDel_onClick() {
 	std::cout << "Layer Delete Button clicked." << std::endl;
 }
@@ -1112,8 +1148,8 @@ void Kage::onButtonClick() {
 	hide();
 }
 
-void Kage::addDataToFrame(VectorDataManager v) {
-	if (m_KageLayerManager.getLayer()->isLocked() == false) {
+void Kage::addDataToFrame(VectorDataManager v, bool p_force) {
+	if (p_force || m_KageLayerManager.getLayer()->isLocked() == false) {
 		KageFrame *l_frame = m_KageFramesManager.getFrame();
 		if (l_frame) {
 			l_frame->vectorsData.push(v);
@@ -1121,8 +1157,8 @@ void Kage::addDataToFrame(VectorDataManager v) {
 		}
 	}
 }
-VectorDataManager Kage::getFrameData() {
-	if (m_KageLayerManager.getLayer()->isVisible()) {
+VectorDataManager Kage::getFrameData(bool p_force) {
+	if (p_force || m_KageLayerManager.getLayer()->isVisible()) {
 		KageFrame *l_frame = m_KageFramesManager.getFrame();
 		if (l_frame) {
 			return l_frame->vectorsData;
@@ -1296,7 +1332,7 @@ void Kage::Save_onClick() {
 					unsigned int l_currentLayer;
 					unsigned int l_currentFrame;
 			
-			saveKageStudio(ksfPath, "<KageStudio version=\"2019.10.14\">");
+			saveKageStudio(ksfPath, "<KageStudio version=\"2020.03.10\">");
 			saveKageStudio(ksfPath, "<stage width=\"" + StringHelper::StringHelper::doubleToString(m_KageStage.stageWidth) + "\" height=\"" + StringHelper::StringHelper::doubleToString(m_KageStage.stageHeight) + "\" " +
 			                        "background=\"rgb(" + StringHelper::integerToString(m_KageStage.stageBG.getR()) + ", " + StringHelper::integerToString(m_KageStage.stageBG.getG()) + ", " + StringHelper::integerToString(m_KageStage.stageBG.getB()) + ")\" " +
 			                        "fps=\"" + StringHelper::integerToString(m_KageStage.fps) + "\" " +
@@ -1306,7 +1342,7 @@ void Kage::Save_onClick() {
 				l_currentFrame = m_KageFramesManager.getCurrentFrame();
 					for (i = 1; i <= l_lMax; i++) {
 						m_KageFramesManager.setCurrentLayer(i);
-						saveKageStudio(ksfPath, "<layer" + StringHelper::unsignedIntegerToString(i) + ">");
+						saveKageStudio(ksfPath, "<layer" + StringHelper::unsignedIntegerToString(i) + " label=\"" + m_KageLayerManager.getLabel() + "\" visible=\"" + (m_KageLayerManager.isLayerVisible()?"true":"false") + "\" locked=\"" + (m_KageLayerManager.isLayerLocked()?"true":"false") + "\">");
 						for (j = 1; j <= l_fMax; ++j) {
 							saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + ">");
 							m_KageFramesManager.setCurrentFrame(j);
@@ -1996,7 +2032,7 @@ void Kage::updateSelectedShapeColor(bool p_doFill, bool p_doStroke) {
 }
 
 string Kage::saveFrame() {
-	vector<VectorData> v = getFrameData().getVectorData();
+	vector<VectorData> v = getFrameData(true).getVectorData();
 	
 	ostringstream l_ostringstream;
 	unsigned int vsize = v.size();//-1;
@@ -2338,6 +2374,18 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 			while (l_layer > m_KageFramesManager.layerCount()) {
 				m_KageLayerManager.addLayer();
 				m_KageFramesManager.addFrameManager(m_KageLayerManager.layerCount());
+				m_KageFramesManager.setCurrentLayer(m_KageLayerManager.layerCount());
+			}
+			
+			for (unsigned int l_propertyIndex = 0; l_propertyIndex < l_properties.size(); ++l_propertyIndex) {
+				cout << "\t\t\t\t\t\tA l_properties[" << l_propertyIndex << "].getName() " << l_properties[l_propertyIndex].getName() << " = " << l_properties[l_propertyIndex].getValue() << " ? " << StringHelper::toBoolean(l_properties[l_propertyIndex].getValue()) << endl;
+				if (l_properties[l_propertyIndex].getName() == "label") {
+					m_KageLayerManager.setLabel(l_properties[l_propertyIndex].getValue());
+				} else if (l_properties[l_propertyIndex].getName() == "visible") {
+					m_KageLayerManager.setVisible(StringHelper::toBoolean(l_properties[l_propertyIndex].getValue()));
+				} else if (l_properties[l_propertyIndex].getName() == "locked") {
+					m_KageLayerManager.setLock(StringHelper::toBoolean(l_properties[l_propertyIndex].getValue()));
+				}
 			}
 			m_KageFramesManager.setCurrentLayer(l_layer);
 		} else if (l_tagname.substr(0, 5) == "frame") {
@@ -2349,24 +2397,24 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 		} else if (l_tagname == "init") {
 			VectorDataManager v;
 				v.addInit();
-			addDataToFrame(v);
+			addDataToFrame(v, true);
 		} else if (l_tagname == "fill") {
 			VectorDataManager v;
 			vector<int> l_colors = parseColorString(l_properties[0].getValue()); //color
 				v.addFill(ColorData(l_colors[0], l_colors[1], l_colors[2], l_colors[3]));
-			addDataToFrame(v);
+			addDataToFrame(v, true);
 		} else if (l_tagname == "stroke") {
 			VectorDataManager v;
 			vector<int> l_colors = parseColorString(l_properties[0].getValue()); //color
 				StrokeColorData l_stroke = StrokeColorData(l_colors[0], l_colors[1], l_colors[2], l_colors[3]);
 				l_stroke.setThickness(StringHelper::toDouble(l_properties[1].getValue()));//thickness
 				v.addLineStyle(l_stroke);
-			addDataToFrame(v);
+			addDataToFrame(v, true);
 		} else if (l_tagname == "move") {
 			VectorDataManager v;
 			vector<double> l_numbers = parseNumbers(p_children[i]._value); //XYs
 				v.addMove(PointData(l_numbers[0], l_numbers[1]));
-			addDataToFrame(v);
+			addDataToFrame(v, true);
 		} else if (l_tagname == "cubiccurve") {
 			VectorDataManager v;
 			vector<double> l_numbers = parseNumbers(p_children[i]._value); //XYs
@@ -2374,11 +2422,11 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 					PointData(l_numbers[0], l_numbers[1]),
 					PointData(l_numbers[2], l_numbers[3]),
 					PointData(l_numbers[4], l_numbers[5]));
-			addDataToFrame(v);
+			addDataToFrame(v, true);
 		} else if (l_tagname == "closepath") {
 			VectorDataManager v;
 				v.addClosePath();
-			addDataToFrame(v);
+			addDataToFrame(v, true);
 		} else if (l_tagname == "stage") {
 			for (unsigned int j = 0; j < l_properties.size(); ++j) {
 				if (l_properties[j].getName() == "width") {
@@ -2401,7 +2449,7 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 		if (l_tagname == "fill") {
 			VectorDataManager v;
 				v.addEndFill();
-			addDataToFrame(v);
+			addDataToFrame(v, true);
 		}
 	}
 	m_KageStage.render();
@@ -2417,7 +2465,11 @@ void Kage::parseKSF(string p_content) {
 				vector<XmlTagProperty> l_xmlTagProperties = l_root.getProperties();
 				if (l_xmlTagProperties.size() > 0
 						&& l_xmlTagProperties[0].getName() == "version"
-						&& l_xmlTagProperties[0].getValue() == "2019.10.14") {					
+						&&
+						(	   l_xmlTagProperties[0].getValue() == "2019.10.14"
+							|| l_xmlTagProperties[0].getValue() == "2020.03.10"
+						)
+					) {					
 					parseKSF_Children(l_root._children);
 					updateStatus("Loaded " + ksfPath);
 				}

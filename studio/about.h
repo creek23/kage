@@ -6,10 +6,12 @@
 	#include <gtkmm/dialog.h>
 	#include <gtkmm/box.h>
 	#include <gtkmm/label.h>
-	#include <gtkmm/entry.h>
+	#include <gtkmm/stock.h>
 	#include <gtkmm/image.h>
 	#include <gtkmm/table.h>
-
+	
+	using namespace std;
+	
 	class AboutDialog : public Gtk::Dialog {
 		public:
 			AboutDialog(Gtk::Window& parent);

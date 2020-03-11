@@ -39,6 +39,7 @@
 			static unsigned int toUnsignedInteger(string p_str);
 			static long toLong(string p_str);
 			static double toDouble(string p_str);
+			static bool toBoolean(string p_str);
 	};
 	
 #endif //UTIL_STRING_HELPER_H

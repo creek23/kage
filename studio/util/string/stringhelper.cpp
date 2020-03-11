@@ -90,3 +90,11 @@ double StringHelper::toDouble(string p_src) {
 	//TODO: validate string to be numerics
 	return (double)atof(p_src.c_str());
 }
+
+bool StringHelper::toBoolean(string p_src) {
+	if (p_src == "1" || StringHelper::toLower(p_src) == "true") {
+		return true;
+	} else {
+		return false;
+	}
+}

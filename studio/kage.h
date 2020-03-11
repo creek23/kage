@@ -50,8 +50,8 @@
 			Kage();
 			virtual ~Kage();
 			
-			void addDataToFrame(VectorDataManager v);
-			VectorDataManager getFrameData();
+			void addDataToFrame(VectorDataManager v, bool p_force = false);
+			VectorDataManager getFrameData(bool p_force = false);
 			void setFrameData(VectorDataManager p_vectorsData);
 			void forceRenderFrames();
 			void renderFrames();
@@ -83,6 +83,9 @@
 			virtual void updateStatus(Glib::ustring status_msg);
 			virtual void onButtonClick();
 			virtual void LayerAdd_onClick();
+			virtual void LayerRename_onClick();
+			virtual void ShowHideLayer_onClick();
+			virtual void LockUnlockLayer_onClick();
 			virtual void LayerDel_onClick();
 			virtual void onToolButtonsClick(Gtk::ToggleButton *p_sourceButton);
 			virtual void onActionActivate();

@@ -28,6 +28,7 @@
 	#include <gtkmm/label.h>
 	#include <gtkmm/button.h>
 	#include "layer.h"
+	#include "../../layer_rename.h"
 	
 	class Kage;
 	
@@ -37,13 +38,27 @@
 			virtual ~KageLayerManager();
 			unsigned layerCount();
 			void addLayer(Glib::ustring p_name = "");
+			void deleteLayer();
 			bool removeAllLayers();
 			void setSelected(KageLayer *p_layer);
 			KageLayer *getLayer();
 			unsigned int getCurrentLayer();
 			void setCurrentLayer(unsigned int p_layer);
 			void renderStage();
+			
+			void toggleLock();
 			bool isLayerLocked();
+			void setLock(bool p_lock);
+			
+			void toggleVisibility();
+			bool isLayerVisible();
+			void setVisible(bool p_visible);
+			
+			void renameLayer(KageLayer *p_layer);
+			void renameLayer();
+			void setLabel(string p_label);
+			string getLabel();
+			
 		protected:
 			Kage *win;
 			unsigned int layerCtr;

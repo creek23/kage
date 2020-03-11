@@ -101,11 +101,12 @@ bool KageFrame::render() {
 		window = get_window();
 	}
 	
-	// force our program to redraw the entire stage
-	Gdk::Rectangle r(0, 0, get_allocation().get_width(),
-			get_allocation().get_height());
-	window->invalidate_rect(r, false);
-	
+	if (window) {
+		// force our program to redraw the entire stage
+		Gdk::Rectangle r(0, 0, get_allocation().get_width(),
+				get_allocation().get_height());
+		window->invalidate_rect(r, false);
+	}
 	return true;
 }
 

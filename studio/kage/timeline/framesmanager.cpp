@@ -33,6 +33,12 @@ void KageFramesManager::addFrameManager(unsigned int p_layer) {
 		pack_end(*framemanager.back(), Gtk::PACK_SHRINK);
 }
 
+void KageFramesManager::deleteFrameManager(unsigned int p_layer) {
+	framemanager[p_layer]->removeAllFrames();
+	remove(*framemanager[p_layer]);
+	framemanager.erase (framemanager.begin() + (p_layer-1));
+}
+
 bool KageFramesManager::addFrame() {
 	unsigned int l_count = 1;
 	if (framemanager.size() > 0) {
@@ -130,7 +136,10 @@ void KageFramesManager::setCurrentFrame(unsigned int p_currentFrame) {
 		if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
 			//do nothing
 		} else {
-			framemanager[l_currentLayer-1]->getFrameAt(p_currentFrame)->setSelected(true);
+			KageFrame * l_frame = framemanager[l_currentLayer-1]->getFrameAt(p_currentFrame);
+			if (l_frame) {
+				l_frame->setSelected(true);
+			}
 		}
 		
 		KageFramesManager::currentFrame = p_currentFrame;

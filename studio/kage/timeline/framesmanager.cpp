@@ -79,7 +79,7 @@ bool KageFramesManager::removeAllFrames() {
 	}
 	
 	framemanager.clear();
-	addFrameManager(0);
+	//addFrameManager(0); //is this needed?!? -- 2020.03.14
 	
 	return true;
 }
@@ -98,6 +98,9 @@ void KageFramesManager::setCurrentLayer(unsigned int p_currentLayer) {
 	}
 	
 	win->setCurrentLayer(p_currentLayer);
+}
+void KageFramesManager::setCurrentLayerByID(unsigned int p_layerID) {
+	win->setCurrentLayerByID(p_layerID);
 }
 
 unsigned int KageFramesManager::getCurrentFrame() {
@@ -178,4 +181,87 @@ KageFrame *KageFramesManager::getFrame() {
 			return framemanager[l_currentLayer-1]->getFrameAt(getCurrentFrame());
 		}
 	}
+}
+
+/**
+ * NOTE: framemanagers are organized as index 0 as BOTTOM and last index is TOP
+ * \sa moveDown() moveToBottom() moveUp()
+ * \return True if framemanager successfully moved to top
+ */
+bool KageFramesManager::moveToTop() {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+		//
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		if (l_currentLayer < framemanager.size()-1) {
+			while (l_currentLayer < framemanager.size()-1) {
+				reorder_child(*framemanager[l_currentLayer], l_currentLayer+1);
+				swap(framemanager[l_currentLayer], framemanager[l_currentLayer+1]);
+				l_currentLayer = l_currentLayer+1;
+			}
+			return true;
+		}
+	}
+	return false;
+}
+/**
+ * NOTE: framemanagers are organized as index 0 as BOTTOM and last index is TOP
+ * \sa moveDown() moveToBottom() moveToTop()
+ * \return True if framemanager successfully moved up
+ */
+bool KageFramesManager::moveUp() {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+		//
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		if (l_currentLayer < framemanager.size()-1) {
+			reorder_child(*framemanager[l_currentLayer], l_currentLayer+1);
+			swap(framemanager[l_currentLayer], framemanager[l_currentLayer+1]);
+			return true;
+		}
+	}
+	return false;
+}
+/**
+ * NOTE: framemanagers are organized as index 0 as BOTTOM and last index is TOP
+ * \sa moveToBottom() moveToTop() moveUp()
+ * \return True if framemanager successfully moved down
+ */
+bool KageFramesManager::moveDown() {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+		//
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		if (l_currentLayer > 0) {
+			reorder_child(*framemanager[l_currentLayer], l_currentLayer-1);
+			swap(framemanager[l_currentLayer], framemanager[l_currentLayer-1]);
+			return true;
+		}
+	}
+	return false;
+}
+/**
+ * NOTE: framemanagers are organized as index 0 as BOTTOM and last index is TOP
+ * \sa moveDown() moveToTop() moveUp()
+ * \return True if framemanager successfully moved to bottom
+ */
+bool KageFramesManager::moveToBottom() {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+		//
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		if (l_currentLayer > 0) {
+			while (l_currentLayer > 0) {
+				reorder_child(*framemanager[l_currentLayer], l_currentLayer-1);
+				swap(framemanager[l_currentLayer], framemanager[l_currentLayer-1]);
+				l_currentLayer = l_currentLayer-1;
+			}
+			return true;
+		}
+	}
+	return false;
 }

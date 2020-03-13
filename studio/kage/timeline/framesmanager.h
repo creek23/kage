@@ -21,6 +21,7 @@
 			void setCurrentFrame(unsigned int p_currentFrame);
 			unsigned int getCurrentFrame();
 			void setCurrentLayer(unsigned int p_currentLayer);
+			void setCurrentLayerByID(unsigned int p_layerID);
 			unsigned int getCurrentLayer(); //currently used by getFrame()
 			unsigned int layerCount();
 			unsigned int frameCount();
@@ -32,6 +33,10 @@
 			bool removeFrame(unsigned int p_frameID);
 			bool removeAllFrames();
 			
+			bool moveToTop();
+			bool moveUp();
+			bool moveDown();
+			bool moveToBottom();
 		protected:
 			Kage *win;
 			Gtk::Label place_holder;

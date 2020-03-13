@@ -33,7 +33,7 @@ KageLayerManager::~KageLayerManager() {
 	layers.clear();
 }
 
-void KageLayerManager::addLayer(Glib::ustring p_name) {
+unsigned int KageLayerManager::addLayer(Glib::ustring p_name) {
 	++layerCtr;
 	if (p_name == "") {
 		p_name = Glib::ustring::compose("Layer %1", layerCtr);
@@ -46,6 +46,8 @@ void KageLayerManager::addLayer(Glib::ustring p_name) {
 			(*layers.back()).set_focus_on_click(false);
 	_currentLayerID = (*layers.back()).layerID;
 	_currentLayerIndex = layers.size()-1;
+	
+	return layerCtr;
 }
 
 void KageLayerManager::deleteLayer() {
@@ -98,6 +100,7 @@ void KageLayerManager::setSelected(KageLayer *p_layer) {
 	} else {
 		for (unsigned int i = 0; i < layerCount(); ++i) {
 			if (layers[i]->layerID == _currentLayerID) {
+				_currentLayerIndex = i;
 				layers[i]->setSelected(false);
 				break;
 			}
@@ -201,6 +204,36 @@ void KageLayerManager::setCurrentLayer(unsigned int p_layer) {
 	layers[_currentLayerIndex]->setSelected(true);
 }
 
+/** For use of Kage.  When a KageFrame is clicked, KageFramesManager will
+ * call this function via Kage then sets currently active Layer
+ * \param p_layerID is layerID of Layer known to KageFrame
+ * \sa getCurrentLayer()
+ */
+void KageLayerManager::setCurrentLayerByID(unsigned int p_layerID) {
+	//unselect current layer
+	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
+		layers[_currentLayerIndex]->setSelected(false);
+	} else {
+		for (unsigned int i = 0; i < layerCount(); ++i) {
+			if (layers[i]->layerID == _currentLayerID) {
+				_currentLayerID = p_layerID;
+				layers[i]->setSelected(false);
+				break;
+			}
+		}
+	}
+	//select new layer by ID	
+	for (unsigned int i = 0; i < layerCount(); ++i) {
+		if (layers[i]->layerID == p_layerID) {
+			_currentLayerIndex = i;
+			_currentLayerID = p_layerID;
+			layers[_currentLayerIndex]->setSelected(true);
+			break;
+		}
+	}
+}
+
+
 /** For use of KageLayer.  When a KageLayer's visibility is clicked,
  * this function will be called to reflect Layer's visibility on stage.
  */
@@ -240,6 +273,7 @@ void KageLayerManager::renameLayer() {
 	} else {
 		for (unsigned int i = 0; i < layerCount(); ++i) {
 			if (layers[i]->layerID == _currentLayerID) {
+				_currentLayerIndex = i;
 				l_layer = layers[i];
 				break;
 			}
@@ -258,6 +292,7 @@ void KageLayerManager::setLabel(string p_label) {
 	} else {
 		for (unsigned int i = 0; i < layerCount(); ++i) {
 			if (layers[i]->layerID == _currentLayerID) {
+				_currentLayerIndex = i;
 				layers[i]->setLabel(p_label);
 				break;
 			}
@@ -272,7 +307,6 @@ string KageLayerManager::getLabel() {
 		for (unsigned int i = 0; i < layerCount(); ++i) {
 			if (layers[i]->layerID == _currentLayerID) {
 				return layers[i]->getLabel();
-				break;
 			}
 		}
 	}
@@ -287,6 +321,7 @@ void KageLayerManager::toggleVisibility() {
 			if (layers[i]->layerID == _currentLayerID) {
 				_currentLayerIndex = i;
 				layers[i]->toggleVisibility();
+				break;
 			}
 		}
 	}
@@ -300,6 +335,7 @@ void KageLayerManager::toggleLock() {
 			if (layers[i]->layerID == _currentLayerID) {
 				_currentLayerIndex = i;
 				layers[i]->toggleLock();
+				break;
 			}
 		}
 	}
@@ -314,6 +350,7 @@ void KageLayerManager::setVisible(bool p_visible) {
 			if (layers[i]->layerID == _currentLayerID) {
 				_currentLayerIndex = i;
 				layers[i]->setVisible(p_visible);
+				break;
 			}
 		}
 	}
@@ -327,8 +364,119 @@ void KageLayerManager::setLock(bool p_lock) {
 			if (layers[i]->layerID == _currentLayerID) {
 				_currentLayerIndex = i;
 				layers[i]->setLock(p_lock);
+				break;
 			}
 		}
 	}
 	renderStage();
+}
+
+/**
+ * NOTE: layers are organized as index 0 as BOTTOM and last index is TOP
+ * \sa moveDown() moveToBottom() moveUp()
+ * \return True if successfully moved to bottom
+ */
+bool KageLayerManager::moveToTop() {
+	bool l_return = false;
+	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
+		while (_currentLayerIndex < layerCount()-1) {
+			l_return = moveUp();
+		}
+		return l_return;
+	} else {
+		for (unsigned int i = 0; i < layerCount(); ++i) {
+			if (layers[i]->layerID == _currentLayerID) {
+				_currentLayerIndex = i;
+				while (_currentLayerIndex < layerCount()-1) {
+					l_return = moveUp();
+				}
+				return l_return;
+			}
+		}
+	}
+	return false;
+}
+/**
+ * NOTE: layers are organized as index 0 as BOTTOM and last index is TOP
+ * \sa moveDown() moveToBottom() moveToTop()
+ * \return True if successfully moved to bottom
+ */
+bool KageLayerManager::moveUp() {
+	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
+		if (_currentLayerIndex < layerCount()-1) {
+			reorder_child(*layers[_currentLayerIndex], _currentLayerIndex+1);
+			swap(layers[_currentLayerIndex], layers[_currentLayerIndex+1]);
+			_currentLayerIndex = _currentLayerIndex+1;
+			return true;
+		}
+	} else {
+		for (unsigned int i = 0; i < layerCount(); ++i) {
+			if (layers[i]->layerID == _currentLayerID) {
+				_currentLayerIndex = i;
+				if (_currentLayerIndex < layerCount()-1) {
+					reorder_child(*layers[_currentLayerIndex], _currentLayerIndex+1);
+					swap(layers[_currentLayerIndex], layers[_currentLayerIndex+1]);
+					_currentLayerIndex = _currentLayerIndex+1;
+					return true;
+				}
+				break;
+			}
+		}
+	}
+	return false;
+}
+/**
+ * NOTE: layers are organized as index 0 as BOTTOM and last index is TOP
+ * \sa moveToBottom() moveToTop() moveUp()
+ * \return True if successfully moved to bottom
+ */
+bool KageLayerManager::moveDown() {
+	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
+		if (_currentLayerIndex > 0) {
+			reorder_child(*layers[_currentLayerIndex], _currentLayerIndex-1);
+			swap(layers[_currentLayerIndex], layers[_currentLayerIndex-1]);
+			_currentLayerIndex = _currentLayerIndex-1;
+			return true;
+		}
+	} else {
+		for (unsigned int i = 0; i < layerCount(); ++i) {
+			if (layers[i]->layerID == _currentLayerID) {
+				_currentLayerIndex = i;
+				if (_currentLayerIndex > 0) {
+					reorder_child(*layers[_currentLayerIndex], _currentLayerIndex-1);
+					swap(layers[_currentLayerIndex], layers[_currentLayerIndex-1]);
+					_currentLayerIndex = _currentLayerIndex-1;
+					return true;
+				}
+				break;
+			}
+		}
+	}
+	return false;
+}
+/**
+ * NOTE: layers are organized as index 0 as BOTTOM and last index is TOP
+ * \sa moveDown() moveToTop() moveUp()
+ * \return True if successfully moved to bottom
+ */
+bool KageLayerManager::moveToBottom() {
+	bool l_return = false;
+	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
+		while (_currentLayerIndex > 0) {
+			l_return = moveDown();
+		}
+		return l_return;
+	} else {
+		for (unsigned int i = 0; i < layerCount(); ++i) {
+			if (layers[i]->layerID == _currentLayerID) {
+				_currentLayerIndex = i;
+				while (_currentLayerIndex > 0) {
+					l_return = moveDown();
+				}
+				return l_return;
+				break;
+			}
+		}
+	}
+	return false;
 }

@@ -125,7 +125,7 @@ KageFrame *KageFrameManager::getFrameAt(unsigned int p_frame) {
 */
 void KageFrameManager::setSelected(KageFrame *p_frame) {
 	fsm->selectAll(false);
-	fsm->setCurrentLayer(p_frame->layerID);
+	fsm->setCurrentLayerByID(p_frame->layerID);
 	fsm->setCurrentFrame(p_frame->frameID);
 /*	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		frames[_currentFrameIndex]->setSelected(false);

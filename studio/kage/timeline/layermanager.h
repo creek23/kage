@@ -36,14 +36,15 @@
 		public:
 			KageLayerManager(Kage *p_win);
 			virtual ~KageLayerManager();
-			unsigned layerCount();
-			void addLayer(Glib::ustring p_name = "");
+			unsigned int layerCount();
+			unsigned int addLayer(Glib::ustring p_name = "");
 			void deleteLayer();
 			bool removeAllLayers();
 			void setSelected(KageLayer *p_layer);
 			KageLayer *getLayer();
 			unsigned int getCurrentLayer();
 			void setCurrentLayer(unsigned int p_layer);
+			void setCurrentLayerByID(unsigned int p_layerID);
 			void renderStage();
 			
 			void toggleLock();
@@ -58,6 +59,11 @@
 			void renameLayer();
 			void setLabel(string p_label);
 			string getLabel();
+			
+			bool moveToTop();
+			bool moveUp();
+			bool moveDown();
+			bool moveToBottom();
 			
 		protected:
 			Kage *win;

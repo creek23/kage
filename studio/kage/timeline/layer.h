@@ -64,6 +64,8 @@
 			virtual bool render();
 			Gtk::Entry _txtLabel;
 			void txtLabel_onEnter();
+			
+			void addEventsListener();
 		protected:
 			//Override default signal handler:
 			virtual bool on_expose_event(GdkEventExpose *e);

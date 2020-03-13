@@ -42,10 +42,8 @@ KageLayer::KageLayer(KageLayerManager *p_layerManager, unsigned p_layerID) {
 	_visible = true;
 	_lock = false;
 	_label = "Layer " + StringHelper::unsignedIntegerToString(p_layerID);
-//	add_events(Gdk::KEY_PRESS_MASK    | Gdk::KEY_RELEASE_MASK);
-	add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
-	add_events(Gdk::ENTER_NOTIFY_MASK | Gdk::LEAVE_NOTIFY_MASK);
-	add_events(Gdk::FOCUS_CHANGE_MASK);
+	
+	addEventsListener();
 	
 	//add(_txtLabel);//, Gtk::PACK_EXPAND_WIDGET);
 	_txtLabel.set_size_request(20, 24);
@@ -59,6 +57,15 @@ KageLayer::KageLayer(KageLayerManager *p_layerManager, unsigned p_layerID) {
 
 KageLayer::~KageLayer() {
 	//
+}
+
+void KageLayer::addEventsListener() {
+//	add_events(Gdk::KEY_PRESS_MASK    | Gdk::KEY_RELEASE_MASK);
+	add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
+	add_events(Gdk::ENTER_NOTIFY_MASK | Gdk::LEAVE_NOTIFY_MASK);
+	add_events(Gdk::FOCUS_CHANGE_MASK);
+	
+	//*window = NULL;
 }
 
 void KageLayer::txtLabel_onEnter() {
@@ -95,7 +102,9 @@ bool KageLayer::on_event(GdkEvent *e) {
 		std::cout << " KageLayer(L " << layerID << ") on_event leave" << std::endl;
 		render();
 	} else if (e->type == GDK_DOUBLE_BUTTON_PRESS) {
-		_layerManager->renameLayer(this);
+		if (e->button.x > 36) {
+			_layerManager->renameLayer(this);
+		}
 		//_txtLabel.show();
 	} else if (e->type == GDK_BUTTON_RELEASE) {
 		KageLayer::mouseIsDown = false;
@@ -151,12 +160,6 @@ bool KageLayer::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 	}
 	if (window) {
 		if (!KageLayer::imageVISIBLE_TRUE) {
-			#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-				string _SLASH_ = "\\";
-			#else
-				string _SLASH_ = "/";
-			#endif
-			
 			try {
 				KageLayer::imageVISIBLE_TRUE  = Gdk::Pixbuf::create_from_resource("/kage/share/layer/visible_true.png");
 				KageLayer::imageVISIBLE_FALSE = Gdk::Pixbuf::create_from_resource("/kage/share/layer/visible_false.png");
@@ -182,7 +185,6 @@ bool KageLayer::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 		
 		//draw label
 		cr->select_font_face ("Verdana", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_NORMAL);
-//		cr->select_font_face ("Verdana", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_BOLD);
 		cr->set_font_size(12);
 		if (isSelected() == true) {
 			cr->set_source_rgb(1, 1, 1);
@@ -244,7 +246,7 @@ void KageLayer::toggleVisibility() {
 	} else {
 		_visible = true;
 	}
-	forceRender();
+	render();
 }
 
 void KageLayer::toggleLock() {
@@ -253,15 +255,15 @@ void KageLayer::toggleLock() {
 	} else {
 		_lock = true;
 	}
-	forceRender();
+	render();
 }
 
 void KageLayer::setVisible(bool p_visible) {
 	_visible = p_visible;
-	forceRender();
+	render();
 }
 
 void KageLayer::setLock(bool p_lock) {
 	_lock = p_lock;
-	forceRender();
+	render();
 }

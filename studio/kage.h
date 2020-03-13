@@ -87,6 +87,10 @@
 			virtual void ShowHideLayer_onClick();
 			virtual void LockUnlockLayer_onClick();
 			virtual void LayerDel_onClick();
+			virtual void LayerMoveTop_onClick();
+			virtual void LayerMoveUp_onClick();
+			virtual void LayerMoveDown_onClick();
+			virtual void LayerMoveBottom_onClick();
 			virtual void onToolButtonsClick(Gtk::ToggleButton *p_sourceButton);
 			virtual void onActionActivate();
 			virtual void Undo_onClick();
@@ -136,6 +140,18 @@
 			Gtk::Button m_Timeline_Del_Button;
 				Gtk::Image                m_Timeline_Del_Button_img;
 				Glib::RefPtr<Gdk::Pixbuf> m_Timeline_Del_Button_pixbuf;
+			Gtk::Button _btnLayerMoveTop;
+				Gtk::Image                _btnLayerMoveTop_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnLayerMoveTop_pixbuf;
+			Gtk::Button _btnLayerMoveUp;
+				Gtk::Image                _btnLayerMoveUp_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnLayerMoveUp_pixbuf;
+			Gtk::Button _btnLayerMoveDown;
+				Gtk::Image                _btnLayerMoveDown_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnLayerMoveDown_pixbuf;
+			Gtk::Button _btnLayerMoveBottom;
+				Gtk::Image                _btnLayerMoveBottom_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnLayerMoveBottom_pixbuf;
 			Gtk::Label m_Timeline_CurrentFrame;
 			Gtk::VBox m_Timeline_Frame_VBox1;
 			Gtk::Label m_TimelineFrame_Label;
@@ -320,6 +336,7 @@
 			unsigned int getCurrentLayer();
 			void setCurrentLayer(unsigned int p_layer);
 			unsigned int getCurrentFrame();
+			void setCurrentLayerByID(unsigned int p_layerID);
 			void setCurrentFrame(unsigned int p_layer);
 	};
 

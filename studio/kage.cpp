@@ -180,6 +180,7 @@ Kage::Kage() : m_KageLayerManager(this),
 		Gtk::AccelKey("Escape"),
 		sigc::mem_fun(*this, &Kage::Deselect_onClick)
 	);
+	//==================================================================
 	m_refActionGroup->add(
 		Gtk::Action::create("LayerAdd", "_Add Layer", "Add New Layer"),
 		Gtk::AccelKey("<shift><control>N"),
@@ -200,6 +201,28 @@ Kage::Kage() : m_KageLayerManager(this),
 //		Gtk::AccelKey("F2"),
 		sigc::mem_fun(*this, &Kage::LockUnlockLayer_onClick)
 	);
+	m_refActionGroup->add(
+		Gtk::Action::create("RaiseLayer", "Raise Layer", "Raise Current Layer"),
+		Gtk::AccelKey("<shift><control>Page_Up"),
+		sigc::mem_fun(*this, &Kage::LayerMoveUp_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("LowerLayer", "Lower Layer", "Lower Current Layer"),
+		Gtk::AccelKey("<shift><control>Page_Down"),
+		sigc::mem_fun(*this, &Kage::LayerMoveDown_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("RaiseToTopLayer", "Layer to Top", "Raise Current Layer to Top"),
+		Gtk::AccelKey("<shift><control>Home"),
+		sigc::mem_fun(*this, &Kage::LayerMoveTop_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("LowerToBottomLayer", "Layer to Bottom", "Lower Current Layer to Bottom"),
+		Gtk::AccelKey("<shift><control>End"),
+		sigc::mem_fun(*this, &Kage::LayerMoveBottom_onClick)
+	);
+	//==================================================================
+	//==================================================================
 	m_refActionGroup->add(
 		Gtk::Action::create("ShapeGroup", "_Group Objects", "Group Selected Objects"),
 		Gtk::AccelKey("<control>G"),
@@ -403,6 +426,11 @@ Kage::Kage() : m_KageLayerManager(this),
 		"			<separator/>"
 		"			<menuitem action='ShowHideLayer'/>"
 		"			<menuitem action='LockUnlockLayer'/>"
+		"			<separator/>"
+		"			<menuitem action='RaiseLayer'/>"
+		"			<menuitem action='LowerLayer'/>"
+		"			<menuitem action='RaiseToTopLayer'/>"
+		"			<menuitem action='LowerToBottomLayer'/>"
 		"		</menu>"
 		"		<menu action='ObjectMenu'>"
 		"			<menuitem action='ShapeGroup'/>"
@@ -509,6 +537,40 @@ Kage::Kage() : m_KageLayerManager(this),
 										m_Timeline_Del_Button.show();
 										m_Timeline_Del_Button.set_size_request(20, 20);
 										m_Timeline_Del_Button.signal_clicked().connect(sigc::mem_fun(*this, &Kage::LayerDel_onClick));
+												
+						m_Timeline_Layer_Add_HBox.pack_start(_btnLayerMoveTop, Gtk::PACK_SHRINK);
+							_btnLayerMoveTop_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/layer/move_top.png");
+								_btnLayerMoveTop_img = Gtk::Image(_btnLayerMoveTop_pixbuf);
+									_btnLayerMoveTop.set_image(_btnLayerMoveTop_img);
+										_btnLayerMoveTop.property_always_show_image();
+										_btnLayerMoveTop.show();
+										_btnLayerMoveTop.set_size_request(20, 20);
+										_btnLayerMoveTop.signal_clicked().connect(sigc::mem_fun(*this, &Kage::LayerMoveTop_onClick));
+						m_Timeline_Layer_Add_HBox.pack_start(_btnLayerMoveUp, Gtk::PACK_SHRINK);
+							_btnLayerMoveUp_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/layer/move_up.png");
+								_btnLayerMoveUp_img = Gtk::Image(_btnLayerMoveUp_pixbuf);
+									_btnLayerMoveUp.set_image(_btnLayerMoveUp_img);
+										_btnLayerMoveUp.property_always_show_image();
+										_btnLayerMoveUp.show();
+										_btnLayerMoveUp.set_size_request(20, 20);
+										_btnLayerMoveUp.signal_clicked().connect(sigc::mem_fun(*this, &Kage::LayerMoveUp_onClick));
+						m_Timeline_Layer_Add_HBox.pack_start(_btnLayerMoveDown, Gtk::PACK_SHRINK);
+							_btnLayerMoveDown_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/layer/move_down.png");
+								_btnLayerMoveDown_img = Gtk::Image(_btnLayerMoveDown_pixbuf);
+									_btnLayerMoveDown.set_image(_btnLayerMoveDown_img);
+										_btnLayerMoveDown.property_always_show_image();
+										_btnLayerMoveDown.show();
+										_btnLayerMoveDown.set_size_request(20, 20);
+										_btnLayerMoveDown.signal_clicked().connect(sigc::mem_fun(*this, &Kage::LayerMoveDown_onClick));
+						m_Timeline_Layer_Add_HBox.pack_start(_btnLayerMoveBottom, Gtk::PACK_SHRINK);
+							_btnLayerMoveBottom_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/layer/move_bottom.png");
+								_btnLayerMoveBottom_img = Gtk::Image(_btnLayerMoveBottom_pixbuf);
+									_btnLayerMoveBottom.set_image(_btnLayerMoveBottom_img);
+										_btnLayerMoveBottom.property_always_show_image();
+										_btnLayerMoveBottom.show();
+										_btnLayerMoveBottom.set_size_request(20, 20);
+										_btnLayerMoveBottom.signal_clicked().connect(sigc::mem_fun(*this, &Kage::LayerMoveBottom_onClick));
+										
 				m_Timeline_HPaned.add2(m_Timeline_Frame_VBox1);
 					m_Timeline_Frame_VBox1.pack_start(m_Timeline_Frame_VBox2, Gtk::PACK_EXPAND_WIDGET);
 						m_Timeline_Frame_VBox2.pack_start(m_Timeline_Frame_ScrolledWindow);//, Gtk::PACK_SHRINK);
@@ -931,8 +993,7 @@ void Kage::updateFrameLabel() {
 }
 
 void Kage::LayerAdd_onClick() {
-	m_KageLayerManager.addLayer();
-	m_KageFramesManager.addFrameManager(m_KageLayerManager.layerCount());
+	m_KageFramesManager.addFrameManager(m_KageLayerManager.addLayer());
 	std::cout << "Layer Count: " << m_KageLayerManager.layerCount() << std::endl;
 	show_all();
 	updateStatus("New Layer Added");
@@ -947,7 +1008,61 @@ void Kage::LockUnlockLayer_onClick() {
 	m_KageLayerManager.toggleLock();
 }
 void Kage::LayerDel_onClick() {
+	m_KageFramesManager.deleteFrameManager(getCurrentLayer());
+	m_KageLayerManager.deleteLayer();
 	std::cout << "Layer Delete Button clicked." << std::endl;
+}
+/**
+ * NOTE: It's important that we rearrange FramesMananger first before
+ * LayerManager because Current Layer is being referenced by FramesManager
+ * from LayerManager. 
+ */
+void Kage::LayerMoveTop_onClick() {
+	std::cout << "Layer Move Top Button clicked." << std::endl;
+	if (m_KageFramesManager.moveToTop() == true && m_KageLayerManager.moveToTop() == true) {
+		forceRenderFrames();
+	} else {
+		cout << "did not swapped" << endl;
+	}
+}
+/**
+ * NOTE: It's important that we rearrange FramesMananger first before
+ * LayerManager because Current Layer is being referenced by FramesManager
+ * from LayerManager. 
+ */
+void Kage::LayerMoveUp_onClick() {
+	std::cout << "Layer Move Up Button clicked." << std::endl;
+	if (m_KageFramesManager.moveUp() == true && m_KageLayerManager.moveUp() == true) {
+		forceRenderFrames();
+	} else {
+		cout << "did not swapped" << endl;
+	}
+}
+/**
+ * NOTE: It's important that we rearrange FramesMananger first before
+ * LayerManager because Current Layer is being referenced by FramesManager
+ * from LayerManager. 
+ */
+void Kage::LayerMoveDown_onClick() {
+	std::cout << "Layer Move Down Button clicked." << std::endl;
+	if (m_KageFramesManager.moveDown() == true && m_KageLayerManager.moveDown() == true) {
+		forceRenderFrames();
+	} else {
+		cout << "did not swapped" << endl;
+	}
+}
+/**
+ * NOTE: It's important that we rearrange FramesMananger first before
+ * LayerManager because Current Layer is being referenced by FramesManager
+ * from LayerManager. 
+ */
+void Kage::LayerMoveBottom_onClick() {
+	std::cout << "Layer Move Bottom Button clicked." << std::endl;
+	if (m_KageFramesManager.moveToBottom() == true && m_KageLayerManager.moveToBottom() == true) {
+		forceRenderFrames();
+	} else {
+		cout << "did not swapped" << endl;
+	}
 }
 
 void Kage::toolsButtonToggle(string p_toolTip) {
@@ -1232,6 +1347,9 @@ void Kage::setCurrentLayer(unsigned int p_layer) {
 unsigned int Kage::getCurrentFrame() {
 	return m_KageFramesManager.getCurrentFrame();
 }
+void Kage::setCurrentLayerByID(unsigned int p_layerID) {
+	return m_KageLayerManager.setCurrentLayerByID(p_layerID);
+}
 
 void Kage::setCurrentFrame(unsigned int p_layer) {
 	return m_KageFramesManager.setCurrentFrame(p_layer);
@@ -1244,10 +1362,8 @@ void Kage::New_onClick() {
 	propNodeXYSetVisible(false);
 
 	m_KageLayerManager.removeAllLayers();
-	m_KageLayerManager.addLayer();
-	
 	m_KageFramesManager.removeAllFrames();
-	//m_KageFramesManager.addFrame();
+	m_KageFramesManager.addFrameManager(m_KageLayerManager.addLayer());
 	
 	_undoRedoManager.clear();
 	stackDo();
@@ -1639,7 +1755,7 @@ void Kage::ExportAVI_onClick() {
 #else
 			if (runExternal("ffmpeg", "-version") == false) {
 #endif
-				updateStatus("FFMPEG is not installed.");
+				updateStatus("FFMPEG is not installed; opening FFMPEG Download page...");
 				openWebsite("https://www.ffmpeg.org/download.html");
 					return;
 			}
@@ -2370,10 +2486,9 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 		vector<XmlTagProperty> l_properties = p_children[i].getProperties();
 		if (l_tagname.substr(0, 5) == "layer") {
 			unsigned int l_layer = StringHelper::toUnsignedInteger(l_tagname.substr(5));
-			cout << "\t\t\t\t\tl_tagname LAYER\t" << l_layer << endl;
+			cout << "\t\t\t\t\tl_tagname LAYER\t" << l_layer << "\t" << l_properties.size() << endl;
 			while (l_layer > m_KageFramesManager.layerCount()) {
-				m_KageLayerManager.addLayer();
-				m_KageFramesManager.addFrameManager(m_KageLayerManager.layerCount());
+				m_KageFramesManager.addFrameManager(m_KageLayerManager.addLayer());
 				m_KageFramesManager.setCurrentLayer(m_KageLayerManager.layerCount());
 			}
 			
@@ -2469,7 +2584,7 @@ void Kage::parseKSF(string p_content) {
 						(	   l_xmlTagProperties[0].getValue() == "2019.10.14"
 							|| l_xmlTagProperties[0].getValue() == "2020.03.10"
 						)
-					) {					
+					) {
 					parseKSF_Children(l_root._children);
 					updateStatus("Loaded " + ksfPath);
 				}
@@ -2492,7 +2607,8 @@ bool Kage::runExternal(string p_cmd, string p_param) {
 		std::cout << "\n\n\nl_cmd " << l_cmd << std::endl;
 		if (i == 0) {
 			// no problem
-//			return false; /*command does not exists*/
+		} else if (i == 1) { //Windows
+			return false; /* p_cmd does not exists*/
 		} else if (i == 32512) { //GNU
 			return false; /* p_cmd not found */
 		}

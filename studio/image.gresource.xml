@@ -15,6 +15,10 @@
 		<file>share/layer/locked_false.png</file>
 		<file>share/layer/layer_add.png</file>
 		<file>share/layer/layer_delete.png</file>
+		<file>share/layer/move_top.png</file>
+		<file>share/layer/move_up.png</file>
+		<file>share/layer/move_down.png</file>
+		<file>share/layer/move_bottom.png</file>
 		<file>share/icons/default.png</file>
 		<file>share/icons/Eraser.png</file>
 		<file>share/icons/Eraser_tango.png</file>

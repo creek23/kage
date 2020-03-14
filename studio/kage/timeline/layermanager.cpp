@@ -55,10 +55,10 @@ void KageLayerManager::deleteLayer() {
 		if (layers[_currentLayerIndex]->isSelected()) {
 			cout << " deleting; index " << _currentLayerIndex << endl;
 			remove(*layers[_currentLayerIndex]);
-		//	delete layers[_currentLayerIndex];
-			layers.erase (layers.begin() + (_currentLayerIndex-1));
-			_currentLayerIndex = layerCount();
-			_currentLayerID = UINT_MAX;
+			delete layers[_currentLayerIndex];
+			layers.erase (layers.begin() + (_currentLayerIndex));
+			_currentLayerID = layers[_currentLayerIndex]->layerID;
+			layers[_currentLayerIndex]->setSelected(true);
 		} else {
 			cout << " layer not selected" << endl;
 		}
@@ -69,10 +69,10 @@ void KageLayerManager::deleteLayer() {
 				if (layers[i]->isSelected()) {
 					cout << " deleting; index " << i << endl;
 					remove(*layers[i]);
-				//	delete layers[i];
+					delete layers[i];
 					layers.erase (layers.begin() + (i-1));
-					_currentLayerIndex = layerCount();
-					_currentLayerID = UINT_MAX;
+					_currentLayerID = layers[_currentLayerIndex]->layerID;
+					layers[_currentLayerIndex]->setSelected(true);
 					return;
 				}
 				break;

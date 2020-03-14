@@ -1021,8 +1021,6 @@ void Kage::LayerMoveTop_onClick() {
 	std::cout << "Layer Move Top Button clicked." << std::endl;
 	if (m_KageFramesManager.moveToTop() == true && m_KageLayerManager.moveToTop() == true) {
 		forceRenderFrames();
-	} else {
-		cout << "did not swapped" << endl;
 	}
 }
 /**
@@ -1034,8 +1032,6 @@ void Kage::LayerMoveUp_onClick() {
 	std::cout << "Layer Move Up Button clicked." << std::endl;
 	if (m_KageFramesManager.moveUp() == true && m_KageLayerManager.moveUp() == true) {
 		forceRenderFrames();
-	} else {
-		cout << "did not swapped" << endl;
 	}
 }
 /**
@@ -1047,8 +1043,6 @@ void Kage::LayerMoveDown_onClick() {
 	std::cout << "Layer Move Down Button clicked." << std::endl;
 	if (m_KageFramesManager.moveDown() == true && m_KageLayerManager.moveDown() == true) {
 		forceRenderFrames();
-	} else {
-		cout << "did not swapped" << endl;
 	}
 }
 /**
@@ -1060,8 +1054,6 @@ void Kage::LayerMoveBottom_onClick() {
 	std::cout << "Layer Move Bottom Button clicked." << std::endl;
 	if (m_KageFramesManager.moveToBottom() == true && m_KageLayerManager.moveToBottom() == true) {
 		forceRenderFrames();
-	} else {
-		cout << "did not swapped" << endl;
 	}
 }
 

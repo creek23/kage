@@ -34,8 +34,8 @@ void KageFramesManager::addFrameManager(unsigned int p_layer) {
 }
 
 void KageFramesManager::deleteFrameManager(unsigned int p_layer) {
-	framemanager[p_layer]->removeAllFrames();
-	remove(*framemanager[p_layer]);
+	framemanager[p_layer-1]->removeAllFrames();
+	remove(*framemanager[p_layer-1]);
 	framemanager.erase (framemanager.begin() + (p_layer-1));
 }
 

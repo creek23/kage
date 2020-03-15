@@ -114,24 +114,15 @@
 			Glib::RefPtr<Gdk::Pixbuf> _bg;
 			Cairo::RefPtr<Cairo::Surface> _bgcr;
 			
-			bool duplicateShapes();
 			bool selectAllShapes();
 			bool deselectSelectedShapes();
 			bool deselectSelectedNodes();
 			bool cancelDrawingPoly();
-			bool groupSelectedShapes();
-			bool ungroupSelectedShapes();
 			bool cutSelectedShapes();
 			bool copySelectedShapes();
 			bool pasteSelectedShapes();
 			bool deleteSelectedShapes();
 			bool deleteSelectedNodes();
-			bool raiseSelectedShape();
-			bool lowerSelectedShape();
-			bool raiseToTopSelectedShape();
-			bool lowerToBottomSelectedShape();
-			bool flipHorizontalSelectedShape();
-			bool flipVerticalSelectedShape();
 			bool toggleLineSelectedNodes();
 			
 			bool isSelectedNode(unsigned int p_index);
@@ -184,10 +175,12 @@
 			bool _rotateApply;
 			
 			bool _gotFocus;
+			
+			void setSelectedShapes(vector<unsigned int> p_selectedShapes);
+			vector<unsigned int> getSelectedShapes();
 		protected:
 			ToolMode prevTool; //used by Hand-tool shortcut [spacebar]
 			Kage *win;
-			//GdkPoint origin;
 			GdkPoint draw1;
 			GdkPoint draw2;
 			double polyXhead, polyYhead;

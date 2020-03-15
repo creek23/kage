@@ -265,3 +265,106 @@ bool KageFramesManager::moveToBottom() {
 	}
 	return false;
 }
+
+vector<unsigned int> KageFramesManager::raiseSelectedShape(vector<unsigned int> p_selectedShapes) {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+		//
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		return framemanager[l_currentLayer]->raiseSelectedShape(p_selectedShapes);
+	}
+	vector<unsigned int> l_nullReturn;
+	return l_nullReturn;
+}
+vector<unsigned int> KageFramesManager::lowerSelectedShape(vector<unsigned int> p_selectedShapes) {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+		//
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		return framemanager[l_currentLayer]->lowerSelectedShape(p_selectedShapes);
+	}
+	vector<unsigned int> l_nullReturn;
+	return l_nullReturn;
+}
+vector<unsigned int> KageFramesManager::raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes) {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+		//
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		return framemanager[l_currentLayer]->raiseToTopSelectedShape(p_selectedShapes);
+	}
+	vector<unsigned int> l_nullReturn;
+	return l_nullReturn;
+}
+vector<unsigned int> KageFramesManager::lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes) {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+		//
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		return framemanager[l_currentLayer]->lowerToBottomSelectedShape(p_selectedShapes);
+	}
+	vector<unsigned int> l_nullReturn;
+	return l_nullReturn;
+}
+
+vector<unsigned int> KageFramesManager::groupSelectedShapes(vector<unsigned int> p_selectedShapes) {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+		//
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		return framemanager[l_currentLayer]->groupSelectedShapes(p_selectedShapes);
+	}
+	vector<unsigned int> l_nullReturn;
+	return l_nullReturn;
+}
+vector<unsigned int> KageFramesManager::ungroupSelectedShapes(vector<unsigned int> p_selectedShapes) {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+		//
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		return framemanager[l_currentLayer]->ungroupSelectedShapes(p_selectedShapes);
+	}
+	vector<unsigned int> l_nullReturn;
+	return l_nullReturn;
+}
+
+vector<unsigned int> KageFramesManager::duplicateShapes(vector<unsigned int> p_selectedShapes) {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+		//
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		return framemanager[l_currentLayer]->duplicateShapes(p_selectedShapes);
+	}
+	vector<unsigned int> l_nullReturn;
+	return l_nullReturn;
+}
+
+bool KageFramesManager::flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes) {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+		//
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		return framemanager[l_currentLayer]->flipHorizontalSelectedShape(p_selectedShapes);
+	}
+	
+	return false;
+}
+bool KageFramesManager::flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes) {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+		//
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		return framemanager[l_currentLayer]->flipVerticalSelectedShape(p_selectedShapes);
+	}
+	
+	return false;
+}

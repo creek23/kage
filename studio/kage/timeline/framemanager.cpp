@@ -140,3 +140,124 @@ void KageFrameManager::setSelected(KageFrame *p_frame) {
 	p_frame->setSelected(true);
 	_currentFrameID = p_frame->frameID;
 }
+
+vector<unsigned int> KageFrameManager::raiseSelectedShape(vector<unsigned int> p_selectedShapes) {
+	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
+		return frames[_currentFrameIndex]->raiseSelectedShape(p_selectedShapes);
+	} else {
+		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+			if (frames[i]->frameID == _currentFrameID) {
+				return frames[_currentFrameIndex]->raiseSelectedShape(p_selectedShapes);
+			}
+		}
+	}
+	vector<unsigned int> l_nullReturn;
+	return l_nullReturn;
+}
+vector<unsigned int> KageFrameManager::lowerSelectedShape(vector<unsigned int> p_selectedShapes) {
+	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
+		return frames[_currentFrameIndex]->lowerSelectedShape(p_selectedShapes);
+	} else {
+		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+			if (frames[i]->frameID == _currentFrameID) {
+				return frames[_currentFrameIndex]->lowerSelectedShape(p_selectedShapes);
+			}
+		}
+	}
+	vector<unsigned int> l_nullReturn;
+	return l_nullReturn;
+}
+vector<unsigned int> KageFrameManager::raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes) {
+	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
+		return frames[_currentFrameIndex]->raiseToTopSelectedShape(p_selectedShapes);
+	} else {
+		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+			if (frames[i]->frameID == _currentFrameID) {
+				return frames[_currentFrameIndex]->raiseToTopSelectedShape(p_selectedShapes);
+			}
+		}
+	}
+	vector<unsigned int> l_nullReturn;
+	return l_nullReturn;
+}
+vector<unsigned int> KageFrameManager::lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes) {
+	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
+		return frames[_currentFrameIndex]->lowerToBottomSelectedShape(p_selectedShapes);
+	} else {
+		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+			if (frames[i]->frameID == _currentFrameID) {
+				return frames[_currentFrameIndex]->lowerToBottomSelectedShape(p_selectedShapes);
+			}
+		}
+	}
+	vector<unsigned int> l_nullReturn;
+	return l_nullReturn;
+}
+
+vector<unsigned int> KageFrameManager::groupSelectedShapes(vector<unsigned int> p_selectedShapes) {
+	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
+		return frames[_currentFrameIndex]->groupSelectedShapes(p_selectedShapes);
+	} else {
+		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+			if (frames[i]->frameID == _currentFrameID) {
+				return frames[_currentFrameIndex]->groupSelectedShapes(p_selectedShapes);
+			}
+		}
+	}
+	vector<unsigned int> l_nullReturn;
+	return l_nullReturn;
+}
+vector<unsigned int> KageFrameManager::ungroupSelectedShapes(vector<unsigned int> p_selectedShapes) {
+	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
+		return frames[_currentFrameIndex]->ungroupSelectedShapes(p_selectedShapes);
+	} else {
+		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+			if (frames[i]->frameID == _currentFrameID) {
+				return frames[_currentFrameIndex]->ungroupSelectedShapes(p_selectedShapes);
+			}
+		}
+	}
+	vector<unsigned int> l_nullReturn;
+	return l_nullReturn;
+}
+
+vector<unsigned int> KageFrameManager::duplicateShapes(vector<unsigned int> p_selectedShapes) {
+	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
+		return frames[_currentFrameIndex]->duplicateShapes(p_selectedShapes);
+	} else {
+		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+			if (frames[i]->frameID == _currentFrameID) {
+				return frames[_currentFrameIndex]->duplicateShapes(p_selectedShapes);
+			}
+		}
+	}
+	vector<unsigned int> l_nullReturn;
+	return l_nullReturn;
+}
+
+bool KageFrameManager::flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes) {
+	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
+		return frames[_currentFrameIndex]->flipHorizontalSelectedShape(p_selectedShapes);
+	} else {
+		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+			if (frames[i]->frameID == _currentFrameID) {
+				return frames[_currentFrameIndex]->flipHorizontalSelectedShape(p_selectedShapes);
+			}
+		}
+	}
+	
+	return false;
+}
+bool KageFrameManager::flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes) {
+	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
+		return frames[_currentFrameIndex]->flipVerticalSelectedShape(p_selectedShapes);
+	} else {
+		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+			if (frames[i]->frameID == _currentFrameID) {
+				return frames[_currentFrameIndex]->flipVerticalSelectedShape(p_selectedShapes);
+			}
+		}
+	}
+	
+	return false;
+}

@@ -38,6 +38,7 @@ Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_NW;
 Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_SW;
 Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_SE;
 Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_ROTATE;
+bool KageFrame::_gotFocus;
 
 unsigned int KageFramesManager::currentFrame;
 unsigned int VectorDataManager::idmaker;
@@ -65,7 +66,7 @@ Kage::Kage() : m_KageLayerManager(this),
 			   m_KageStage(this),
 			   _undoRedoManager() {
 	m_ContextId = m_Statusbar.get_context_id(app_title);
-	
+	KageFrame::_gotFocus = false;
 	set_title("Kage Studio");
 	set_icon(Gdk::Pixbuf::create_from_resource("/kage/share/icons/default.png"));
 	set_border_width(0);
@@ -795,28 +796,58 @@ void Kage::Redo_onClick() {
 	}
 }
 void Kage::Cut_onClick() {
-	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp();
-		std::cout << " Kage::Cut_onClick" << std::endl;
-		if (m_KageStage.cutSelectedShapes() == true) {
-			forceRenderFrames();
+	Kage::timestamp();
+	std::cout << " Kage::Cut_onClick " << m_KageStage._gotFocus << " " << KageFrame::_gotFocus << std::endl;
+	if (m_KageStage._gotFocus == true) {
+		if (KageStage::toolMode == KageStage::MODE_SELECT) {
+			if (m_KageStage.cutSelectedShapes() == true) {
+				forceRenderFrames();
+			}
+		}
+	} else if (KageFrame::_gotFocus == true) {	
+		//delete Frame via Selecting All then Deleting selected shapes
+		if (m_KageStage.selectAllShapes() == true) {
+			if (m_KageStage.cutSelectedShapes() == true) {
+				stackDo();
+				forceRenderFrames();
+			}
 		}
 	}
 }
 void Kage::Copy_onClick() {
-	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp();
-		std::cout << " Kage::Copy_onClick" << std::endl;
-		if (m_KageStage.copySelectedShapes() == true) {
-			forceRenderFrames();
+	Kage::timestamp();
+	std::cout << " Kage::Copy_onClick " << m_KageStage._gotFocus << " " << KageFrame::_gotFocus << std::endl;
+	if (m_KageStage._gotFocus == true) {
+		if (KageStage::toolMode == KageStage::MODE_SELECT) {
+			if (m_KageStage.copySelectedShapes() == true) {
+				forceRenderFrames();
+			}
+		}
+	} else if (KageFrame::_gotFocus == true) {	
+		//copy Frame's full content
+		if (m_KageStage.selectAllShapes() == true) {
+			if (m_KageStage.copySelectedShapes() == true) {
+				forceRenderFrames();
+			}
 		}
 	}
 }
 void Kage::Paste_onClick() {
-	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp();
-		std::cout << " Kage::Paste_onClick" << std::endl;
+	Kage::timestamp();
+	std::cout << " Kage::Paste_onClick " << m_KageStage._gotFocus << " " << KageFrame::_gotFocus << std::endl;
+	if (m_KageStage._gotFocus == true) {
+		if (KageStage::toolMode == KageStage::MODE_SELECT) {
+			if (m_KageStage.pasteSelectedShapes() == true) {
+				forceRenderFrames();
+			}
+		}
+	} else if (KageFrame::_gotFocus == true) {	
+		//over write Frame's current content via Selecting All then Deleting selected shapes then pasting buffer
+		if (m_KageStage.selectAllShapes() == true) {
+			m_KageStage.deleteSelectedShapes();
+		}
 		if (m_KageStage.pasteSelectedShapes() == true) {
+			stackDo();
 			forceRenderFrames();
 		}
 	}
@@ -825,8 +856,13 @@ void Kage::Duplicate_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp();
 		std::cout << " Kage::Duplicate_onClick" << std::endl;
-		if (m_KageStage.duplicateShapes() == true) {
-			forceRenderFrames();
+		if (isLayerLocked() == false) {
+			vector<unsigned int> l_selectedShapes = m_KageFramesManager.duplicateShapes(m_KageStage.getSelectedShapes());
+			if (l_selectedShapes.size() > 0) {
+				m_KageStage.setSelectedShapes(l_selectedShapes);
+				stackDo();
+				forceRenderFrames();
+			}
 		}
 	}
 }
@@ -856,12 +892,18 @@ void Kage::Deselect_onClick() {
 		}
 	}
 }
+
 void Kage::ShapeGroup_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp();
 		std::cout << " Kage::ShapeGroup_onClick" << std::endl;
-		if (m_KageStage.groupSelectedShapes() == true) {
-			forceRenderFrames();
+		if (isLayerLocked() == false) {
+			vector<unsigned int> l_selectedShapes = m_KageFramesManager.groupSelectedShapes(m_KageStage.getSelectedShapes());
+			if (l_selectedShapes.size() > 0) {
+				m_KageStage.setSelectedShapes(l_selectedShapes);
+				stackDo();
+				forceRenderFrames();
+			}
 		}
 	}
 }
@@ -869,17 +911,30 @@ void Kage::ShapeUngroup_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp();
 		std::cout << " Kage::ShapeUngroup_onClick" << std::endl;
-		if (m_KageStage.ungroupSelectedShapes() == true) {
-			forceRenderFrames();
+		
+		if (isLayerLocked() == false) {
+			vector<unsigned int> l_selectedShapes = m_KageFramesManager.ungroupSelectedShapes(m_KageStage.getSelectedShapes());
+			if (l_selectedShapes.size() > 0) {
+				m_KageStage.setSelectedShapes(l_selectedShapes);
+				stackDo();
+				forceRenderFrames();
+			}
 		}
 	}
 }
+
 void Kage::Raise_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp();
 		std::cout << " Kage::Raise_onClick" << std::endl;
-		if (m_KageStage.raiseSelectedShape() == true) {
-			forceRenderFrames();
+		
+		if (isLayerLocked() == false) {
+			vector<unsigned int> l_selectedShapes = m_KageFramesManager.raiseSelectedShape(m_KageStage.getSelectedShapes());
+			if (l_selectedShapes.size() > 0) {
+				m_KageStage.setSelectedShapes(l_selectedShapes);
+				stackDo();
+				forceRenderFrames();
+			}
 		}
 	}
 }
@@ -887,8 +942,14 @@ void Kage::Lower_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp();
 		std::cout << " Kage::Lower_onClick" << std::endl;
-		if (m_KageStage.lowerSelectedShape() == true) {
-			forceRenderFrames();
+		
+		if (isLayerLocked() == false) {
+			vector<unsigned int> l_selectedShapes = m_KageFramesManager.lowerSelectedShape(m_KageStage.getSelectedShapes());
+			if (l_selectedShapes.size() > 0) {
+				m_KageStage.setSelectedShapes(l_selectedShapes);
+				stackDo();
+				forceRenderFrames();
+			}
 		}
 	}
 }
@@ -896,8 +957,14 @@ void Kage::RaiseToTop_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp();
 		std::cout << " Kage::RaiseToTop_onClick" << std::endl;
-		if (m_KageStage.raiseToTopSelectedShape() == true) {
-			forceRenderFrames();
+		
+		if (isLayerLocked() == false) {
+			vector<unsigned int> l_selectedShapes = m_KageFramesManager.raiseToTopSelectedShape(m_KageStage.getSelectedShapes());
+			if (l_selectedShapes.size() > 0) {
+				m_KageStage.setSelectedShapes(l_selectedShapes);
+				stackDo();
+				forceRenderFrames();
+			}
 		}
 	}
 }
@@ -905,17 +972,28 @@ void Kage::LowerToBottom_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp();
 		std::cout << " Kage::LowerToBottom_onClick" << std::endl;
-		if (m_KageStage.lowerToBottomSelectedShape() == true) {
-			forceRenderFrames();
+		
+		if (isLayerLocked() == false) {
+			vector<unsigned int> l_selectedShapes = m_KageFramesManager.lowerToBottomSelectedShape(m_KageStage.getSelectedShapes());
+			if (l_selectedShapes.size() > 0) {
+				m_KageStage.setSelectedShapes(l_selectedShapes);
+				stackDo();
+				forceRenderFrames();
+			}
 		}
 	}
 }
+
 void Kage::FlipHorizontal_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp();
 		std::cout << " Kage::FlipHorizontal_onClick" << std::endl;
-		if (m_KageStage.flipHorizontalSelectedShape() == true) {
-			forceRenderFrames();
+		
+		if (isLayerLocked() == false) {
+			if (m_KageFramesManager.flipHorizontalSelectedShape(m_KageStage.getSelectedShapes()) == true) {
+				stackDo();
+				forceRenderFrames();
+			}
 		}
 	}
 }
@@ -923,11 +1001,16 @@ void Kage::FlipVertical_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp();
 		std::cout << " Kage::FlipVertical_onClick" << std::endl;
-		if (m_KageStage.flipVerticalSelectedShape() == true) {
-			forceRenderFrames();
+		
+		if (isLayerLocked() == false) {
+			if (m_KageFramesManager.flipVerticalSelectedShape(m_KageStage.getSelectedShapes()) == true) {
+				stackDo();
+				forceRenderFrames();
+			}
 		}
 	}
 }
+
 void Kage::Delete_onClick() {
 	if (m_KageStage._gotFocus == true) {
 		if (KageStage::toolMode == KageStage::MODE_SELECT) {
@@ -944,8 +1027,14 @@ void Kage::Delete_onClick() {
 				forceRenderFrames();
 			}
 		}
-	} else {
-		//TODO: check if focus is on any of the Frames 
+	} else if (KageFrame::_gotFocus == true) {	
+		//delete Frame via Selecting All then Deleting selected shapes	
+		if (m_KageStage.selectAllShapes() == true) {
+			if (m_KageStage.deleteSelectedShapes() == true) {
+				stackDo();
+				forceRenderFrames();
+			}
+		} 
 	}
 }
 

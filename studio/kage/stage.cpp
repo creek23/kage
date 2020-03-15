@@ -143,9 +143,11 @@ bool KageStage::on_event(GdkEvent *e) {
 	} else if (e->type == GDK_KEY_RELEASE) {
 		on_key_release_event((GdkEventKey*) e);
 	} else if (e->type == GDK_DOUBLE_BUTTON_PRESS) {
-		if (KageStage::toolMode == MODE_SELECT) {
-			KageStage::toolMode = MODE_NODE;
-			win->toolsButtonToggle("Node Tool");
+		if (selectedShapes.size() > 0) {
+			if (KageStage::toolMode == MODE_SELECT) {
+				KageStage::toolMode = MODE_NODE;
+				win->toolsButtonToggle("Node Tool");
+			}
 		}
 	} else if (e->type == GDK_BUTTON_PRESS) { //mouse down
 		mouseDown = true;
@@ -433,6 +435,13 @@ double KageStage::getZoomRatioY(double p_value) {
 	return p_value;
 }
 
+void KageStage::setSelectedShapes(vector<unsigned int> p_selectedShapes) {
+	selectedNodes = p_selectedShapes;
+	tryMultiSelectShapes_populateShapes();
+}
+vector<unsigned int> KageStage::getSelectedShapes() {
+	return selectedShapes;
+}
 vector<VectorData> KageStage::applyZoom(vector<VectorData> v) {
 	return v;
 }
@@ -877,6 +886,12 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
 					p_context->set_line_width(scolor.getThickness() * _zoomValue);
 						p_context->set_line_cap(Cairo::LINE_CAP_ROUND);
 							p_context->stroke();
+				}
+				if (l_mouseLocationShapeIndex == _NO_SELECTION) {
+					l_mouseLocationOnFill = p_context->in_stroke(_mouseLocation.x, _mouseLocation.y);
+					if (l_mouseLocationOnFill != 0) {
+						_mouseLocationShapeIndex = l_mouseLocationShapeIndex;
+					}
 				}
 				break;
 			case VectorData::TYPE_STROKE:
@@ -2807,21 +2822,6 @@ bool KageStage::copySelectedShapes() {
 	return true;
 }
 
-bool KageStage::duplicateShapes() {
-	Kage::timestamp();
-	std::cout << " KageStage::duplicateShapes " << selectedShapes.size() << std::endl;
-	
-	if (selectedShapes.size() == 0) {
-		return false;
-	}
-	
-	if (copySelectedShapes() == true) {
-		return pasteSelectedShapes();
-	}
-	
-	return false;
-}
-
 bool KageStage::selectAllShapes() {
 	Kage::timestamp();
 	std::cout << " KageStage::selectAllShapes " << selectedShapes.size() << std::endl;
@@ -2887,68 +2887,6 @@ bool KageStage::deselectSelectedNodes() {
 	win->propNodeXYSetVisible(false);
 	
 	return true;
-}
-bool KageStage::groupSelectedShapes() {
-	if (win->isLayerLocked() == true) {
-		return false;
-	}
-	Kage::timestamp();
-	std::cout << " KageStage::groupSelectedShapes " << selectedShapes.size() << std::endl;
-	
-	if (selectedShapes.size() == 0) {
-		return false;
-	}
-	if (copySelectedShapes() == true) {
-		if (deleteSelectedShapes() == true) {			
-			///erase index if vectorType is TYPE INIT
-			for (unsigned int i = 0; i < _vectorDataCopyBuffer.size(); ++i) {
-				if (_vectorDataCopyBuffer[i].vectorType == VectorData::TYPE_INIT
-						&& i != 0) {
-					_vectorDataCopyBuffer.erase( _vectorDataCopyBuffer.begin() + i );
-				}
-			}
-			return pasteSelectedShapes();
-		}
-	}
-	
-	return false;
-}
-
-bool KageStage::ungroupSelectedShapes() {
-	if (win->isLayerLocked() == true) {
-		return false;
-	}
-	Kage::timestamp();
-	std::cout << " KageStage::ungroupSelectedShapes " << selectedShapes.size() << std::endl;
-	
-	if (selectedShapes.size() == 0) {
-		return false;
-	}
-	if (copySelectedShapes() == true) {
-		if (deleteSelectedShapes() == true) {			
-			///insert TYPE INIT between ENDFILL and FILL
-			_vectorDataZOrderBufferA.clear();
-			for (unsigned int i = 0; i < _vectorDataCopyBuffer.size(); ++i) {
-				_vectorDataZOrderBufferA.push_back(_vectorDataCopyBuffer[i]);
-				if (_vectorDataCopyBuffer[i].vectorType == VectorData::TYPE_ENDFILL
-						&& i+1 != _vectorDataCopyBuffer.size()
-						&& _vectorDataCopyBuffer[i+1].vectorType == VectorData::TYPE_FILL) {
-					VectorData l_vectorData;
-						l_vectorData.vectorType = VectorData::TYPE_INIT;
-						l_vectorData.stroke = StrokeColorData();
-						l_vectorData.fillColor = ColorData();
-					_vectorDataZOrderBufferA.push_back(l_vectorData);
-				}
-			}
-			_vectorDataCopyBuffer.clear();
-			for (unsigned int i = 0; i < _vectorDataZOrderBufferA.size(); ++i) {
-				_vectorDataCopyBuffer.push_back(_vectorDataZOrderBufferA[i]);
-			}
-			return pasteSelectedShapes();
-		}
-	}
-	
-	return false;
 }
 bool KageStage::pasteSelectedShapes() {
 	if (win->isLayerLocked() == true) {
@@ -3129,461 +3067,6 @@ bool KageStage::deleteSelectedNode(unsigned int p_index) {
 	}
 	
 	win->setFrameData(v);
-	
-	return true;
-}
-
-/** Multiple selected Shapes can be raised one step above its z-ordering by
- *  splicing the VectorData array into group of four.
- *  1.) Whatever shape is behind the selected Shape
- *  2.) The selected Shape itself
- *  3.) The one directly infront of the selected Shape
- *  4.) All others infront of selected Shape less the one infront of it
- * These four groups will be merged back to one in this exact order:
- *  1 + 3 + 2 + 4
-  \return True if it successfully lowered back selected Shape
-  \sa lowerSelectedShape(), raiseToTopSelectedShape() and lowerToBottomSelectedShape()
-*/
-bool KageStage::raiseSelectedShape() {
-	if (win->isLayerLocked() == true) {
-		return false;
-	}
-	Kage::timestamp();
-	std::cout << " KageStage::raiseSelectedShape " << selectedShapes.size() << std::endl;
-	
-	if (selectedShapes.size() == 0) {
-		return false;
-	}
-	
-	vector<unsigned int> l_selectedShapesOld(selectedShapes);
-		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater <unsigned int>());
-	vector<unsigned int> l_selectedShapesNew;
-		l_selectedShapesNew.clear();
-	
-	vector<VectorData> v = win->getFrameData().getVectorData();
-	_vectorDataZOrderBufferA.clear();
-	_vectorDataZOrderBufferB.clear();
-	_vectorDataZOrderBufferC.clear();
-	
-	for (unsigned int l_selectedShape = 0; l_selectedShape < l_selectedShapesOld.size(); ++l_selectedShape) {
-		unsigned int vsize = v.size();
-		unsigned int l_temp = _NO_SELECTION;
-		unsigned int l_shapeBstart = _NO_SELECTION;
-		for (unsigned int i = l_selectedShapesOld[l_selectedShape]; i < vsize; ++i) {
-			if (v[i].vectorType == VectorData::TYPE_INIT
-					&& i != l_selectedShapesOld[l_selectedShape]) {			
-				l_shapeBstart = i;
-				l_temp = i;
-				for (i = i; i < vsize; ++i) {
-					if (v[i].vectorType == VectorData::TYPE_INIT
-							&& i != l_shapeBstart) {
-						for (i = i; i < vsize; ++i) {
-							_vectorDataZOrderBufferC.push_back(v[i]);
-						}
-						l_temp = vsize;
-						break;
-					} else {
-						_vectorDataZOrderBufferB.push_back(v[i]);
-						l_temp = i+1;
-					}
-				}
-				break;
-			} else {
-				_vectorDataZOrderBufferA.push_back(v[i]);
-			}
-		}
-		if (l_temp == _NO_SELECTION) {
-			_vectorDataZOrderBufferA.clear();
-			l_selectedShapesNew.push_back(l_selectedShapesOld[l_selectedShape]);
-		} else {
-			v.erase (v.begin() + l_selectedShapesOld[l_selectedShape],
-					 v.begin() + l_temp);
-				for (unsigned int i = 0; i < _vectorDataZOrderBufferB.size(); ++i) {
-					v.push_back(_vectorDataZOrderBufferB[i]);
-				}
-					_vectorDataZOrderBufferB.clear();
-				
-				l_selectedShapesNew.push_back(v.size());
-				
-				for (unsigned int i = 0; i < _vectorDataZOrderBufferA.size(); ++i) {
-					v.push_back(_vectorDataZOrderBufferA[i]);
-				}
-					_vectorDataZOrderBufferA.clear();
-				
-				for (unsigned int i = 0; i < _vectorDataZOrderBufferC.size(); ++i) {
-					v.push_back(_vectorDataZOrderBufferC[i]);
-				}
-					_vectorDataZOrderBufferC.clear();
-		}
-	}
-	if (l_selectedShapesNew.size() > 0) {
-		selectedShapes.clear();
-		for (unsigned int i = 0; i < l_selectedShapesNew.size(); ++i) {
-			selectedShapes.push_back(l_selectedShapesNew[i]);
-		}
-	}
-	
-	win->setFrameData(v);
-	
-	win->stackDo();
-	
-	return true;
-}
-
-/** Multiple selected Shapes can be lowered one step below its z-ordering by
- *  splicing the VectorData array into group of four.
- *  1.) Whatever shape is behind the selected Shape less the one behind selected Shape
- *  2.) The one behind the selected Shape
- *  3.) The selected Shape itself
- *  4.) All others infront of selected Shape
- * These four groups will be merged back to one in this exact order:
- *  1 + 3 + 2 + 4
-  \return True if it successfully lowered back selected Shape
-  \sa raiseSelectedShape(), raiseToTopSelectedShape() and lowerToBottomSelectedShape()
-*/
-bool KageStage::lowerSelectedShape() {
-	if (win->isLayerLocked() == true) {
-		return false;
-	}
-	Kage::timestamp();
-	std::cout << " KageStage::lowerSelectedShape " << selectedShapes.size() << std::endl;
-	
-	if (selectedShapes.size() == 0) {
-		return false;
-	}
-	
-	vector<unsigned int> l_selectedShapesOld(selectedShapes);
-		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater <unsigned int>());
-	vector<unsigned int> l_selectedShapesNew;
-		l_selectedShapesNew.clear();
-	
-	vector<VectorData> v = win->getFrameData().getVectorData();
-	_vectorDataZOrderBufferA.clear();
-	_vectorDataZOrderBufferB.clear();
-	_vectorDataZOrderBufferC.clear();
-	
-	for (unsigned int l_selectedShape = 0; l_selectedShape < l_selectedShapesOld.size(); ++l_selectedShape) {
-		unsigned int vsize = v.size();
-		unsigned int l_temp = vsize;
-		for (unsigned int i = l_selectedShapesOld[l_selectedShape]; i < vsize; ++i) {
-			if (v[i].vectorType == VectorData::TYPE_INIT
-					&& i != l_selectedShapesOld[l_selectedShape]) {
-				for (i = i; i < vsize; ++i) {
-					_vectorDataZOrderBufferC.push_back(v[i]);
-				}
-				l_temp = i;
-				break;
-			} else {
-				_vectorDataZOrderBufferA.push_back(v[i]);
-			}
-		}
-			for (unsigned int i = l_selectedShapesOld[l_selectedShape]-1; i >= 0 && i != UINT_MAX; --i) {
-				if (v[i].vectorType == VectorData::TYPE_INIT) {
-					unsigned int l_tempSelectedShape = i;
-					for (i = i; i < l_selectedShapesOld[l_selectedShape]; ++i) {
-						if (v[i].vectorType == VectorData::TYPE_INIT
-								&& i != l_tempSelectedShape) {
-							break;
-						} else {
-							_vectorDataZOrderBufferB.push_back(v[i]);
-						}
-					}
-					l_selectedShapesOld[l_selectedShape] = l_tempSelectedShape;
-					break;
-				}
-			}
-		
-		v.erase (v.begin() + l_selectedShapesOld[l_selectedShape],
-				 v.begin() + l_temp);
-			
-			l_selectedShapesOld[l_selectedShape] = v.size();
-			
-			l_selectedShapesNew.push_back(v.size());
-			
-			for (unsigned int i = 0; i < _vectorDataZOrderBufferA.size(); ++i) {
-				v.push_back(_vectorDataZOrderBufferA[i]);
-			}
-				_vectorDataZOrderBufferA.clear();
-			
-			for (unsigned int i = 0; i < _vectorDataZOrderBufferB.size(); ++i) {
-				v.push_back(_vectorDataZOrderBufferB[i]);
-			}
-				_vectorDataZOrderBufferB.clear();
-			
-			for (unsigned int i = 0; i < _vectorDataZOrderBufferC.size(); ++i) {
-				v.push_back(_vectorDataZOrderBufferC[i]);
-			}
-				_vectorDataZOrderBufferC.clear();
-	}
-	if (l_selectedShapesNew.size() > 0) {
-		selectedShapes.clear();
-		for (unsigned int i = 0; i < l_selectedShapesNew.size(); ++i) {
-			selectedShapes.push_back(l_selectedShapesNew[i]);
-		}
-	}
-	
-	win->setFrameData(v);
-	
-	win->stackDo();
-	
-	return true;
-}
-
-/** To move selected item to the top of z-ordering,<br/>
- *  1. Copy selected shapes to Buffer<br/>
- *  2. Delete selected shapes<br/>
- *  3. Paste Buffer<br/>
- *  \return True if it successfully raised selected Shape on top of z-ordering
- *  \sa raiseSelectedShape(), lowerSelectedShape() and lowerToBottomSelectedShape()
- */
-bool KageStage::raiseToTopSelectedShape() {
-	if (win->isLayerLocked() == true) {
-		return false;
-	}
-	Kage::timestamp();
-	std::cout << " KageStage::raiseToTopSelectedShape " << selectedShapes.size() << std::endl;
-	
-	if (selectedShapes.size() == 0) {
-		return false;
-	}
-	
-	if (copySelectedShapes() == true) { ///avoid spoiling user's CopyBuffer, create a different copySelectedShape using different CopyBuffer
-		if (deleteSelectedShapes() == true) {
-			if (pasteSelectedShapes() == true) {
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-/** To move selected item to the bottom of z-ordering,<br/>
- *  1. Copy selected shapes to Buffer<br/>
- *  2. Delete selected shapes<br/>
- *  3. Append remaining shapes to Buffer<br/>
- *  4. Delete all remaining shapes<br/>
- *  5. Paste Buffer
- *  \return True if it successfully lowered selected Shape to bottom of z-ordering
- *  \sa raiseSelectedShape(), lowerSelectedShape() and raiseToTopSelectedShape()
- */
-bool KageStage::lowerToBottomSelectedShape() {
-	if (win->isLayerLocked() == true) {
-		return false;
-	}
-	Kage::timestamp();
-	std::cout << " KageStage::lowerToBottomSelectedShape " << selectedShapes.size() << std::endl;
-	
-	if (selectedShapes.size() == 0) {
-		return false;
-	}
-	
-	if (copySelectedShapes() == true) { ///avoid spoiling user's CopyBuffer, create a different copySelectedShape using different CopyBuffer
-		if (deleteSelectedShapes() == true) {
-			selectedNodes.clear();
-			for (unsigned int i = 0; i < _vectorDataCopyBuffer.size(); ++i) {
-				if (_vectorDataCopyBuffer[i].vectorType == VectorData::TYPE_INIT) {
-					selectedNodes.push_back(i);
-				}
-			}
-			vector<VectorData> v = win->getFrameData().getVectorData();
-				for (unsigned int i = 0; i < v.size(); ++i) {
-					_vectorDataCopyBuffer.push_back(v[i]);
-				}
-			win->setFrameData(_vectorDataCopyBuffer);
-			
-			win->stackDo();
-			
-			tryMultiSelectShapes_populateShapes();
-			
-			_vectorDataCopyBuffer.clear();
-			return true;
-		}
-	}
-	return false;
-}
-
-bool KageStage::flipHorizontalSelectedShape() {
-	if (win->isLayerLocked() == true) {
-		return false;
-	}
-	if (selectedShapes.size() == 0) {
-		return false;
-	}
-	
-	vector<unsigned int> l_selectedShapesOld(selectedShapes);
-		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater <unsigned int>());
-	
-	vector<VectorData> v = win->getFrameData().getVectorData();
-	
-	double l_leftPoint = DBL_MAX;
-	double l_rightPoint = DBL_MIN;
-	double l_midPoint = 0;
-	
-	/// 1. get left-most, right-most, mid-point
-	for (unsigned int l_selectedShape = 0; l_selectedShape < l_selectedShapesOld.size(); ++l_selectedShape) {
-		unsigned int vsize = v.size();
-		for (unsigned int i = l_selectedShapesOld[l_selectedShape]; i < vsize; ++i) {
-			if (v[i].vectorType == VectorData::TYPE_INIT
-					&& i != l_selectedShapesOld[l_selectedShape]) {
-				break;
-			} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
-					|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
-				if (v[i].points[0].x < l_leftPoint) {
-					l_leftPoint = v[i].points[0].x;
-				} else if (v[i].points[0].x > l_rightPoint) {
-					l_rightPoint = v[i].points[0].x;
-				}
-				if (v[i].points[1].x < l_leftPoint) {
-					l_leftPoint = v[i].points[1].x;
-				} else if (v[i].points[1].x > l_rightPoint) {
-					l_rightPoint = v[i].points[1].x;
-				}
-				if (v[i].points[2].x < l_leftPoint) {
-					l_leftPoint = v[i].points[2].x;
-				} else if (v[i].points[2].x > l_rightPoint) {
-					l_rightPoint = v[i].points[2].x;
-				}
-			} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
-				if (v[i].points[0].x < l_leftPoint) {
-					l_leftPoint = v[i].points[0].x;
-				} else if (v[i].points[0].x > l_rightPoint) {
-					l_rightPoint = v[i].points[0].x;
-				}
-			}
-		}
-	}
-	l_midPoint = (l_leftPoint + l_rightPoint) / 2;
-	
-	/// 2. loop among selected shapes' points and invert point against location in left-mid-right
-	for (unsigned int l_selectedShape = 0; l_selectedShape < l_selectedShapesOld.size(); ++l_selectedShape) {
-		unsigned int vsize = v.size();
-		for (unsigned int i = l_selectedShapesOld[l_selectedShape]; i < vsize; ++i) {
-			if (v[i].vectorType == VectorData::TYPE_INIT
-					&& i != l_selectedShapesOld[l_selectedShape]) {
-				break;
-			} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
-					|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
-				if (v[i].points[0].x < l_midPoint) {
-					v[i].points[0].x += ((l_midPoint-v[i].points[0].x) * 2);
-				} else if (v[i].points[0].x > l_midPoint) {
-					v[i].points[0].x -= ((v[i].points[0].x-l_midPoint) * 2);
-				}
-				if (v[i].points[1].x < l_midPoint) {
-					v[i].points[1].x += ((l_midPoint-v[i].points[1].x) * 2);
-				} else if (v[i].points[1].x > l_midPoint) {
-					v[i].points[1].x -= ((v[i].points[1].x-l_midPoint) * 2);
-				}
-				if (v[i].points[2].x < l_midPoint) {
-					v[i].points[2].x += ((l_midPoint-v[i].points[2].x) * 2);
-				} else if (v[i].points[2].x > l_midPoint) {
-					v[i].points[2].x -= ((v[i].points[2].x-l_midPoint) * 2);
-				}
-			} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
-				if (v[i].points[0].x < l_midPoint) {
-					v[i].points[0].x += ((l_midPoint-v[i].points[0].x) * 2);
-				} else if (v[i].points[0].x > l_midPoint) {
-					v[i].points[0].x -= ((v[i].points[0].x-l_midPoint) * 2);
-				}
-			}
-		}
-	}
-	
-	win->setFrameData(v);
-	
-	win->stackDo();
-	
-	return true;
-}
-
-bool KageStage::flipVerticalSelectedShape() {
-	if (win->isLayerLocked() == true) {
-		return false;
-	}
-	if (selectedShapes.size() == 0) {
-		return false;
-	}
-	
-	vector<unsigned int> l_selectedShapesOld(selectedShapes);
-		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater <unsigned int>());
-	
-	vector<VectorData> v = win->getFrameData().getVectorData();
-	
-	double l_upperPoint = DBL_MAX;
-	double l_lowerPoint = DBL_MIN;
-	double l_midPoint = 0;
-	
-	/// 1. get upper-most, lower-most, mid-point
-	for (unsigned int l_selectedShape = 0; l_selectedShape < l_selectedShapesOld.size(); ++l_selectedShape) {
-		unsigned int vsize = v.size();
-		for (unsigned int i = l_selectedShapesOld[l_selectedShape]; i < vsize; ++i) {
-			if (v[i].vectorType == VectorData::TYPE_INIT
-					&& i != l_selectedShapesOld[l_selectedShape]) {
-				break;
-			} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
-					|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
-				if (v[i].points[0].y < l_upperPoint) {
-					l_upperPoint = v[i].points[0].y;
-				} else if (v[i].points[0].y > l_lowerPoint) {
-					l_lowerPoint = v[i].points[0].y;
-				}
-				if (v[i].points[1].y < l_upperPoint) {
-					l_upperPoint = v[i].points[1].y;
-				} else if (v[i].points[1].y > l_lowerPoint) {
-					l_lowerPoint = v[i].points[1].y;
-				}
-				if (v[i].points[2].y < l_upperPoint) {
-					l_upperPoint = v[i].points[2].y;
-				} else if (v[i].points[2].y > l_lowerPoint) {
-					l_lowerPoint = v[i].points[2].y;
-				}
-			} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
-				if (v[i].points[0].y < l_upperPoint) {
-					l_upperPoint = v[i].points[0].y;
-				} else if (v[i].points[0].y > l_lowerPoint) {
-					l_lowerPoint = v[i].points[0].y;
-				}
-			}
-		}
-	}
-	l_midPoint = (l_upperPoint + l_lowerPoint) / 2;
-	
-	/// 2. loop among selected shapes' points and invert point against location in upper-mid-lower
-	for (unsigned int l_selectedShape = 0; l_selectedShape < l_selectedShapesOld.size(); ++l_selectedShape) {
-		unsigned int vsize = v.size();
-		for (unsigned int i = l_selectedShapesOld[l_selectedShape]; i < vsize; ++i) {
-			if (v[i].vectorType == VectorData::TYPE_INIT
-					&& i != l_selectedShapesOld[l_selectedShape]) {
-				break;
-			} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
-					|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
-				if (v[i].points[0].y < l_midPoint) {
-					v[i].points[0].y += ((l_midPoint-v[i].points[0].y) * 2);
-				} else if (v[i].points[0].y > l_midPoint) {
-					v[i].points[0].y -= ((v[i].points[0].y-l_midPoint) * 2);
-				}
-				if (v[i].points[1].y < l_midPoint) {
-					v[i].points[1].y += ((l_midPoint-v[i].points[1].y) * 2);
-				} else if (v[i].points[1].y > l_midPoint) {
-					v[i].points[1].y -= ((v[i].points[1].y-l_midPoint) * 2);
-				}
-				if (v[i].points[2].y < l_midPoint) {
-					v[i].points[2].y += ((l_midPoint-v[i].points[2].y) * 2);
-				} else if (v[i].points[2].y > l_midPoint) {
-					v[i].points[2].y -= ((v[i].points[2].y-l_midPoint) * 2);
-				}
-			} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
-				if (v[i].points[0].y < l_midPoint) {
-					v[i].points[0].y += ((l_midPoint-v[i].points[0].y) * 2);
-				} else if (v[i].points[0].y > l_midPoint) {
-					v[i].points[0].y -= ((v[i].points[0].y-l_midPoint) * 2);
-				}
-			}
-		}
-	}
-	
-	win->setFrameData(v);
-	
-	win->stackDo();
 	
 	return true;
 }

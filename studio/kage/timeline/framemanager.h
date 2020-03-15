@@ -26,6 +26,16 @@
 			KageFrame *getFrameAt(unsigned int p_frame);
 			
 			void setSelected(KageFrame *p_frame);
+			
+			vector<unsigned int> raiseSelectedShape(vector<unsigned int> p_selectedShapes);
+			vector<unsigned int> lowerSelectedShape(vector<unsigned int> p_selectedShapes);
+			vector<unsigned int> raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes);
+			vector<unsigned int> lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes);
+			vector<unsigned int> groupSelectedShapes(vector<unsigned int> p_selectedShapes);
+			vector<unsigned int> ungroupSelectedShapes(vector<unsigned int> p_selectedShapes);
+			vector<unsigned int> duplicateShapes(vector<unsigned int> p_selectedShapes);
+			bool flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes);
+			bool flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes);
 		protected:
 			unsigned int layerID;
 //			unsigned int layerCtr;

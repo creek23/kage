@@ -39,11 +39,26 @@
 			
 //			void init(ColorData p_fill, StrokeColorData p_stroke);
 			void push(VectorDataManager p_vectorsData);
+			
+			vector<unsigned int> raiseSelectedShape(vector<unsigned int> p_selectedShapes);
+			vector<unsigned int> lowerSelectedShape(vector<unsigned int> p_selectedShapes);
+			vector<unsigned int> raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes);
+			vector<unsigned int> lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes);
+			vector<unsigned int> groupSelectedShapes(vector<unsigned int> p_selectedShapes);
+			vector<unsigned int> ungroupSelectedShapes(vector<unsigned int> p_selectedShapes);
+			vector<unsigned int> duplicateShapes(vector<unsigned int> p_selectedShapes);
+			bool flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes);
+			bool flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes);
 		protected:
 			void add(VectorData::type p_type, ColorData p_fill, StrokeColorData p_stroke);
 			
 			vector<VectorData> vectorData;
 			
 			void addCurve(PointData p_point1, PointData p_point2, PointData p_point3, VectorData::type p_curveType);
+			
+			//for use on z-ordering~ish
+			vector<VectorData> copySelectedShapes(vector<unsigned int> p_selectedShapes);
+			vector<unsigned int> pasteSelectedShapes(vector<VectorData> p_vectorDataCopyBuffer);
+			bool deleteSelectedShapes(vector<unsigned int> p_selectedShapes);
 	};
 #endif //GTKMM_KAGE_MANAGER_DATA_VECTOR_Hx

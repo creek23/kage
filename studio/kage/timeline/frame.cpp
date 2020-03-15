@@ -81,6 +81,12 @@ bool KageFrame::on_event(GdkEvent *e) {
 		on_expose_event((GdkEventExpose*) e);
 	} else if (e->type == GDK_FOCUS_CHANGE) {
 		//filter out from echos
+		cout << "GDK_FOCUS_CHANGE e->send_event " << ((GdkEventFocus*)e)->send_event << " e->in " << ((GdkEventFocus*)e)->in << endl;
+		if (((GdkEventFocus*)e)->in) {
+			KageFrame::_gotFocus = true;
+		} else {
+			KageFrame::_gotFocus = false;
+		}
 	} else if (e->type == GDK_KEY_PRESS) {
 		on_key_press_event((GdkEventKey*) e);
 	} else if (e->type == GDK_KEY_RELEASE) {
@@ -183,4 +189,35 @@ unsigned int KageFrame::getFrameSource() {
 
 void KageFrame::setFocus() {
 	grab_focus();
+}
+
+vector<unsigned int> KageFrame::raiseSelectedShape(vector<unsigned int> p_selectedShapes) {
+	return vectorsData.raiseSelectedShape(p_selectedShapes);
+}
+vector<unsigned int> KageFrame::lowerSelectedShape(vector<unsigned int> p_selectedShapes) {
+	return vectorsData.lowerSelectedShape(p_selectedShapes);
+}
+vector<unsigned int> KageFrame::raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes) {
+	return vectorsData.raiseToTopSelectedShape(p_selectedShapes);
+}
+vector<unsigned int> KageFrame::lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes) {
+	return vectorsData.lowerToBottomSelectedShape(p_selectedShapes);
+}
+
+vector<unsigned int> KageFrame::groupSelectedShapes(vector<unsigned int> p_selectedShapes) {
+	return vectorsData.groupSelectedShapes(p_selectedShapes);
+}
+vector<unsigned int> KageFrame::ungroupSelectedShapes(vector<unsigned int> p_selectedShapes) {
+	return vectorsData.ungroupSelectedShapes(p_selectedShapes);
+}
+
+vector<unsigned int> KageFrame::duplicateShapes(vector<unsigned int> p_selectedShapes) {
+	return vectorsData.duplicateShapes(p_selectedShapes);
+}
+
+bool KageFrame::flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes) {
+	return vectorsData.flipHorizontalSelectedShape(p_selectedShapes);
+}
+bool KageFrame::flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes) {
+	return vectorsData.flipVerticalSelectedShape(p_selectedShapes);
 }

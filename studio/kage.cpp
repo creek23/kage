@@ -133,7 +133,7 @@ Kage::Kage() : m_KageLayerManager(this),
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("Quit", Gtk::Stock::QUIT, "_Quit", "Quit"),
-		sigc::mem_fun(*this, &Kage::onButtonClick)
+		sigc::mem_fun(*this, &Kage::Quit_onClick)
 	);
 	
 	m_refActionGroup->add(
@@ -755,10 +755,15 @@ Kage::Kage() : m_KageLayerManager(this),
 						m_EntryNodeY.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.nodeY));
 						m_EntryNodeY.signal_activate().connect(
 							sigc::mem_fun(*this, &Kage::EntryNodeY_onEnter));
-					m_propNodeXYV2.pack_start(m_ToggleLine, Gtk::PACK_SHRINK);
-						m_ToggleLine.add_pixlabel("shared/icons/straighten.png","");
-						m_ToggleLine.set_focus_on_click(false);
-						m_ToggleLine.signal_clicked().connect(sigc::mem_fun(*this, &Kage::ToggleLine_onClick));
+					m_propNodeXYV2.pack_start(_btnToggleLine, Gtk::PACK_SHRINK);
+						_btnToggleLine_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/icons/straighten.png");
+							_btnToggleLine_img = Gtk::Image(_btnToggleLine_pixbuf);
+								_btnToggleLine.set_image(_btnToggleLine_img);
+									_btnToggleLine.property_always_show_image();
+									_btnToggleLine.show();
+									_btnToggleLine.set_size_request(20, 20);
+						_btnToggleLine.set_focus_on_click(false);
+						_btnToggleLine.signal_clicked().connect(sigc::mem_fun(*this, &Kage::ToggleLine_onClick));
 	
 	New_onClick();
 }
@@ -1338,9 +1343,23 @@ void Kage::updateNodeXY() {
 }
 
 void Kage::stackDo() {
+	KageDo l_kageDo = _undoRedoManager.previewUndo();
+	unsigned int l_layer = l_kageDo._layer;
+	unsigned int l_frame = l_kageDo._frame;
+	if (l_layer != -1 && l_frame != -1) {
+		if (       l_layer != getCurrentLayer()
+				|| l_frame != getCurrentFrame()) {
+			_undoRedoManager.stackDo(getCurrentLayer(), KageFramesManager::currentFrame, _undoBase);
+		}
+	} else {
+		_undoRedoManager.stackDo(getCurrentLayer(), KageFramesManager::currentFrame, _undoBase);
+		
+	}
+	
 	_undoRedoManager.stackDo(getCurrentLayer(), KageFramesManager::currentFrame, getFrameData().getVectorData());
 }
-void Kage::onButtonClick() {
+
+void Kage::Quit_onClick() {
 	hide();
 }
 
@@ -1369,12 +1388,32 @@ VectorDataManager Kage::getFrameData(bool p_force) {
 }
 
 void Kage::setFrameData(VectorDataManager p_vectorsData) {
-	if (m_KageLayerManager.getLayer()->isLocked() == false) {
+	setFrameData(p_vectorsData, false);
+}
+void Kage::setFrameData(VectorDataManager p_vectorsData, bool p_force) {
+	if (p_force == true) {
 		KageFrame *l_frame = m_KageFramesManager.getFrame();
 		if (l_frame) {
 			l_frame->vectorsData.clear();
 			l_frame->vectorsData = p_vectorsData.clone();
 		}
+	} else {
+		if (m_KageLayerManager.getLayer()->isLocked() == false) {
+			KageFrame *l_frame = m_KageFramesManager.getFrame();
+			if (l_frame) {
+				l_frame->vectorsData.clear();
+				l_frame->vectorsData = p_vectorsData.clone();
+			}
+		}
+	}
+}
+
+bool Kage::isFrameEmpty() {
+	KageFrame *l_frame = m_KageFramesManager.getFrame();
+	if (l_frame) {
+		return (l_frame->vectorsData.getVectorData().size() > 0);
+	} else {
+		return false;
 	}
 }
 
@@ -1423,17 +1462,20 @@ unsigned int Kage::getCurrentLayer() {
 }
 
 void Kage::setCurrentLayer(unsigned int p_layer) {
-	return m_KageLayerManager.setCurrentLayer(p_layer);
+	_undoBase = getFrameData().getVectorData(); //for use later by stackDo()
+	m_KageLayerManager.setCurrentLayer(p_layer);
 }
 unsigned int Kage::getCurrentFrame() {
 	return m_KageFramesManager.getCurrentFrame();
 }
 void Kage::setCurrentLayerByID(unsigned int p_layerID) {
-	return m_KageLayerManager.setCurrentLayerByID(p_layerID);
+	_undoBase = getFrameData().getVectorData(); //for use later by stackDo()
+	m_KageLayerManager.setCurrentLayerByID(p_layerID);
 }
 
 void Kage::setCurrentFrame(unsigned int p_layer) {
-	return m_KageFramesManager.setCurrentFrame(p_layer);
+	_undoBase = getFrameData().getVectorData(); //for use later by stackDo()
+	m_KageFramesManager.setCurrentFrame(p_layer);
 }
 
 void Kage::New_onClick() {
@@ -1494,7 +1536,9 @@ void Kage::OpenKSF_onClick() {
 			parseKSF(l_ksfContent);
 			_undoRedoManager.clear();
 			stackDo();
-			
+			propFillStrokeSetVisible(false);
+			propLocationSizeSetVisible(false);
+			propNodeXYSetVisible(false);
 			break;
 //		default:
 //			std::cout << "clicked " << result << endl;

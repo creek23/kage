@@ -20,6 +20,7 @@
 			void stackDo(unsigned int p_layer, unsigned int p_frame, vector<VectorData> p_data);
 			KageDo undo();
 			KageDo redo();
+			KageDo previewUndo();
 			
 			void clear();
 			

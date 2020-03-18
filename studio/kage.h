@@ -53,6 +53,8 @@
 			void addDataToFrame(VectorDataManager v, bool p_force = false);
 			VectorDataManager getFrameData(bool p_force = false);
 			void setFrameData(VectorDataManager p_vectorsData);
+			void setFrameData(VectorDataManager p_vectorsData, bool p_force);
+			bool isFrameEmpty();
 			void forceRenderFrames();
 			void renderFrames();
 			void renderFramesBelowCurrentLayer();
@@ -81,7 +83,7 @@
 			
 			//Signal handlers:
 			virtual void updateStatus(Glib::ustring status_msg);
-			virtual void onButtonClick();
+			virtual void Quit_onClick();
 			virtual void LayerAdd_onClick();
 			virtual void LayerRename_onClick();
 			virtual void ShowHideLayer_onClick();
@@ -121,10 +123,6 @@
 			virtual void ExportPNGTransparent_onClick();
 			virtual void ExportPNGSequence_onClick();
 			virtual void ExportAVI_onClick();
-			
-			unsigned int undoStackCount;
-			unsigned int undoStackPointer;
-			std::vector<unsigned int> undoStack;
 			
 			//Member widgets:
 			Gtk::VBox m_VBoxRoot;
@@ -234,7 +232,9 @@
 				Gtk::Entry m_EntryNodeY;
 					void EntryNodeY_onEnter();
 				Gtk::Label m_LabelToggleLine;
-				Gtk::Button m_ToggleLine;
+				Gtk::Button _btnToggleLine;
+					Gtk::Image                _btnToggleLine_img;
+					Glib::RefPtr<Gdk::Pixbuf> _btnToggleLine_pixbuf;
 					void ToggleLine_onClick();
 			
 			Gtk::Label m_LblHolder_Toolbar;
@@ -306,6 +306,7 @@
 			guint tickCounter;
 			guint frameCounter;
 			
+			vector<VectorData> _undoBase;
 		public:
 			void toolsButtonToggle(string p_toolTip);
 			

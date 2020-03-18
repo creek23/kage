@@ -55,6 +55,22 @@ KageDo UnRe::redo() {
 	return l_kageDo;
 }
 
+/**
+ * While undo() pops a KageDo from a stack, this just gives a preview
+ * of the top KageDo on the stack.
+ * \return latest state pushed in the stack
+ * \sa undo()
+ */
+KageDo UnRe::previewUndo() {
+	KageDo l_kageDo;
+	
+	if (_stackIndex > 0 && _stackIndex != -1) {
+		l_kageDo = _undoStack[_stackIndex].clone();
+	}
+	
+	return l_kageDo;
+}
+
 PointData UnRe::applyZoomRatio(PointData p_zoomReference, double p_zoomRatio, PointData p_value) {
 	if (p_zoomRatio == 0.0f) { return p_value; }
 	

@@ -4,9 +4,6 @@
 
 KageFramesManager::KageFramesManager(Kage *p_win) {
 	win = p_win;
-	pack_start(place_holder, Gtk::PACK_SHRINK);
-		place_holder.set_label(" ");
-		place_holder.set_size_request(100, 20);
 	//addFrameManager(1);
 }
 
@@ -31,6 +28,7 @@ void KageFramesManager::addFrameManager(unsigned int p_layer) {
 	}
 	framemanager.push_back(Gtk::manage(new KageFrameManager(this, p_layer, l_count)));
 		pack_end(*framemanager.back(), Gtk::PACK_SHRINK);
+			(*framemanager.back()).set_size_request(100, 23);
 }
 
 void KageFramesManager::deleteFrameManager(unsigned int p_layer) {

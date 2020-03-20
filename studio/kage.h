@@ -22,6 +22,7 @@
 	#include <gtkmm/filechooserdialog.h>
 	#include <gtkmm/colorbutton.h>
 	#include <gtkmm/colorselection.h>
+	#include <gtkmm/scale.h>
 	#include "kage/timeline/layermanager.h"
 	//#include "kage/timeline/layer.h"
 	#include "kage/timeline/framesmanager.h"
@@ -117,12 +118,16 @@
 //			virtual void New_onClick();
 			virtual void OpenKSF_onClick();
 			virtual void Save_onClick();
+			virtual void SaveAs_onClick();
 			virtual void ExportKS_onClick();
 			virtual void ExportHTML5_onClick();
 			virtual void ExportPNG_onClick();
 			virtual void ExportPNGTransparent_onClick();
 			virtual void ExportPNGSequence_onClick();
 			virtual void ExportAVI_onClick();
+			
+			void doSaveDialog(string p_title);
+			void doSave(string p_filename);
 			
 			//Member widgets:
 			Gtk::VBox m_VBoxRoot;
@@ -191,16 +196,18 @@
 				Gtk::ColorButton m_ColorButtonFill;
 					void ColorButtonFill_onClick();
 				Gtk::Label m_LabelFillAlpha;
-				Gtk::Entry m_EntryFillAlpha;
-					void EntryFillAlpha_onEnter();
+				Glib::RefPtr<Gtk::Adjustment> _adjustFill;
+				Glib::RefPtr<Gtk::Adjustment> _adjustStroke;
+				Gtk::Scale _scaleFillAplha;
+					void FillAlpha_onChange();
 				
 				Gtk::Label m_LabelStroke;
 				Gtk::Label m_LabelStrokeThickness;
 				Gtk::Entry m_EntryStrokeThickness;
 					void EntryStrokeThickness_onEnter();
 				Gtk::Label m_LabelStrokeAlpha;
-				Gtk::Entry m_EntryStrokeAlpha;
-					void EntryStrokeAlpha_onEnter();
+				Gtk::Scale _scaleStrokeAlpha;
+					void StrokeAlpha_onChange();
 				Gtk::ColorButton m_ColorButtonStroke;
 					void ColorButtonStroke_onClick();
 			
@@ -305,6 +312,7 @@
 			const gint64 cycle_time = 3000000; // microseconds
 			guint tickCounter;
 			guint frameCounter;
+			bool _isPlaying;
 			
 			vector<VectorData> _undoBase;
 		public:

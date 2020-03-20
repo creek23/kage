@@ -64,6 +64,10 @@ Kage::Kage() : m_KageLayerManager(this),
 			   m_LabelToggleLine("Straighten"),
 			   m_LblHolder_Toolbar("Toolbar"),
 			   m_KageStage(this),
+			   _adjustFill( Gtk::Adjustment::create(0.0, 0.0, 101.0, 0.1, 1.0, 1.0) ),
+			   _adjustStroke( Gtk::Adjustment::create(0.0, 0.0, 101.0, 0.1, 1.0, 1.0) ),
+			   _scaleFillAplha(_adjustFill, Gtk::ORIENTATION_HORIZONTAL),
+			   _scaleStrokeAlpha(_adjustStroke, Gtk::ORIENTATION_HORIZONTAL),
 			   _undoRedoManager() {
 	m_ContextId = m_Statusbar.get_context_id(app_title);
 	KageFrame::_gotFocus = false;
@@ -75,11 +79,8 @@ Kage::Kage() : m_KageLayerManager(this),
 	set_default_size(1920,1080);
 	maximize();
 	//Define the actions:
-	m_refActionGroup = Gtk::ActionGroup::create("Actions"); //It also works with no name, which is probably better if there is only one.
+	m_refActionGroup = Gtk::ActionGroup::create("Actions");
 	
-	//In real life, the details would not be supplied _in addition _ the stock IDs.
-	
-	//Add normal Actions:
 	m_refActionGroup->add( Gtk::Action::create("FileMenu", "_File") ); 
 	m_refActionGroup->add( Gtk::Action::create("ExportMenu", "_Export...") ); 
 	m_refActionGroup->add( Gtk::Action::create("ExportPNGMenu", "_PNG...") ); 
@@ -100,6 +101,10 @@ Kage::Kage() : m_KageLayerManager(this),
 	m_refActionGroup->add(
 		Gtk::Action::create("Save", Gtk::Stock::SAVE, "_Save", "Save current file"),
 		sigc::mem_fun(*this, &Kage::Save_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("SaveAs", Gtk::Stock::SAVE, "Save _As", "Save current file As"),
+		sigc::mem_fun(*this, &Kage::SaveAs_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("ExportKS", "Export KonsolScript", "Export to KS"),
@@ -392,6 +397,7 @@ Kage::Kage() : m_KageLayerManager(this),
 		"			<menuitem action='OpenKSF'/>"
 		"			<separator/>"
 		"			<menuitem action='Save'/>"
+		"			<menuitem action='SaveAs'/>"
 		"			<separator/>"
 		"			<menu action='ExportMenu'>"
 		"				<menuitem action='ExportAVI'/>"
@@ -514,10 +520,13 @@ Kage::Kage() : m_KageLayerManager(this),
 	m_HBoxToolbar.pack_start(m_VPane_Timeline, Gtk::PACK_EXPAND_WIDGET);
 		m_VPane_Timeline.add1(m_Timeline_HBox);
 			m_Timeline_HBox.pack_start(m_Timeline_HPaned);
+				m_Timeline_HPaned.set_size_request(100, 100);
 				m_Timeline_HPaned.add1(m_Timeline_Layer_VBox);
 					m_Timeline_Layer_VBox.pack_start(m_Timeline_Layer_ScrolledWindow);//, Gtk::PACK_SHRINK);
-						m_Timeline_Layer_ScrolledWindow.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_NEVER);
+						m_Timeline_Layer_ScrolledWindow.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_EXTERNAL);
 							m_Timeline_Layer_ScrolledWindow.add(m_KageLayerManager);
+							m_Timeline_Frame_ScrolledWindow.set_border_width(0);
+							m_Timeline_Frame_ScrolledWindow.set_shadow_type(Gtk::SHADOW_NONE);
 							cout << "layer count " << m_KageLayerManager.layerCount() << endl;
 					m_Timeline_Layer_VBox.pack_start(m_Timeline_Layer_Add_HBox, Gtk::PACK_SHRINK);
 						m_Timeline_Layer_Add_HBox.pack_start(m_Timeline_Label, Gtk::PACK_EXPAND_WIDGET);
@@ -575,15 +584,16 @@ Kage::Kage() : m_KageLayerManager(this),
 				m_Timeline_HPaned.add2(m_Timeline_Frame_VBox1);
 					m_Timeline_Frame_VBox1.pack_start(m_Timeline_Frame_VBox2, Gtk::PACK_EXPAND_WIDGET);
 						m_Timeline_Frame_VBox2.pack_start(m_Timeline_Frame_ScrolledWindow);//, Gtk::PACK_SHRINK);
-							m_Timeline_Frame_ScrolledWindow.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_NEVER);
+							m_Timeline_Frame_ScrolledWindow.set_policy(Gtk::POLICY_EXTERNAL , Gtk::POLICY_EXTERNAL);
 								m_Timeline_Frame_ScrolledWindow.set_border_width(0);
 								m_Timeline_Frame_ScrolledWindow.add(m_KageFramesManager);
 								m_Timeline_Frame_ScrolledWindow.set_shadow_type(Gtk::SHADOW_NONE);
+								m_Timeline_Frame_ScrolledWindow.set_kinetic_scrolling(true);
 						m_Timeline_Frame_VBox2.pack_start(m_Timeline_HScrollbar, Gtk::PACK_SHRINK);
 							m_Timeline_HScrollbar.set_adjustment(m_Timeline_Frame_ScrolledWindow.get_hadjustment());
 					m_Timeline_Frame_VBox1.pack_start(m_Timeline_CurrentFrame, Gtk::PACK_SHRINK);
 							m_Timeline_CurrentFrame.set_label("L 1 F 1");
-							m_Timeline_CurrentFrame.set_size_request(20, 20);
+							m_Timeline_CurrentFrame.set_size_request(22, 22);
 
 			m_Timeline_HBox.pack_start(m_Timeline_VScrollbar, Gtk::PACK_SHRINK);
 				m_Timeline_VScrollbar.set_adjustment(m_Timeline_Frame_ScrolledWindow.get_vadjustment());
@@ -661,26 +671,26 @@ Kage::Kage() : m_KageLayerManager(this),
 						m_ColorButtonFill.set_title("Choose Fill Color");
 							m_ColorButtonFill.set_color(m_KageStage.getStageBG());
 						m_ColorButtonFill.signal_color_set().connect(sigc::mem_fun(* this, &Kage::ColorButtonFill_onClick) );
-					m_PropFillStrokeV2.pack_start(m_EntryFillAlpha, Gtk::PACK_SHRINK);
-						m_EntryFillAlpha.set_size_request(20, 24);
-						m_EntryFillAlpha.set_width_chars(3);
-						m_EntryFillAlpha.set_max_length(3);
-						m_EntryFillAlpha.set_text(StringHelper::integerToString((int)KageStage::fillColor.getA()));
-						m_EntryFillAlpha.signal_activate().connect(
-							sigc::mem_fun(*this, &Kage::EntryFillAlpha_onEnter));
+					m_PropFillStrokeV2.pack_start(_scaleFillAplha, Gtk::PACK_SHRINK);
+						_scaleFillAplha.set_digits(0);
+						_scaleFillAplha.set_value(100);
+						_scaleFillAplha.set_value_pos(Gtk::POS_TOP);
+						_scaleFillAplha.set_draw_value();
+						_scaleFillAplha.signal_value_changed().connect(
+							sigc::mem_fun(*this, &Kage::FillAlpha_onChange));
 					m_PropFillStrokeV2.pack_start(m_ColorButtonStroke);
 						m_ColorButtonStroke.set_size_request(32, 32);
 						m_ColorButtonStroke.set_use_alpha(true);
 						m_ColorButtonStroke.set_title("Choose Stroke Color");
 							m_ColorButtonStroke.set_color(m_KageStage.getStageBG());
 						m_ColorButtonStroke.signal_color_set().connect(sigc::mem_fun(* this, &Kage::ColorButtonStroke_onClick) );
-					m_PropFillStrokeV2.pack_start(m_EntryStrokeAlpha, Gtk::PACK_SHRINK);
-						m_EntryStrokeAlpha.set_size_request(20, 24);
-						m_EntryStrokeAlpha.set_width_chars(3);
-						m_EntryStrokeAlpha.set_max_length(3);
-						m_EntryStrokeAlpha.set_text(StringHelper::integerToString((int)KageStage::stroke.getA()));
-						m_EntryStrokeAlpha.signal_activate().connect(
-							sigc::mem_fun(*this, &Kage::EntryStrokeAlpha_onEnter));
+					m_PropFillStrokeV2.pack_start(_scaleStrokeAlpha, Gtk::PACK_SHRINK);
+						_scaleStrokeAlpha.set_digits(0);
+						_scaleStrokeAlpha.set_value(100);
+						_scaleStrokeAlpha.set_value_pos(Gtk::POS_TOP);
+						_scaleStrokeAlpha.set_draw_value();
+						_scaleStrokeAlpha.signal_value_changed().connect(
+							sigc::mem_fun(*this, &Kage::StrokeAlpha_onChange));
 					m_PropFillStrokeV2.pack_start(m_EntryStrokeThickness, Gtk::PACK_SHRINK);
 						m_EntryStrokeThickness.set_size_request(20, 24);
 						m_EntryStrokeThickness.set_width_chars(2);
@@ -1324,9 +1334,9 @@ void Kage::propNodeXYSetVisible(bool p_visible) {
 
 void Kage::updateColors() {
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
-	m_EntryFillAlpha.set_text(StringHelper::unsignedIntegerToString(KageStage::fillColor.getA()));
+	_scaleFillAplha.set_value((double) KageStage::fillColor.getA()*100.0f/256.0f);
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
-	m_EntryStrokeAlpha.set_text(StringHelper::unsignedIntegerToString(KageStage::stroke.getA()));
+	_scaleStrokeAlpha.set_value((double) KageStage::stroke.getA()*100.0f/256.0f);
 	m_EntryStrokeThickness.set_text(StringHelper::unsignedIntegerToString(KageStage::stroke.getThickness()));
 }
 
@@ -1357,6 +1367,7 @@ void Kage::stackDo() {
 	}
 	
 	_undoRedoManager.stackDo(getCurrentLayer(), KageFramesManager::currentFrame, getFrameData().getVectorData());
+	set_title("*" + ksfPath + " - Kage Studio");
 }
 
 void Kage::Quit_onClick() {
@@ -1507,6 +1518,8 @@ void Kage::New_onClick() {
 	
 	m_KageStage.render();
 	
+	ksfPath = "Untitled";
+	set_title(ksfPath + " - Kage Studio");
 	updateStatus("Ready");
 }
 
@@ -1528,6 +1541,11 @@ void Kage::OpenKSF_onClick() {
 		case Gtk::RESPONSE_OK:
 			New_onClick();
 			ksfPath = dialog.get_filename();
+			
+			int l_len = strlen(ksfPath.c_str()) - 4;
+			if (StringHelper::toLower(ksfPath).substr(l_len, 4) != ".ksf") {
+				ksfPath = ksfPath + ".ksf";
+			}
 			cout << "uri:" << dialog.get_uri() << endl;
 			
 			string l_ksfContent = BasicXml::openXMLFile(ksfPath);
@@ -1539,70 +1557,89 @@ void Kage::OpenKSF_onClick() {
 			propFillStrokeSetVisible(false);
 			propLocationSizeSetVisible(false);
 			propNodeXYSetVisible(false);
+			set_title(ksfPath + " - Kage Studio");
 			break;
 //		default:
 //			std::cout << "clicked " << result << endl;
 	}
 }
 void Kage::Save_onClick() {
-	Gtk::FileChooserDialog dialog("Save File", Gtk::FILE_CHOOSER_ACTION_SAVE);
-	dialog.set_transient_for( * this);
+	if (ksfPath != "Untitled") {
+		doSave(ksfPath);
+		return;
+	}
+	doSaveDialog("Save File");
+}
+void Kage::SaveAs_onClick() {
+	doSaveDialog("Save File As");
+}
+
+void Kage::doSaveDialog(string p_title) {
+	Gtk::FileChooserDialog dialog(p_title, Gtk::FILE_CHOOSER_ACTION_SAVE);
+	dialog.set_transient_for( *this);
 		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 		dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
-	//Add filters, so that only certain file types can be selected:
+	
 	auto filter_kage = Gtk::FileFilter::create();
 		filter_kage->set_name("Kage Studio Files");
 		filter_kage->add_mime_type("text/x-kage");
 		filter_kage->add_pattern("*.ksf");
 			dialog.add_filter(filter_kage);
-	//Show the dialog and wait for a user response:
+	
 	int result = dialog.run();
 	
-	//Handle the response:
 	switch (result) {
 		case Gtk::RESPONSE_OK:
-			ksfPath = dialog.get_filename();
 			cout << "uri:" << dialog.get_uri() << endl;
-			ksfInited = false;
-			ksfFile.close();
-			
-			unsigned int l_lMax = m_KageLayerManager.layerCount();
-			unsigned int i;
-				unsigned int l_fMax = m_KageFramesManager.frameCount();
-				unsigned int j;
-					unsigned int l_currentLayer;
-					unsigned int l_currentFrame;
-			
-			saveKageStudio(ksfPath, "<KageStudio version=\"2020.03.10\">");
-			saveKageStudio(ksfPath, "<stage width=\"" + StringHelper::StringHelper::doubleToString(m_KageStage.stageWidth) + "\" height=\"" + StringHelper::StringHelper::doubleToString(m_KageStage.stageHeight) + "\" " +
-			                        "background=\"rgb(" + StringHelper::integerToString(m_KageStage.stageBG.getR()) + ", " + StringHelper::integerToString(m_KageStage.stageBG.getG()) + ", " + StringHelper::integerToString(m_KageStage.stageBG.getB()) + ")\" " +
-			                        "fps=\"" + StringHelper::integerToString(m_KageStage.fps) + "\" " +
-			                        "layers=\"" + StringHelper::integerToString(l_lMax) + "\" " +
-			                        "frames=\"" + StringHelper::integerToString(l_fMax) + "\" />");
-				l_currentLayer = getCurrentLayer();
-				l_currentFrame = m_KageFramesManager.getCurrentFrame();
-					for (i = 1; i <= l_lMax; i++) {
-						m_KageFramesManager.setCurrentLayer(i);
-						saveKageStudio(ksfPath, "<layer" + StringHelper::unsignedIntegerToString(i) + " label=\"" + m_KageLayerManager.getLabel() + "\" visible=\"" + (m_KageLayerManager.isLayerVisible()?"true":"false") + "\" locked=\"" + (m_KageLayerManager.isLayerLocked()?"true":"false") + "\">");
-						for (j = 1; j <= l_fMax; ++j) {
-							saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + ">");
-							m_KageFramesManager.setCurrentFrame(j);
-							saveKageStudio(ksfPath, saveFrame());
-							saveKageStudio(ksfPath, "</frame" + StringHelper::unsignedIntegerToString(j) + ">");
-						}
-						saveKageStudio(ksfPath, "</layer" + StringHelper::unsignedIntegerToString(i) + ">");
-					}
-				setCurrentLayer(l_currentLayer);
-				m_KageFramesManager.setCurrentFrame(l_currentFrame);
-			saveKageStudio(ksfPath, "</KageStudio>");
-			updateStatus("Saved to " + ksfPath);
-			//TODO: zip saved file -- should it be zipped?
+			doSave(dialog.get_filename());
 			break;
 //		default:
 //			std::cout << "clicked " << result << endl;
 	}
 }
-
+void Kage::doSave(string p_filename) {
+	int l_len = strlen(p_filename.c_str()) - 4;
+	if (StringHelper::toLower(p_filename).substr(l_len, 4) != ".ksf") {
+		p_filename = p_filename + ".ksf";
+	}
+	ksfPath = p_filename;
+	ksfInited = false;
+	ksfFile.close();
+	
+	unsigned int l_lMax = m_KageLayerManager.layerCount();
+	unsigned int i;
+		unsigned int l_fMax = m_KageFramesManager.frameCount();
+		unsigned int j;
+			unsigned int l_currentLayer;
+			unsigned int l_currentFrame;
+	
+	saveKageStudio(ksfPath, "<KageStudio version=\"2020.03.10\">");
+	saveKageStudio(ksfPath, "<stage width=\"" + StringHelper::StringHelper::doubleToString(m_KageStage.stageWidth) + "\" height=\"" + StringHelper::StringHelper::doubleToString(m_KageStage.stageHeight) + "\" " +
+							"background=\"rgb(" + StringHelper::integerToString(m_KageStage.stageBG.getR()) + ", " + StringHelper::integerToString(m_KageStage.stageBG.getG()) + ", " + StringHelper::integerToString(m_KageStage.stageBG.getB()) + ")\" " +
+							"fps=\"" + StringHelper::integerToString(m_KageStage.fps) + "\" " +
+							"layers=\"" + StringHelper::integerToString(l_lMax) + "\" " +
+							"frames=\"" + StringHelper::integerToString(l_fMax) + "\" />");
+		l_currentLayer = getCurrentLayer();
+		l_currentFrame = m_KageFramesManager.getCurrentFrame();
+			for (i = 1; i <= l_lMax; i++) {
+				m_KageFramesManager.setCurrentLayer(i);
+				saveKageStudio(ksfPath, "<layer" + StringHelper::unsignedIntegerToString(i) + " label=\"" + m_KageLayerManager.getLabel() + "\" visible=\"" + (m_KageLayerManager.isLayerVisible()?"true":"false") + "\" locked=\"" + (m_KageLayerManager.isLayerLocked()?"true":"false") + "\">");
+				for (j = 1; j <= l_fMax; ++j) {
+					saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + ">");
+					m_KageFramesManager.setCurrentFrame(j);
+					saveKageStudio(ksfPath, saveFrame());
+					saveKageStudio(ksfPath, "</frame" + StringHelper::unsignedIntegerToString(j) + ">");
+				}
+				saveKageStudio(ksfPath, "</layer" + StringHelper::unsignedIntegerToString(i) + ">");
+			}
+		setCurrentLayer(l_currentLayer);
+		m_KageFramesManager.setCurrentFrame(l_currentFrame);
+	saveKageStudio(ksfPath, "</KageStudio>");
+	updateStatus("Saved to " + ksfPath);
+	
+	set_title(ksfPath + " - Kage Studio");
+	//TODO: zip saved file -- should it be zipped?
+}
 void Kage::ExportKS_onClick() {
 	Gtk::FileChooserDialog dialog("Export File", Gtk::FILE_CHOOSER_ACTION_SAVE);
 	dialog.set_transient_for( * this);
@@ -2005,9 +2042,13 @@ void Kage::onActionActivate() {
 }
 
 void Kage::Play_onClick() {
+	if (_isPlaying == true) {
+		m_KageStage.remove_tick_callback(m_tick_id);
+	}
 	std::cout << " Kage::Play_onClick" << std::endl;
 	tickCounter = 0;
 	frameCounter = 0;
+	_isPlaying = true;
 	m_tick_id = m_KageStage.add_tick_callback( sigc::mem_fun(*this, &Kage::on_tick) );
 }
 
@@ -2032,6 +2073,7 @@ bool Kage::on_tick(const Glib::RefPtr<Gdk::FrameClock>& frame_clock) {
 			frameCounter = m_KageFramesManager.frameCount();
 			
 			m_KageStage.remove_tick_callback(m_tick_id);
+			_isPlaying = false;
 		}
 		//
 		m_KageFramesManager.setCurrentFrame(frameCounter);
@@ -2040,17 +2082,15 @@ bool Kage::on_tick(const Glib::RefPtr<Gdk::FrameClock>& frame_clock) {
 	
 	return true;
 }
-void Kage::EntryFillAlpha_onEnter() {
-	unsigned int l_uint = StringHelper::toUnsignedInteger(m_EntryFillAlpha.get_text());
-	KageStage::fillColor.setA(l_uint % 256);
-	m_EntryFillAlpha.set_text(StringHelper::unsignedIntegerToString(KageStage::fillColor.getA()));
+void Kage::FillAlpha_onChange() {
+	double l_fillAlpha = _scaleFillAplha.get_value();
+	KageStage::fillColor.setA((int) (l_fillAlpha * 256.0f/ 100.0f));
 	m_KageStage.updateShapeColor();
 }
 
-void Kage::EntryStrokeAlpha_onEnter() {
-	unsigned int l_uint = StringHelper::toUnsignedInteger(m_EntryStrokeAlpha.get_text());
-	KageStage::stroke.setA(l_uint % 256);
-	m_EntryStrokeAlpha.set_text(StringHelper::unsignedIntegerToString(KageStage::stroke.getA()));
+void Kage::StrokeAlpha_onChange() {
+	double l_strokeAlpha = _scaleStrokeAlpha.get_value();
+	KageStage::stroke.setA((int) (l_strokeAlpha * 256.0f/ 100.0f));
 	m_KageStage.updateShapeColor();
 }
 
@@ -2247,26 +2287,22 @@ void Kage::ColorButtonStroke_onClick() {
 }
 
 void Kage::updateSelectedShapeColor(bool p_doFill, bool p_doStroke) {
-	unsigned int l_uint;
+	double l_alphaValue;
 	if (p_doFill == true) {
 		m_Color = m_ColorButtonFill.get_color();
 		m_KageStage.setFill  (m_Color);
 		
-		l_uint = StringHelper::toUnsignedInteger(m_EntryFillAlpha.get_text());
-		l_uint %= 256;
-		m_EntryFillAlpha.set_text(StringHelper::unsignedIntegerToString(l_uint));
-		m_KageStage.fillColor.setA(l_uint % 256);
+		l_alphaValue = _scaleFillAplha.get_value();
+		m_KageStage.fillColor.setA((int) (l_alphaValue * 256.0f/ 100.0f));
 	}
 	if (p_doStroke == true) {
 		m_Color = m_ColorButtonStroke.get_color();
 		m_KageStage.setStroke(m_Color);
 		
-		l_uint = StringHelper::toUnsignedInteger(m_EntryStrokeAlpha.get_text());
-		l_uint %= 256;
-		m_EntryStrokeAlpha.set_text(StringHelper::unsignedIntegerToString(l_uint));
-		m_KageStage.fillColor.setA(l_uint);
+		l_alphaValue = _scaleFillAplha.get_value();
+		m_KageStage.stroke.setA((int) (l_alphaValue * 256.0f/ 100.0f));
 		
-		l_uint = StringHelper::toUnsignedInteger(m_EntryStrokeThickness.get_text());
+		unsigned int l_uint = StringHelper::toUnsignedInteger(m_EntryStrokeThickness.get_text());
 		KageStage::stroke.setThickness(l_uint);
 	}
 	m_KageStage.updateShapeColor(p_doFill, p_doStroke);

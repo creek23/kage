@@ -49,7 +49,6 @@
 			bool flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes);
 		protected:
 			Kage *win;
-			Gtk::Label place_holder;
 			std::vector<KageFrameManager*> framemanager;
 	};
 #endif // GTKMM_KAGE_MANAGER_FRAMES_H

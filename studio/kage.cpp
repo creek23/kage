@@ -1,8 +1,6 @@
 
 #include "kage.h"
 
-const Glib::ustring app_title = "Kage Studio";
-
 bool KageFrame::mouseIsDown = false;
 ColorData KageStage::stageBG(255, 255, 255);
 ColorData KageStage::fillColor(0, 0, 255, 255);
@@ -69,9 +67,9 @@ Kage::Kage() : m_KageLayerManager(this),
 			   _scaleFillAplha(_adjustFill, Gtk::ORIENTATION_HORIZONTAL),
 			   _scaleStrokeAlpha(_adjustStroke, Gtk::ORIENTATION_HORIZONTAL),
 			   _undoRedoManager() {
-	m_ContextId = m_Statusbar.get_context_id(app_title);
+	m_ContextId = m_Statusbar.get_context_id(KageAbout::app_title);
 	KageFrame::_gotFocus = false;
-	set_title("Kage Studio");
+	set_title(KageAbout::app_title);
 	set_icon(Gdk::Pixbuf::create_from_resource("/kage/share/icons/default.png"));
 	set_border_width(0);
 	
@@ -103,7 +101,7 @@ Kage::Kage() : m_KageLayerManager(this),
 		sigc::mem_fun(*this, &Kage::Save_onClick)
 	);
 	m_refActionGroup->add(
-		Gtk::Action::create("SaveAs", Gtk::Stock::SAVE, "Save _As", "Save current file As"),
+		Gtk::Action::create("SaveAs", "Save _As", "Save current file As"),
 		sigc::mem_fun(*this, &Kage::SaveAs_onClick)
 	);
 	m_refActionGroup->add(
@@ -313,7 +311,7 @@ Kage::Kage() : m_KageLayerManager(this),
 	m_refActionGroup->add(
 		Gtk::Action::create("DeleteLayer", "_Delete Layer", "Delete Layer"),
 		Gtk::AccelKey("<control>F8"),
-		sigc::mem_fun(*this, &Kage::onActionActivate)
+		sigc::mem_fun(*this, &Kage::LayerDel_onClick)
 	);
 	Gtk::RadioAction::Group group_tools;
 	m_refActionGroup->add(
@@ -367,7 +365,7 @@ Kage::Kage() : m_KageLayerManager(this),
 		sigc::mem_fun(*this, &Kage::onActionActivate)
 	);
 	m_refActionGroup->add(
-		Gtk::Action::create("Website", "_Website", "Visit Kage Studio Website"),
+		Gtk::Action::create("Website", "_Website", "Visit " + KageAbout::app_title + " Website"),
 		sigc::mem_fun(*this, &Kage::Website_onClick)
 	);
 	m_refActionGroup->add(
@@ -379,7 +377,7 @@ Kage::Kage() : m_KageLayerManager(this),
 		sigc::mem_fun(*this, &Kage::btnDebug_onClick)
 	);
 	m_refActionGroup->add(
-		Gtk::Action::create("About", "_About", "About Kage Studio"),
+		Gtk::Action::create("About", "_About", "About " + KageAbout::app_title),
 		Gtk::AccelKey("F2"),
 		sigc::mem_fun(*this, &Kage::btnAbout_onClick)
 	);
@@ -553,6 +551,7 @@ Kage::Kage() : m_KageLayerManager(this),
 								_btnLayerMoveTop_img = Gtk::Image(_btnLayerMoveTop_pixbuf);
 									_btnLayerMoveTop.set_image(_btnLayerMoveTop_img);
 										_btnLayerMoveTop.property_always_show_image();
+										_btnLayerMoveTop.set_tooltip_text("Move Layer to Top");
 										_btnLayerMoveTop.show();
 										_btnLayerMoveTop.set_size_request(20, 20);
 										_btnLayerMoveTop.signal_clicked().connect(sigc::mem_fun(*this, &Kage::LayerMoveTop_onClick));
@@ -561,6 +560,8 @@ Kage::Kage() : m_KageLayerManager(this),
 								_btnLayerMoveUp_img = Gtk::Image(_btnLayerMoveUp_pixbuf);
 									_btnLayerMoveUp.set_image(_btnLayerMoveUp_img);
 										_btnLayerMoveUp.property_always_show_image();
+										_btnLayerMoveUp.set_tooltip_text("Move Layer Up");
+										_btnLayerMoveUp.set_focus_on_click(false);
 										_btnLayerMoveUp.show();
 										_btnLayerMoveUp.set_size_request(20, 20);
 										_btnLayerMoveUp.signal_clicked().connect(sigc::mem_fun(*this, &Kage::LayerMoveUp_onClick));
@@ -569,6 +570,8 @@ Kage::Kage() : m_KageLayerManager(this),
 								_btnLayerMoveDown_img = Gtk::Image(_btnLayerMoveDown_pixbuf);
 									_btnLayerMoveDown.set_image(_btnLayerMoveDown_img);
 										_btnLayerMoveDown.property_always_show_image();
+										_btnLayerMoveDown.set_tooltip_text("Move Layer Down");
+										_btnLayerMoveDown.set_focus_on_click(false);
 										_btnLayerMoveDown.show();
 										_btnLayerMoveDown.set_size_request(20, 20);
 										_btnLayerMoveDown.signal_clicked().connect(sigc::mem_fun(*this, &Kage::LayerMoveDown_onClick));
@@ -577,9 +580,31 @@ Kage::Kage() : m_KageLayerManager(this),
 								_btnLayerMoveBottom_img = Gtk::Image(_btnLayerMoveBottom_pixbuf);
 									_btnLayerMoveBottom.set_image(_btnLayerMoveBottom_img);
 										_btnLayerMoveBottom.property_always_show_image();
+										_btnLayerMoveBottom.set_tooltip_text("Move Layer to Bottom");
+										_btnLayerMoveBottom.set_focus_on_click(false);
 										_btnLayerMoveBottom.show();
 										_btnLayerMoveBottom.set_size_request(20, 20);
 										_btnLayerMoveBottom.signal_clicked().connect(sigc::mem_fun(*this, &Kage::LayerMoveBottom_onClick));
+						m_Timeline_Layer_Add_HBox.pack_start(_toggleOnion, Gtk::PACK_SHRINK);
+							_toggleOnion_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/layer/onion.png");
+								_toggleOnion_img = Gtk::Image(_toggleOnion_pixbuf);
+									_toggleOnion.set_image(_toggleOnion_img);
+										_toggleOnion.property_always_show_image();
+										_toggleOnion.set_tooltip_text("Toggle Onion Skin");
+										_toggleOnion.set_focus_on_click(false);
+										_toggleOnion.show();
+										_toggleOnion.set_size_request(20, 20);
+										_toggleOnion.signal_clicked().connect(sigc::mem_fun(*this, &Kage::ToggleOnion_onClick));
+						m_Timeline_Layer_Add_HBox.pack_start(_toggleOnionLayer, Gtk::PACK_SHRINK);
+							_toggleOnionLayer_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/layer/onion_layer.png");
+								_toggleOnionLayer_img = Gtk::Image(_toggleOnionLayer_pixbuf);
+									_toggleOnionLayer.set_image(_toggleOnionLayer_img);
+										_toggleOnionLayer.property_always_show_image();
+										_toggleOnionLayer.set_tooltip_text("Toggle Onion Layer");
+										_toggleOnionLayer.set_focus_on_click(false);
+										_toggleOnionLayer.show();
+										_toggleOnionLayer.set_size_request(20, 20);
+										_toggleOnionLayer.signal_clicked().connect(sigc::mem_fun(*this, &Kage::ToggleOnion_onClick));
 										
 				m_Timeline_HPaned.add2(m_Timeline_Frame_VBox1);
 					m_Timeline_Frame_VBox1.pack_start(m_Timeline_Frame_VBox2, Gtk::PACK_EXPAND_WIDGET);
@@ -795,7 +820,7 @@ void Kage::Undo_onClick() {
 	if (l_kageDo._layer != -1 && l_kageDo._frame != -1) {
 		m_KageFramesManager.setCurrentLayer(l_kageDo._layer);
 		m_KageFramesManager.setCurrentFrame(l_kageDo._frame);
-		setFrameData(l_kageDo.getVectorData());
+		setFrameData(l_kageDo.getVectorData(), true);
 		
 		forceRenderFrames();
 	}
@@ -805,7 +830,7 @@ void Kage::Redo_onClick() {
 	if (l_kageDo._layer != -1 && l_kageDo._frame != -1) {
 		m_KageFramesManager.setCurrentLayer(l_kageDo._layer);
 		m_KageFramesManager.setCurrentFrame(l_kageDo._frame);
-		setFrameData(l_kageDo.getVectorData());
+		setFrameData(l_kageDo.getVectorData(), true);
 		
 		forceRenderFrames();
 	}
@@ -1060,7 +1085,8 @@ void Kage::AddFrame_onClick() {
 }
 
 void Kage::DuplicateFrame_onClick() {
-	m_KageFramesManager.addFrame();
+	m_KageFramesManager.duplicateFrame();
+/*	m_KageFramesManager.addFrame();
 	
 	KageFrame *l_frame = m_KageFramesManager.getFrame();
 	VectorDataManager l_vectorsData;
@@ -1070,7 +1096,7 @@ void Kage::DuplicateFrame_onClick() {
 	
 	m_KageFramesManager.setCurrentFrame(KageFramesManager::currentFrame + 1);
 	
-	m_KageFramesManager.getFrame()->vectorsData = l_vectorsData;
+	m_KageFramesManager.getFrame()->vectorsData = l_vectorsData;*/
 	
 	show_all();
 }
@@ -1112,8 +1138,10 @@ void Kage::LockUnlockLayer_onClick() {
 	m_KageLayerManager.toggleLock();
 }
 void Kage::LayerDel_onClick() {
-	m_KageFramesManager.deleteFrameManager(getCurrentLayer());
-	m_KageLayerManager.deleteLayer();
+	if (m_KageLayerManager.layerCount() > 1) {
+		m_KageFramesManager.deleteFrameManager(getCurrentLayer());
+		m_KageLayerManager.deleteLayer();
+	}
 	std::cout << "Layer Delete Button clicked." << std::endl;
 }
 /**
@@ -1122,7 +1150,6 @@ void Kage::LayerDel_onClick() {
  * from LayerManager. 
  */
 void Kage::LayerMoveTop_onClick() {
-	std::cout << "Layer Move Top Button clicked." << std::endl;
 	if (m_KageFramesManager.moveToTop() == true && m_KageLayerManager.moveToTop() == true) {
 		forceRenderFrames();
 	}
@@ -1133,7 +1160,6 @@ void Kage::LayerMoveTop_onClick() {
  * from LayerManager. 
  */
 void Kage::LayerMoveUp_onClick() {
-	std::cout << "Layer Move Up Button clicked." << std::endl;
 	if (m_KageFramesManager.moveUp() == true && m_KageLayerManager.moveUp() == true) {
 		forceRenderFrames();
 	}
@@ -1144,7 +1170,6 @@ void Kage::LayerMoveUp_onClick() {
  * from LayerManager. 
  */
 void Kage::LayerMoveDown_onClick() {
-	std::cout << "Layer Move Down Button clicked." << std::endl;
 	if (m_KageFramesManager.moveDown() == true && m_KageLayerManager.moveDown() == true) {
 		forceRenderFrames();
 	}
@@ -1155,10 +1180,15 @@ void Kage::LayerMoveDown_onClick() {
  * from LayerManager. 
  */
 void Kage::LayerMoveBottom_onClick() {
-	std::cout << "Layer Move Bottom Button clicked." << std::endl;
 	if (m_KageFramesManager.moveToBottom() == true && m_KageLayerManager.moveToBottom() == true) {
 		forceRenderFrames();
 	}
+}
+
+void Kage::ToggleOnion_onClick() {
+	std::cout << "ToggleOnion_onClick " << std::endl;
+	//reflect onion in rendering
+	forceRenderFrames();
 }
 
 void Kage::toolsButtonToggle(string p_toolTip) {
@@ -1176,8 +1206,12 @@ void Kage::toolsButtonToggle(string p_toolTip) {
 	}
 }
 
-void Kage::onToolButtonsClick(Gtk::ToggleButton *p_sourceButton) {
+void Kage::ToolButtons_onClick(Gtk::ToggleButton *p_sourceButton) {
 	if (p_sourceButton->get_active() == 1) {
+		if (currentTool->get_tooltip_text() == "Poly Tool") {
+			m_KageStage.cancelDrawingPoly();
+		}
+		
 		currentTool = p_sourceButton;
 		if (p_sourceButton->get_tooltip_text() == "Select Tool") {
 			ToolSelect_onClick();
@@ -1366,8 +1400,9 @@ void Kage::stackDo() {
 		
 	}
 	
+	//NOTE: still using KageFramesManager::currentFrame instead of getCurrentFrame()?!?
 	_undoRedoManager.stackDo(getCurrentLayer(), KageFramesManager::currentFrame, getFrameData().getVectorData());
-	set_title("*" + ksfPath + " - Kage Studio");
+	set_title("*" + ksfPath + " - " + KageAbout::app_title);
 }
 
 void Kage::Quit_onClick() {
@@ -1383,9 +1418,35 @@ void Kage::addDataToFrame(VectorDataManager v, bool p_force) {
 		}
 	}
 }
+/**
+ * Returns Frame's VectorDataManager if visible, but can be forced to by-pass.
+ * \param p_force to by-pass "Is Visible" blocking
+ * \return Frame's VectorDataManager.
+ */
 VectorDataManager Kage::getFrameData(bool p_force) {
 	if (p_force || m_KageLayerManager.getLayer()->isVisible()) {
 		KageFrame *l_frame = m_KageFramesManager.getFrame();
+		if (l_frame) {
+			return l_frame->vectorsData;
+		} else {
+			VectorDataManager l_vectorDataManager;
+			return l_vectorDataManager;
+		}
+	} else {
+		VectorDataManager l_vectorDataManager;
+		return l_vectorDataManager;
+	}
+}
+
+/**
+ * For use on Onion Skin feature.  Returns Frame's VectorDataManager
+ * only if it's visible.
+ * \param p_frame is from 1 to total frame count, select any
+ * \return Frame's VectorDataManager.
+ */
+VectorDataManager Kage::getFrameDataAt(unsigned int p_frame) {
+	if (m_KageLayerManager.getLayer()->isVisible()) {
+		KageFrame *l_frame = m_KageFramesManager.getFrameAt(p_frame);
 		if (l_frame) {
 			return l_frame->vectorsData;
 		} else {
@@ -1432,12 +1493,48 @@ void Kage::forceRenderFrames() {
 	m_KageStage.render();
 	renderFrames();
 }
-/**
-	renders all frameN in all layers, where frameN is the currentFrame
-*/
-void Kage::renderFrames() {
+
+
+void Kage::renderOnionFrames() {
 	unsigned int l_layerCount = m_KageLayerManager.layerCount();
+	unsigned int l_frameCount = m_KageFramesManager.frameCount();
+	
+	unsigned int l_currentLayer = getCurrentLayer();
+	unsigned int l_currentFrame = getCurrentFrame();
+	double l_alpha[5] = {0.07, 0.12, 1.0, 0.12, 0.07};
+		for (int f = (int)l_currentFrame-2; f <= (int)l_currentFrame+2; ++f) {
+			if (f < 1) {
+				continue;
+			} else if (f > l_frameCount) {
+				continue;
+			}
+			
+			unsigned int l_frame = (unsigned int) f;
+			for (unsigned int i = 1; i <= l_layerCount; ++i) {
+				m_KageFramesManager.setCurrentLayer(i);
+				if (l_frame == l_currentFrame) {
+					m_KageStage.renderFrame(m_KageStage.cr);
+				} else {
+					vector<VectorData> l_vectorData = getFrameDataAt(l_frame).getVectorData();
+					m_KageStage.renderOnionFrame(m_KageStage.cr, l_vectorData, l_alpha[f-(l_currentFrame-2)]);
+				}
+			}
+		}
+	setCurrentLayer(l_currentLayer);
+}
+/**
+ * TODO: review when is usually it called?
+ * renders all frameN in all layers, where frameN is the currentFrame
+ */
+void Kage::renderFrames() {
 	m_KageStage.clearScreen(m_KageStage.cr);
+	
+	if (_toggleOnion.get_active() == true) {
+		renderOnionFrames();
+		return;
+	}
+	
+	unsigned int l_layerCount = m_KageLayerManager.layerCount();
 	unsigned int l_currentLayer = getCurrentLayer();
 		for (unsigned int i = 1; i <= l_layerCount; ++i) {
 			m_KageFramesManager.setCurrentLayer(i);
@@ -1451,16 +1548,26 @@ void Kage::renderFramesBelowCurrentLayer() {
 	unsigned int l_currentLayer = getCurrentLayer();
 		for (unsigned int i = 1; i < l_currentLayer; ++i) {
 			m_KageFramesManager.setCurrentLayer(i);
-			m_KageStage.renderFrame(m_KageStage.cr);
+			if (_toggleOnionLayer.get_active() == false) {
+				m_KageStage.renderFrame(m_KageStage.cr);
+			} else {
+				vector<VectorData> l_vectorData = getFrameData().getVectorData();
+				m_KageStage.renderOnionFrame(m_KageStage.cr, l_vectorData, 0.25);
+			}
 		}
 	setCurrentLayer(l_currentLayer);
 }
 void Kage::renderFramesAboveCurrentLayer() {
 	unsigned int l_layerCount = m_KageLayerManager.layerCount();
 	unsigned int l_currentLayer = getCurrentLayer();
-		for (unsigned int i = (l_currentLayer + 1); i < l_layerCount; ++i) {
+		for (unsigned int i = (l_currentLayer + 1); i <= l_layerCount; ++i) {
 			m_KageFramesManager.setCurrentLayer(i);
-			m_KageStage.renderFrame(m_KageStage.cr);
+			if (_toggleOnionLayer.get_active() == false) {
+				m_KageStage.renderFrame(m_KageStage.cr);
+			} else {
+				vector<VectorData> l_vectorData = getFrameData().getVectorData();
+				m_KageStage.renderOnionFrame(m_KageStage.cr, l_vectorData, 0.25);
+			}
 		}
 	setCurrentLayer(l_currentLayer);
 }
@@ -1473,19 +1580,22 @@ unsigned int Kage::getCurrentLayer() {
 }
 
 void Kage::setCurrentLayer(unsigned int p_layer) {
-	_undoBase = getFrameData().getVectorData(); //for use later by stackDo()
+	cout << "setting undoBase A setCurrentLayer " << endl;
+	_undoBase = getFrameData(true).getVectorData(); //for use later by stackDo()
 	m_KageLayerManager.setCurrentLayer(p_layer);
 }
 unsigned int Kage::getCurrentFrame() {
 	return m_KageFramesManager.getCurrentFrame();
 }
 void Kage::setCurrentLayerByID(unsigned int p_layerID) {
-	_undoBase = getFrameData().getVectorData(); //for use later by stackDo()
+	cout << "setting undoBase B setCurrentLayerByID " << endl;
+	_undoBase = getFrameData(true).getVectorData(); //for use later by stackDo()
 	m_KageLayerManager.setCurrentLayerByID(p_layerID);
 }
 
 void Kage::setCurrentFrame(unsigned int p_layer) {
-	_undoBase = getFrameData().getVectorData(); //for use later by stackDo()
+	cout << "setting undoBase C setCurrentFrame " << endl;
+	_undoBase = getFrameData(true).getVectorData(); //for use later by stackDo()
 	m_KageFramesManager.setCurrentFrame(p_layer);
 }
 
@@ -1504,8 +1614,8 @@ void Kage::New_onClick() {
 	
 	show_all();
 	
-	m_KageFramesManager.setCurrentFrame(1);
 	m_KageFramesManager.setCurrentLayer(1);
+	m_KageFramesManager.setCurrentFrame(1);
 	
 	currentTool = toggleButtons[0];
 	currentTool->set_active(true);
@@ -1519,7 +1629,7 @@ void Kage::New_onClick() {
 	m_KageStage.render();
 	
 	ksfPath = "Untitled";
-	set_title(ksfPath + " - Kage Studio");
+	set_title(ksfPath + " - " + KageAbout::app_title);
 	updateStatus("Ready");
 }
 
@@ -1528,8 +1638,10 @@ void Kage::OpenKSF_onClick() {
 	dialog.set_transient_for( * this);
 		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 		dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
+		dialog.set_default_size(800, 600);
+	
 	auto filter_kage = Gtk::FileFilter::create();
-		filter_kage->set_name("Kage Studio Files");
+		filter_kage->set_name(KageAbout::app_title + " Files");
 		filter_kage->add_mime_type("text/x-kage");
 		filter_kage->add_pattern("*.ksf");
 			dialog.add_filter(filter_kage);
@@ -1557,7 +1669,7 @@ void Kage::OpenKSF_onClick() {
 			propFillStrokeSetVisible(false);
 			propLocationSizeSetVisible(false);
 			propNodeXYSetVisible(false);
-			set_title(ksfPath + " - Kage Studio");
+			set_title(ksfPath + " - " + KageAbout::app_title);
 			break;
 //		default:
 //			std::cout << "clicked " << result << endl;
@@ -1579,9 +1691,10 @@ void Kage::doSaveDialog(string p_title) {
 	dialog.set_transient_for( *this);
 		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 		dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
+		dialog.set_do_overwrite_confirmation(true);
 	
 	auto filter_kage = Gtk::FileFilter::create();
-		filter_kage->set_name("Kage Studio Files");
+		filter_kage->set_name(KageAbout::app_title + " Files");
 		filter_kage->add_mime_type("text/x-kage");
 		filter_kage->add_pattern("*.ksf");
 			dialog.add_filter(filter_kage);
@@ -1634,18 +1747,24 @@ void Kage::doSave(string p_filename) {
 			}
 		setCurrentLayer(l_currentLayer);
 		m_KageFramesManager.setCurrentFrame(l_currentFrame);
-	saveKageStudio(ksfPath, "</KageStudio>");
-	updateStatus("Saved to " + ksfPath);
-	
-	set_title(ksfPath + " - Kage Studio");
-	//TODO: zip saved file -- should it be zipped?
+	if (saveKageStudio(ksfPath, "</KageStudio>") == true) {
+		updateStatus("Saved to " + ksfPath);
+		
+		set_title(ksfPath + " - " + KageAbout::app_title);
+		//TODO: zip saved file -- should it be zipped?
+	} else {
+		updateStatus("Unable to save file!  Try saving to a different location");
+	}
 }
 void Kage::ExportKS_onClick() {
-	Gtk::FileChooserDialog dialog("Export File", Gtk::FILE_CHOOSER_ACTION_SAVE);
+	Gtk::FileChooserDialog dialog("Export to KonsolScript", Gtk::FILE_CHOOSER_ACTION_SAVE);
 	dialog.set_transient_for( * this);
 		//Add response buttons the the dialog:
 		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 		dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
+		dialog.set_do_overwrite_confirmation(true);
+		
+		dialog.set_filename(ksfPath);
 	
 	auto filter_ks = Gtk::FileFilter::create();
 		filter_ks->set_name("KonsolScript files");
@@ -1656,35 +1775,39 @@ void Kage::ExportKS_onClick() {
 	
 	switch (result) {
 		case Gtk::RESPONSE_OK:
-			ksfPath = dialog.get_filename();
+			string ksPath = dialog.get_filename();
 			ksfInited = false;
 			ksfFile.close();
 			
-			exportKonsolScript(ksfPath, "Var:Number bgcolor;\n");
-			exportKonsolScript(ksfPath, "function kagestudio_screencls() {");
-			exportKonsolScript(ksfPath, "\tDraw:RectFill(0, 0, " + StringHelper::StringHelper::doubleToString(m_KageStage.stageWidth) + ", " + StringHelper::StringHelper::doubleToString(m_KageStage.stageHeight) + ", bgcolor, screen)");
-			exportKonsolScript(ksfPath, "}");
-			exportKonsolScript(ksfPath, "function render() {");
-			exportKonsolScript(ksfPath, "\tkagestudio_screencls()");
-			exportKonsolScript(ksfPath, "\tks_f1()");
-			exportKonsolScript(ksfPath, "}");
-			exportKonsolScript(ksfPath, "function ks_f1() {");
-			exportKonsolScript(ksfPath, "\t" + dumpFrame(true));
-			exportKonsolScript(ksfPath, "}");
-			exportKonsolScript(ksfPath, "function main() {");
-			exportKonsolScript(ksfPath, "\t//add variable initialization...");
-			exportKonsolScript(ksfPath, "\tKonsol:RGB(" + StringHelper::integerToString(m_KageStage.stageBG.getR()) + ", " + StringHelper::integerToString(m_KageStage.stageBG.getG()) + "," + StringHelper::integerToString(m_KageStage.stageBG.getB()) + ", bgcolor)");
-			exportKonsolScript(ksfPath, "}");
-			updateStatus("Exported to " + ksfPath);
+			exportKonsolScript(ksPath, "Var:Number bgcolor;\n");
+			exportKonsolScript(ksPath, "function kagestudio_screencls() {");
+			exportKonsolScript(ksPath, "\tDraw:RectFill(0, 0, " + StringHelper::StringHelper::doubleToString(m_KageStage.stageWidth) + ", " + StringHelper::StringHelper::doubleToString(m_KageStage.stageHeight) + ", bgcolor, screen)");
+			exportKonsolScript(ksPath, "}");
+			exportKonsolScript(ksPath, "function render() {");
+			exportKonsolScript(ksPath, "\tkagestudio_screencls()");
+			exportKonsolScript(ksPath, "\tks_f1()");
+			exportKonsolScript(ksPath, "}");
+			exportKonsolScript(ksPath, "function ks_f1() {");
+			exportKonsolScript(ksPath, "\t" + dumpFrame(true));
+			exportKonsolScript(ksPath, "}");
+			exportKonsolScript(ksPath, "function main() {");
+			exportKonsolScript(ksPath, "\t//add variable initialization...");
+			exportKonsolScript(ksPath, "\tKonsol:RGB(" + StringHelper::integerToString(m_KageStage.stageBG.getR()) + ", " + StringHelper::integerToString(m_KageStage.stageBG.getG()) + "," + StringHelper::integerToString(m_KageStage.stageBG.getB()) + ", bgcolor)");
+			if (exportKonsolScript(ksPath, "}") == true) {
+				updateStatus("Exported to " + ksPath);
+			} else {
+				updateStatus("Unable to export!  Please try a different directory.");
+			}
 			break;
 	}
 }
 void Kage::ExportHTML5_onClick() {
-	Gtk::FileChooserDialog dialog("Export File", Gtk::FILE_CHOOSER_ACTION_SAVE);
+	Gtk::FileChooserDialog dialog("Export to HTML5", Gtk::FILE_CHOOSER_ACTION_SAVE);
 	dialog.set_transient_for( * this);
 		//Add response buttons the the dialog:
 		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 		dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
+		dialog.set_do_overwrite_confirmation(true);
 	
 	auto filter_html5 = Gtk::FileFilter::create();
 		filter_html5->set_name("HTML5");
@@ -1705,7 +1828,7 @@ void Kage::ExportHTML5_onClick() {
 				unsigned int j;
 					unsigned int t;
 			
-			exportHtml5(expPath, "<html>\n<head>\n<title>Exported from Kage Studio</title>\n<script type='text/javascript'>\n");
+			exportHtml5(expPath, "<html>\n<head>\n<title>Exported from " + KageAbout::app_title + " v" + KageAbout::app_version + " </title>\n<script type='text/javascript'>\n");
 			exportHtml5(expPath, "var screen;\n");
 			exportHtml5(expPath, "var frame = 1;\n");
 			exportHtml5(expPath, "var frameMax = " + StringHelper::unsignedIntegerToString(l_fMax) + ";\n");
@@ -1745,48 +1868,35 @@ void Kage::ExportHTML5_onClick() {
 				KageFramesManager::currentFrame = f;
 				setCurrentLayer(t);
 			exportHtml5(expPath, "function main() {\n\t//add variable initialization...\n}");
-			exportHtml5(expPath, "</script>\n</head>\n<body align='center' onload='kagestudio();' bgcolor='#101010'>\n<canvas id='screen' width='" + StringHelper::doubleToString(m_KageStage.stageWidth) + "' height='" + StringHelper::doubleToString(m_KageStage.stageHeight) + "' style='display: block; margin: auto;'></canvas>\n</body>\n</html>");
-			updateStatus("Exported to " + expPath);
+			if (exportHtml5(expPath, "</script>\n</head>\n<body align='center' onload='kagestudio();' bgcolor='#101010'>\n<canvas id='screen' width='" + StringHelper::doubleToString(m_KageStage.stageWidth) + "' height='" + StringHelper::doubleToString(m_KageStage.stageHeight) + "' style='display: block; margin: auto;'></canvas>\n</body>\n</html>") == true) {
+				updateStatus("Exported to " + expPath);
+			} else {
+				updateStatus("Unable to export!  Please try a different directory.");
+			}
 			break;
 	}
 }
 
 void Kage::ExportPNG_onClick() {
-	Gtk::FileChooserDialog dialog("Export File", Gtk::FILE_CHOOSER_ACTION_SAVE);
-	dialog.set_transient_for( * this);
-		//Add response buttons the the dialog:
-		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-		dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
-	
-	auto filter_png = Gtk::FileFilter::create();
-		filter_png->set_name("Portable Network Graphics");
-		filter_png->add_mime_type("image/png");
-		filter_png->add_pattern("*.png");
-			dialog.add_filter(filter_png);
-	int result = dialog.run();
-	
-	switch (result) {
-		case Gtk::RESPONSE_OK:
-			string l_pngPath = dialog.get_filename();
-			cout << "uri:" << dialog.get_uri() << endl;
-			
-			int l_len = strlen(l_pngPath.c_str()) - 4;
-			if (StringHelper::toLower(l_pngPath).substr(l_len, 4) != ".png") {
-				l_pngPath = l_pngPath + ".png";
-			}
-			
-			m_KageStage.renderToPNG(l_pngPath, false);
-			updateStatus("Exported to " + l_pngPath);
-			break;
-	}
+	doExportPNGDialog("Export to PNG", false);
 }
 
 void Kage::ExportPNGTransparent_onClick() {
-	Gtk::FileChooserDialog dialog("Export File", Gtk::FILE_CHOOSER_ACTION_SAVE);
+	doExportPNGDialog("Export to PNG (Transparent)", true);
+}
+void Kage::doExportPNGDialog(string p_title, bool p_transparent) {
+	Gtk::FileChooserDialog dialog(p_title, Gtk::FILE_CHOOSER_ACTION_SAVE);
 	dialog.set_transient_for( * this);
 		//Add response buttons the the dialog:
 		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 		dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
+		dialog.set_do_overwrite_confirmation(true);
+		
+		string l_exportPNG = "";
+		int l_len = strlen(ksfPath.c_str()) - 4;
+			l_exportPNG = StringHelper::toLower(ksfPath).substr(0, l_len) + ".png";
+		cout << " setting to " << l_exportPNG << endl; 
+		dialog.set_filename(l_exportPNG);
 	
 	auto filter_png = Gtk::FileFilter::create();
 		filter_png->set_name("Portable Network Graphics");
@@ -1805,14 +1915,17 @@ void Kage::ExportPNGTransparent_onClick() {
 				l_pngPath = l_pngPath + ".png";
 			}
 			
-			m_KageStage.renderToPNG(l_pngPath, true);
-			updateStatus("Exported to " + l_pngPath);
+			if (m_KageStage.renderToPNG(l_pngPath, p_transparent) == true) {
+				updateStatus("Exported to " + l_pngPath);
+			} else {
+				updateStatus("Unable to exported!  Please try a different directory.");
+			}
 			break;
 	}
 }
 
 void Kage::ExportPNGSequence_onClick() {
-	Gtk::FileChooserDialog dialog("Export File", Gtk::FILE_CHOOSER_ACTION_SAVE);
+	Gtk::FileChooserDialog dialog("Export to PNG Sequence", Gtk::FILE_CHOOSER_ACTION_SAVE);
 	dialog.set_transient_for( * this);
 		//Add response buttons the the dialog:
 		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -1875,7 +1988,7 @@ void Kage::ExportPNGSequence_onClick() {
 						} else if (j < 100000) {
 							l_pngSequencePath = l_pngPath + StringHelper::unsignedIntegerToString(j) + ".png";
 						}
-						surface->write_to_png(l_pngSequencePath);
+						CairoKage::writeToPNG(l_pngSequencePath, surface);
 					}
 				KageFramesManager::currentFrame = f;
 				setCurrentLayer(t);
@@ -1889,12 +2002,20 @@ void Kage::ExportPNGSequence_onClick() {
 }
 
 void Kage::ExportAVI_onClick() {
-	Gtk::FileChooserDialog dialog("Export File", Gtk::FILE_CHOOSER_ACTION_SAVE);
+	Gtk::FileChooserDialog dialog("Export to AVI", Gtk::FILE_CHOOSER_ACTION_SAVE);
 	dialog.set_transient_for( * this);
 		//Add response buttons the the dialog:
 		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 		dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
-	
+		dialog.set_do_overwrite_confirmation(true);
+		
+		string l_exportAVI = "";
+		int l_len = strlen(ksfPath.c_str()) - 4;
+			l_exportAVI = StringHelper::toLower(ksfPath).substr(0, l_len) + ".avi";
+		cout << " setting to " << l_exportAVI << endl; 
+		dialog.set_filename(l_exportAVI);
+		
+		
 	auto filter_avi = Gtk::FileFilter::create();
 		filter_avi->set_name("Audio Video Interleave files");
 		filter_avi->add_mime_type("video/x-msvideo");
@@ -1950,10 +2071,10 @@ void Kage::ExportAVI_onClick() {
 						Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, m_KageStage.stageWidth, m_KageStage.stageHeight);
 						Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
 						
+							m_KageStage.clearScreen(l_context);
 							for (i = 1; i <= l_lMax; i++) {
 								m_KageFramesManager.setCurrentLayer(i);
-								m_KageStage.clearScreen(l_context);
-								m_KageStage.renderFrame(l_context);
+								m_KageStage.renderFrame(l_context, true);
 							}
 						
 						if (j < 10) {
@@ -1967,7 +2088,7 @@ void Kage::ExportAVI_onClick() {
 						} else if (j < 100000) {
 							l_pngSequencePath = l_pngPath + StringHelper::unsignedIntegerToString(j) + ".png";
 						}
-						surface->write_to_png(l_pngSequencePath);
+						CairoKage::writeToPNG(l_pngSequencePath, surface);
 					}
 					//workaround to FFMPEG-bug: see https://sourceforge.net/p/kage/tickets/25/
 						for (j = 1; j <= (m_KageStage.fps); ++j) {
@@ -1977,7 +2098,10 @@ void Kage::ExportAVI_onClick() {
 							Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
 							
 								m_KageStage.clearScreen(l_context);
-								m_KageStage.renderFrame(l_context);
+								for (i = 1; i <= l_lMax; i++) {
+									m_KageFramesManager.setCurrentLayer(i);
+									m_KageStage.renderFrame(l_context, true);
+								}
 							
 							if (l_fMax+j < 10) {
 								l_pngSequencePath = l_pngPath + "0000" + StringHelper::unsignedIntegerToString(l_fMax+j) + ".png";
@@ -1990,7 +2114,7 @@ void Kage::ExportAVI_onClick() {
 							} else if (l_fMax+j < 100000) {
 								l_pngSequencePath = l_pngPath + StringHelper::unsignedIntegerToString(l_fMax+j) + ".png";
 							}
-							surface->write_to_png(l_pngSequencePath);
+							CairoKage::writeToPNG(l_pngSequencePath, surface);
 						}
 					//end of workaround
 				KageFramesManager::currentFrame = f;
@@ -2000,10 +2124,10 @@ void Kage::ExportAVI_onClick() {
 				m_KageStage.origin.y = l_tempOrigin.y;
 			
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-			if (runExternal(".\\ffmpeg", "-framerate " + StringHelper::unsignedIntegerToString(m_KageStage.fps) + " -i \"" + l_pngPath + "%05d.png\" -b:v 2048k \"" + l_pngPath + ".avi\"")) {
+			if (runExternal(".\\ffmpeg", "-y -framerate " + StringHelper::unsignedIntegerToString(m_KageStage.fps) + " -i \"" + l_pngPath + "%05d.png\" -b:v 2048k \"" + l_pngPath + ".avi\"")) {
 				if (runExternal("del", "/f \"" + l_pngPath + "*.png\"")) {
 #else
-			if (runExternal("ffmpeg", "-framerate " + StringHelper::unsignedIntegerToString(m_KageStage.fps) + " -i '" + l_pngPath + "%05d.png' -b:v 2048k '" + l_pngPath + ".avi'")) {
+			if (runExternal("ffmpeg", "-y -framerate " + StringHelper::unsignedIntegerToString(m_KageStage.fps) + " -i '" + l_pngPath + "%05d.png' -b:v 2048k '" + l_pngPath + ".avi'")) {
 				if (runExternal("rm", "-f '" + l_pngPath + "*.png'")) {
 #endif
 					updateStatus("Exported to " + l_pngPath + ".avi");
@@ -2075,9 +2199,9 @@ bool Kage::on_tick(const Glib::RefPtr<Gdk::FrameClock>& frame_clock) {
 			m_KageStage.remove_tick_callback(m_tick_id);
 			_isPlaying = false;
 		}
-		//
+		
 		m_KageFramesManager.setCurrentFrame(frameCounter);
-		renderFrames();
+		//renderFrames(); ^setCurrentFrame automatically calls renderFrames, somehow
 	}
 	
 	return true;
@@ -2168,7 +2292,7 @@ void Kage::addToolButton(const Glib::ustring &label) {
 			
 			(*toggleButtons.back()).set_focus_on_click(false);
 			(*toggleButtons.back()).set_tooltip_text(label + " Tool");
-			(*toggleButtons.back()).signal_clicked().connect(sigc::bind(sigc::mem_fun(*this, &Kage::onToolButtonsClick), toggleButtons.back()));
+			(*toggleButtons.back()).signal_clicked().connect(sigc::bind(sigc::mem_fun(*this, &Kage::ToolButtons_onClick), toggleButtons.back()));
 }
 
 void Kage::btnDebug_onClick() {
@@ -2177,17 +2301,18 @@ void Kage::btnDebug_onClick() {
 }
 
 void Kage::btnAbout_onClick() {
-	AboutDialog* pDialog = new AboutDialog(*this);
+	KageAbout* pDialog = new KageAbout(*this);
 		pDialog->run();
 	delete pDialog;
 }
 
 void Kage::CheckUpdate_onClick() {
-	///TODO: launch kagestudio page
+	//TODO: Use WGET to query and get latest version, for now:
+	openWebsite(KageAbout::app_website + "/update.php?version="+KageAbout::app_version);
 }
 
 void Kage::Website_onClick() {
-	openWebsite("http://konsolscript.sf.net/web/?s=kage+studio");
+	openWebsite(KageAbout::app_website);
 }
 
 void Kage::openWebsite(string p_url) {
@@ -2379,7 +2504,7 @@ string Kage::saveFrame() {
 }
 
 string Kage::dumpFrame(bool bKS) {
-	vector<VectorData> v = getFrameData().getVectorData();
+	vector<VectorData> v = getFrameData(true).getVectorData();
 	
 	ostringstream l_ostringstream;
 	unsigned int vsize = v.size();//-1;

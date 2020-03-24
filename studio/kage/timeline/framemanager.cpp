@@ -22,6 +22,10 @@ void KageFrameManager::addFrame() {
 		pack_start(*frames.back(), Gtk::PACK_SHRINK);
 }
 
+void KageFrameManager::duplicateFrame() {
+
+}
+
 void KageFrameManager::extendFrame(unsigned int p_frameID) {
 	++frameCtr;
 	frames.push_back(Gtk::manage(new KageFrame(this, layerID, frameCtr)));

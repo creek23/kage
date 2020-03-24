@@ -48,6 +48,24 @@ bool KageFramesManager::addFrame() {
 	return true;
 }
 
+bool KageFramesManager::duplicateFrame() {
+	//TODO: add Frame ONLY if next frame is NOT EMPTY or next frame is NULL
+	
+	addFrame();
+	
+	KageFrame *l_frame = getFrame();
+	VectorDataManager l_vectorsData;
+	if (l_frame) {
+		l_vectorsData = l_frame->vectorsData.clone();
+	}
+	
+	setCurrentFrame(KageFramesManager::currentFrame + 1);
+	
+	getFrame()->vectorsData = l_vectorsData;
+	
+	return true;
+}
+
 bool KageFramesManager::extendFrame(unsigned int p_frameID) {
 	unsigned int l_count = 1;
 	if (framemanager.size() > 0) {
@@ -177,6 +195,20 @@ KageFrame *KageFramesManager::getFrame() {
 			return l_frameManager->getFrameAt(getCurrentFrame());
 		} else {
 			return framemanager[l_currentLayer-1]->getFrameAt(getCurrentFrame());
+		}
+	}
+}
+
+KageFrame *KageFramesManager::getFrameAt(unsigned int p_frame) {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+		return NULL;
+	} else {
+		KageFrameManager *l_frameManager = framemanager[l_currentLayer-1];
+		if (l_frameManager) {
+			return l_frameManager->getFrameAt(p_frame);
+		} else {
+			return framemanager[l_currentLayer-1]->getFrameAt(p_frame);
 		}
 	}
 }

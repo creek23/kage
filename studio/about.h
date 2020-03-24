@@ -12,10 +12,17 @@
 	
 	using namespace std;
 	
-	class AboutDialog : public Gtk::Dialog {
+	class KageAbout : public Gtk::Dialog {
 		public:
-			AboutDialog(Gtk::Window& parent);
-			virtual ~AboutDialog();
+			KageAbout(Gtk::Window& parent);
+			virtual ~KageAbout();
+			static string app_version;
+			static string app_title;
+			static string app_author;
+			static string app_contact;
+			static string app_website;
+			static string app_copyright;
+			static string app_comment;
 		
 		protected:
 			//Member widgets:

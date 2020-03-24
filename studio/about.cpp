@@ -1,13 +1,24 @@
 
 #include "about.h"
 
-AboutDialog::AboutDialog(Gtk::Window& parent)
+string KageAbout::app_title = "Kage Studio";
+string KageAbout::app_version = "0.2.200324";
+string KageAbout::app_author = "Mj Mendoza IV";
+string KageAbout::app_contact = "mj.mendoza.iv@gmail.com";
+string KageAbout::app_website = "https://kage.sourceforge.io";
+string KageAbout::app_copyright = "Copyleft 2011~2020";
+string KageAbout::app_comment = "A Simple Free and Open Source 2D Animation Software.";
+
+KageAbout::KageAbout(Gtk::Window& parent)
 		: Gtk::Dialog("About Kage Studio", parent, true),
 		m_HBox(false, 8),
 		m_Table(2, 2, false),
-		m_Label1("Kage Studio v0.2.200320", true),
-		m_Label2("A Simple Free and Open Source 2D Animation Software.\n\nhttps://kage.sourceforge.io\nCopyleft 2011~2020 Mj Mendoza IV <mj.mendoza.iv@gmail.com>\nAll Rights Reversed", true),
+		m_Label1("", true),
+		m_Label2("", true),
 		m_Image(Gtk::Stock::DIALOG_INFO, Gtk::ICON_SIZE_DIALOG) {
+	m_Label1.set_label(KageAbout::app_title + " v" + KageAbout::app_version);
+	m_Label2.set_label(KageAbout::app_comment + "\n\n" + KageAbout::app_website + "\n" + KageAbout::app_copyright + " " + KageAbout::app_author + " <" + KageAbout::app_contact + ">\nAll Rights Reversed");
+	
 	add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);
 	
 	m_HBox.set_border_width(8);
@@ -24,6 +35,6 @@ AboutDialog::AboutDialog(Gtk::Window& parent)
 	show_all();
 }
 
-AboutDialog::~AboutDialog() {
+KageAbout::~KageAbout() {
 	//
 }

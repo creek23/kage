@@ -39,6 +39,7 @@
 	#include "util/xml/xmltag.h"
 	#include "util/xml/xml.h"
 	#include "util/string/stringhelper.h"
+	#include "util/cairo/cairo_kage.h"
 	
 	#include <fstream> //ofstream
 	#include <iostream> //cerr
@@ -53,10 +54,12 @@
 			
 			void addDataToFrame(VectorDataManager v, bool p_force = false);
 			VectorDataManager getFrameData(bool p_force = false);
+			VectorDataManager getFrameDataAt(unsigned int p_frame);
 			void setFrameData(VectorDataManager p_vectorsData);
 			void setFrameData(VectorDataManager p_vectorsData, bool p_force);
 			bool isFrameEmpty();
 			void forceRenderFrames();
+			void renderOnionFrames();
 			void renderFrames();
 			void renderFramesBelowCurrentLayer();
 			void renderFramesAboveCurrentLayer();
@@ -94,7 +97,8 @@
 			virtual void LayerMoveUp_onClick();
 			virtual void LayerMoveDown_onClick();
 			virtual void LayerMoveBottom_onClick();
-			virtual void onToolButtonsClick(Gtk::ToggleButton *p_sourceButton);
+			virtual void ToggleOnion_onClick();
+			virtual void ToolButtons_onClick(Gtk::ToggleButton *p_sourceButton);
 			virtual void onActionActivate();
 			virtual void Undo_onClick();
 			virtual void Redo_onClick();
@@ -129,6 +133,8 @@
 			void doSaveDialog(string p_title);
 			void doSave(string p_filename);
 			
+			void doExportPNGDialog(string p_title, bool p_transparent);
+			
 			//Member widgets:
 			Gtk::VBox m_VBoxRoot;
 			Gtk::HBox m_HBoxToolbar;
@@ -155,6 +161,12 @@
 			Gtk::Button _btnLayerMoveBottom;
 				Gtk::Image                _btnLayerMoveBottom_img;
 				Glib::RefPtr<Gdk::Pixbuf> _btnLayerMoveBottom_pixbuf;
+			Gtk::ToggleButton _toggleOnion;
+				Gtk::Image                _toggleOnion_img;
+				Glib::RefPtr<Gdk::Pixbuf> _toggleOnion_pixbuf;
+			Gtk::ToggleButton _toggleOnionLayer;
+				Gtk::Image                _toggleOnionLayer_img;
+				Glib::RefPtr<Gdk::Pixbuf> _toggleOnionLayer_pixbuf;
 			Gtk::Label m_Timeline_CurrentFrame;
 			Gtk::VBox m_Timeline_Frame_VBox1;
 			Gtk::Label m_TimelineFrame_Label;

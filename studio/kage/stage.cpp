@@ -317,6 +317,7 @@ bool KageStage::on_event(GdkEvent *e) {
 			
 			render();
 		}
+		win->forceRenderFrames();
 		KageStage::moveStageXY.x = e->button.x;
 		KageStage::moveStageXY.y = e->button.y;
 	} else if (e->type == GDK_EXPOSE) {
@@ -457,16 +458,18 @@ void KageStage::applyZoom() {
 	
 		win->stackDoZoom(origin, __origin, _zoomReference, _zoomRatio);
 	
+	unsigned int l_layerCount = win->m_KageLayerManager.layerCount();
+	unsigned int l_frameCount = win->m_KageFramesManager.frameCount();
 	unsigned int l_currentFrame = win->m_KageFramesManager.getCurrentFrame();
 	unsigned int l_currentLayer = win->getCurrentLayer();
 	
-	for (unsigned int l_frame = 1; l_frame <= win->m_KageFramesManager.frameCount(); ++l_frame) {
+	for (unsigned int l_frame = 1; l_frame <= l_frameCount; ++l_frame) {
 		win->m_KageFramesManager.setCurrentFrame(l_frame);
 		
-		for (unsigned int l_layer = 1; l_layer <= win->m_KageFramesManager.layerCount(); ++l_layer) {
+		for (unsigned int l_layer = 1; l_layer <= l_layerCount; ++l_layer) {
 			win->m_KageFramesManager.setCurrentLayer(l_layer);
 			
-			vector<VectorData> v = win->getFrameData().getVectorData();
+			vector<VectorData> v = win->getFrameData(true).getVectorData();
 			
 			
 			for (unsigned int i = 0; i < v.size(); ++i) {
@@ -489,11 +492,13 @@ void KageStage::applyZoom() {
 				}
 			}
 			
-			win->setFrameData(v);
+			win->setFrameData(v, true);
 		}
 	}
-	win->m_KageFramesManager.setCurrentFrame(l_currentFrame);
+	
+	//TODO: is it needed to access m_KageFramesManager? why not just win->setCurrentLayer(l_currentLayer)?
 	win->m_KageFramesManager.setCurrentLayer(l_currentLayer);
+	win->m_KageFramesManager.setCurrentFrame(l_currentFrame);
 	
 	origin = __origin.clone();
 	stageWidth  = __stageArea.x;
@@ -810,7 +815,7 @@ void KageStage::clearScreen(Cairo::RefPtr<Cairo::Context> p_context) {
 	}
 }
 
-void KageStage::renderToPNG(string p_path, bool p_transparent) {
+bool KageStage::renderToPNG(string p_path, bool p_transparent) {
 	#ifdef CAIRO_HAS_PNG_FUNCTIONS
 		Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, stageWidth, stageHeight);
 		
@@ -827,22 +832,43 @@ void KageStage::renderToPNG(string p_path, bool p_transparent) {
 			clearScreen(l_context);
 		}
 		
-		renderFrame(l_context);
-		surface->write_to_png(p_path);
-		std::cout << "Wrote png file \"" << p_path << "\"" << std::endl;
+		unsigned int l_layerCount = win->m_KageLayerManager.layerCount();
+		unsigned int l_currentLayer = win->getCurrentLayer();
+			for (unsigned int i = 1; i <= l_layerCount; ++i) {
+				win->m_KageFramesManager.setCurrentLayer(i);
+				renderFrameToPNG(l_context);
+			}
+		win->setCurrentLayer(l_currentLayer);
+		
+		CairoKage::writeToPNG(p_path, surface);
 		
 		origin.x = l_tempOrigin.x;
 		origin.y = l_tempOrigin.y;
+		
+		return true;
 	#else
 		std::cout << "You must compile cairo with PNG support for this example to work." << std::endl;
+		return false;
 	#endif
 }
-void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context) {
-	vector<VectorData> v = win->getFrameData().getVectorData();
-	renderFrame(p_context, v);
+void KageStage::renderFrameToPNG(Cairo::RefPtr<Cairo::Context> p_context) {
+	renderFrame(p_context, true);
 }
-void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> v) {
-	unsigned int vsize = v.size();
+void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, bool p_force) {
+	vector<VectorData> v = win->getFrameData(p_force).getVectorData();
+	renderFrame(p_context, v);
+	if (_polyVectors.isEmpty() == false) {
+		renderFrame(p_context, _polyVectors.getVectorData());
+	}
+}
+/**
+ * For use by Kage, when Onion Skin is toggled
+ */
+void KageStage::renderOnionFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> p_vectorData, double p_alpha) {
+	renderFrame(p_context, p_vectorData, p_alpha);
+}
+void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> p_vectorData, double p_alpha) {
+	unsigned int vsize = p_vectorData.size();
 	unsigned int fillCtr = 0;
 	ColorData fcolor;
 	StrokeColorData scolor;
@@ -856,12 +882,12 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
 	bool l_mouseLocationOnFill = false;
 	unsigned int l_mouseLocationShapeIndex = _NO_SELECTION;
 	for (unsigned int i = 0; i < vsize; ++i) {
-		switch (v[i].vectorType) {
+		switch (p_vectorData[i].vectorType) {
 			case VectorData::TYPE_CLOSE_PATH:
 				p_context->close_path();
 				break;
 			case VectorData::TYPE_FILL:
-				fcolor = v[i].fillColor;
+				fcolor = p_vectorData[i].fillColor;
 				fillCtr++;
 				p_context->begin_new_path();
 				break;
@@ -871,18 +897,18 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
 					_mouseLocationShapeIndex = l_mouseLocationShapeIndex;
 				}
 				if (fillCtr > 0) {
-					p_context->set_source_rgba((double)fcolor.getR()/255.0f,
-											   (double)fcolor.getG()/255.0f,
-											   (double)fcolor.getB()/255.0f,
-											   (double)fcolor.getA()/255.0f);
+					p_context->set_source_rgba((double)fcolor.getR()/255.0f * p_alpha,
+											   (double)fcolor.getG()/255.0f * p_alpha,
+											   (double)fcolor.getB()/255.0f * p_alpha,
+											   (double)fcolor.getA()/255.0f * p_alpha);
 					p_context->fill_preserve();
 					fillCtr--;
 				}
 				if (scolor.getThickness() > 0) {
-					p_context->set_source_rgba((double)scolor.getR()/255.0f,
-											   (double)scolor.getG()/255.0f,
-											   (double)scolor.getB()/255.0f,
-											   (double)scolor.getA()/255.0f);
+					p_context->set_source_rgba((double)scolor.getR()/255.0f * p_alpha,
+											   (double)scolor.getG()/255.0f * p_alpha,
+											   (double)scolor.getB()/255.0f * p_alpha,
+											   (double)scolor.getA()/255.0f * p_alpha);
 					p_context->set_line_width(scolor.getThickness() * _zoomValue);
 						p_context->set_line_cap(Cairo::LINE_CAP_ROUND);
 							p_context->stroke();
@@ -895,26 +921,26 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
 				}
 				break;
 			case VectorData::TYPE_STROKE:
-				scolor = v[i].stroke;
+				scolor = p_vectorData[i].stroke;
 				break;
 			case VectorData::TYPE_MOVE:
-				p_context->move_to(v[i].points[0].x + origin.x, v[i].points[0].y + origin.y);
+				p_context->move_to(p_vectorData[i].points[0].x + origin.x, p_vectorData[i].points[0].y + origin.y);
 				
-				p.x = v[i].points[0].x;
-				p.y = v[i].points[0].y;
+				p.x = p_vectorData[i].points[0].x;
+				p.y = p_vectorData[i].points[0].y;
 				break;
 			case VectorData::TYPE_LINE:
-				p_context->line_to(v[i].points[0].x + origin.x, v[i].points[0].y + origin.y);
+				p_context->line_to(p_vectorData[i].points[0].x + origin.x, p_vectorData[i].points[0].y + origin.y);
 				
-				p.x = v[i].points[0].x;
-				p.y = v[i].points[0].y;
+				p.x = p_vectorData[i].points[0].x;
+				p.y = p_vectorData[i].points[0].y;
 				break;
 			case VectorData::TYPE_CURVE_QUADRATIC:
 				//cubic-to-quad algo borrowed from Mono/Moonlight's moon_quad_curve_to
-				x1 = v[i].points[0].x;
-				y1 = v[i].points[0].y;
-				x2 = v[i].points[1].x;
-				y2 = v[i].points[1].y;
+				x1 = p_vectorData[i].points[0].x;
+				y1 = p_vectorData[i].points[0].y;
+				x2 = p_vectorData[i].points[1].x;
+				y2 = p_vectorData[i].points[1].y;
 				x3 = x2;
 				y3 = y2;
 				
@@ -934,9 +960,9 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
 				break;
 			case VectorData::TYPE_CURVE_CUBIC:
 				p_context->curve_to(
-						v[i].points[0].x + origin.x, v[i].points[0].y + origin.y,
-						v[i].points[1].x + origin.x, v[i].points[1].y + origin.y,
-						v[i].points[2].x + origin.x, v[i].points[2].y + origin.y
+						p_vectorData[i].points[0].x + origin.x, p_vectorData[i].points[0].y + origin.y,
+						p_vectorData[i].points[1].x + origin.x, p_vectorData[i].points[1].y + origin.y,
+						p_vectorData[i].points[2].x + origin.x, p_vectorData[i].points[2].y + origin.y
 				);
 				break;
 			case VectorData::TYPE_TEXT:
@@ -2864,12 +2890,9 @@ bool KageStage::cancelDrawingPoly() {
 	if (win->isLayerLocked() == true) {
 		return false;
 	}
-	vector<VectorData> v = win->getFrameData().getVectorData();
-	unsigned int l_temp;
-	l_temp = getSelectedShapeViaNode(v.size() - 1, v);
-	v.erase (v.begin() + l_temp, v.end());
+	_polyVectors.clear();
 	drawCtr = 0;
-	win->setFrameData(v);
+	
 	render();
 	
 	return true;
@@ -3219,44 +3242,46 @@ void KageStage::handleDrawPolyMouseUp() {
 	if (win->isLayerLocked() == true) {
 		return;
 	}
-	VectorDataManager v;// = v_poly;
+	
 	Kage::timestamp();
 	std::cout << " KageStage::handleDrawPolyMouseUp" << std::endl;
-
-	if (       draw1.x-5 <= polyXhead && draw1.x+5 >= polyXhead
+	
+	if (drawCtr > 0
+			&& draw1.x-5 <= polyXhead && draw1.x+5 >= polyXhead
 			&& draw1.y-5 <= polyYhead && draw1.y+5 >= polyYhead) {
-		v.addLinePoly(PointData(polyXhead,polyYhead), polyXtail, polyYtail);
-		v.addClosePath();
-		v.addEndFill();
-		win->ToolSelect_onClick();
+		_polyVectors.addLinePoly(PointData(polyXhead,polyYhead), polyXtail, polyYtail);
+		_polyVectors.addClosePath();
+		_polyVectors.addEndFill();
+		win->addDataToFrame(_polyVectors);
 		drawCtr = 0;
-	} else if (draw1.x-5 <= polyXtail && draw1.x+5 >= polyXtail
+		_polyVectors.clear();
+		win->ToolSelect_onClick();
+		win->stackDo();
+	} else if (drawCtr > 0
+			&& draw1.x-5 <= polyXtail && draw1.x+5 >= polyXtail
 			&& draw1.y-5 <= polyYtail && draw1.y+5 >= polyYtail) {
-		v.addEndFill();
-		win->ToolSelect_onClick();
+		_polyVectors.addEndFill();
+		win->addDataToFrame(_polyVectors);
+		_polyVectors.clear();
 		drawCtr = 0;
+		win->ToolSelect_onClick();
+		win->stackDo();
 	} else {
 		if (drawCtr > 0) {
 			PointData p2(draw1);
-				v.addLinePoly(p2, polyXtail, polyYtail);
+				_polyVectors.addLinePoly(p2, polyXtail, polyYtail);
 		} else {
 			polyXhead = draw1.x;
 			polyYhead = draw1.y;
 			PointData p1(draw1);
-				v.addInit();
-				v.addFill(KageStage::fillColor.clone());
-				v.addLineStyle(KageStage::stroke);
-				v.addMove(p1);
+				_polyVectors.addInit();
+				_polyVectors.addFill(KageStage::fillColor.clone());
+				_polyVectors.addLineStyle(KageStage::stroke);
+				_polyVectors.addMove(p1);
 		}
 		polyXtail = draw1.x;
 		polyYtail = draw1.y;
 		++drawCtr;
-	}
-	win->addDataToFrame(v);
-	
-	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		//above is true after calling Kage::ToolSelect_onClick()
-		win->stackDo();
 	}
 	
 	render();
@@ -3267,8 +3292,8 @@ void KageStage::handlePoly() {
 		return;
 	}
 	if (drawCtr == 0) return;
-	
-//	cr->move_to(draw1.x, draw1.y);
+
+	cr->move_to(draw1.x, draw1.y);
 	cr->line_to(draw2.x, draw2.y);
 		cr->set_source_rgba((double)KageStage::fillColor.getR()/255, (double)KageStage::fillColor.getG()/255, (double)KageStage::fillColor.getB()/255, (double)KageStage::fillColor.getA()/255);
 		cr->fill_preserve();
@@ -3281,6 +3306,17 @@ void KageStage::handlePoly() {
 		cr->set_line_width(0.5);
 		cr->set_source_rgba(1.0, 0.0, 0.0, 1.0);
 		cr->stroke();
+
+	cr->move_to(polyXhead-3 + origin.x, polyYhead-3 + origin.y);
+		cr->line_to(polyXhead+3 + origin.x, polyYhead-3 + origin.y);
+		cr->line_to(polyXhead+3 + origin.x, polyYhead+3 + origin.y);
+		cr->line_to(polyXhead-3 + origin.x, polyYhead+3 + origin.y);
+	cr->close_path();
+		cr->set_source_rgb(1.0, 1.0, 1.0);
+		cr->fill_preserve();
+			cr->set_line_width(1.0);
+			cr->set_source_rgb(0.0, 0.0, 0.0);
+			cr->stroke();
 }
 
 void KageStage::handleRect() {

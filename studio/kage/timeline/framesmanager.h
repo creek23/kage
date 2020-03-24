@@ -17,6 +17,7 @@
 			void addFrameManager(unsigned int p_layer);
 			void deleteFrameManager(unsigned int p_layer);
 			bool addFrame();
+			bool duplicateFrame();
 			bool extendFrame(unsigned int p_frameID);
 			void setCurrentFrame(unsigned int p_currentFrame);
 			unsigned int getCurrentFrame();
@@ -27,6 +28,7 @@
 			unsigned int frameCount();
 			void selectAll(bool p_selectAll); //used by KageFrame
 			KageFrame *getFrame();
+			KageFrame *getFrameAt(unsigned int p_frame);
 			
 			void renderStage(); //used by KageFrame
 			

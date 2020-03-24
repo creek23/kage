@@ -15,6 +15,7 @@
 			bool selectAll(bool p_selectAll);
 			unsigned int getFrameCount();
 			void addFrame();
+			void duplicateFrame();
 			void extendFrame(unsigned int p_frameID);
 			void setCurrentFrame(unsigned int p_frame);
 			void focusFrame(unsigned int p_frame);

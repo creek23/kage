@@ -28,6 +28,7 @@ SOURCES = \
 	./util/xml/xmltag.cpp \
 	./util/xml/xml.cpp \
 	./util/string/stringhelper.cpp \
+	./util/cairo/cairo_kage.cpp \
 	kage.cpp \
 	resources.cpp \
 	about.cpp \

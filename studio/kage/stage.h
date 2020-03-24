@@ -8,8 +8,10 @@
 	#include "data/color.h"
 	#include "data/strokecolor.h"
 	#include "data/vectordata.h"
+	#include "vectordatamanager.h"
 	#include <cairomm/context.h>
 	#include <gdkmm/general.h> // set_source_pixbuf()
+	#include "../util/cairo/cairo_kage.h"
 	
 	class Kage; //forward declaration
 	
@@ -76,8 +78,9 @@
 			double stageWidth; //direct use for get only
 			double stageHeight; //direct use for get only
 			void clearScreen(Cairo::RefPtr<Cairo::Context> p_context);
-			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context);
-			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> v);
+			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context, bool p_force = false);
+			void renderOnionFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> p_vectorData, double p_alpha);
+			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> p_vectorData, double p_alpha = 1.0);
 			void initNodeTool();
 			void handleShapes();
 			void handleShapes_modifyingShapeRotate();
@@ -148,7 +151,8 @@
 			vector<VectorData> _vectorDataZOrderBufferB;
 			vector<VectorData> _vectorDataZOrderBufferC;
 			
-			void renderToPNG(string p_path, bool p_transparent);
+			bool renderToPNG(string p_path, bool p_transparent);
+			void renderFrameToPNG(Cairo::RefPtr<Cairo::Context> p_context);
 			
 			Cairo::RefPtr<Cairo::Context> cr;
 			PointData origin;
@@ -185,6 +189,7 @@
 			GdkPoint draw2;
 			double polyXhead, polyYhead;
 			double polyXtail, polyYtail;
+			VectorDataManager _polyVectors;
 			Glib::RefPtr<Gdk::Window> window;
 			bool mouseDown;
 			GdkPoint _mouseLocation;

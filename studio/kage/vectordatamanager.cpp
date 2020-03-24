@@ -198,6 +198,11 @@ void VectorDataManager::addCurve(PointData p_point1, PointData p_point2, PointDa
 }
 
 
+bool VectorDataManager::isEmpty() {
+	return (getVectorData().size() == 0);
+}
+
+
 vector<VectorData> VectorDataManager::copySelectedShapes(vector<unsigned int> p_selectedShapes) {
 	vector<VectorData> l_vectorDataCopyBuffer;
 	l_vectorDataCopyBuffer.clear();

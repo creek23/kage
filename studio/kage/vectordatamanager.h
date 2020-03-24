@@ -40,6 +40,8 @@
 //			void init(ColorData p_fill, StrokeColorData p_stroke);
 			void push(VectorDataManager p_vectorsData);
 			
+			bool isEmpty();
+			
 			vector<unsigned int> raiseSelectedShape(vector<unsigned int> p_selectedShapes);
 			vector<unsigned int> lowerSelectedShape(vector<unsigned int> p_selectedShapes);
 			vector<unsigned int> raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes);

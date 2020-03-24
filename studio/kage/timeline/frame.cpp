@@ -56,7 +56,6 @@ bool KageFrame::on_expose_event(GdkEventExpose* e) {
 }
 
 bool KageFrame::on_event(GdkEvent *e) {
-		std::cout << " KageFrame(F " << frameID << " L " << layerID << ") on_event ANY" << std::endl;
 	if (e->type == GDK_ENTER_NOTIFY) {
 		Kage::timestamp();
 		std::cout << " KageFrame(F " << frameID << " L " << layerID << ") on_event enter" << std::endl;
@@ -94,6 +93,8 @@ bool KageFrame::on_event(GdkEvent *e) {
 		//filter out from echos
 	} else if (e->type == GDK_CONFIGURE) {
 		//filter out from echos 
+	} else {
+		std::cout << " KageFrame(F " << frameID << " L " << layerID << ") on_event type? " << e->type << std::endl;
 	}
 	return true;
 }

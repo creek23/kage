@@ -56,23 +56,23 @@ bool KageFramesManager::duplicateFrame() {
 	KageFrame *l_frame = getFrame();
 	VectorDataManager l_vectorsData;
 	if (l_frame) {
-		l_vectorsData = l_frame->vectorsData.clone();
+		l_vectorsData = l_frame->getFrameData().clone();
 	}
 	
 	setCurrentFrame(KageFramesManager::currentFrame + 1);
 	
-	getFrame()->vectorsData = l_vectorsData;
+	getFrame()->setFrameData(l_vectorsData);
 	
 	return true;
 }
 
-bool KageFramesManager::extendFrame(unsigned int p_frameID) {
+bool KageFramesManager::extendFrame() {
 	unsigned int l_count = 1;
 	if (framemanager.size() > 0) {
 		l_count = framemanager.size();
 	}
 	for (unsigned int i = 0; i < l_count; ++i) {
-		framemanager[i]->extendFrame(p_frameID);
+		framemanager[i]->extendFrame();
 	}
 	return true;
 }
@@ -397,4 +397,68 @@ bool KageFramesManager::flipVerticalSelectedShape(vector<unsigned int> p_selecte
 	}
 	
 	return false;
+}
+
+bool KageFramesManager::addDataToFrame(VectorDataManager p_vectorsData) {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+		//
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		return framemanager[l_currentLayer]->addDataToFrame(p_vectorsData);
+	}
+	return false;
+}
+
+bool KageFramesManager::setFrameData(VectorDataManager p_vectorsData) {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+		//
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		return framemanager[l_currentLayer]->setFrameData(p_vectorsData);
+	}
+	return false;
+}
+VectorDataManager KageFramesManager::getFrameData() {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+		//
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		return framemanager[l_currentLayer]->getFrameData();
+	}
+	VectorDataManager l_nullReturn;
+	return l_nullReturn;
+}
+VectorDataManager KageFramesManager::getFrameDataAt(unsigned int p_frame) {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+		//
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		return framemanager[l_currentLayer]->getFrameDataAt(p_frame);
+	}
+	VectorDataManager l_nullReturn;
+	return l_nullReturn;
+}
+
+void KageFramesManager::switchToPreviousFrame(unsigned int p_frameID) {
+	unsigned int l_count = 1;
+	if (framemanager.size() > 0) {
+		l_count = framemanager.size();
+	}
+	for (unsigned int i = 0; i < l_count; ++i) {
+		framemanager[i]->switchToPreviousFrame(p_frameID);
+	}
+}
+
+void KageFramesManager::switchToNextFrame(unsigned int p_frameID) {
+	unsigned int l_count = 1;
+	if (framemanager.size() > 0) {
+		l_count = framemanager.size();
+	}
+	for (unsigned int i = 0; i < l_count; ++i) {
+		framemanager[i]->switchToNextFrame(p_frameID);
+	}
 }

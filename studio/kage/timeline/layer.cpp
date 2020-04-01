@@ -109,7 +109,7 @@ bool KageLayer::on_event(GdkEvent *e) {
 	} else if (e->type == GDK_BUTTON_RELEASE) {
 		KageLayer::mouseIsDown = false;
 		grab_focus();
-//		render();
+		render();
 	} else if (e->type == GDK_BUTTON_PRESS) {
 		KageLayer::mouseIsDown = true;
 		if (e->button.x < 18) {
@@ -120,6 +120,7 @@ bool KageLayer::on_event(GdkEvent *e) {
 			_layerManager->setSelected(this);
 		}
 		_layerManager->renderStage();
+		render();
 	} else if (e->type == GDK_EXPOSE) {
 		on_expose_event((GdkEventExpose*) e);
 	} else if (e->type == GDK_FOCUS_CHANGE) {

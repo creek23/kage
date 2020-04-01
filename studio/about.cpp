@@ -2,7 +2,7 @@
 #include "about.h"
 
 string KageAbout::app_title = "Kage Studio";
-string KageAbout::app_version = "0.2.200324";
+string KageAbout::app_version = "0.2.200330";
 string KageAbout::app_author = "Mj Mendoza IV";
 string KageAbout::app_contact = "mj.mendoza.iv@gmail.com";
 string KageAbout::app_website = "https://kage.sourceforge.io";

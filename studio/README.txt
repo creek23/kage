@@ -1,4 +1,4 @@
-Current version is v0.2.200324
+Current version is v0.2.200330
 Kage Studio is a simple, Free and Open Source 2D Animation Software
 written by Mj Mendoza IV <mj.mendoza.iv at gmail dot com>
 

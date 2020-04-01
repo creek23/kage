@@ -1,14 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
 	<gresource prefix="/kage">
-		<file>share/frame/blank.png</file>
-		<file>share/frame/blank_cur.png</file>
-		<file>share/frame/drawn.png</file>
-		<file>share/frame/drawn_cur.png</file>
 		<file>share/frame/null.png</file>
 		<file>share/frame/null_cur.png</file>
+		<file>share/frame/null_x.png</file>
+		<file>share/frame/null_x_cur.png</file>
+		<file>share/frame/blank.png</file>
+		<file>share/frame/blank_cur.png</file>
+		<file>share/frame/blank_x.png</file>
+		<file>share/frame/blank_x_cur.png</file>
+		<file>share/frame/drawn.png</file>
+		<file>share/frame/drawn_cur.png</file>
+		<file>share/frame/drawn_x.png</file>
+		<file>share/frame/drawn_x_cur.png</file>
+		<file>share/frame/tween.png</file>
+		<file>share/frame/tween_cur.png</file>
+		<file>share/frame/tween_x.png</file>
+		<file>share/frame/tween_x_cur.png</file>
 		<file>share/frame/selected.png</file>
 		<file>share/frame/selected_cur.png</file>
+		<file>share/frame/selected_x.png</file>
+		<file>share/frame/selected_x_cur.png</file>
 		<file>share/layer/visible_true.png</file>
 		<file>share/layer/visible_false.png</file>
 		<file>share/layer/locked_true.png</file>

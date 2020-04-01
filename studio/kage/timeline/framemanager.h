@@ -16,7 +16,8 @@
 			unsigned int getFrameCount();
 			void addFrame();
 			void duplicateFrame();
-			void extendFrame(unsigned int p_frameID);
+			void extendFrame();
+			unsigned int getCurrentFrame();
 			void setCurrentFrame(unsigned int p_frame);
 			void focusFrame(unsigned int p_frame);
 			
@@ -37,6 +38,20 @@
 			vector<unsigned int> duplicateShapes(vector<unsigned int> p_selectedShapes);
 			bool flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes);
 			bool flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes);
+				bool doFlipVerticalSelectedShapeOn(unsigned int p_frameIndex, vector<unsigned int> p_selectedShapes);
+				bool doFlipVerticalSelectedShapeOnExtendedFrame(unsigned int p_frameIndex, vector<unsigned int> p_selectedShapes);
+			
+			bool addDataToFrame(VectorDataManager p_vectorsData);
+			bool setFrameData(VectorDataManager p_vectorsData);
+			VectorDataManager getFrameData();
+			VectorDataManager getFrameDataAt(unsigned int p_frame); ///NOTE: "Frame" -- NOT "frame ID"
+			VectorDataManager getPreviousFrameData(unsigned int p_frameID); ///Called by KageFrame if KageFrame is Extended
+			bool setFrameDataToPreviousFrame(VectorDataManager p_vectorsData, unsigned int p_frameID); ///Called by KageFrame if KageFrame is Extended
+			bool addDataToPreviousFrame(VectorDataManager v, unsigned int p_frameID); ///Called by KageFrame if KageFrame is Extended
+			
+			bool switchToPreviousFrame(unsigned int p_frameID); ///Called by KageFrame for navigating to Previous Frame
+			bool switchToNextFrame(unsigned int p_frameID); ///Called by KageFrame for navigating to Next Frame
+			bool isCurrentFrame(unsigned int p_frameID); ///Called by KageFrame when rendering
 		protected:
 			unsigned int layerID;
 //			unsigned int layerCtr;
@@ -47,5 +62,9 @@
 			KageFramesManager *fsm;
 			unsigned int _currentFrameID;
 			unsigned int _currentFrameIndex;
+			
+			bool moveToLeft();                       ///Moves Current Frame to Left
+			bool moveToLeftAt(unsigned int p_frame); ///Moves Current Frame to Left on indicated Frame
+			bool moveToLeftMost();                   ///Moves Current Frame to Left
 	};
 #endif // GTKMM_KAGE_MANAGER_FRAME_H

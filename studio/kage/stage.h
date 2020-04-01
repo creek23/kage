@@ -238,6 +238,8 @@
 			AnchorData anchor_center;
 			AnchorData anchor_lowerRight;
 			
+			AnchorData anchor_rotate; //for global use rotation-anchor
+			
 			bool keyShiftDown;
 			bool keyControlDown;
 			bool keyUpDown;

@@ -48,7 +48,6 @@
 			string getLabel();
 			void setSelected(bool p_selected);
 			bool isSelected();
-			unsigned int getFrameSource(); //?!?
 			void setFocus();
 			bool isVisible();
 			bool isLocked();

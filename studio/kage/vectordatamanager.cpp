@@ -48,8 +48,25 @@ void VectorDataManager::add(VectorData::type p_type, ColorData p_fill, StrokeCol
 }
 
 void VectorDataManager::addInit() {
-	add(VectorData::TYPE_INIT, KageStage::fillColor, KageStage::stroke);
+	PointData l_point(0.0, 0.0);
+	addInit(l_point);
 }
+void VectorDataManager::addInit(PointData p_point) {
+	VectorData l_vectorData;
+	if (vectorData.size() > 0) {
+		l_vectorData = vectorData[vectorData.size()-1];
+	} else {
+		l_vectorData.setType(VectorData::TYPE_INIT);
+		l_vectorData.fillColor = KageStage::fillColor;
+		l_vectorData.stroke = KageStage::stroke;
+	}
+	add(VectorData::TYPE_INIT, l_vectorData.fillColor, l_vectorData.stroke);
+	
+	vector<PointData> ps;
+		ps.push_back(p_point);
+	vectorData[vectorData.size()-1].setPoints(ps);
+}
+
 void VectorDataManager::addFill(ColorData p_color) {
 	VectorData l_vectorData;
 	if (vectorData.size() > 0) {

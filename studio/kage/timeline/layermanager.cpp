@@ -435,7 +435,7 @@ bool KageLayerManager::moveDown() {
 		if (_currentLayerIndex > 0) {
 			reorder_child(*layers[_currentLayerIndex], _currentLayerIndex-1);
 			swap(layers[_currentLayerIndex], layers[_currentLayerIndex-1]);
-			_currentLayerIndex = _currentLayerIndex-1;
+			--_currentLayerIndex;
 			return true;
 		}
 	} else {
@@ -445,7 +445,7 @@ bool KageLayerManager::moveDown() {
 				if (_currentLayerIndex > 0) {
 					reorder_child(*layers[_currentLayerIndex], _currentLayerIndex-1);
 					swap(layers[_currentLayerIndex], layers[_currentLayerIndex-1]);
-					_currentLayerIndex = _currentLayerIndex-1;
+					--_currentLayerIndex;
 					return true;
 				}
 				break;
@@ -474,7 +474,6 @@ bool KageLayerManager::moveToBottom() {
 					l_return = moveDown();
 				}
 				return l_return;
-				break;
 			}
 		}
 	}

@@ -24,6 +24,7 @@
 				TYPE_TEXT,            //TODO: handle string content
 				TYPE_IMAGE            //TODO: think of how to handle blits from imageB to imageA
 			};
+			
 			VectorData();
 			VectorData(type p_type);
 			virtual ~VectorData();

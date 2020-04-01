@@ -18,7 +18,7 @@
 			void deleteFrameManager(unsigned int p_layer);
 			bool addFrame();
 			bool duplicateFrame();
-			bool extendFrame(unsigned int p_frameID);
+			bool extendFrame();
 			void setCurrentFrame(unsigned int p_currentFrame);
 			unsigned int getCurrentFrame();
 			void setCurrentLayer(unsigned int p_currentLayer);
@@ -49,6 +49,14 @@
 			vector<unsigned int> duplicateShapes(vector<unsigned int> p_selectedShapes);
 			bool flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes);
 			bool flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes);
+			
+			bool addDataToFrame(VectorDataManager p_vectorsData);
+			bool setFrameData(VectorDataManager p_vectorsData);
+			VectorDataManager getFrameData();
+			VectorDataManager getFrameDataAt(unsigned int p_frame);  ///NOTE: "Frame" -- NOT "frame ID"
+			
+			void switchToPreviousFrame(unsigned int p_frameID); ///Called by KageFrame for navigating to Previous Frame
+			void switchToNextFrame(unsigned int p_frameID); ///Called by KageFrame for navigating to Next Frame
 		protected:
 			Kage *win;
 			std::vector<KageFrameManager*> framemanager;

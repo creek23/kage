@@ -27,6 +27,7 @@
 			
 			void clear();
 			void addInit();
+			void addInit(PointData p_point);
 			void addFill(ColorData p_color);
 			void addEndFill();
 			void addClosePath();

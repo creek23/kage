@@ -1,7 +1,6 @@
 
 #include "kage.h"
 
-bool KageFrame::mouseIsDown = false;
 ColorData KageStage::stageBG(255, 255, 255);
 ColorData KageStage::fillColor(0, 0, 255, 255);
 StrokeColorData KageStage::stroke(255, 0, 0, 255);
@@ -14,17 +13,6 @@ Glib::RefPtr<Gdk::Pixbuf> KageLayer::imageVISIBLE_TRUE;
 Glib::RefPtr<Gdk::Pixbuf> KageLayer::imageVISIBLE_FALSE;
 Glib::RefPtr<Gdk::Pixbuf> KageLayer::imageLOCKED_TRUE;
 Glib::RefPtr<Gdk::Pixbuf> KageLayer::imageLOCKED_FALSE;
-				
-Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageNULL;
-Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageNULL_CUR;
-Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageBLANK;
-Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageBLANK_CUR;
-Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageDRAWN;
-Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageDRAWN_CUR;
-Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageEXTENSION;
-Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageEXTENSION_CUR;
-Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageSELECTED;
-Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageSELECTED_CUR;
 
 Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_000;
 Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_045;
@@ -296,12 +284,32 @@ Kage::Kage() : m_KageLayerManager(this),
 	m_refActionGroup->add(
 		Gtk::Action::create("ExtendFrame", "_Extend Frame", "Extend Frame"),
 		Gtk::AccelKey("F5"),
-		sigc::mem_fun(*this, &Kage::onActionActivate)
+		sigc::mem_fun(*this, &Kage::ExtendFrame_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("DuplicateFrame", "_Duplicate Frame", "Duplicate Frame"),
 		Gtk::AccelKey("F6"),
 		sigc::mem_fun(*this, &Kage::DuplicateFrame_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("CutFrame", "Cu_t Frame", "Cut Frame"),
+		Gtk::AccelKey("<control><shift>X"),
+		sigc::mem_fun(*this, &Kage::CutFrame_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("CopyFrame", "_Copy Frame", "Copy Frame"),
+		Gtk::AccelKey("<control><shift>C"),
+		sigc::mem_fun(*this, &Kage::CopyFrame_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("PasteFrame", "_Paste Frame", "Paste Frame"),
+		Gtk::AccelKey("<control><shift>V"),
+		sigc::mem_fun(*this, &Kage::PasteFrame_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("DeleteFrame", "_Delete Frame", "Delete Frame"),
+		Gtk::AccelKey("<control><shift>Delete"),
+		sigc::mem_fun(*this, &Kage::DeleteFrame_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("AddLayer", "_Add Layer", "Add Layer"),
@@ -457,6 +465,11 @@ Kage::Kage() : m_KageLayerManager(this),
 		"			<menuitem action='AddFrame'/>"
 		"			<menuitem action='ExtendFrame'/>"
 		"			<menuitem action='DuplicateFrame'/>"
+		"			<separator/>"
+		"			<menuitem action='CutFrame'/>"
+		"			<menuitem action='CopyFrame'/>"
+		"			<menuitem action='PasteFrame'/>"
+		"			<menuitem action='DeleteFrame'/>"
 		"			<separator/>"
 		"			<menuitem action='AddLayer'/>"
 		"			<menuitem action='DeleteLayer'/>"
@@ -844,14 +857,6 @@ void Kage::Cut_onClick() {
 				forceRenderFrames();
 			}
 		}
-	} else if (KageFrame::_gotFocus == true) {	
-		//delete Frame via Selecting All then Deleting selected shapes
-		if (m_KageStage.selectAllShapes() == true) {
-			if (m_KageStage.cutSelectedShapes() == true) {
-				stackDo();
-				forceRenderFrames();
-			}
-		}
 	}
 }
 void Kage::Copy_onClick() {
@@ -859,13 +864,6 @@ void Kage::Copy_onClick() {
 	std::cout << " Kage::Copy_onClick " << m_KageStage._gotFocus << " " << KageFrame::_gotFocus << std::endl;
 	if (m_KageStage._gotFocus == true) {
 		if (KageStage::toolMode == KageStage::MODE_SELECT) {
-			if (m_KageStage.copySelectedShapes() == true) {
-				forceRenderFrames();
-			}
-		}
-	} else if (KageFrame::_gotFocus == true) {	
-		//copy Frame's full content
-		if (m_KageStage.selectAllShapes() == true) {
 			if (m_KageStage.copySelectedShapes() == true) {
 				forceRenderFrames();
 			}
@@ -880,15 +878,6 @@ void Kage::Paste_onClick() {
 			if (m_KageStage.pasteSelectedShapes() == true) {
 				forceRenderFrames();
 			}
-		}
-	} else if (KageFrame::_gotFocus == true) {	
-		//over write Frame's current content via Selecting All then Deleting selected shapes then pasting buffer
-		if (m_KageStage.selectAllShapes() == true) {
-			m_KageStage.deleteSelectedShapes();
-		}
-		if (m_KageStage.pasteSelectedShapes() == true) {
-			stackDo();
-			forceRenderFrames();
 		}
 	}
 }
@@ -1067,38 +1056,62 @@ void Kage::Delete_onClick() {
 				forceRenderFrames();
 			}
 		}
-	} else if (KageFrame::_gotFocus == true) {	
-		//delete Frame via Selecting All then Deleting selected shapes	
-		if (m_KageStage.selectAllShapes() == true) {
-			if (m_KageStage.deleteSelectedShapes() == true) {
-				stackDo();
-				forceRenderFrames();
-			}
-		} 
 	}
 }
 
 void Kage::AddFrame_onClick() {
 	m_KageFramesManager.addFrame();
 	m_KageFramesManager.setCurrentFrame(KageFramesManager::currentFrame + 1);
+	
+	show_all();
+}
+void Kage::ExtendFrame_onClick() {
+	m_KageFramesManager.extendFrame();
+//	m_KageFramesManager.setCurrentFrame(KageFramesManager::currentFrame + 1);
+	
+	show_all();
+}
+void Kage::DuplicateFrame_onClick() {
+	m_KageFramesManager.duplicateFrame();
+	
 	show_all();
 }
 
-void Kage::DuplicateFrame_onClick() {
-	m_KageFramesManager.duplicateFrame();
-/*	m_KageFramesManager.addFrame();
-	
-	KageFrame *l_frame = m_KageFramesManager.getFrame();
-	VectorDataManager l_vectorsData;
-	if (l_frame) {
-		l_vectorsData = l_frame->vectorsData.clone();
+void Kage::CutFrame_onClick() {
+	//delete Frame via Selecting All then Deleting selected shapes
+	if (m_KageStage.selectAllShapes() == true) {
+		if (m_KageStage.cutSelectedShapes() == true) {
+			stackDo();
+			forceRenderFrames();
+		}
 	}
-	
-	m_KageFramesManager.setCurrentFrame(KageFramesManager::currentFrame + 1);
-	
-	m_KageFramesManager.getFrame()->vectorsData = l_vectorsData;*/
-	
-	show_all();
+}
+void Kage::CopyFrame_onClick() {
+	//copy Frame's full content
+	if (m_KageStage.selectAllShapes() == true) {
+		if (m_KageStage.copySelectedShapes() == true) {
+			forceRenderFrames();
+		}
+	}
+}
+void Kage::PasteFrame_onClick() {
+	//over write Frame's current content via Selecting All then Deleting selected shapes then pasting buffer
+	if (m_KageStage.selectAllShapes() == true) {
+		m_KageStage.deleteSelectedShapes();
+	}
+	if (m_KageStage.pasteSelectedShapes() == true) {
+		stackDo();
+		forceRenderFrames();
+	}
+}
+void Kage::DeleteFrame_onClick() {
+	//delete Frame via Selecting All then Deleting selected shapes	
+	if (m_KageStage.selectAllShapes() == true) {
+		if (m_KageStage.deleteSelectedShapes() == true) {
+			stackDo();
+			forceRenderFrames();
+		}
+	}
 }
 
 void Kage::switchToPreviousFrame() {
@@ -1406,16 +1419,30 @@ void Kage::stackDo() {
 }
 
 void Kage::Quit_onClick() {
-	hide();
+	GdkEventAny *any_event;
+	if (on_delete_event(any_event) == false) {
+		hide();
+	}
+}
+
+bool Kage::on_delete_event(GdkEventAny* any_event) {
+	if (get_title()[0] != '*') {
+		return false;
+	}
+	
+	Gtk::MessageDialog l_prompt = Gtk::MessageDialog("Are you sure you want to quit?", false, Gtk::MessageType::MESSAGE_QUESTION, Gtk::ButtonsType::BUTTONS_YES_NO, true);
+		int l_response = l_prompt.run();
+	
+	if (l_response == Gtk::ResponseType::RESPONSE_YES) {
+		return false;
+	}
+
+	return true;
 }
 
 void Kage::addDataToFrame(VectorDataManager v, bool p_force) {
 	if (p_force || m_KageLayerManager.getLayer()->isLocked() == false) {
-		KageFrame *l_frame = m_KageFramesManager.getFrame();
-		if (l_frame) {
-			l_frame->vectorsData.push(v);
-			l_frame->forceRender();
-		}
+		m_KageFramesManager.addDataToFrame(v);
 	}
 }
 /**
@@ -1425,16 +1452,10 @@ void Kage::addDataToFrame(VectorDataManager v, bool p_force) {
  */
 VectorDataManager Kage::getFrameData(bool p_force) {
 	if (p_force || m_KageLayerManager.getLayer()->isVisible()) {
-		KageFrame *l_frame = m_KageFramesManager.getFrame();
-		if (l_frame) {
-			return l_frame->vectorsData;
-		} else {
-			VectorDataManager l_vectorDataManager;
-			return l_vectorDataManager;
-		}
+		return m_KageFramesManager.getFrameData();
 	} else {
-		VectorDataManager l_vectorDataManager;
-		return l_vectorDataManager;
+		VectorDataManager l_nullReturn;
+		return l_nullReturn;
 	}
 }
 
@@ -1446,16 +1467,10 @@ VectorDataManager Kage::getFrameData(bool p_force) {
  */
 VectorDataManager Kage::getFrameDataAt(unsigned int p_frame) {
 	if (m_KageLayerManager.getLayer()->isVisible()) {
-		KageFrame *l_frame = m_KageFramesManager.getFrameAt(p_frame);
-		if (l_frame) {
-			return l_frame->vectorsData;
-		} else {
-			VectorDataManager l_vectorDataManager;
-			return l_vectorDataManager;
-		}
+		return m_KageFramesManager.getFrameDataAt(p_frame);
 	} else {
-		VectorDataManager l_vectorDataManager;
-		return l_vectorDataManager;
+		VectorDataManager l_nullReturn;
+		return l_nullReturn;
 	}
 }
 
@@ -1463,30 +1478,14 @@ void Kage::setFrameData(VectorDataManager p_vectorsData) {
 	setFrameData(p_vectorsData, false);
 }
 void Kage::setFrameData(VectorDataManager p_vectorsData, bool p_force) {
-	if (p_force == true) {
-		KageFrame *l_frame = m_KageFramesManager.getFrame();
-		if (l_frame) {
-			l_frame->vectorsData.clear();
-			l_frame->vectorsData = p_vectorsData.clone();
-		}
-	} else {
-		if (m_KageLayerManager.getLayer()->isLocked() == false) {
-			KageFrame *l_frame = m_KageFramesManager.getFrame();
-			if (l_frame) {
-				l_frame->vectorsData.clear();
-				l_frame->vectorsData = p_vectorsData.clone();
-			}
-		}
+	if (p_force == true
+			|| m_KageLayerManager.getLayer()->isLocked() == false) {
+		m_KageFramesManager.setFrameData(p_vectorsData);
 	}
 }
 
 bool Kage::isFrameEmpty() {
-	KageFrame *l_frame = m_KageFramesManager.getFrame();
-	if (l_frame) {
-		return (l_frame->vectorsData.getVectorData().size() > 0);
-	} else {
-		return false;
-	}
+	return (m_KageFramesManager.getFrameData().getVectorData().size() > 0);
 }
 
 void Kage::forceRenderFrames() {
@@ -1740,8 +1739,7 @@ void Kage::doSave(string p_filename) {
 				for (j = 1; j <= l_fMax; ++j) {
 					saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + ">");
 					m_KageFramesManager.setCurrentFrame(j);
-					saveKageStudio(ksfPath, saveFrame());
-					saveKageStudio(ksfPath, "</frame" + StringHelper::unsignedIntegerToString(j) + ">");
+					saveKageStudio(ksfPath, saveFrame() + "\n</frame" + StringHelper::unsignedIntegerToString(j) + ">");
 				}
 				saveKageStudio(ksfPath, "</layer" + StringHelper::unsignedIntegerToString(i) + ">");
 			}
@@ -2450,7 +2448,7 @@ string Kage::saveFrame() {
 				l_ostringstream << "<closepath/>\n";
 				break;
 			case VectorData::TYPE_INIT:
-				l_ostringstream << "<init/>\n";// " << "\n";
+				l_ostringstream << "<init>" << v[i].points[0].x << " " << v[i].points[0].y << "</init>\n";
 				break;
 			case VectorData::TYPE_TEXT: break;
 			case VectorData::TYPE_FILL:
@@ -2467,7 +2465,7 @@ string Kage::saveFrame() {
 				}
 				break;
 			case VectorData::TYPE_STROKE:
-				l_ostringstream << "<stroke color=\"rgba" << ColorData(v[i].stroke).toString() << "\" thickness=\"" + StringHelper::doubleToString(v[i].stroke.getThickness()) + "\"/>\n";
+				l_ostringstream << "\t<stroke color=\"rgba" << ColorData(v[i].stroke).toString() << "\" thickness=\"" + StringHelper::doubleToString(v[i].stroke.getThickness()) + "\"/>\n";
 				scolor = v[i].stroke;
 					if (!scolorPrev.equalTo(scolor) || scolorPrev.getThickness() != scolor.getThickness()) {
 						doStroke = true;
@@ -2475,25 +2473,14 @@ string Kage::saveFrame() {
 					}
 				break;
 			case VectorData::TYPE_MOVE:
-				l_ostringstream << "<move>" << v[i].points[0].x << " " << v[i].points[0].y << "</move>\n";
-				
-				p.x = v[i].points[0].x;
-				p.y = v[i].points[0].y;
+				l_ostringstream << "\t<move>" << v[i].points[0].x << " " << v[i].points[0].y << "</move>\n";
 				break;
 			case VectorData::TYPE_LINE: //currently not used
-				l_ostringstream << "screen.lineTo(" << v[i].points[0].x << ", " << v[i].points[0].y << ");\n";
-				
-				p.x = v[i].points[0].x;
-				p.y = v[i].points[0].y;
+				l_ostringstream << "\t<line>" << v[i].points[0].x << " " << v[i].points[0].y << "</line>\n";
 				break;
-			case VectorData::TYPE_CURVE_QUADRATIC: //currently not used
-				l_ostringstream << "screen.quadraticCurveTo(" << p.x << ", " << p.y << ", " << v[i].points[0].x << ", " << v[i].points[0].y << ", " << v[i].points[1].x << ", " << v[i].points[1].y << ");\n";
-				
-				p.x = v[i].points[1].x;
-				p.y = v[i].points[1].y;
-				break;
+			case VectorData::TYPE_CURVE_QUADRATIC:
 			case VectorData::TYPE_CURVE_CUBIC:
-				l_ostringstream << "<cubiccurve>" << v[i].points[0].x << " " << v[i].points[0].y << " " << v[i].points[1].x << " " << v[i].points[1].y << " " << v[i].points[2].x << " " << v[i].points[2].y << "</cubiccurve>\n";
+				l_ostringstream << "\t<curve>" << v[i].points[0].x << " " << v[i].points[0].y << " " << v[i].points[1].x << " " << v[i].points[1].y << " " << v[i].points[2].x << " " << v[i].points[2].y << "</curve>\n";
 				break;
 			case VectorData::TYPE_IMAGE:
 				//2 '1st is for X/Y, 2nd is for width/height  -- ?!?
@@ -2797,7 +2784,13 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 			m_KageFramesManager.setCurrentFrame(l_frame);
 		} else if (l_tagname == "init") {
 			VectorDataManager v;
+			
+			vector<double> l_numbers = parseNumbers(p_children[i]._value); //XY for rotation anchor
+			if (l_numbers.size() == 2) {
+				v.addInit(PointData(l_numbers[0], l_numbers[1]));
+			} else {
 				v.addInit();
+			}
 			addDataToFrame(v, true);
 		} else if (l_tagname == "fill") {
 			VectorDataManager v;
@@ -2813,10 +2806,10 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 			addDataToFrame(v, true);
 		} else if (l_tagname == "move") {
 			VectorDataManager v;
-			vector<double> l_numbers = parseNumbers(p_children[i]._value); //XYs
+			vector<double> l_numbers = parseNumbers(p_children[i]._value); //XY
 				v.addMove(PointData(l_numbers[0], l_numbers[1]));
 			addDataToFrame(v, true);
-		} else if (l_tagname == "cubiccurve") {
+		} else if (l_tagname == "cubiccurve" || l_tagname == "curve") {
 			VectorDataManager v;
 			vector<double> l_numbers = parseNumbers(p_children[i]._value); //XYs
 				v.addCubic(

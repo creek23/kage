@@ -175,7 +175,7 @@ unsigned int KageLayerManager::getCurrentLayer() {
 	}
 	return layers.size(); //temporarily DONT -1 as we integrate code to previous implementation
 }
-/** For use of Kage.  When a KageFrame is clicked, KageFramesManager will
+/** For use of Kage.  When a KageFrame is clicked, KageFramesetManager will
  * call this function via Kage then sets currently active Layer
  * \param p_layer is index of Layer known to KageFrame
  * \sa getCurrentLayer()
@@ -204,7 +204,7 @@ void KageLayerManager::setCurrentLayer(unsigned int p_layer) {
 	layers[_currentLayerIndex]->setSelected(true);
 }
 
-/** For use of Kage.  When a KageFrame is clicked, KageFramesManager will
+/** For use of Kage.  When a KageFrame is clicked, KageFramesetManager will
  * call this function via Kage then sets currently active Layer
  * \param p_layerID is layerID of Layer known to KageFrame
  * \sa getCurrentLayer()

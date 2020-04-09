@@ -4,22 +4,23 @@
 	#include <gtkmm/box.h>
 	#include <gtkmm/window.h>
 	#include <gtkmm/label.h>
-	#include "framemanager.h"
+	#include "frameset.h"
 	
 	class Kage;
 	
-	class KageFramesManager : public Gtk::VBox {
+	class KageFramesetManager : public Gtk::VBox {
 		public:
-			static unsigned int currentFrame;
-			
-			KageFramesManager(Kage *p_win);
-			virtual ~KageFramesManager();
-			void addFrameManager(unsigned int p_layer);
-			void deleteFrameManager(unsigned int p_layer);
+			static bool LOADING_MODE;
+			KageFramesetManager(Kage *p_win);
+			virtual ~KageFramesetManager();
+			void addFrameset(unsigned int p_layer);
+			void deleteFrameset(unsigned int p_layer);
 			bool addFrame();
-			bool duplicateFrame();
 			bool extendFrame();
-			void setCurrentFrame(unsigned int p_currentFrame);
+			bool duplicateFrame();
+			bool removeFrame();
+			void setCurrentFrame(unsigned int p_frame);
+			void setCurrentFrameByID(unsigned int p_frameID);
 			unsigned int getCurrentFrame();
 			void setCurrentLayer(unsigned int p_currentLayer);
 			void setCurrentLayerByID(unsigned int p_layerID);
@@ -32,7 +33,6 @@
 			
 			void renderStage(); //used by KageFrame
 			
-			bool removeFrame(unsigned int p_frameID);
 			bool removeAllFrames();
 			
 			bool moveToTop();
@@ -55,10 +55,14 @@
 			VectorDataManager getFrameData();
 			VectorDataManager getFrameDataAt(unsigned int p_frame);  ///NOTE: "Frame" -- NOT "frame ID"
 			
+			void switchToPreviousFrame(); ///Called by Kage for navigating to Previous Frame
 			void switchToPreviousFrame(unsigned int p_frameID); ///Called by KageFrame for navigating to Previous Frame
+			void switchToNextFrame(); ///Called by Kage for navigating to Next Frame
 			void switchToNextFrame(unsigned int p_frameID); ///Called by KageFrame for navigating to Next Frame
+			
+			void setFrameExtension(KageFrame::extension p_extension);
 		protected:
 			Kage *win;
-			std::vector<KageFrameManager*> framemanager;
+			std::vector<KageFrameset*> _framesets;
 	};
 #endif // GTKMM_KAGE_MANAGER_FRAMES_H

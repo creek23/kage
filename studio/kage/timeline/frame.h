@@ -5,7 +5,7 @@
 	#include <time.h>
 	#include "../vectordatamanager.h"
 	
-	class KageFrameManager; ///forward declaration
+	class KageFrameset; ///forward declaration
 	
 	class KageFrame : public Gtk::DrawingArea {
 		public:
@@ -43,7 +43,7 @@
 			
 			Glib::RefPtr<Gdk::Window> window;
 			
-			KageFrame(KageFrameManager *p_fm, unsigned p_layerID, unsigned int p_frameID);
+			KageFrame(KageFrameset *p_frameset, unsigned p_layerID, unsigned int p_frameID);
 			virtual ~KageFrame();
 			
 			bool isEmpty();
@@ -99,7 +99,7 @@
 			
 			KageFrame::extension _extension;
 			
-			KageFrameManager *fm;
+			KageFrameset *_frameset;
 			VectorDataManager vectorsData;
 	};
 #endif // GTKMM_KAGE_FRAME_H

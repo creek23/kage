@@ -33,17 +33,18 @@ Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageSELECTED_CUR;
 Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageSELECTED_X;
 Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageSELECTED_X_CUR;
 
-KageFrame::KageFrame(KageFrameManager *p_fm, unsigned p_layerID, unsigned int p_frameID) :
+KageFrame::KageFrame(KageFrameset *p_frameset, unsigned p_layerID, unsigned int p_frameID) :
 		vectorsData() {
 	set_state_flags(Gtk::STATE_FLAG_NORMAL);
 	set_can_focus(true); //to accept key_press
-	fm = p_fm;
+	_frameset = p_frameset;
 	layerID = p_layerID;
 	frameID = p_frameID;
 	set_size_request(8, 23);
 	setSelected(false);
 	setCurrent(false);
 	setTween(false);
+	setNull(false);
 	setExtension(KageFrame::extension::EXTENSION_NOT);
 //	add_events(Gdk::KEY_PRESS_MASK    | Gdk::KEY_RELEASE_MASK);
 	add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
@@ -60,15 +61,11 @@ bool KageFrame::on_key_press_event(GdkEventKey *e) {
 	Kage::timestamp();
 	std::cout << " KageFrame(F " << frameID << " L " << layerID << ") on_key_press_event" << std::endl;
 	if (e->keyval == GDK_KEY_period) {
-//		fm->getFsm()->setCurrentFrame(frameID+1);
-//		fm->focusFrame(frameID+1);
-		fm->getFsm()->switchToNextFrame(frameID);
-		fm->getFsm()->renderStage();
+		_frameset->getFsm()->switchToNextFrame(frameID);
+		_frameset->getFsm()->renderStage();
 	} else if (e->keyval == GDK_KEY_comma) {
-//		fm->getFsm()->setCurrentFrame(frameID-1);
-//		fm->focusFrame(frameID-1);
-		fm->getFsm()->switchToPreviousFrame(frameID);
-		fm->getFsm()->renderStage();
+		_frameset->getFsm()->switchToPreviousFrame(frameID);
+		_frameset->getFsm()->renderStage();
 	}
 	return true;
 }
@@ -94,16 +91,14 @@ bool KageFrame::on_event(GdkEvent *e) {
 		render();
 	} else if (e->type == GDK_BUTTON_RELEASE) {
 		KageFrame::mouseIsDown = false;
-//		fm->setSelected(this); //a bit redundant?
 		grab_focus();
 //		render();
 	} else if (e->type == GDK_BUTTON_PRESS) {
 		KageFrame::mouseIsDown = true;
-		//KageFramesManager::currentFrame = frameID; ///?!?
-		fm->setSelected(this);
+		_frameset->setSelected(this);
 		cout << e->button.x << " " << e->button.y << endl;
 		
-		fm->getFsm()->renderStage();
+		_frameset->getFsm()->renderStage();
 	} else if (e->type == GDK_EXPOSE) {
 		on_expose_event((GdkEventExpose*) e);
 	} else if (e->type == GDK_FOCUS_CHANGE) {
@@ -117,7 +112,7 @@ bool KageFrame::on_event(GdkEvent *e) {
 	} else if (e->type == GDK_KEY_PRESS) {
 		on_key_press_event((GdkEventKey*) e);
 	} else if (e->type == GDK_KEY_RELEASE) {
-//		fm->getFsm()->setCurrentFrame(KageFramesManager::currentFrame);
+//		_frameset->getFsm()->setCurrentFrame(getCurrentFrame());
 		//filter out from echos
 	} else if (e->type == GDK_CONFIGURE) {
 		//filter out from echos 
@@ -182,31 +177,31 @@ bool KageFrame::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 			case KageFrame::extension::EXTENSION_NOT:
 			case KageFrame::extension::EXTENSION_END:
 				if (isSelected() == true) {
-					if (fm->isCurrentFrame(frameID) == true) {
+					if (_frameset->isCurrentFrame(frameID) == true) {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageSELECTED_CUR, 0, -1);
 					} else {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageSELECTED, 0, -1);
 					}
 				} else if (isEmpty() == true) {
-					if (fm->isCurrentFrame(frameID) == true) {
+					if (_frameset->isCurrentFrame(frameID) == true) {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK_CUR, 0, -1);
 					} else {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK, 0, -1);
 					}
 				} else if (getTween() == true) {
-					if (fm->isCurrentFrame(frameID) == true) {
+					if (_frameset->isCurrentFrame(frameID) == true) {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageTWEEN_CUR, 0, -1);
 					} else {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageTWEEN, 0, -1);
 					}
 				} else if (isNull() == true) {
-					if (fm->isCurrentFrame(frameID) == true) {
+					if (_frameset->isCurrentFrame(frameID) == true) {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageNULL_CUR, 0, -1);
 					} else {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageNULL, 0, -1);
 					}
 				} else {
-					if (fm->isCurrentFrame(frameID) == true) {
+					if (_frameset->isCurrentFrame(frameID) == true) {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN_CUR, 0, -1);
 					} else {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN, 0, -1);
@@ -216,25 +211,31 @@ bool KageFrame::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 			case KageFrame::extension::EXTENSION_START:
 			case KageFrame::extension::EXTENSION_MID:
 				if (isSelected() == true) {
-					if (fm->isCurrentFrame(frameID) == true) {
+					if (_frameset->isCurrentFrame(frameID) == true) {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageSELECTED_X_CUR, 0, -1);
 					} else {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageSELECTED_X, 0, -1);
 					}
 				} else if (isEmpty() == true) {
-					if (fm->isCurrentFrame(frameID) == true) {
+					if (_frameset->isCurrentFrame(frameID) == true) {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK_X_CUR, 0, -1);
 					} else {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK_X, 0, -1);
 					}
 				} else if (getTween() == true) {
-					if (fm->isCurrentFrame(frameID) == true) {
+					if (_frameset->isCurrentFrame(frameID) == true) {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageTWEEN_X_CUR, 0, -1);
 					} else {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageTWEEN_X, 0, -1);
 					}
+				} else if (isNull() == true) {
+					if (_frameset->isCurrentFrame(frameID) == true) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageNULL_X_CUR, 0, -1);
+					} else {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageNULL_X, 0, -1);
+					}
 				} else {
-					if (fm->isCurrentFrame(frameID) == true) {
+					if (_frameset->isCurrentFrame(frameID) == true) {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN_X_CUR, 0, -1);
 					} else {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN_X, 0, -1);
@@ -281,6 +282,9 @@ bool KageFrame::getTween() {
 }
 
 void KageFrame::setCurrent(bool p_current) {
+	if (p_current == true) {
+		grab_focus();
+	}
 	_current = p_current;
 	render();
 }
@@ -289,20 +293,27 @@ bool KageFrame::isCurrent() {
 }
 
 VectorDataManager KageFrame::getFrameData() {
+	if (_null == true) {
+		VectorDataManager l_nullReturn;
+		return l_nullReturn;
+	}
 	if (       _extension == KageFrame::extension::EXTENSION_NOT
 			|| _extension == KageFrame::extension::EXTENSION_START) {
 		return vectorsData;
 	} else {
-		return fm->getPreviousFrameData(frameID);
+		return _frameset->getPreviousFrameData(frameID);
 	}
 }
 void KageFrame::setFrameData(VectorDataManager p_vectorsData) {
+	if (_null == true) {
+		setNull(false);
+	}
 	if (       _extension == KageFrame::extension::EXTENSION_NOT
 			|| _extension == KageFrame::extension::EXTENSION_START) {
 		vectorsData = p_vectorsData;
 		render();
 	} else {
-		fm->setFrameDataToPreviousFrame(p_vectorsData, frameID);
+		_frameset->setFrameDataToPreviousFrame(p_vectorsData, frameID);
 	}
 }
 
@@ -311,7 +322,7 @@ bool KageFrame::isEmpty() {
 			|| _extension == KageFrame::extension::EXTENSION_START) {
 		return (vectorsData.getVectorData().size() <= 1);
 	} else {
-		return (fm->getPreviousFrameData(frameID).getVectorData().size() <= 1);
+		return (_frameset->getPreviousFrameData(frameID).getVectorData().size() <= 1);
 	}
 }
 
@@ -352,9 +363,12 @@ bool KageFrame::flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes)
 void KageFrame::addDataToFrame(VectorDataManager v) {
 	if (       _extension == KageFrame::extension::EXTENSION_NOT
 			|| _extension == KageFrame::extension::EXTENSION_START) {
+		if (_null == true) {
+			setNull(false);
+		}
 		vectorsData.push(v);
 		forceRender();
 	} else {
-		fm->addDataToPreviousFrame(v, frameID);
+		_frameset->addDataToPreviousFrame(v, frameID);
 	}
 }

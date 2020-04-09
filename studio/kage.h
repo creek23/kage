@@ -69,22 +69,10 @@
 			string int255ToHex(unsigned int p);
 			char int15ToHex(unsigned int p);
 			
-			KageLayerManager m_KageLayerManager;
-			KageFramesManager m_KageFramesManager;
+			KageLayerManager _layerManager;
+			KageFramesetManager _framesetManager;
 			
 		protected:
-			enum color {
-				COLOR_RED,
-				COLOR_GREEN,
-				COLOR_BLUE
-			};
-			
-			enum shape {
-				SHAPE_SQUARE,
-				SHAPE_RECTANGLE,
-				SHAPE_OVAL
-			};
-			
 			//Signal handlers:
 			void updateStatus(Glib::ustring status_msg);
 			void Quit_onClick();
@@ -120,6 +108,7 @@
 			void AddFrame_onClick();
 			void ExtendFrame_onClick();
 			void DuplicateFrame_onClick();
+			void RemoveFrame_onClick();
 			void CutFrame_onClick();
 			void CopyFrame_onClick();
 			void PasteFrame_onClick();

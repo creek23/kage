@@ -469,16 +469,16 @@ void KageStage::applyZoom() {
 	
 		win->stackDoZoom(origin, __origin, _zoomReference, _zoomRatio);
 	
-	unsigned int l_layerCount = win->m_KageLayerManager.layerCount();
-	unsigned int l_frameCount = win->m_KageFramesManager.frameCount();
-	unsigned int l_currentFrame = win->m_KageFramesManager.getCurrentFrame();
+	unsigned int l_layerCount = win->_layerManager.layerCount();
+	unsigned int l_frameCount = win->_framesetManager.frameCount();
+	unsigned int l_currentFrame = win->_framesetManager.getCurrentFrame();
 	unsigned int l_currentLayer = win->getCurrentLayer();
 	
 	for (unsigned int l_frame = 1; l_frame <= l_frameCount; ++l_frame) {
-		win->m_KageFramesManager.setCurrentFrame(l_frame);
+		win->_framesetManager.setCurrentFrame(l_frame);
 		
 		for (unsigned int l_layer = 1; l_layer <= l_layerCount; ++l_layer) {
-			win->m_KageFramesManager.setCurrentLayer(l_layer);
+			win->_framesetManager.setCurrentLayer(l_layer);
 			
 			vector<VectorData> v = win->getFrameData(true).getVectorData();
 			
@@ -507,9 +507,9 @@ void KageStage::applyZoom() {
 		}
 	}
 	
-	//TODO: is it needed to access m_KageFramesManager? why not just win->setCurrentLayer(l_currentLayer)?
-	win->m_KageFramesManager.setCurrentLayer(l_currentLayer);
-	win->m_KageFramesManager.setCurrentFrame(l_currentFrame);
+	//TODO: is it needed to access _framesetManager? why not just win->setCurrentLayer(l_currentLayer)?
+	win->_framesetManager.setCurrentLayer(l_currentLayer);
+	win->_framesetManager.setCurrentFrame(l_currentFrame);
 	
 	origin = __origin.clone();
 	stageWidth  = __stageArea.x;
@@ -843,10 +843,10 @@ bool KageStage::renderToPNG(string p_path, bool p_transparent) {
 			clearScreen(l_context);
 		}
 		
-		unsigned int l_layerCount = win->m_KageLayerManager.layerCount();
+		unsigned int l_layerCount = win->_layerManager.layerCount();
 		unsigned int l_currentLayer = win->getCurrentLayer();
 			for (unsigned int i = 1; i <= l_layerCount; ++i) {
-				win->m_KageFramesManager.setCurrentLayer(i);
+				win->_framesetManager.setCurrentLayer(i);
 				renderFrameToPNG(l_context);
 			}
 		win->setCurrentLayer(l_currentLayer);

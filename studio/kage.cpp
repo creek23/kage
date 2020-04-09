@@ -26,11 +26,10 @@ Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_SE;
 Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_ROTATE;
 bool KageFrame::_gotFocus;
 
-unsigned int KageFramesManager::currentFrame;
 unsigned int VectorDataManager::idmaker;
 
-Kage::Kage() : m_KageLayerManager(this),
-			   m_KageFramesManager(this),
+Kage::Kage() : _layerManager(this),
+			   _framesetManager(this),
 			   m_LabelProp("Properties"),
 			   m_LabelStageWid("Width"),
 			   m_LabelStageHgt("Height"),
@@ -292,6 +291,11 @@ Kage::Kage() : m_KageLayerManager(this),
 		sigc::mem_fun(*this, &Kage::DuplicateFrame_onClick)
 	);
 	m_refActionGroup->add(
+		Gtk::Action::create("RemoveFrame", "_Remove Frame", "Remove Frame"),
+		Gtk::AccelKey("<shift>F7"),
+		sigc::mem_fun(*this, &Kage::RemoveFrame_onClick)
+	);
+	m_refActionGroup->add(
 		Gtk::Action::create("CutFrame", "Cu_t Frame", "Cut Frame"),
 		Gtk::AccelKey("<control><shift>X"),
 		sigc::mem_fun(*this, &Kage::CutFrame_onClick)
@@ -465,6 +469,7 @@ Kage::Kage() : m_KageLayerManager(this),
 		"			<menuitem action='AddFrame'/>"
 		"			<menuitem action='ExtendFrame'/>"
 		"			<menuitem action='DuplicateFrame'/>"
+		"			<menuitem action='RemoveFrame'/>"
 		"			<separator/>"
 		"			<menuitem action='CutFrame'/>"
 		"			<menuitem action='CopyFrame'/>"
@@ -535,10 +540,10 @@ Kage::Kage() : m_KageLayerManager(this),
 				m_Timeline_HPaned.add1(m_Timeline_Layer_VBox);
 					m_Timeline_Layer_VBox.pack_start(m_Timeline_Layer_ScrolledWindow);//, Gtk::PACK_SHRINK);
 						m_Timeline_Layer_ScrolledWindow.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_EXTERNAL);
-							m_Timeline_Layer_ScrolledWindow.add(m_KageLayerManager);
+							m_Timeline_Layer_ScrolledWindow.add(_layerManager);
 							m_Timeline_Frame_ScrolledWindow.set_border_width(0);
 							m_Timeline_Frame_ScrolledWindow.set_shadow_type(Gtk::SHADOW_NONE);
-							cout << "layer count " << m_KageLayerManager.layerCount() << endl;
+							cout << "layer count " << _layerManager.layerCount() << endl;
 					m_Timeline_Layer_VBox.pack_start(m_Timeline_Layer_Add_HBox, Gtk::PACK_SHRINK);
 						m_Timeline_Layer_Add_HBox.pack_start(m_Timeline_Label, Gtk::PACK_EXPAND_WIDGET);
 							m_Timeline_Label.set_label("  Timeline  ");
@@ -624,7 +629,7 @@ Kage::Kage() : m_KageLayerManager(this),
 						m_Timeline_Frame_VBox2.pack_start(m_Timeline_Frame_ScrolledWindow);//, Gtk::PACK_SHRINK);
 							m_Timeline_Frame_ScrolledWindow.set_policy(Gtk::POLICY_EXTERNAL , Gtk::POLICY_EXTERNAL);
 								m_Timeline_Frame_ScrolledWindow.set_border_width(0);
-								m_Timeline_Frame_ScrolledWindow.add(m_KageFramesManager);
+								m_Timeline_Frame_ScrolledWindow.add(_framesetManager);
 								m_Timeline_Frame_ScrolledWindow.set_shadow_type(Gtk::SHADOW_NONE);
 								m_Timeline_Frame_ScrolledWindow.set_kinetic_scrolling(true);
 						m_Timeline_Frame_VBox2.pack_start(m_Timeline_HScrollbar, Gtk::PACK_SHRINK);
@@ -831,8 +836,8 @@ void Kage::stackDoZoom(PointData p_originBefore, PointData p_originAfter, PointD
 void Kage::Undo_onClick() {
 	KageDo l_kageDo = _undoRedoManager.undo();
 	if (l_kageDo._layer != -1 && l_kageDo._frame != -1) {
-		m_KageFramesManager.setCurrentLayer(l_kageDo._layer);
-		m_KageFramesManager.setCurrentFrame(l_kageDo._frame);
+		_framesetManager.setCurrentLayer(l_kageDo._layer);
+		_framesetManager.setCurrentFrame(l_kageDo._frame);
 		setFrameData(l_kageDo.getVectorData(), true);
 		
 		forceRenderFrames();
@@ -841,8 +846,8 @@ void Kage::Undo_onClick() {
 void Kage::Redo_onClick() {
 	KageDo l_kageDo = _undoRedoManager.redo();
 	if (l_kageDo._layer != -1 && l_kageDo._frame != -1) {
-		m_KageFramesManager.setCurrentLayer(l_kageDo._layer);
-		m_KageFramesManager.setCurrentFrame(l_kageDo._frame);
+		_framesetManager.setCurrentLayer(l_kageDo._layer);
+		_framesetManager.setCurrentFrame(l_kageDo._frame);
 		setFrameData(l_kageDo.getVectorData(), true);
 		
 		forceRenderFrames();
@@ -851,33 +856,27 @@ void Kage::Redo_onClick() {
 void Kage::Cut_onClick() {
 	Kage::timestamp();
 	std::cout << " Kage::Cut_onClick " << m_KageStage._gotFocus << " " << KageFrame::_gotFocus << std::endl;
-	if (m_KageStage._gotFocus == true) {
-		if (KageStage::toolMode == KageStage::MODE_SELECT) {
-			if (m_KageStage.cutSelectedShapes() == true) {
-				forceRenderFrames();
-			}
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		if (m_KageStage.cutSelectedShapes() == true) {
+			forceRenderFrames();
 		}
 	}
 }
 void Kage::Copy_onClick() {
 	Kage::timestamp();
 	std::cout << " Kage::Copy_onClick " << m_KageStage._gotFocus << " " << KageFrame::_gotFocus << std::endl;
-	if (m_KageStage._gotFocus == true) {
-		if (KageStage::toolMode == KageStage::MODE_SELECT) {
-			if (m_KageStage.copySelectedShapes() == true) {
-				forceRenderFrames();
-			}
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		if (m_KageStage.copySelectedShapes() == true) {
+			forceRenderFrames();
 		}
 	}
 }
 void Kage::Paste_onClick() {
 	Kage::timestamp();
 	std::cout << " Kage::Paste_onClick " << m_KageStage._gotFocus << " " << KageFrame::_gotFocus << std::endl;
-	if (m_KageStage._gotFocus == true) {
-		if (KageStage::toolMode == KageStage::MODE_SELECT) {
-			if (m_KageStage.pasteSelectedShapes() == true) {
-				forceRenderFrames();
-			}
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		if (m_KageStage.pasteSelectedShapes() == true) {
+			forceRenderFrames();
 		}
 	}
 }
@@ -886,7 +885,7 @@ void Kage::Duplicate_onClick() {
 		Kage::timestamp();
 		std::cout << " Kage::Duplicate_onClick" << std::endl;
 		if (isLayerLocked() == false) {
-			vector<unsigned int> l_selectedShapes = m_KageFramesManager.duplicateShapes(m_KageStage.getSelectedShapes());
+			vector<unsigned int> l_selectedShapes = _framesetManager.duplicateShapes(m_KageStage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
 				m_KageStage.setSelectedShapes(l_selectedShapes);
 				stackDo();
@@ -927,7 +926,7 @@ void Kage::ShapeGroup_onClick() {
 		Kage::timestamp();
 		std::cout << " Kage::ShapeGroup_onClick" << std::endl;
 		if (isLayerLocked() == false) {
-			vector<unsigned int> l_selectedShapes = m_KageFramesManager.groupSelectedShapes(m_KageStage.getSelectedShapes());
+			vector<unsigned int> l_selectedShapes = _framesetManager.groupSelectedShapes(m_KageStage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
 				m_KageStage.setSelectedShapes(l_selectedShapes);
 				stackDo();
@@ -942,7 +941,7 @@ void Kage::ShapeUngroup_onClick() {
 		std::cout << " Kage::ShapeUngroup_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
-			vector<unsigned int> l_selectedShapes = m_KageFramesManager.ungroupSelectedShapes(m_KageStage.getSelectedShapes());
+			vector<unsigned int> l_selectedShapes = _framesetManager.ungroupSelectedShapes(m_KageStage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
 				m_KageStage.setSelectedShapes(l_selectedShapes);
 				stackDo();
@@ -958,7 +957,7 @@ void Kage::Raise_onClick() {
 		std::cout << " Kage::Raise_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
-			vector<unsigned int> l_selectedShapes = m_KageFramesManager.raiseSelectedShape(m_KageStage.getSelectedShapes());
+			vector<unsigned int> l_selectedShapes = _framesetManager.raiseSelectedShape(m_KageStage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
 				m_KageStage.setSelectedShapes(l_selectedShapes);
 				stackDo();
@@ -973,7 +972,7 @@ void Kage::Lower_onClick() {
 		std::cout << " Kage::Lower_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
-			vector<unsigned int> l_selectedShapes = m_KageFramesManager.lowerSelectedShape(m_KageStage.getSelectedShapes());
+			vector<unsigned int> l_selectedShapes = _framesetManager.lowerSelectedShape(m_KageStage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
 				m_KageStage.setSelectedShapes(l_selectedShapes);
 				stackDo();
@@ -988,7 +987,7 @@ void Kage::RaiseToTop_onClick() {
 		std::cout << " Kage::RaiseToTop_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
-			vector<unsigned int> l_selectedShapes = m_KageFramesManager.raiseToTopSelectedShape(m_KageStage.getSelectedShapes());
+			vector<unsigned int> l_selectedShapes = _framesetManager.raiseToTopSelectedShape(m_KageStage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
 				m_KageStage.setSelectedShapes(l_selectedShapes);
 				stackDo();
@@ -1003,7 +1002,7 @@ void Kage::LowerToBottom_onClick() {
 		std::cout << " Kage::LowerToBottom_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
-			vector<unsigned int> l_selectedShapes = m_KageFramesManager.lowerToBottomSelectedShape(m_KageStage.getSelectedShapes());
+			vector<unsigned int> l_selectedShapes = _framesetManager.lowerToBottomSelectedShape(m_KageStage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
 				m_KageStage.setSelectedShapes(l_selectedShapes);
 				stackDo();
@@ -1019,7 +1018,7 @@ void Kage::FlipHorizontal_onClick() {
 		std::cout << " Kage::FlipHorizontal_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
-			if (m_KageFramesManager.flipHorizontalSelectedShape(m_KageStage.getSelectedShapes()) == true) {
+			if (_framesetManager.flipHorizontalSelectedShape(m_KageStage.getSelectedShapes()) == true) {
 				stackDo();
 				forceRenderFrames();
 			}
@@ -1032,7 +1031,7 @@ void Kage::FlipVertical_onClick() {
 		std::cout << " Kage::FlipVertical_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
-			if (m_KageFramesManager.flipVerticalSelectedShape(m_KageStage.getSelectedShapes()) == true) {
+			if (_framesetManager.flipVerticalSelectedShape(m_KageStage.getSelectedShapes()) == true) {
 				stackDo();
 				forceRenderFrames();
 			}
@@ -1060,25 +1059,31 @@ void Kage::Delete_onClick() {
 }
 
 void Kage::AddFrame_onClick() {
-	m_KageFramesManager.addFrame();
-	m_KageFramesManager.setCurrentFrame(KageFramesManager::currentFrame + 1);
+	_framesetManager.addFrame();
+	_framesetManager.setCurrentFrame(getCurrentFrame() + 1);
 	
 	show_all();
 }
 void Kage::ExtendFrame_onClick() {
-	m_KageFramesManager.extendFrame();
-//	m_KageFramesManager.setCurrentFrame(KageFramesManager::currentFrame + 1);
+	_framesetManager.extendFrame();
 	
 	show_all();
 }
 void Kage::DuplicateFrame_onClick() {
-	m_KageFramesManager.duplicateFrame();
+	_framesetManager.duplicateFrame();
+	
+	show_all();
+}
+void Kage::RemoveFrame_onClick() {
+	_framesetManager.removeFrame();
 	
 	show_all();
 }
 
+/**
+ * Deletes a Frame via Selecting All then Deleting selected shapes
+ */
 void Kage::CutFrame_onClick() {
-	//delete Frame via Selecting All then Deleting selected shapes
 	if (m_KageStage.selectAllShapes() == true) {
 		if (m_KageStage.cutSelectedShapes() == true) {
 			stackDo();
@@ -1086,16 +1091,21 @@ void Kage::CutFrame_onClick() {
 		}
 	}
 }
+/**
+ * Copies Frame's full content
+ */
 void Kage::CopyFrame_onClick() {
-	//copy Frame's full content
 	if (m_KageStage.selectAllShapes() == true) {
 		if (m_KageStage.copySelectedShapes() == true) {
 			forceRenderFrames();
 		}
 	}
 }
+/**
+ * Overwrites Frame's current content via Selecting All then
+ * Deleting selected shapes then pasting buffer
+ */
 void Kage::PasteFrame_onClick() {
-	//over write Frame's current content via Selecting All then Deleting selected shapes then pasting buffer
 	if (m_KageStage.selectAllShapes() == true) {
 		m_KageStage.deleteSelectedShapes();
 	}
@@ -1104,8 +1114,10 @@ void Kage::PasteFrame_onClick() {
 		forceRenderFrames();
 	}
 }
+/**
+ * Deletes a Frame via Selecting All then Deleting selected shapes
+ */
 void Kage::DeleteFrame_onClick() {
-	//delete Frame via Selecting All then Deleting selected shapes	
 	if (m_KageStage.selectAllShapes() == true) {
 		if (m_KageStage.deleteSelectedShapes() == true) {
 			stackDo();
@@ -1115,45 +1127,41 @@ void Kage::DeleteFrame_onClick() {
 }
 
 void Kage::switchToPreviousFrame() {
-	if (KageFramesManager::currentFrame > 1) {
-		m_KageFramesManager.setCurrentFrame(KageFramesManager::currentFrame - 1);
-		show_all();
-	}
+	_framesetManager.switchToPreviousFrame();
+	show_all();
 }
 
 void Kage::switchToNextFrame() {
-	if (KageFramesManager::currentFrame < m_KageFramesManager.frameCount()) {
-		m_KageFramesManager.setCurrentFrame(KageFramesManager::currentFrame + 1);
-		show_all();
-	}
+	_framesetManager.switchToNextFrame();
+	show_all();
 }
 
 /**
- * Called by KageFramesManager::setCurrentFrame
+ * Called by KageFramesetManager::setCurrentFrame
  */
 void Kage::updateFrameLabel() {
-	m_Timeline_CurrentFrame.set_label("L " + StringHelper::unsignedIntegerToString(getCurrentLayer()) + " F " + StringHelper::unsignedIntegerToString(KageFramesManager::currentFrame));
+	m_Timeline_CurrentFrame.set_label("L " + StringHelper::unsignedIntegerToString(getCurrentLayer()) + " F " + StringHelper::unsignedIntegerToString(getCurrentFrame()));
 }
 
 void Kage::LayerAdd_onClick() {
-	m_KageFramesManager.addFrameManager(m_KageLayerManager.addLayer());
-	std::cout << "Layer Count: " << m_KageLayerManager.layerCount() << std::endl;
+	_framesetManager.addFrameset(_layerManager.addLayer());
+	std::cout << "Layer Count: " << _layerManager.layerCount() << std::endl;
 	show_all();
 	updateStatus("New Layer Added");
 }
 void Kage::LayerRename_onClick() {
-	m_KageLayerManager.renameLayer();
+	_layerManager.renameLayer();
 }
 void Kage::ShowHideLayer_onClick() {
-	m_KageLayerManager.toggleVisibility();
+	_layerManager.toggleVisibility();
 }
 void Kage::LockUnlockLayer_onClick() {
-	m_KageLayerManager.toggleLock();
+	_layerManager.toggleLock();
 }
 void Kage::LayerDel_onClick() {
-	if (m_KageLayerManager.layerCount() > 1) {
-		m_KageFramesManager.deleteFrameManager(getCurrentLayer());
-		m_KageLayerManager.deleteLayer();
+	if (_layerManager.layerCount() > 1) {
+		_framesetManager.deleteFrameset(getCurrentLayer());
+		_layerManager.deleteLayer();
 	}
 	std::cout << "Layer Delete Button clicked." << std::endl;
 }
@@ -1163,7 +1171,7 @@ void Kage::LayerDel_onClick() {
  * from LayerManager. 
  */
 void Kage::LayerMoveTop_onClick() {
-	if (m_KageFramesManager.moveToTop() == true && m_KageLayerManager.moveToTop() == true) {
+	if (_framesetManager.moveToTop() == true && _layerManager.moveToTop() == true) {
 		forceRenderFrames();
 	}
 }
@@ -1173,7 +1181,7 @@ void Kage::LayerMoveTop_onClick() {
  * from LayerManager. 
  */
 void Kage::LayerMoveUp_onClick() {
-	if (m_KageFramesManager.moveUp() == true && m_KageLayerManager.moveUp() == true) {
+	if (_framesetManager.moveUp() == true && _layerManager.moveUp() == true) {
 		forceRenderFrames();
 	}
 }
@@ -1183,7 +1191,7 @@ void Kage::LayerMoveUp_onClick() {
  * from LayerManager. 
  */
 void Kage::LayerMoveDown_onClick() {
-	if (m_KageFramesManager.moveDown() == true && m_KageLayerManager.moveDown() == true) {
+	if (_framesetManager.moveDown() == true && _layerManager.moveDown() == true) {
 		forceRenderFrames();
 	}
 }
@@ -1193,7 +1201,7 @@ void Kage::LayerMoveDown_onClick() {
  * from LayerManager. 
  */
 void Kage::LayerMoveBottom_onClick() {
-	if (m_KageFramesManager.moveToBottom() == true && m_KageLayerManager.moveToBottom() == true) {
+	if (_framesetManager.moveToBottom() == true && _layerManager.moveToBottom() == true) {
 		forceRenderFrames();
 	}
 }
@@ -1406,15 +1414,14 @@ void Kage::stackDo() {
 	if (l_layer != -1 && l_frame != -1) {
 		if (       l_layer != getCurrentLayer()
 				|| l_frame != getCurrentFrame()) {
-			_undoRedoManager.stackDo(getCurrentLayer(), KageFramesManager::currentFrame, _undoBase);
+			_undoRedoManager.stackDo(getCurrentLayer(), getCurrentFrame(), _undoBase);
 		}
 	} else {
-		_undoRedoManager.stackDo(getCurrentLayer(), KageFramesManager::currentFrame, _undoBase);
+		_undoRedoManager.stackDo(getCurrentLayer(), getCurrentFrame(), _undoBase);
 		
 	}
 	
-	//NOTE: still using KageFramesManager::currentFrame instead of getCurrentFrame()?!?
-	_undoRedoManager.stackDo(getCurrentLayer(), KageFramesManager::currentFrame, getFrameData().getVectorData());
+	_undoRedoManager.stackDo(getCurrentLayer(), getCurrentFrame(), getFrameData().getVectorData());
 	set_title("*" + ksfPath + " - " + KageAbout::app_title);
 }
 
@@ -1441,8 +1448,8 @@ bool Kage::on_delete_event(GdkEventAny* any_event) {
 }
 
 void Kage::addDataToFrame(VectorDataManager v, bool p_force) {
-	if (p_force || m_KageLayerManager.getLayer()->isLocked() == false) {
-		m_KageFramesManager.addDataToFrame(v);
+	if (p_force || _layerManager.getLayer()->isLocked() == false) {
+		_framesetManager.addDataToFrame(v);
 	}
 }
 /**
@@ -1451,8 +1458,8 @@ void Kage::addDataToFrame(VectorDataManager v, bool p_force) {
  * \return Frame's VectorDataManager.
  */
 VectorDataManager Kage::getFrameData(bool p_force) {
-	if (p_force || m_KageLayerManager.getLayer()->isVisible()) {
-		return m_KageFramesManager.getFrameData();
+	if (p_force || _layerManager.getLayer()->isVisible()) {
+		return _framesetManager.getFrameData();
 	} else {
 		VectorDataManager l_nullReturn;
 		return l_nullReturn;
@@ -1466,8 +1473,8 @@ VectorDataManager Kage::getFrameData(bool p_force) {
  * \return Frame's VectorDataManager.
  */
 VectorDataManager Kage::getFrameDataAt(unsigned int p_frame) {
-	if (m_KageLayerManager.getLayer()->isVisible()) {
-		return m_KageFramesManager.getFrameDataAt(p_frame);
+	if (_layerManager.getLayer()->isVisible()) {
+		return _framesetManager.getFrameDataAt(p_frame);
 	} else {
 		VectorDataManager l_nullReturn;
 		return l_nullReturn;
@@ -1479,13 +1486,13 @@ void Kage::setFrameData(VectorDataManager p_vectorsData) {
 }
 void Kage::setFrameData(VectorDataManager p_vectorsData, bool p_force) {
 	if (p_force == true
-			|| m_KageLayerManager.getLayer()->isLocked() == false) {
-		m_KageFramesManager.setFrameData(p_vectorsData);
+			|| _layerManager.getLayer()->isLocked() == false) {
+		_framesetManager.setFrameData(p_vectorsData);
 	}
 }
 
 bool Kage::isFrameEmpty() {
-	return (m_KageFramesManager.getFrameData().getVectorData().size() > 0);
+	return (_framesetManager.getFrameData().getVectorData().size() > 0);
 }
 
 void Kage::forceRenderFrames() {
@@ -1495,8 +1502,8 @@ void Kage::forceRenderFrames() {
 
 
 void Kage::renderOnionFrames() {
-	unsigned int l_layerCount = m_KageLayerManager.layerCount();
-	unsigned int l_frameCount = m_KageFramesManager.frameCount();
+	unsigned int l_layerCount = _layerManager.layerCount();
+	unsigned int l_frameCount = _framesetManager.frameCount();
 	
 	unsigned int l_currentLayer = getCurrentLayer();
 	unsigned int l_currentFrame = getCurrentFrame();
@@ -1510,7 +1517,7 @@ void Kage::renderOnionFrames() {
 			
 			unsigned int l_frame = (unsigned int) f;
 			for (unsigned int i = 1; i <= l_layerCount; ++i) {
-				m_KageFramesManager.setCurrentLayer(i);
+				_framesetManager.setCurrentLayer(i);
 				if (l_frame == l_currentFrame) {
 					m_KageStage.renderFrame(m_KageStage.cr);
 				} else {
@@ -1533,10 +1540,10 @@ void Kage::renderFrames() {
 		return;
 	}
 	
-	unsigned int l_layerCount = m_KageLayerManager.layerCount();
+	unsigned int l_layerCount = _layerManager.layerCount();
 	unsigned int l_currentLayer = getCurrentLayer();
 		for (unsigned int i = 1; i <= l_layerCount; ++i) {
-			m_KageFramesManager.setCurrentLayer(i);
+			_framesetManager.setCurrentLayer(i);
 			m_KageStage.renderFrame(m_KageStage.cr);
 		}
 	setCurrentLayer(l_currentLayer);
@@ -1544,9 +1551,15 @@ void Kage::renderFrames() {
 
 void Kage::renderFramesBelowCurrentLayer() {
 	m_KageStage.clearScreen(m_KageStage.cr);
+	
+	if (_toggleOnion.get_active() == true) {
+		renderOnionFrames();
+		return;
+	}
+	
 	unsigned int l_currentLayer = getCurrentLayer();
 		for (unsigned int i = 1; i < l_currentLayer; ++i) {
-			m_KageFramesManager.setCurrentLayer(i);
+			_framesetManager.setCurrentLayer(i);
 			if (_toggleOnionLayer.get_active() == false) {
 				m_KageStage.renderFrame(m_KageStage.cr);
 			} else {
@@ -1557,10 +1570,10 @@ void Kage::renderFramesBelowCurrentLayer() {
 	setCurrentLayer(l_currentLayer);
 }
 void Kage::renderFramesAboveCurrentLayer() {
-	unsigned int l_layerCount = m_KageLayerManager.layerCount();
+	unsigned int l_layerCount = _layerManager.layerCount();
 	unsigned int l_currentLayer = getCurrentLayer();
 		for (unsigned int i = (l_currentLayer + 1); i <= l_layerCount; ++i) {
-			m_KageFramesManager.setCurrentLayer(i);
+			_framesetManager.setCurrentLayer(i);
 			if (_toggleOnionLayer.get_active() == false) {
 				m_KageStage.renderFrame(m_KageStage.cr);
 			} else {
@@ -1572,30 +1585,30 @@ void Kage::renderFramesAboveCurrentLayer() {
 }
 
 bool Kage::isLayerLocked() {
-	return m_KageLayerManager.isLayerLocked();
+	return _layerManager.isLayerLocked();
 }
 unsigned int Kage::getCurrentLayer() {
-	return m_KageLayerManager.getCurrentLayer();
+	return _layerManager.getCurrentLayer();
 }
 
 void Kage::setCurrentLayer(unsigned int p_layer) {
 	cout << "setting undoBase A setCurrentLayer " << endl;
 	_undoBase = getFrameData(true).getVectorData(); //for use later by stackDo()
-	m_KageLayerManager.setCurrentLayer(p_layer);
+	_layerManager.setCurrentLayer(p_layer);
 }
 unsigned int Kage::getCurrentFrame() {
-	return m_KageFramesManager.getCurrentFrame();
+	return _framesetManager.getCurrentFrame();
 }
 void Kage::setCurrentLayerByID(unsigned int p_layerID) {
 	cout << "setting undoBase B setCurrentLayerByID " << endl;
 	_undoBase = getFrameData(true).getVectorData(); //for use later by stackDo()
-	m_KageLayerManager.setCurrentLayerByID(p_layerID);
+	_layerManager.setCurrentLayerByID(p_layerID);
 }
 
 void Kage::setCurrentFrame(unsigned int p_layer) {
 	cout << "setting undoBase C setCurrentFrame " << endl;
 	_undoBase = getFrameData(true).getVectorData(); //for use later by stackDo()
-	m_KageFramesManager.setCurrentFrame(p_layer);
+	_framesetManager.setCurrentFrame(p_layer);
 }
 
 void Kage::New_onClick() {
@@ -1604,17 +1617,17 @@ void Kage::New_onClick() {
 	propLocationSizeSetVisible(false);
 	propNodeXYSetVisible(false);
 
-	m_KageLayerManager.removeAllLayers();
-	m_KageFramesManager.removeAllFrames();
-	m_KageFramesManager.addFrameManager(m_KageLayerManager.addLayer());
+	_layerManager.removeAllLayers();
+	_framesetManager.removeAllFrames();
+	_framesetManager.addFrameset(_layerManager.addLayer());
 	
 	_undoRedoManager.clear();
 	stackDo();
 	
 	show_all();
 	
-	m_KageFramesManager.setCurrentLayer(1);
-	m_KageFramesManager.setCurrentFrame(1);
+	_framesetManager.setCurrentLayer(1);
+	_framesetManager.setCurrentFrame(1);
 	
 	currentTool = toggleButtons[0];
 	currentTool->set_active(true);
@@ -1718,9 +1731,9 @@ void Kage::doSave(string p_filename) {
 	ksfInited = false;
 	ksfFile.close();
 	
-	unsigned int l_lMax = m_KageLayerManager.layerCount();
+	unsigned int l_lMax = _layerManager.layerCount();
 	unsigned int i;
-		unsigned int l_fMax = m_KageFramesManager.frameCount();
+		unsigned int l_fMax = _framesetManager.frameCount();
 		unsigned int j;
 			unsigned int l_currentLayer;
 			unsigned int l_currentFrame;
@@ -1732,19 +1745,31 @@ void Kage::doSave(string p_filename) {
 							"layers=\"" + StringHelper::integerToString(l_lMax) + "\" " +
 							"frames=\"" + StringHelper::integerToString(l_fMax) + "\" />");
 		l_currentLayer = getCurrentLayer();
-		l_currentFrame = m_KageFramesManager.getCurrentFrame();
+		l_currentFrame = getCurrentFrame();
 			for (i = 1; i <= l_lMax; i++) {
-				m_KageFramesManager.setCurrentLayer(i);
-				saveKageStudio(ksfPath, "<layer" + StringHelper::unsignedIntegerToString(i) + " label=\"" + m_KageLayerManager.getLabel() + "\" visible=\"" + (m_KageLayerManager.isLayerVisible()?"true":"false") + "\" locked=\"" + (m_KageLayerManager.isLayerLocked()?"true":"false") + "\">");
+				_framesetManager.setCurrentLayer(i);
+				saveKageStudio(ksfPath, "<layer" + StringHelper::unsignedIntegerToString(i) + " label=\"" + _layerManager.getLabel() + "\" visible=\"" + (_layerManager.isLayerVisible()?"true":"false") + "\" locked=\"" + (_layerManager.isLayerLocked()?"true":"false") + "\">");
 				for (j = 1; j <= l_fMax; ++j) {
-					saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + ">");
-					m_KageFramesManager.setCurrentFrame(j);
-					saveKageStudio(ksfPath, saveFrame() + "\n</frame" + StringHelper::unsignedIntegerToString(j) + ">");
+					KageFrame *l_frame = _framesetManager.getFrameAt(j);
+					KageFrame::extension l_extension = l_frame->getExtension();
+					if (l_extension == KageFrame::extension::EXTENSION_NOT) {
+						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + ">");
+						_framesetManager.setCurrentFrame(j);
+						saveKageStudio(ksfPath, saveFrame() + "\n</frame" + StringHelper::unsignedIntegerToString(j) + ">");
+					} else if (l_extension == KageFrame::extension::EXTENSION_START) {
+						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + " extend=\"start\">");
+						_framesetManager.setCurrentFrame(j);
+						saveKageStudio(ksfPath, saveFrame() + "\n</frame" + StringHelper::unsignedIntegerToString(j) + ">");
+					} else if (l_extension == KageFrame::extension::EXTENSION_MID) {
+						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + " extend=\"mid\" />");
+					} else if (l_extension == KageFrame::extension::EXTENSION_END) {
+						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + " extend=\"end\" />");
+					}
 				}
 				saveKageStudio(ksfPath, "</layer" + StringHelper::unsignedIntegerToString(i) + ">");
 			}
 		setCurrentLayer(l_currentLayer);
-		m_KageFramesManager.setCurrentFrame(l_currentFrame);
+		_framesetManager.setCurrentFrame(l_currentFrame);
 	if (saveKageStudio(ksfPath, "</KageStudio>") == true) {
 		updateStatus("Saved to " + ksfPath);
 		
@@ -1820,9 +1845,9 @@ void Kage::ExportHTML5_onClick() {
 			expInited = false;
 			expFile.close();
 			
-			unsigned int l_lMax = m_KageLayerManager.layerCount();
+			unsigned int l_lMax = _layerManager.layerCount();
 			unsigned int i;
-				unsigned int l_fMax = m_KageFramesManager.frameCount();
+				unsigned int l_fMax = _framesetManager.frameCount();
 				unsigned int j;
 					unsigned int t;
 			
@@ -1853,17 +1878,17 @@ void Kage::ExportHTML5_onClick() {
 				exportHtml5(expPath, "}");
 			}
 				t = getCurrentLayer();
-				unsigned int f = KageFramesManager::currentFrame;
+				unsigned int f = getCurrentFrame();
 					for (j = 1; j <= l_fMax; ++j) {
-						m_KageFramesManager.setCurrentFrame(j);
+						_framesetManager.setCurrentFrame(j);
 						exportHtml5(expPath, "function ks_f" + StringHelper::unsignedIntegerToString(j) + "() {");
 						for (i = 1; i <= l_lMax; i++) {
-							m_KageFramesManager.setCurrentLayer(i);
+							_framesetManager.setCurrentLayer(i);
 							exportHtml5(expPath, dumpFrame(false));
 						}
 						exportHtml5(expPath, "}\n");
 					}
-				KageFramesManager::currentFrame = f;
+				setCurrentFrame(f);
 				setCurrentLayer(t);
 			exportHtml5(expPath, "function main() {\n\t//add variable initialization...\n}");
 			if (exportHtml5(expPath, "</script>\n</head>\n<body align='center' onload='kagestudio();' bgcolor='#101010'>\n<canvas id='screen' width='" + StringHelper::doubleToString(m_KageStage.stageWidth) + "' height='" + StringHelper::doubleToString(m_KageStage.stageHeight) + "' style='display: block; margin: auto;'></canvas>\n</body>\n</html>") == true) {
@@ -1946,9 +1971,9 @@ void Kage::ExportPNGSequence_onClick() {
 				l_pngPath = l_pngPath.substr(0, l_len);
 			}
 			
-			unsigned int l_lMax = m_KageLayerManager.layerCount();
+			unsigned int l_lMax = _layerManager.layerCount();
 			unsigned int i;
-				unsigned int l_fMax = m_KageFramesManager.frameCount();
+				unsigned int l_fMax = _framesetManager.frameCount();
 				unsigned int j;
 					unsigned int t;
 					unsigned int f;
@@ -1962,16 +1987,16 @@ void Kage::ExportPNGSequence_onClick() {
 				m_KageStage.origin.y = 0;
 						
 				t = getCurrentLayer();
-				f = KageFramesManager::currentFrame;
+				f = getCurrentFrame();
 					
 					for (j = 1; j <= l_fMax; ++j) {
-						m_KageFramesManager.setCurrentFrame(j);
+						_framesetManager.setCurrentFrame(j);
 						
 						Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, m_KageStage.stageWidth, m_KageStage.stageHeight);
 						Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
 						
 							for (i = 1; i <= l_lMax; i++) {
-								m_KageFramesManager.setCurrentLayer(i);
+								_framesetManager.setCurrentLayer(i);
 								m_KageStage.renderFrame(l_context);
 							}
 						
@@ -1988,7 +2013,7 @@ void Kage::ExportPNGSequence_onClick() {
 						}
 						CairoKage::writeToPNG(l_pngSequencePath, surface);
 					}
-				KageFramesManager::currentFrame = f;
+				setCurrentFrame(f);
 				setCurrentLayer(t);
 			
 				m_KageStage.origin.x = l_tempOrigin.x;
@@ -2041,9 +2066,9 @@ void Kage::ExportAVI_onClick() {
 					return;
 			}
 			
-			unsigned int l_lMax = m_KageLayerManager.layerCount();
+			unsigned int l_lMax = _layerManager.layerCount();
 			unsigned int i;
-				unsigned int l_fMax = m_KageFramesManager.frameCount();
+				unsigned int l_fMax = _framesetManager.frameCount();
 				unsigned int j;
 					unsigned int t;
 					unsigned int f;
@@ -2061,17 +2086,17 @@ void Kage::ExportAVI_onClick() {
 				m_KageStage.origin.y = 0;
 						
 				t = getCurrentLayer();
-				f = KageFramesManager::currentFrame;
+				f = getCurrentFrame();
 					
 					for (j = 1; j <= l_fMax; ++j) {
-						m_KageFramesManager.setCurrentFrame(j);
+						_framesetManager.setCurrentFrame(j);
 						
 						Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, m_KageStage.stageWidth, m_KageStage.stageHeight);
 						Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
 						
 							m_KageStage.clearScreen(l_context);
 							for (i = 1; i <= l_lMax; i++) {
-								m_KageFramesManager.setCurrentLayer(i);
+								_framesetManager.setCurrentLayer(i);
 								m_KageStage.renderFrame(l_context, true);
 							}
 						
@@ -2090,14 +2115,14 @@ void Kage::ExportAVI_onClick() {
 					}
 					//workaround to FFMPEG-bug: see https://sourceforge.net/p/kage/tickets/25/
 						for (j = 1; j <= (m_KageStage.fps); ++j) {
-							m_KageFramesManager.setCurrentFrame(l_fMax);
+							_framesetManager.setCurrentFrame(l_fMax);
 							
 							Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, m_KageStage.stageWidth, m_KageStage.stageHeight);
 							Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
 							
 								m_KageStage.clearScreen(l_context);
 								for (i = 1; i <= l_lMax; i++) {
-									m_KageFramesManager.setCurrentLayer(i);
+									_framesetManager.setCurrentLayer(i);
 									m_KageStage.renderFrame(l_context, true);
 								}
 							
@@ -2115,7 +2140,7 @@ void Kage::ExportAVI_onClick() {
 							CairoKage::writeToPNG(l_pngSequencePath, surface);
 						}
 					//end of workaround
-				KageFramesManager::currentFrame = f;
+				setCurrentFrame(f);
 				setCurrentLayer(t);
 			
 				m_KageStage.origin.x = l_tempOrigin.x;
@@ -2191,14 +2216,14 @@ bool Kage::on_tick(const Glib::RefPtr<Gdk::FrameClock>& frame_clock) {
 		tickCounter = 0;
 		
 		++frameCounter;
-		if (frameCounter > m_KageFramesManager.frameCount()) {
-			frameCounter = m_KageFramesManager.frameCount();
+		if (frameCounter > _framesetManager.frameCount()) {
+			frameCounter = _framesetManager.frameCount();
 			
 			m_KageStage.remove_tick_callback(m_tick_id);
 			_isPlaying = false;
 		}
 		
-		m_KageFramesManager.setCurrentFrame(frameCounter);
+		_framesetManager.setCurrentFrame(frameCounter);
 		//renderFrames(); ^setCurrentFrame automatically calls renderFrames, somehow
 	}
 	
@@ -2445,7 +2470,7 @@ string Kage::saveFrame() {
 	for (unsigned int i = 0; i < vsize; ++i) {
 		switch (v[i].vectorType) {
 			case VectorData::TYPE_CLOSE_PATH:
-				l_ostringstream << "<closepath/>\n";
+				l_ostringstream << "\t<closepath/>\n";
 				break;
 			case VectorData::TYPE_INIT:
 				l_ostringstream << "<init>" << v[i].points[0].x << " " << v[i].points[0].y << "</init>\n";
@@ -2760,28 +2785,37 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 		if (l_tagname.substr(0, 5) == "layer") {
 			unsigned int l_layer = StringHelper::toUnsignedInteger(l_tagname.substr(5));
 			cout << "\t\t\t\t\tl_tagname LAYER\t" << l_layer << "\t" << l_properties.size() << endl;
-			while (l_layer > m_KageFramesManager.layerCount()) {
-				m_KageFramesManager.addFrameManager(m_KageLayerManager.addLayer());
-				m_KageFramesManager.setCurrentLayer(m_KageLayerManager.layerCount());
+			while (l_layer > _framesetManager.layerCount()) {
+				_framesetManager.addFrameset(_layerManager.addLayer());
+				_framesetManager.setCurrentLayer(_layerManager.layerCount());
 			}
 			
 			for (unsigned int l_propertyIndex = 0; l_propertyIndex < l_properties.size(); ++l_propertyIndex) {
 				cout << "\t\t\t\t\t\tA l_properties[" << l_propertyIndex << "].getName() " << l_properties[l_propertyIndex].getName() << " = " << l_properties[l_propertyIndex].getValue() << " ? " << StringHelper::toBoolean(l_properties[l_propertyIndex].getValue()) << endl;
 				if (l_properties[l_propertyIndex].getName() == "label") {
-					m_KageLayerManager.setLabel(l_properties[l_propertyIndex].getValue());
+					_layerManager.setLabel(l_properties[l_propertyIndex].getValue());
 				} else if (l_properties[l_propertyIndex].getName() == "visible") {
-					m_KageLayerManager.setVisible(StringHelper::toBoolean(l_properties[l_propertyIndex].getValue()));
+					_layerManager.setVisible(StringHelper::toBoolean(l_properties[l_propertyIndex].getValue()));
 				} else if (l_properties[l_propertyIndex].getName() == "locked") {
-					m_KageLayerManager.setLock(StringHelper::toBoolean(l_properties[l_propertyIndex].getValue()));
+					_layerManager.setLock(StringHelper::toBoolean(l_properties[l_propertyIndex].getValue()));
 				}
 			}
-			m_KageFramesManager.setCurrentLayer(l_layer);
+			_framesetManager.setCurrentLayer(l_layer);
 		} else if (l_tagname.substr(0, 5) == "frame") {
 			unsigned int l_frame = StringHelper::toUnsignedInteger(l_tagname.substr(5));
-			while (l_frame > m_KageFramesManager.frameCount()) {
-				m_KageFramesManager.addFrame();
+			while (l_frame > _framesetManager.frameCount()) {
+				_framesetManager.addFrame();
 			}
-			m_KageFramesManager.setCurrentFrame(l_frame);
+			_framesetManager.setCurrentFrame(l_frame);
+			if (l_properties.size() > 0 && (l_properties[0].getName() == "extend")) {
+				if (l_properties[0].getValue() == "start") {
+					_framesetManager.setFrameExtension(KageFrame::extension::EXTENSION_START);
+				} else if (l_properties[0].getValue() == "mid") {
+					_framesetManager.setFrameExtension(KageFrame::extension::EXTENSION_MID);
+				} else if (l_properties[0].getValue() == "end") {
+					_framesetManager.setFrameExtension(KageFrame::extension::EXTENSION_END);
+				}
+			}
 		} else if (l_tagname == "init") {
 			VectorDataManager v;
 			
@@ -2864,8 +2898,10 @@ void Kage::parseKSF(string p_content) {
 							|| l_xmlTagProperties[0].getValue() == "2020.03.10"
 						)
 					) {
-					parseKSF_Children(l_root._children);
-					updateStatus("Loaded " + ksfPath);
+					KageFramesetManager::LOADING_MODE = true;
+						parseKSF_Children(l_root._children);
+						updateStatus("Loaded " + ksfPath);
+					KageFramesetManager::LOADING_MODE = false;
 				}
 			}
 		} else {

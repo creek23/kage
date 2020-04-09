@@ -15,7 +15,7 @@ SOURCES = \
 	./kage/data/vectordata.cpp \
 	./kage/timeline/frame.cpp \
 	./kage/timeline/frame_padding.cpp \
-	./kage/timeline/framemanager.cpp \
+	./kage/timeline/frameset.cpp \
 	./kage/timeline/framesmanager.cpp \
 	./kage/timeline/layer.cpp \
 	./kage/timeline/layermanager.cpp \

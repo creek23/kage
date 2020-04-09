@@ -5,27 +5,29 @@
 	#include "frame.h"
 	#include "frame_padding.h"
 	
-	class KageFramesManager; //forward declaration
+	class KageFramesetManager; //forward declaration
 	
-	class KageFrameManager : public Gtk::HBox {
+	class KageFrameset : public Gtk::HBox {
 		public:
-			KageFrameManager(KageFramesManager *p_fsm, unsigned int p_layerID, unsigned int p_frameCount);
-			virtual ~KageFrameManager();
+			KageFrameset(KageFramesetManager *p_fsm, unsigned int p_layerID, unsigned int p_frameCount);
+			virtual ~KageFrameset();
 			unsigned int getID();
 			bool selectAll(bool p_selectAll);
 			unsigned int getFrameCount();
-			void addFrame();
+			bool addFrame();
 			void duplicateFrame();
 			void extendFrame();
+			bool removeFrame();
 			unsigned int getCurrentFrame();
 			void setCurrentFrame(unsigned int p_frame);
+			void setCurrentFrameByID(unsigned int p_frameID);
 			void focusFrame(unsigned int p_frame);
 			
-			void removeFrame(unsigned int p_frameID);
 			void removeAllFrames();
 			
-			KageFramesManager *getFsm();
+			KageFramesetManager *getFsm();
 			KageFrame *getFrameAt(unsigned int p_frame);
+			unsigned int getFrameNumberByID(unsigned int p_frameID);
 			
 			void setSelected(KageFrame *p_frame);
 			
@@ -49,9 +51,14 @@
 			bool setFrameDataToPreviousFrame(VectorDataManager p_vectorsData, unsigned int p_frameID); ///Called by KageFrame if KageFrame is Extended
 			bool addDataToPreviousFrame(VectorDataManager v, unsigned int p_frameID); ///Called by KageFrame if KageFrame is Extended
 			
+			bool switchToPreviousFrame(); ///Called by FrameSet for navigating to Previous Frame
 			bool switchToPreviousFrame(unsigned int p_frameID); ///Called by KageFrame for navigating to Previous Frame
+			bool switchToNextFrame(); ///Called by FrameSet for navigating to Next Frame
 			bool switchToNextFrame(unsigned int p_frameID); ///Called by KageFrame for navigating to Next Frame
 			bool isCurrentFrame(unsigned int p_frameID); ///Called by KageFrame when rendering
+			bool canDuplicateNextFrame(); ///Called by KageFramesetManager when duplicating Frame
+			
+			void setFrameExtension(KageFrame::extension p_extension);
 		protected:
 			unsigned int layerID;
 //			unsigned int layerCtr;
@@ -59,7 +66,7 @@
 			std::vector<KageFrame*> frames;
 			KageFramePadding frame_padding;
 			
-			KageFramesManager *fsm;
+			KageFramesetManager *fsm;
 			unsigned int _currentFrameID;
 			unsigned int _currentFrameIndex;
 			

@@ -2,109 +2,116 @@
 #include "framesmanager.h"
 #include "../../kage.h"
 
-KageFramesManager::KageFramesManager(Kage *p_win) {
+bool KageFramesetManager::LOADING_MODE = false;
+
+KageFramesetManager::KageFramesetManager(Kage *p_win) {
 	win = p_win;
-	//addFrameManager(1);
+	//addFrameset(1);
 }
 
-KageFramesManager::~KageFramesManager() {
+KageFramesetManager::~KageFramesetManager() {
 	//
 }
 
-unsigned int KageFramesManager::layerCount() {
-	return framemanager.size();
+unsigned int KageFramesetManager::layerCount() {
+	return _framesets.size();
 }
-unsigned int KageFramesManager::frameCount() {
+unsigned int KageFramesetManager::frameCount() {
 	unsigned int l_count = 1;
-	if (framemanager.size() > 0) {
-		l_count = (*framemanager.back()).getFrameCount();
+	if (_framesets.size() > 0) {
+		l_count = (*_framesets.back()).getFrameCount();
 	}
 	return l_count;
 }
-void KageFramesManager::addFrameManager(unsigned int p_layer) {
+void KageFramesetManager::addFrameset(unsigned int p_layer) {
 	unsigned int l_count = 1;
-	if (framemanager.size() > 0) {
-		l_count = (*framemanager.back()).getFrameCount();
+	if (_framesets.size() > 0) {
+		l_count = (*_framesets.back()).getFrameCount();
 	}
-	framemanager.push_back(Gtk::manage(new KageFrameManager(this, p_layer, l_count)));
-		pack_end(*framemanager.back(), Gtk::PACK_SHRINK);
-			(*framemanager.back()).set_size_request(100, 23);
+	KageFramesetManager::LOADING_MODE = true;
+		_framesets.push_back(Gtk::manage(new KageFrameset(this, p_layer, l_count)));
+			pack_end(*_framesets.back(), Gtk::PACK_SHRINK);
+				(*_framesets.back()).set_size_request(100, 23);
+	KageFramesetManager::LOADING_MODE = false;
 }
 
-void KageFramesManager::deleteFrameManager(unsigned int p_layer) {
-	framemanager[p_layer-1]->removeAllFrames();
-	remove(*framemanager[p_layer-1]);
-	framemanager.erase (framemanager.begin() + (p_layer-1));
+void KageFramesetManager::deleteFrameset(unsigned int p_layer) {
+	_framesets[p_layer-1]->removeAllFrames();
+	remove(*_framesets[p_layer-1]);
+	_framesets.erase (_framesets.begin() + (p_layer-1));
 }
 
-bool KageFramesManager::addFrame() {
+bool KageFramesetManager::addFrame() {
 	unsigned int l_count = 1;
-	if (framemanager.size() > 0) {
-		l_count = framemanager.size();
+	if (_framesets.size() > 0) {
+		l_count = _framesets.size();
 	}
-	for (unsigned int i = 0; i < l_count; ++i) {
-		framemanager[i]->addFrame();
+	unsigned int l_currentLayer = getCurrentLayer();
+	if (_framesets[l_currentLayer-1]->addFrame() == true) {
+		for (unsigned int i = 0; i < l_count; ++i) {
+			if (i != l_currentLayer-1) {
+				_framesets[i]->addFrame();
+			}
+		}
 	}
 	return true;
 }
 
-bool KageFramesManager::duplicateFrame() {
+bool KageFramesetManager::duplicateFrame() {
 	//TODO: add Frame ONLY if next frame is NOT EMPTY or next frame is NULL
-	
-	addFrame();
-	
-	KageFrame *l_frame = getFrame();
-	VectorDataManager l_vectorsData;
-	if (l_frame) {
-		l_vectorsData = l_frame->getFrameData().clone();
+	unsigned int l_currentLayer = getCurrentLayer();
+	if (_framesets[l_currentLayer-1]->canDuplicateNextFrame() == false) {
+		addFrame();
 	}
-	
-	setCurrentFrame(KageFramesManager::currentFrame + 1);
-	
-	getFrame()->setFrameData(l_vectorsData);
+	_framesets[l_currentLayer-1]->duplicateFrame();
 	
 	return true;
 }
 
-bool KageFramesManager::extendFrame() {
+bool KageFramesetManager::removeFrame() {
+	unsigned int l_currentLayer = getCurrentLayer();
+	if (_framesets[l_currentLayer-1]->removeFrame() == true) {
+		unsigned int l_count = _framesets.size();
+		for (unsigned int i = 0; i < l_count; ++i) {
+			if (i != l_currentLayer-1) {
+				_framesets[i]->removeFrame();
+			}
+		}
+	}
+	
+	return true;
+}
+
+bool KageFramesetManager::extendFrame() {
 	unsigned int l_count = 1;
-	if (framemanager.size() > 0) {
-		l_count = framemanager.size();
+	if (_framesets.size() > 0) {
+		l_count = _framesets.size();
 	}
 	for (unsigned int i = 0; i < l_count; ++i) {
-		framemanager[i]->extendFrame();
+		_framesets[i]->extendFrame();
 	}
 	return true;
 }
 
-bool KageFramesManager::removeFrame(unsigned int p_frameID) {
-	unsigned int l_count = framemanager.size();
+bool KageFramesetManager::removeAllFrames() {
+	unsigned int l_count = _framesets.size();
 	
 	for (unsigned int i = 0; i < l_count; ++i) {
-		framemanager[i]->removeFrame(p_frameID);
-	}
-	return true;
-}
-
-bool KageFramesManager::removeAllFrames() {
-	unsigned int l_count = framemanager.size();
-	
-	for (unsigned int i = 0; i < l_count; ++i) {
-		framemanager[i]->removeAllFrames();
-		remove(*framemanager[i]);
+		_framesets[i]->removeAllFrames();
+		remove(*_framesets[i]);
 	}
 	
-	framemanager.clear();
-	//addFrameManager(0); //is this needed?!? -- 2020.03.14
+	_framesets.clear();
+	//addFrameset(0); //is this needed?!? -- 2020.03.14
 	
 	return true;
 }
 
-unsigned int KageFramesManager::getCurrentLayer() {
+unsigned int KageFramesetManager::getCurrentLayer() {
 	return win->getCurrentLayer();
 }
-void KageFramesManager::setCurrentLayer(unsigned int p_currentLayer) {
-	unsigned int l_count = framemanager.size();
+void KageFramesetManager::setCurrentLayer(unsigned int p_currentLayer) {
+	unsigned int l_count = _framesets.size();
 	
 	if (p_currentLayer > l_count) {
 		p_currentLayer = l_count;
@@ -115,119 +122,135 @@ void KageFramesManager::setCurrentLayer(unsigned int p_currentLayer) {
 	
 	win->setCurrentLayer(p_currentLayer);
 }
-void KageFramesManager::setCurrentLayerByID(unsigned int p_layerID) {
+void KageFramesetManager::setCurrentLayerByID(unsigned int p_layerID) {
 	win->setCurrentLayerByID(p_layerID);
 }
 
-unsigned int KageFramesManager::getCurrentFrame() {
+unsigned int KageFramesetManager::getCurrentFrame() {
 	//filter and make sure value is valid
 	//NOTE: do NOT call setCurrentFrame to avoid recursive call to Kage::renderFrames()
-	unsigned int l_count = framemanager.size();
+	unsigned int l_count = _framesets.size();
 	if (l_count > 0) {
-		unsigned int l_fcount = framemanager[0]->getFrameCount();
-		if (KageFramesManager::currentFrame > l_fcount) {
-			KageFramesManager::currentFrame = l_fcount;
-		}
-		if (KageFramesManager::currentFrame < 1) {
-			KageFramesManager::currentFrame = 1;
-		}
+		return _framesets[0]->getCurrentFrame();
 	}
 	
-	return KageFramesManager::currentFrame;
+	return l_count;
 }
-void KageFramesManager::setCurrentFrame(unsigned int p_currentFrame) {
-	unsigned int l_count = framemanager.size();
+void KageFramesetManager::setCurrentFrame(unsigned int p_frame) {
+	unsigned int l_count = _framesets.size();
 	if (l_count > 0) {
-		unsigned int l_fcount = framemanager[0]->getFrameCount();
-		if (p_currentFrame > l_fcount) {
-			p_currentFrame = l_fcount;
+		unsigned int l_fcount = _framesets[0]->getFrameCount();
+		if (p_frame > l_fcount) {
+			p_frame = l_fcount;
 		}
-		if (p_currentFrame < 1) {
-			p_currentFrame = 1;
+		if (p_frame < 1) {
+			p_frame = 1;
 		}
 		
 		for (unsigned int i = 0; i < l_count; ++i) {
-			framemanager[i]->setCurrentFrame(p_currentFrame);
+			_framesets[i]->setCurrentFrame(p_frame);
 		}
+		selectAll(false);
 		
-		selectAll(false); //should it be here?
 		unsigned int l_currentLayer = win->getCurrentLayer();
-		if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+		if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
 			//do nothing
 		} else {
-			KageFrame * l_frame = framemanager[l_currentLayer-1]->getFrameAt(p_currentFrame);
+			KageFrame * l_frame = _framesets[l_currentLayer-1]->getFrameAt(p_frame);
 			if (l_frame) {
 				l_frame->setSelected(true);
 			}
 		}
 		
-		KageFramesManager::currentFrame = p_currentFrame;
+		win->updateFrameLabel();
+		win->forceRenderFrames();
+	}
+}
+void KageFramesetManager::setCurrentFrameByID(unsigned int p_frameID) {
+	unsigned int l_count = _framesets.size();
+	if (l_count > 0) {
+		unsigned int l_currentLayer = win->getCurrentLayer();
+		if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
+			//do nothing
+		} else {
+			unsigned int l_frameByID = _framesets[l_currentLayer-1]->getFrameNumberByID(p_frameID);
+			for (unsigned int i = 0; i < l_count; ++i) {
+				_framesets[i]->setCurrentFrame(l_frameByID);
+			}
+			selectAll(false);
+			
+			KageFrame * l_frame = _framesets[l_currentLayer-1]->getFrameAt(l_frameByID);
+			if (l_frame) {
+				l_frame->setSelected(true);
+			}
+		}
+		
 		win->updateFrameLabel();
 		win->forceRenderFrames();
 	}
 }
 
-void KageFramesManager::renderStage() {
+void KageFramesetManager::renderStage() {
 	Kage::timestamp();
-	cout << " KageFramesManager::renderStage <" << endl;
+	cout << " KageFramesetManager::renderStage <" << endl;
 	win->forceRenderFrames();
 	Kage::timestamp();
-	cout << " KageFramesManager::renderStage >" << endl;
+	cout << " KageFramesetManager::renderStage >" << endl;
 }
 
-void KageFramesManager::selectAll(bool p_selectAll) {
+void KageFramesetManager::selectAll(bool p_selectAll) {
 	unsigned int l_count = 1;
-	if (framemanager.size() > 0) {
-		l_count = framemanager.size();
+	if (_framesets.size() > 0) {
+		l_count = _framesets.size();
 	}
 	for (unsigned int i = 0; i < l_count; ++i) {
-		framemanager[i]->selectAll(p_selectAll);
+		_framesets[i]->selectAll(p_selectAll);
 	}
 }
 
-KageFrame *KageFramesManager::getFrame() {
+KageFrame *KageFramesetManager::getFrame() {
 	unsigned int l_currentLayer = win->getCurrentLayer();
-	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
 		return NULL;
 	} else {
-		KageFrameManager *l_frameManager = framemanager[l_currentLayer-1];
-		if (l_frameManager) {
-			return l_frameManager->getFrameAt(getCurrentFrame());
+		KageFrameset *l_frameset = _framesets[l_currentLayer-1];
+		if (l_frameset) {
+			return l_frameset->getFrameAt(getCurrentFrame());
 		} else {
-			return framemanager[l_currentLayer-1]->getFrameAt(getCurrentFrame());
+			return _framesets[l_currentLayer-1]->getFrameAt(getCurrentFrame());
 		}
 	}
 }
 
-KageFrame *KageFramesManager::getFrameAt(unsigned int p_frame) {
+KageFrame *KageFramesetManager::getFrameAt(unsigned int p_frame) {
 	unsigned int l_currentLayer = win->getCurrentLayer();
-	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
 		return NULL;
 	} else {
-		KageFrameManager *l_frameManager = framemanager[l_currentLayer-1];
-		if (l_frameManager) {
-			return l_frameManager->getFrameAt(p_frame);
+		KageFrameset *l_frameset = _framesets[l_currentLayer-1];
+		if (l_frameset) {
+			return l_frameset->getFrameAt(p_frame);
 		} else {
-			return framemanager[l_currentLayer-1]->getFrameAt(p_frame);
+			return _framesets[l_currentLayer-1]->getFrameAt(p_frame);
 		}
 	}
 }
 
 /**
- * NOTE: framemanagers are organized as index 0 as BOTTOM and last index is TOP
+ * NOTE: KageFrameset are organized as index 0 as BOTTOM and last index is TOP
  * \sa moveDown() moveToBottom() moveUp()
- * \return True if framemanager successfully moved to top
+ * \return True if KageFrameset successfully moved to top
  */
-bool KageFramesManager::moveToTop() {
+bool KageFramesetManager::moveToTop() {
 	unsigned int l_currentLayer = win->getCurrentLayer();
-	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
 		//
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
-		if (l_currentLayer < framemanager.size()-1) {
-			while (l_currentLayer < framemanager.size()-1) {
-				reorder_child(*framemanager[l_currentLayer], l_currentLayer+1);
-				swap(framemanager[l_currentLayer], framemanager[l_currentLayer+1]);
+		if (l_currentLayer < _framesets.size()-1) {
+			while (l_currentLayer < _framesets.size()-1) {
+				reorder_child(*_framesets[l_currentLayer], l_currentLayer+1);
+				swap(_framesets[l_currentLayer], _framesets[l_currentLayer+1]);
 				l_currentLayer = l_currentLayer+1;
 			}
 			return true;
@@ -236,58 +259,58 @@ bool KageFramesManager::moveToTop() {
 	return false;
 }
 /**
- * NOTE: framemanagers are organized as index 0 as BOTTOM and last index is TOP
+ * NOTE: KageFrameset are organized as index 0 as BOTTOM and last index is TOP
  * \sa moveDown() moveToBottom() moveToTop()
- * \return True if framemanager successfully moved up
+ * \return True if KageFrameset successfully moved up
  */
-bool KageFramesManager::moveUp() {
+bool KageFramesetManager::moveUp() {
 	unsigned int l_currentLayer = win->getCurrentLayer();
-	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
 		//
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
-		if (l_currentLayer < framemanager.size()-1) {
-			reorder_child(*framemanager[l_currentLayer], l_currentLayer+1);
-			swap(framemanager[l_currentLayer], framemanager[l_currentLayer+1]);
+		if (l_currentLayer < _framesets.size()-1) {
+			reorder_child(*_framesets[l_currentLayer], l_currentLayer+1);
+			swap(_framesets[l_currentLayer], _framesets[l_currentLayer+1]);
 			return true;
 		}
 	}
 	return false;
 }
 /**
- * NOTE: framemanagers are organized as index 0 as BOTTOM and last index is TOP
+ * NOTE: KageFrameset are organized as index 0 as BOTTOM and last index is TOP
  * \sa moveToBottom() moveToTop() moveUp()
- * \return True if framemanager successfully moved down
+ * \return True if KageFrameset successfully moved down
  */
-bool KageFramesManager::moveDown() {
+bool KageFramesetManager::moveDown() {
 	unsigned int l_currentLayer = win->getCurrentLayer();
-	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
 		//
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
 		if (l_currentLayer > 0) {
-			reorder_child(*framemanager[l_currentLayer], l_currentLayer-1);
-			swap(framemanager[l_currentLayer], framemanager[l_currentLayer-1]);
+			reorder_child(*_framesets[l_currentLayer], l_currentLayer-1);
+			swap(_framesets[l_currentLayer], _framesets[l_currentLayer-1]);
 			return true;
 		}
 	}
 	return false;
 }
 /**
- * NOTE: framemanagers are organized as index 0 as BOTTOM and last index is TOP
+ * NOTE: KageFrameset are organized as index 0 as BOTTOM and last index is TOP
  * \sa moveDown() moveToTop() moveUp()
- * \return True if framemanager successfully moved to bottom
+ * \return True if KageFrameset successfully moved to bottom
  */
-bool KageFramesManager::moveToBottom() {
+bool KageFramesetManager::moveToBottom() {
 	unsigned int l_currentLayer = win->getCurrentLayer();
-	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
 		//
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
 		if (l_currentLayer > 0) {
 			while (l_currentLayer > 0) {
-				reorder_child(*framemanager[l_currentLayer], l_currentLayer-1);
-				swap(framemanager[l_currentLayer], framemanager[l_currentLayer-1]);
+				reorder_child(*_framesets[l_currentLayer], l_currentLayer-1);
+				swap(_framesets[l_currentLayer], _framesets[l_currentLayer-1]);
 				l_currentLayer = l_currentLayer-1;
 			}
 			return true;
@@ -296,169 +319,232 @@ bool KageFramesManager::moveToBottom() {
 	return false;
 }
 
-vector<unsigned int> KageFramesManager::raiseSelectedShape(vector<unsigned int> p_selectedShapes) {
+vector<unsigned int> KageFramesetManager::raiseSelectedShape(vector<unsigned int> p_selectedShapes) {
 	unsigned int l_currentLayer = win->getCurrentLayer();
-	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
 		//
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
-		return framemanager[l_currentLayer]->raiseSelectedShape(p_selectedShapes);
+		return _framesets[l_currentLayer]->raiseSelectedShape(p_selectedShapes);
 	}
 	vector<unsigned int> l_nullReturn;
 	return l_nullReturn;
 }
-vector<unsigned int> KageFramesManager::lowerSelectedShape(vector<unsigned int> p_selectedShapes) {
+vector<unsigned int> KageFramesetManager::lowerSelectedShape(vector<unsigned int> p_selectedShapes) {
 	unsigned int l_currentLayer = win->getCurrentLayer();
-	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
 		//
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
-		return framemanager[l_currentLayer]->lowerSelectedShape(p_selectedShapes);
+		return _framesets[l_currentLayer]->lowerSelectedShape(p_selectedShapes);
 	}
 	vector<unsigned int> l_nullReturn;
 	return l_nullReturn;
 }
-vector<unsigned int> KageFramesManager::raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes) {
+vector<unsigned int> KageFramesetManager::raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes) {
 	unsigned int l_currentLayer = win->getCurrentLayer();
-	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
 		//
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
-		return framemanager[l_currentLayer]->raiseToTopSelectedShape(p_selectedShapes);
+		return _framesets[l_currentLayer]->raiseToTopSelectedShape(p_selectedShapes);
 	}
 	vector<unsigned int> l_nullReturn;
 	return l_nullReturn;
 }
-vector<unsigned int> KageFramesManager::lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes) {
+vector<unsigned int> KageFramesetManager::lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes) {
 	unsigned int l_currentLayer = win->getCurrentLayer();
-	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
 		//
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
-		return framemanager[l_currentLayer]->lowerToBottomSelectedShape(p_selectedShapes);
-	}
-	vector<unsigned int> l_nullReturn;
-	return l_nullReturn;
-}
-
-vector<unsigned int> KageFramesManager::groupSelectedShapes(vector<unsigned int> p_selectedShapes) {
-	unsigned int l_currentLayer = win->getCurrentLayer();
-	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
-		//
-	} else {
-		--l_currentLayer; //layer now becomes Layer Index
-		return framemanager[l_currentLayer]->groupSelectedShapes(p_selectedShapes);
-	}
-	vector<unsigned int> l_nullReturn;
-	return l_nullReturn;
-}
-vector<unsigned int> KageFramesManager::ungroupSelectedShapes(vector<unsigned int> p_selectedShapes) {
-	unsigned int l_currentLayer = win->getCurrentLayer();
-	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
-		//
-	} else {
-		--l_currentLayer; //layer now becomes Layer Index
-		return framemanager[l_currentLayer]->ungroupSelectedShapes(p_selectedShapes);
+		return _framesets[l_currentLayer]->lowerToBottomSelectedShape(p_selectedShapes);
 	}
 	vector<unsigned int> l_nullReturn;
 	return l_nullReturn;
 }
 
-vector<unsigned int> KageFramesManager::duplicateShapes(vector<unsigned int> p_selectedShapes) {
+vector<unsigned int> KageFramesetManager::groupSelectedShapes(vector<unsigned int> p_selectedShapes) {
 	unsigned int l_currentLayer = win->getCurrentLayer();
-	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
 		//
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
-		return framemanager[l_currentLayer]->duplicateShapes(p_selectedShapes);
+		return _framesets[l_currentLayer]->groupSelectedShapes(p_selectedShapes);
+	}
+	vector<unsigned int> l_nullReturn;
+	return l_nullReturn;
+}
+vector<unsigned int> KageFramesetManager::ungroupSelectedShapes(vector<unsigned int> p_selectedShapes) {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
+		//
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		return _framesets[l_currentLayer]->ungroupSelectedShapes(p_selectedShapes);
 	}
 	vector<unsigned int> l_nullReturn;
 	return l_nullReturn;
 }
 
-bool KageFramesManager::flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes) {
+vector<unsigned int> KageFramesetManager::duplicateShapes(vector<unsigned int> p_selectedShapes) {
 	unsigned int l_currentLayer = win->getCurrentLayer();
-	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
 		//
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
-		return framemanager[l_currentLayer]->flipHorizontalSelectedShape(p_selectedShapes);
+		return _framesets[l_currentLayer]->duplicateShapes(p_selectedShapes);
+	}
+	vector<unsigned int> l_nullReturn;
+	return l_nullReturn;
+}
+
+bool KageFramesetManager::flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes) {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
+		//
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		return _framesets[l_currentLayer]->flipHorizontalSelectedShape(p_selectedShapes);
 	}
 	
 	return false;
 }
-bool KageFramesManager::flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes) {
+bool KageFramesetManager::flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes) {
 	unsigned int l_currentLayer = win->getCurrentLayer();
-	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
 		//
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
-		return framemanager[l_currentLayer]->flipVerticalSelectedShape(p_selectedShapes);
+		return _framesets[l_currentLayer]->flipVerticalSelectedShape(p_selectedShapes);
 	}
 	
 	return false;
 }
 
-bool KageFramesManager::addDataToFrame(VectorDataManager p_vectorsData) {
+bool KageFramesetManager::addDataToFrame(VectorDataManager p_vectorsData) {
 	unsigned int l_currentLayer = win->getCurrentLayer();
-	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
 		//
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
-		return framemanager[l_currentLayer]->addDataToFrame(p_vectorsData);
+		return _framesets[l_currentLayer]->addDataToFrame(p_vectorsData);
 	}
 	return false;
 }
 
-bool KageFramesManager::setFrameData(VectorDataManager p_vectorsData) {
+bool KageFramesetManager::setFrameData(VectorDataManager p_vectorsData) {
 	unsigned int l_currentLayer = win->getCurrentLayer();
-	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
 		//
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
-		return framemanager[l_currentLayer]->setFrameData(p_vectorsData);
+		return _framesets[l_currentLayer]->setFrameData(p_vectorsData);
 	}
 	return false;
 }
-VectorDataManager KageFramesManager::getFrameData() {
+VectorDataManager KageFramesetManager::getFrameData() {
 	unsigned int l_currentLayer = win->getCurrentLayer();
-	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
 		//
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
-		return framemanager[l_currentLayer]->getFrameData();
+		return _framesets[l_currentLayer]->getFrameData();
 	}
 	VectorDataManager l_nullReturn;
 	return l_nullReturn;
 }
-VectorDataManager KageFramesManager::getFrameDataAt(unsigned int p_frame) {
+VectorDataManager KageFramesetManager::getFrameDataAt(unsigned int p_frame) {
 	unsigned int l_currentLayer = win->getCurrentLayer();
-	if (l_currentLayer < 1 || l_currentLayer > framemanager.size()) {
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
 		//
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
-		return framemanager[l_currentLayer]->getFrameDataAt(p_frame);
+		return _framesets[l_currentLayer]->getFrameDataAt(p_frame);
 	}
 	VectorDataManager l_nullReturn;
 	return l_nullReturn;
 }
 
-void KageFramesManager::switchToPreviousFrame(unsigned int p_frameID) {
+void KageFramesetManager::switchToPreviousFrame() {
 	unsigned int l_count = 1;
-	if (framemanager.size() > 0) {
-		l_count = framemanager.size();
+	if (_framesets.size() > 0) {
+		l_count = _framesets.size();
 	}
 	for (unsigned int i = 0; i < l_count; ++i) {
-		framemanager[i]->switchToPreviousFrame(p_frameID);
+		_framesets[i]->switchToPreviousFrame();
 	}
 }
-
-void KageFramesManager::switchToNextFrame(unsigned int p_frameID) {
+void KageFramesetManager::switchToPreviousFrame(unsigned int p_frameID) {
 	unsigned int l_count = 1;
-	if (framemanager.size() > 0) {
-		l_count = framemanager.size();
+	if (_framesets.size() > 0) {
+		l_count = _framesets.size();
+	}
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
+		//do nothing
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		unsigned int l_frameByID = _framesets[l_currentLayer]->getFrameNumberByID(p_frameID);
+		KageFrame * l_frame = _framesets[l_currentLayer]->getFrameAt(l_frameByID-1);
+		
+		switchToPreviousFrame();	
+		selectAll(false);
+		
+		if (l_frame) {
+			l_frame->setSelected(true);
+			l_frame->setCurrent(true);
+		}
+	}
+	
+	win->updateFrameLabel();
+	win->forceRenderFrames();
+}
+
+void KageFramesetManager::switchToNextFrame() {
+	unsigned int l_count = 1;
+	if (_framesets.size() > 0) {
+		l_count = _framesets.size();
 	}
 	for (unsigned int i = 0; i < l_count; ++i) {
-		framemanager[i]->switchToNextFrame(p_frameID);
+		_framesets[i]->switchToNextFrame();
+	}
+}
+void KageFramesetManager::switchToNextFrame(unsigned int p_frameID) {
+	unsigned int l_count = 1;
+	if (_framesets.size() > 0) {
+		l_count = _framesets.size();
+	}
+	
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
+		//do nothing
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		unsigned int l_frameByID = _framesets[l_currentLayer]->getFrameNumberByID(p_frameID);
+		KageFrame * l_frame = _framesets[l_currentLayer]->getFrameAt(l_frameByID+1);
+		
+		switchToNextFrame();	
+		selectAll(false);
+		
+		if (l_frame) {
+			l_frame->setSelected(true);
+			l_frame->setCurrent(true);
+		}
+	}
+	
+	win->updateFrameLabel();
+	win->forceRenderFrames();
+}
+
+void KageFramesetManager::setFrameExtension(KageFrame::extension p_extension) {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
+		cout << "KageFramesetManager::setFrameExtension FAILED" << endl;
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		_framesets[l_currentLayer]->setFrameExtension(p_extension);
 	}
 }

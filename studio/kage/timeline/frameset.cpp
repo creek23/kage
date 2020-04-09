@@ -1,8 +1,8 @@
 
-#include "framemanager.h"
+#include "frameset.h"
 #include "framesmanager.h"
 
-KageFrameManager::KageFrameManager(KageFramesManager *p_fsm, unsigned int p_layerID, unsigned int p_frameCount) {
+KageFrameset::KageFrameset(KageFramesetManager *p_fsm, unsigned int p_layerID, unsigned int p_frameCount) {
 	pack_start(frame_padding, Gtk::PACK_SHRINK);
 	fsm = p_fsm;
 	layerID = p_layerID;
@@ -12,22 +12,232 @@ KageFrameManager::KageFrameManager(KageFramesManager *p_fsm, unsigned int p_laye
 	}
 }
 
-KageFrameManager::~KageFrameManager() {
+KageFrameset::~KageFrameset() {
 	//
 }
 
-void KageFrameManager::addFrame() {
+bool KageFrameset::addFrame() {
+	unsigned int l_currentFrame = getCurrentFrame();
+/*	//TODO: if current layer added FRAME, all other Frame should ADD frame
+	//      if current layer have EXTRA FRAME (currently Extended), no need to add Frame
+	
+	if (l_currentFrame == getFrameCount()) {
+		//proceed add
+	} else {
+		//TODO: if next frame extended?
+		KageFrame::extension l_extension = frames[l_currentFrame-1]->getExtension();
+		if (l_extension == KageFrame::extension::EXTENSION_NOT) {
+			//proceed add
+		} else if (l_extension == KageFrame::extension::EXTENSION_START) {
+			frames[l_currentFrame-1]->setExtension(KageFrame::extension::EXTENSION_NOT);
+			l_extension = frames[l_currentFrame+1]->getExtension();
+			if (       l_extension == KageFrame::extension::EXTENSION_MID
+					|| l_extension == KageFrame::extension::EXTENSION_END) {
+				frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_START);
+			}
+		} else if (l_extension == KageFrame::extension::EXTENSION_MID) {
+			frames[l_currentFrame-1]->setExtension(KageFrame::extension::EXTENSION_END);
+			l_extension = frames[l_currentFrame+1]->getExtension();
+			if (       l_extension == KageFrame::extension::EXTENSION_MID
+					|| l_extension == KageFrame::extension::EXTENSION_END) {
+				frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_START);
+			}
+		} else if (l_extension == KageFrame::extension::EXTENSION_END) {
+			//keep
+		}
+	}*/
+	
 	++frameCtr;
 	frames.push_back(Gtk::manage(new KageFrame(this, layerID, frameCtr)));
 		pack_start(*frames.back(), Gtk::PACK_SHRINK);
+	
+	if (KageFramesetManager::LOADING_MODE == true) {
+		return true;
+	}
+	
+	if (l_currentFrame == getFrameCount()) {
+		if (frames.size() > 1) {
+			KageFrame::extension l_extension = frames[frames.size()-2]->getExtension();
+			if (l_extension == KageFrame::extension::EXTENSION_NOT) {
+				//keep
+			} else if (l_extension == KageFrame::extension::EXTENSION_END) {
+				//keep
+			}
+		}
+	} else if (l_currentFrame < getFrameCount()) {
+		unsigned int l_frameIndex = getFrameCount();
+		while (l_frameIndex > l_currentFrame+1) {
+			setCurrentFrame(l_frameIndex);
+			moveToLeft();
+			--l_frameIndex;
+		}
+		
+		if (frames.size() > 1) {
+			KageFrame::extension l_extension = frames[l_currentFrame-1]->getExtension();
+			if (l_extension == KageFrame::extension::EXTENSION_NOT) {
+				//keep
+			} else if (l_extension == KageFrame::extension::EXTENSION_START) {
+				frames[l_currentFrame-1]->setExtension(KageFrame::extension::EXTENSION_NOT);
+				l_extension = frames[l_currentFrame+1]->getExtension();
+				if (       l_extension == KageFrame::extension::EXTENSION_MID
+						|| l_extension == KageFrame::extension::EXTENSION_END) {
+					frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_START);
+				}
+			} else if (l_extension == KageFrame::extension::EXTENSION_MID) {
+				frames[l_currentFrame-1]->setExtension(KageFrame::extension::EXTENSION_END);
+				l_extension = frames[l_currentFrame+1]->getExtension();
+				if (       l_extension == KageFrame::extension::EXTENSION_MID
+						|| l_extension == KageFrame::extension::EXTENSION_END) {
+					frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_START);
+				}
+			} else if (l_extension == KageFrame::extension::EXTENSION_END) {
+				//keep
+			}
+			setCurrentFrame(l_currentFrame); //restore Current Frame because moveToLeft changed Current Frame
+		}
+	}
+	
+	return true;
 }
 
-void KageFrameManager::duplicateFrame() {
-	//TODO: 1. call extendFrame if next Frame is Extended
-	//      2. copy content of Current frame to Next Frame
+void KageFrameset::duplicateFrame() {
+	VectorDataManager l_frameData = getFrameData().clone();
+		switchToNextFrame();
+		
+		unsigned int l_currentFrame = getCurrentFrame()-1;
+		if (frames.size() > 1) {
+			KageFrame::extension l_extension = frames[l_currentFrame-1]->getExtension();
+			if (l_extension == KageFrame::extension::EXTENSION_NOT) {
+				//keep
+	//			l_extension = frames[l_currentFrame+1]->getExtension();
+	//			if (       l_extension == KageFrame::extension::EXTENSION_MID
+	//					|| l_extension == KageFrame::extension::EXTENSION_END) {
+	//				frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_START);
+	//			}
+			} else if (l_extension == KageFrame::extension::EXTENSION_START) {
+				frames[l_currentFrame-1]->setExtension(KageFrame::extension::EXTENSION_NOT);
+				l_extension = frames[l_currentFrame+1]->getExtension();
+				if (       l_extension == KageFrame::extension::EXTENSION_MID
+						|| l_extension == KageFrame::extension::EXTENSION_END) {
+					frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_START);
+				} else if (l_extension == KageFrame::extension::EXTENSION_NOT
+						|| l_extension == KageFrame::extension::EXTENSION_START) {
+					frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
+				}
+			} else if (l_extension == KageFrame::extension::EXTENSION_MID) {
+				frames[l_currentFrame-1]->setExtension(KageFrame::extension::EXTENSION_END);
+				l_extension = frames[l_currentFrame+1]->getExtension();
+				if (       l_extension == KageFrame::extension::EXTENSION_MID
+						|| l_extension == KageFrame::extension::EXTENSION_END) {
+					frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_START);
+				}
+			} else if (l_extension == KageFrame::extension::EXTENSION_END) {
+				//keep
+			}
+		}
+
+	setFrameData(l_frameData);
 }
 
-bool KageFrameManager::moveToLeft() {
+/**
+ * If KageFrame is NULL or Last Frame (but not Frame-index0), remove Frame Widget, else, do belows step.
+ * <ol><li>Copy content of Frame+1 to Frame+0; then make Frame+1 as Frame+0</li>
+ * <li>If Frame+0 is not Last Frame, repeat 1</li>
+ * <li>Set last Frame = NULL</li></ol>
+ * \return True if Last Frame widget was removed
+ */
+bool KageFrameset::removeFrame() {
+	unsigned int l_currentFrame = getCurrentFrame();
+	unsigned int l_currentFrameIndex = l_currentFrame-1;
+	if (frames[l_currentFrameIndex]->isNull() == true
+			|| (l_currentFrame == getFrameCount() && l_currentFrame > 1)) {
+		if (getFrameCount() > 1) {
+			remove(*frames[l_currentFrameIndex]);
+			frames.erase (frames.begin()+frames.size()-1);
+			setCurrentFrame(--l_currentFrame);
+			return true;
+		} else {
+			cout << "last frame? do nothing" << endl;
+		}
+	} else if (getFrameCount() > 1) {
+		KageFrame::extension l_extensionPrevious;
+		KageFrame::extension l_extensionNext;
+		VectorDataManager l_frameData;
+		for (unsigned int i = l_currentFrameIndex; i < getFrameCount()-1; ++i) {
+			if (frames[i]->isNull() == false) {
+				if (i > 0) {
+					l_extensionPrevious = frames[i-1]->getExtension();
+					l_extensionNext     = frames[i+1]->getExtension();
+					switchToNextFrame();
+						l_frameData = getFrameData().clone();
+					if (l_extensionPrevious == KageFrame::extension::EXTENSION_NOT) {
+						//keep Previous
+						if (       l_extensionNext == KageFrame::extension::EXTENSION_START
+								&& l_extensionNext == KageFrame::extension::EXTENSION_MID) {
+							frames[i  ]->setExtension(KageFrame::extension::EXTENSION_START);
+						} else if (l_extensionNext == KageFrame::extension::EXTENSION_END
+								&& l_extensionNext == KageFrame::extension::EXTENSION_NOT) {
+							frames[i  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
+						}
+					} else if (l_extensionPrevious == KageFrame::extension::EXTENSION_START) {
+						if (       l_extensionNext == KageFrame::extension::EXTENSION_MID
+								&& l_extensionNext == KageFrame::extension::EXTENSION_END) {
+							//keep Previous
+							//keep current
+						} else if (l_extensionNext == KageFrame::extension::EXTENSION_NOT) {
+							frames[i-1]->setExtension(KageFrame::extension::EXTENSION_NOT);
+							frames[i  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
+						} else if (l_extensionNext == KageFrame::extension::EXTENSION_START) {
+							frames[i-1]->setExtension(KageFrame::extension::EXTENSION_END);
+							frames[i  ]->setExtension(KageFrame::extension::EXTENSION_START);
+						}
+					} else if (l_extensionPrevious == KageFrame::extension::EXTENSION_MID) {
+						if (       l_extensionNext == KageFrame::extension::EXTENSION_NOT) {
+							frames[i-1]->setExtension(KageFrame::extension::EXTENSION_END);
+							frames[i  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
+						} else if (l_extensionNext == KageFrame::extension::EXTENSION_START) {
+							frames[i-1]->setExtension(KageFrame::extension::EXTENSION_END);
+							frames[i  ]->setExtension(KageFrame::extension::EXTENSION_START);
+						} else if (l_extensionNext == KageFrame::extension::EXTENSION_MID) {
+							//keep Previous
+							//keep current
+						} else if (l_extensionNext == KageFrame::extension::EXTENSION_END) {
+							//keep Previous
+							frames[i  ]->setExtension(KageFrame::extension::EXTENSION_END);
+						}
+					} else if (l_extensionPrevious == KageFrame::extension::EXTENSION_END) {
+						//keep Previous
+						if (       l_extensionNext == KageFrame::extension::EXTENSION_NOT) {
+							frames[i  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
+						} else if (l_extensionNext == KageFrame::extension::EXTENSION_START) {
+							frames[i  ]->setExtension(KageFrame::extension::EXTENSION_START);
+						} else if (l_extensionNext == KageFrame::extension::EXTENSION_MID) {
+							//keep current
+						} else if (l_extensionNext == KageFrame::extension::EXTENSION_END) {
+							frames[i  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
+						}
+					}
+				} else {
+					l_extensionNext = frames[i+1]->getExtension();
+					frames[i]->setExtension(l_extensionNext);
+				}
+				//do copy Next Frame to This Frame
+					switchToPreviousFrame();
+						setFrameData(l_frameData.clone());
+				switchToNextFrame();
+			} else {
+				frames[i-1]->setNull(true); //when willl Frame be NULL if not the Last Frame
+				break;
+			}
+		}
+		frames[getFrameCount()-1]->setNull(true);
+		setCurrentFrame(l_currentFrame);
+	}
+	
+	return false;
+}
+
+bool KageFrameset::moveToLeft() {
 	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		if (_currentFrameIndex > 0) {
 			reorder_child(*frames[_currentFrameIndex], _currentFrameIndex);
@@ -51,7 +261,7 @@ bool KageFrameManager::moveToLeft() {
 	}
 	return false;
 }
-bool KageFrameManager::moveToLeftAt(unsigned int p_frame) {
+bool KageFrameset::moveToLeftAt(unsigned int p_frame) {
 	bool l_return = false;
 	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		while (_currentFrameIndex > p_frame) {
@@ -71,7 +281,7 @@ bool KageFrameManager::moveToLeftAt(unsigned int p_frame) {
 	}
 	return false;
 }
-bool KageFrameManager::moveToLeftMost() {
+bool KageFrameset::moveToLeftMost() {
 	bool l_return = false;
 	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		while (_currentFrameIndex > 0) {
@@ -92,7 +302,7 @@ bool KageFrameManager::moveToLeftMost() {
 	return false;
 }
 
-void KageFrameManager::extendFrame() {
+void KageFrameset::extendFrame() {
 	++frameCtr;
 	unsigned int l_currentFrame = getCurrentFrame();
 	frames.push_back(Gtk::manage(new KageFrame(this, layerID, frameCtr)));
@@ -108,17 +318,14 @@ void KageFrameManager::extendFrame() {
 			frames[frames.size()-1]->setExtension(KageFrame::extension::EXTENSION_END);
 		}
 	} else if (l_currentFrame < getFrameCount()) {
-//		frames.insert(frames.begin() + l_currentFrame, Gtk::manage(new KageFrame(this, layerID, frameCtr)));
-//			pack_start(*frames[l_currentFrame], Gtk::PACK_SHRINK);
 		unsigned int l_frameIndex = getFrameCount();
 		while (l_frameIndex > l_currentFrame+1) {
 			setCurrentFrame(l_frameIndex);
 			moveToLeft();
 			--l_frameIndex;
 		}
-			
+		
 		KageFrame::extension l_extension = frames[l_currentFrame-1]->getExtension();
-			cout << "\t\t l_extension " << l_extension << " " << KageFrame::extension::EXTENSION_NOT << " " << KageFrame::extension::EXTENSION_START << " " << KageFrame::extension::EXTENSION_MID << " " << KageFrame::extension::EXTENSION_END << endl;
 		if (l_extension == KageFrame::extension::EXTENSION_NOT) {
 			frames[l_currentFrame-1]->setExtension(KageFrame::extension::EXTENSION_START);
 			frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_END);
@@ -148,46 +355,30 @@ void KageFrameManager::extendFrame() {
 	}
 }
 
-void KageFrameManager::removeFrame(unsigned int p_frameID) {
-	frameCtr = getFrameCount();
-	for (unsigned int i = 0; i < frameCtr; ++i) {
-		if (frames[i]->frameID == p_frameID) {
-			remove(*frames[i]);
-			--frameCtr;
-			for (unsigned int j = i; j < frameCtr; ++j) {
-				frames[j]->frameID -= 1;
-			}
-			break;
-		}
-	}
-	pack_start(*frames.back(), Gtk::PACK_SHRINK);
-}
-
-void KageFrameManager::removeAllFrames() {
+void KageFrameset::removeAllFrames() {
 	for (unsigned int i = 0; i < getFrameCount(); ++i) {
 		remove(*frames[i]);
 	}
 	frameCtr = 0;
 	frames.clear();
-//	pack_start(*frames.back(), Gtk::PACK_SHRINK);
 }
 
-unsigned int KageFrameManager::getID() {
+unsigned int KageFrameset::getID() {
 	return layerID;
 }
 
-unsigned int KageFrameManager::getFrameCount() {
+unsigned int KageFrameset::getFrameCount() {
 	return frames.size();
 }
 
-bool KageFrameManager::selectAll(bool p_selectAll) {
+bool KageFrameset::selectAll(bool p_selectAll) {
 	for (unsigned int i = 0; i < getFrameCount(); ++i) {
 		frames[i]->setSelected(p_selectAll);
 	}
 	return true;
 }
 
-KageFramesManager *KageFrameManager::getFsm() {
+KageFramesetManager *KageFrameset::getFsm() {
 	return fsm;
 }
 
@@ -196,7 +387,7 @@ KageFramesManager *KageFrameManager::getFsm() {
  * \param p_frame is Frame Number known to KageFrame(/Layer?)
  * \sa getCurrentFrame()
 */
-void KageFrameManager::setCurrentFrame(unsigned int p_frame) {
+void KageFrameset::setCurrentFrame(unsigned int p_frame) {
 	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		frames[_currentFrameIndex]->setSelected(false);
 		frames[_currentFrameIndex]->setCurrent(false);
@@ -223,7 +414,7 @@ void KageFrameManager::setCurrentFrame(unsigned int p_frame) {
 	frames[_currentFrameIndex]->setCurrent(true);
 }
 
-unsigned int KageFrameManager::getCurrentFrame() {
+unsigned int KageFrameset::getCurrentFrame() {
 	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return _currentFrameIndex+1;
 	} else {
@@ -235,14 +426,14 @@ unsigned int KageFrameManager::getCurrentFrame() {
 	}
 	return 1;
 }
-void KageFrameManager::focusFrame(unsigned int p_frame) {
+void KageFrameset::focusFrame(unsigned int p_frame) {
 	if (p_frame < 1 || p_frame > getFrameCount()) {
 		return;
 	}
 	frames[p_frame-1]->setFocus();
 }
 
-KageFrame *KageFrameManager::getFrameAt(unsigned int p_frame) {
+KageFrame *KageFrameset::getFrameAt(unsigned int p_frame) {
 	if (p_frame < 1 || p_frame > getFrameCount()) {
 		return NULL;
 	}
@@ -250,15 +441,25 @@ KageFrame *KageFrameManager::getFrameAt(unsigned int p_frame) {
 	return frames[p_frame-1];
 }
 
+unsigned int KageFrameset::getFrameNumberByID(unsigned int p_frameID) {
+	for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		if (frames[i]->frameID == p_frameID) {
+			return i+1;
+		}
+	}
+	
+	return 0;
+}
+
 
 /** For use of KageFrame.  When a KageFrame is clicked, previously clicked
  * KageFrame should be un-selected.
  * \param p_frame is pointer to KageFrame who called this function
 */
-void KageFrameManager::setSelected(KageFrame *p_frame) {
+void KageFrameset::setSelected(KageFrame *p_frame) {
 	fsm->selectAll(false);
 	fsm->setCurrentLayerByID(p_frame->layerID);
-	fsm->setCurrentFrame(p_frame->frameID);
+	fsm->setCurrentFrameByID(p_frame->frameID);
 /*	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		frames[_currentFrameIndex]->setSelected(false);
 	} else {
@@ -275,7 +476,7 @@ void KageFrameManager::setSelected(KageFrame *p_frame) {
 	_currentFrameID = p_frame->frameID;
 }
 
-vector<unsigned int> KageFrameManager::raiseSelectedShape(vector<unsigned int> p_selectedShapes) {
+vector<unsigned int> KageFrameset::raiseSelectedShape(vector<unsigned int> p_selectedShapes) {
 	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return frames[_currentFrameIndex]->raiseSelectedShape(p_selectedShapes);
 	} else {
@@ -290,7 +491,7 @@ vector<unsigned int> KageFrameManager::raiseSelectedShape(vector<unsigned int> p
 	vector<unsigned int> l_nullReturn;
 	return l_nullReturn;
 }
-vector<unsigned int> KageFrameManager::lowerSelectedShape(vector<unsigned int> p_selectedShapes) {
+vector<unsigned int> KageFrameset::lowerSelectedShape(vector<unsigned int> p_selectedShapes) {
 	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return frames[_currentFrameIndex]->lowerSelectedShape(p_selectedShapes);
 	} else {
@@ -305,7 +506,7 @@ vector<unsigned int> KageFrameManager::lowerSelectedShape(vector<unsigned int> p
 	vector<unsigned int> l_nullReturn;
 	return l_nullReturn;
 }
-vector<unsigned int> KageFrameManager::raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes) {
+vector<unsigned int> KageFrameset::raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes) {
 	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return frames[_currentFrameIndex]->raiseToTopSelectedShape(p_selectedShapes);
 	} else {
@@ -320,7 +521,7 @@ vector<unsigned int> KageFrameManager::raiseToTopSelectedShape(vector<unsigned i
 	vector<unsigned int> l_nullReturn;
 	return l_nullReturn;
 }
-vector<unsigned int> KageFrameManager::lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes) {
+vector<unsigned int> KageFrameset::lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes) {
 	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return frames[_currentFrameIndex]->lowerToBottomSelectedShape(p_selectedShapes);
 	} else {
@@ -336,7 +537,7 @@ vector<unsigned int> KageFrameManager::lowerToBottomSelectedShape(vector<unsigne
 	return l_nullReturn;
 }
 
-vector<unsigned int> KageFrameManager::groupSelectedShapes(vector<unsigned int> p_selectedShapes) {
+vector<unsigned int> KageFrameset::groupSelectedShapes(vector<unsigned int> p_selectedShapes) {
 	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return frames[_currentFrameIndex]->groupSelectedShapes(p_selectedShapes);
 	} else {
@@ -351,7 +552,7 @@ vector<unsigned int> KageFrameManager::groupSelectedShapes(vector<unsigned int> 
 	vector<unsigned int> l_nullReturn;
 	return l_nullReturn;
 }
-vector<unsigned int> KageFrameManager::ungroupSelectedShapes(vector<unsigned int> p_selectedShapes) {
+vector<unsigned int> KageFrameset::ungroupSelectedShapes(vector<unsigned int> p_selectedShapes) {
 	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return frames[_currentFrameIndex]->ungroupSelectedShapes(p_selectedShapes);
 	} else {
@@ -367,7 +568,7 @@ vector<unsigned int> KageFrameManager::ungroupSelectedShapes(vector<unsigned int
 	return l_nullReturn;
 }
 
-vector<unsigned int> KageFrameManager::duplicateShapes(vector<unsigned int> p_selectedShapes) {
+vector<unsigned int> KageFrameset::duplicateShapes(vector<unsigned int> p_selectedShapes) {
 	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return frames[_currentFrameIndex]->duplicateShapes(p_selectedShapes);
 	} else {
@@ -383,7 +584,7 @@ vector<unsigned int> KageFrameManager::duplicateShapes(vector<unsigned int> p_se
 	return l_nullReturn;
 }
 
-bool KageFrameManager::flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes) {
+bool KageFrameset::flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes) {
 	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return frames[_currentFrameIndex]->flipHorizontalSelectedShape(p_selectedShapes);
 	} else {
@@ -398,7 +599,7 @@ bool KageFrameManager::flipHorizontalSelectedShape(vector<unsigned int> p_select
 	
 	return false;
 }
-bool KageFrameManager::flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes) {
+bool KageFrameset::flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes) {
 	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return doFlipVerticalSelectedShapeOn(_currentFrameIndex, p_selectedShapes);
 /*		if (       frames[_currentFrameIndex]->getExtension() == KageFrame::extension::EXTENSION_NOT
@@ -429,7 +630,7 @@ bool KageFrameManager::flipVerticalSelectedShape(vector<unsigned int> p_selected
 	
 	return false;
 }
-	bool KageFrameManager::doFlipVerticalSelectedShapeOn(unsigned int p_frameIndex, vector<unsigned int> p_selectedShapes) {
+	bool KageFrameset::doFlipVerticalSelectedShapeOn(unsigned int p_frameIndex, vector<unsigned int> p_selectedShapes) {
 		if (       frames[p_frameIndex]->getExtension() == KageFrame::extension::EXTENSION_NOT
 				|| frames[p_frameIndex]->getExtension() == KageFrame::extension::EXTENSION_START) {
 			return frames[p_frameIndex]->flipVerticalSelectedShape(p_selectedShapes);
@@ -437,7 +638,7 @@ bool KageFrameManager::flipVerticalSelectedShape(vector<unsigned int> p_selected
 			return doFlipVerticalSelectedShapeOnExtendedFrame(p_frameIndex-1, p_selectedShapes);
 		}
 	}
-	bool KageFrameManager::doFlipVerticalSelectedShapeOnExtendedFrame(unsigned int p_frameIndex, vector<unsigned int> p_selectedShapes) {
+	bool KageFrameset::doFlipVerticalSelectedShapeOnExtendedFrame(unsigned int p_frameIndex, vector<unsigned int> p_selectedShapes) {
 		while (p_frameIndex > 0) {
 			if (       frames[p_frameIndex]->getExtension() == KageFrame::extension::EXTENSION_NOT
 					|| frames[p_frameIndex]->getExtension() == KageFrame::extension::EXTENSION_START) {
@@ -450,7 +651,7 @@ bool KageFrameManager::flipVerticalSelectedShape(vector<unsigned int> p_selected
 	}
 
 
-bool KageFrameManager::addDataToFrame(VectorDataManager p_vectorsData) {
+bool KageFrameset::addDataToFrame(VectorDataManager p_vectorsData) {
 	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		frames[_currentFrameIndex]->addDataToFrame(p_vectorsData);
 		return true;
@@ -468,7 +669,7 @@ bool KageFrameManager::addDataToFrame(VectorDataManager p_vectorsData) {
 	return false;
 }
 
-bool KageFrameManager::setFrameData(VectorDataManager p_vectorsData) {
+bool KageFrameset::setFrameData(VectorDataManager p_vectorsData) {
 	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		frames[_currentFrameIndex]->setFrameData(p_vectorsData.clone());
 		return true;
@@ -486,7 +687,7 @@ bool KageFrameManager::setFrameData(VectorDataManager p_vectorsData) {
 	return false;
 }
 
-VectorDataManager KageFrameManager::getFrameData() {
+VectorDataManager KageFrameset::getFrameData() {
 	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return frames[_currentFrameIndex]->getFrameData();
 	} else {
@@ -502,7 +703,7 @@ VectorDataManager KageFrameManager::getFrameData() {
 	VectorDataManager l_nullReturn;
 	return l_nullReturn;
 }
-VectorDataManager KageFrameManager::getFrameDataAt(unsigned int p_frame) {
+VectorDataManager KageFrameset::getFrameDataAt(unsigned int p_frame) {
 	if (p_frame > 0 && p_frame <= getFrameCount()) {
 		--p_frame; //layer now becomes Frame Index
 		return frames[p_frame]->getFrameData();
@@ -511,7 +712,7 @@ VectorDataManager KageFrameManager::getFrameDataAt(unsigned int p_frame) {
 	VectorDataManager l_nullReturn;
 	return l_nullReturn;
 }
-VectorDataManager KageFrameManager::getPreviousFrameData(unsigned int p_frameID) {
+VectorDataManager KageFrameset::getPreviousFrameData(unsigned int p_frameID) {
 	for (unsigned int i = 1; i < getFrameCount(); ++i) {
 		if (frames[i]->frameID == p_frameID) {
 			return frames[i-1]->getFrameData();
@@ -522,7 +723,7 @@ VectorDataManager KageFrameManager::getPreviousFrameData(unsigned int p_frameID)
 	return l_nullReturn;
 }
 
-bool KageFrameManager::setFrameDataToPreviousFrame(VectorDataManager p_vectorsData, unsigned int p_frameID) {
+bool KageFrameset::setFrameDataToPreviousFrame(VectorDataManager p_vectorsData, unsigned int p_frameID) {
 	for (unsigned int i = 1; i < getFrameCount(); ++i) {
 		if (frames[i]->frameID == p_frameID) {
 			frames[i-1]->setFrameData(p_vectorsData);
@@ -533,7 +734,7 @@ bool KageFrameManager::setFrameDataToPreviousFrame(VectorDataManager p_vectorsDa
 	return false;
 }
 
-bool KageFrameManager::addDataToPreviousFrame(VectorDataManager p_vectorsData, unsigned int p_frameID) {
+bool KageFrameset::addDataToPreviousFrame(VectorDataManager p_vectorsData, unsigned int p_frameID) {
 	for (unsigned int i = 1; i < getFrameCount(); ++i) {
 		if (frames[i]->frameID == p_frameID) {
 			frames[i-1]->addDataToFrame(p_vectorsData);
@@ -544,7 +745,20 @@ bool KageFrameManager::addDataToPreviousFrame(VectorDataManager p_vectorsData, u
 	return false;
 }
 
-bool KageFrameManager::switchToPreviousFrame(unsigned int p_frameID) {
+bool KageFrameset::switchToPreviousFrame() {
+	for (unsigned int i = 1; i < getFrameCount(); ++i) {
+		if (frames[i]->frameID == _currentFrameID) {
+			///index + 1 = becomes frameNumber for current. then -1 becomes frameNumber of Previous Frame; thus `setCurrentFrame(i)'
+			setCurrentFrame(i);
+			focusFrame(i);
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+bool KageFrameset::switchToPreviousFrame(unsigned int p_frameID) {
 	for (unsigned int i = 1; i < getFrameCount(); ++i) {
 		if (frames[i]->frameID == p_frameID) {
 			///index + 1 = becomes frameNumber for current. then -1 becomes frameNumber of Previous Frame; thus `setCurrentFrame(i)'
@@ -557,7 +771,20 @@ bool KageFrameManager::switchToPreviousFrame(unsigned int p_frameID) {
 	return false;
 }
 
-bool KageFrameManager::switchToNextFrame(unsigned int p_frameID) {
+bool KageFrameset::switchToNextFrame() {
+	for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		if (frames[i]->frameID == _currentFrameID) {
+			///index + 1 = becomes frameNumber for current. then +1 becomes frameNumber of Next Frame
+			setCurrentFrame(i+2);
+			focusFrame(i+2);
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+bool KageFrameset::switchToNextFrame(unsigned int p_frameID) {
 	for (unsigned int i = 0; i < getFrameCount(); ++i) {
 		if (frames[i]->frameID == p_frameID) {
 			///index + 1 = becomes frameNumber for current. then +1 becomes frameNumber of Next Frame
@@ -570,11 +797,44 @@ bool KageFrameManager::switchToNextFrame(unsigned int p_frameID) {
 	return false;
 }
 
-bool KageFrameManager::isCurrentFrame(unsigned int p_frameID) {
+bool KageFrameset::isCurrentFrame(unsigned int p_frameID) {
 	if (frames[_currentFrameIndex]->frameID == p_frameID
 			&& _currentFrameID == p_frameID) {
 		return true;
 	}
 	
 	return false;
+}
+
+bool KageFrameset::canDuplicateNextFrame() {
+	if (_currentFrameIndex+1 == frames.size()) {
+		return false;
+	} if (     frames[_currentFrameIndex+1]->isNull()       == true
+			|| frames[_currentFrameIndex+1]->getExtension() == KageFrame::extension::EXTENSION_NOT
+			|| frames[_currentFrameIndex+1]->getExtension() == KageFrame::extension::EXTENSION_START) {
+		return false;
+	}
+	
+	return true;
+}
+
+/**
+ * For use of Kage when loading KSF file
+ * \param p_extension if start/mid/end of frame extension
+ */
+void KageFrameset::setFrameExtension(KageFrame::extension p_extension) {
+	if (_currentFrameIndex < getFrameCount() && frames[_currentFrameIndex]->frameID == _currentFrameID) {
+		cout << "KageFrameset::setFrameExtension A to " << p_extension << endl;
+		frames[_currentFrameIndex]->setExtension(p_extension);
+		return;
+	} else {
+		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+			if (frames[i]->frameID == _currentFrameID) {
+				frames[_currentFrameIndex]->setExtension(p_extension);
+				cout << "KageFrameset::setFrameExtension B to " << p_extension << endl;
+				return;
+			}
+		}
+	}
+	cout << "KageFrameset::setFrameExtension FAILED!" << endl;
 }

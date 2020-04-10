@@ -122,6 +122,10 @@ Kage::Kage() : _layerManager(this),
 		sigc::mem_fun(*this, &Kage::ExportAVI_onClick)
 	);
 	m_refActionGroup->add(
+		Gtk::Action::create("Close", Gtk::Stock::CLOSE, "_Close", "Close file"),
+		sigc::mem_fun(*this, &Kage::New_onClick)
+	);
+	m_refActionGroup->add(
 		Gtk::Action::create("Quit", Gtk::Stock::QUIT, "_Quit", "Quit"),
 		sigc::mem_fun(*this, &Kage::Quit_onClick)
 	);
@@ -419,6 +423,8 @@ Kage::Kage() : _layerManager(this),
 		"					<menuitem action='ExportPNGSequence'/>"
 		"				</menu>"
 		"			</menu>"
+		"			<separator/>"
+		"			<menuitem action='Close'/>"
 		"			<separator/>"
 		"			<menuitem action='Quit'/>"
 		"		</menu>"
@@ -1059,8 +1065,9 @@ void Kage::Delete_onClick() {
 }
 
 void Kage::AddFrame_onClick() {
-	_framesetManager.addFrame();
-	_framesetManager.setCurrentFrame(getCurrentFrame() + 1);
+	KageFramesetManager::LOADING_MODE = true;
+		_framesetManager.addFrame();
+	KageFramesetManager::LOADING_MODE = false;
 	
 	show_all();
 }
@@ -1118,14 +1125,17 @@ void Kage::PasteFrame_onClick() {
  * Deletes a Frame via Selecting All then Deleting selected shapes
  */
 void Kage::DeleteFrame_onClick() {
-	if (m_KageStage.selectAllShapes() == true) {
-		if (m_KageStage.deleteSelectedShapes() == true) {
-			stackDo();
-			forceRenderFrames();
-		}
+	if (doDeleteFrame() == true) {
+		stackDo();
+		forceRenderFrames();
 	}
 }
-
+	bool Kage::doDeleteFrame() {
+		if (m_KageStage.selectAllShapes() == true) {
+			return m_KageStage.deleteSelectedShapes();
+		}
+		return false;
+	}
 void Kage::switchToPreviousFrame() {
 	_framesetManager.switchToPreviousFrame();
 	show_all();
@@ -1147,6 +1157,7 @@ void Kage::LayerAdd_onClick() {
 	_framesetManager.addFrameset(_layerManager.addLayer());
 	std::cout << "Layer Count: " << _layerManager.layerCount() << std::endl;
 	show_all();
+	setCurrentFrame(getCurrentFrame());
 	updateStatus("New Layer Added");
 }
 void Kage::LayerRename_onClick() {
@@ -1612,6 +1623,9 @@ void Kage::setCurrentFrame(unsigned int p_layer) {
 }
 
 void Kage::New_onClick() {
+	if (continueNewFileWithUnsavedWork() == false) {
+		return;
+	}
 	propStageSetVisible(true);
 	propFillStrokeSetVisible(false);
 	propLocationSizeSetVisible(false);
@@ -1643,6 +1657,21 @@ void Kage::New_onClick() {
 	ksfPath = "Untitled";
 	set_title(ksfPath + " - " + KageAbout::app_title);
 	updateStatus("Ready");
+}
+
+bool Kage::continueNewFileWithUnsavedWork() {
+	if (get_title()[0] != '*') {
+		return true;
+	}
+	
+	Gtk::MessageDialog l_prompt = Gtk::MessageDialog("File is not saved. Do you want to discard unsaved content?", false, Gtk::MessageType::MESSAGE_QUESTION, Gtk::ButtonsType::BUTTONS_YES_NO, true);
+		int l_response = l_prompt.run();
+	
+	if (l_response == Gtk::ResponseType::RESPONSE_YES) {
+		return true;
+	}
+
+	return false;
 }
 
 void Kage::OpenKSF_onClick() {
@@ -2701,58 +2730,8 @@ string Kage::openTextFile(string p_path) {
 	return l_string;
 }
 
-string Trim(string p_source) {
-	string l_source = "";
-	int i;
-	int l_len;
-	//remove "space" before
-	l_len = strlen(p_source.c_str());
-	for (i = 0; i < l_len; ++i) {
-		if (p_source[i] == ' ') {
-			//skip to next...
-		}
-		else {
-			l_source = p_source.substr(i, l_len - i);
-			break;
-		}
-	}
-
-	//remove "space" after
-	l_len = strlen(l_source.c_str());
-	for (i = l_len - 1; i > 0; --i) {
-		if (l_source[i] == ' ') {
-			//skip to next...
-		}
-		else {
-			l_source = l_source.substr(0, i + 1);
-			break;
-		}
-	}
-	return l_source;
-}
-
-vector<string> split(const string &s, const string &delim, const bool keep_empty) {
-	vector<string> l_rets;
-	if (delim.empty()) {
-		l_rets.push_back(s);
-		return l_rets;
-	}
-	string::const_iterator substart = s.begin(), subend;
-	while (true) {
-		subend = search(substart, s.end(), delim.begin(), delim.end());
-		string temp(substart, subend);
-		if (!temp.empty()) {
-			l_rets.push_back(Trim(temp));
-		}
-		if (subend == s.end()) {
-			break;
-		}
-		substart = subend + delim.size();
-	}
-	return l_rets;
-}
 vector<double> Kage::parseNumbers(string p_numbers) {
-	vector<string> l_XYs = split(p_numbers, " ", false);
+	vector<string> l_XYs = StringHelper::split(p_numbers, " ");
 	vector<double> l_numbers;
 	for (unsigned int i = 0; i < l_XYs.size(); ++i) {
 		l_numbers.push_back(StringHelper::toDouble(l_XYs[i]));
@@ -2762,16 +2741,16 @@ vector<double> Kage::parseNumbers(string p_numbers) {
 vector<int> Kage::parseColorString(string p_color) {
 	vector<int> l_colors;
 	if (p_color.length() > 4 && p_color.substr(0, 5) == "rgba(") {
-		vector<string> l_rgba = split(p_color.substr(5), ", ", false);
+		vector<string> l_rgba = StringHelper::split(p_color.substr(5), ", ");
 		l_colors.push_back(StringHelper::toInteger(l_rgba[0]));
 		l_colors.push_back(StringHelper::toInteger(l_rgba[1]));
 		l_colors.push_back(StringHelper::toInteger(l_rgba[2]));
-		l_colors.push_back(StringHelper::toInteger(split(l_rgba[3], ")", false)[0]));
+		l_colors.push_back(StringHelper::toInteger(StringHelper::split(l_rgba[3], ")")[0]));
 	} else if (p_color.length() > 3 && p_color.substr(0, 4) == "rgb(") {
-		vector<string> l_rgb = split(p_color.substr(4), ", ", false);
+		vector<string> l_rgb = StringHelper::split(p_color.substr(4), ", ");
 		l_colors.push_back(StringHelper::toInteger(l_rgb[0]));
 		l_colors.push_back(StringHelper::toInteger(l_rgb[1]));
-		l_colors.push_back(StringHelper::toInteger(split(l_rgb[2], ")", false)[0]));
+		l_colors.push_back(StringHelper::toInteger(StringHelper::split(l_rgb[2], ")")[0]));
 	} else {
 		cout << "?!?" << p_color << "\n";
 	}

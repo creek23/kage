@@ -320,7 +320,7 @@ void KageFrame::setFrameData(VectorDataManager p_vectorsData) {
 bool KageFrame::isEmpty() {
 	if (       _extension == KageFrame::extension::EXTENSION_NOT
 			|| _extension == KageFrame::extension::EXTENSION_START) {
-		return (vectorsData.getVectorData().size() <= 1);
+		return (vectorsData.getVectorData().size() == 0);
 	} else {
 		return (_frameset->getPreviousFrameData(frameID).getVectorData().size() <= 1);
 	}

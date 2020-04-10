@@ -26,6 +26,9 @@
 	
 	#include <string>
 	#include <sstream>
+	#include <vector>
+	#include <algorithm>
+	#include <cstring>
 	using namespace std;
 	
 	class StringHelper {
@@ -40,6 +43,8 @@
 			static long toLong(string p_str);
 			static double toDouble(string p_str);
 			static bool toBoolean(string p_str);
+			static vector<string> split(const string &p_source, const string &p_delimiter);
+			static string trim(string p_source);
 	};
 	
 #endif //UTIL_STRING_HELPER_H

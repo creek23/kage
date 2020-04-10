@@ -12,7 +12,7 @@ SOURCES = \
 	./kage/data/vectordata.cpp \
 	./kage/timeline/frame.cpp \
 	./kage/timeline/frame_padding.cpp \
-	./kage/timeline/framemanager.cpp \
+	./kage/timeline/frameset.cpp \
 	./kage/timeline/framesmanager.cpp \
 	./kage/timeline/layer.cpp \
 	./kage/timeline/layermanager.cpp \
@@ -25,8 +25,11 @@ SOURCES = \
 	./util/xml/xmltag.cpp \
 	./util/xml/xml.cpp \
 	./util/string/stringhelper.cpp \
+	./util/cairo/cairo_kage.cpp \
 	kage.cpp \
 	resources.cpp \
+	about.cpp \
+	layer_rename.cpp \
 	main.cpp
 
 OBJECTS = $(SOURCES:.cpp=.o)

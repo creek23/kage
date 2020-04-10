@@ -323,6 +323,8 @@
 			bool _isPlaying;
 			
 			vector<VectorData> _undoBase;
+			
+			bool continueNewFileWithUnsavedWork();
 		public:
 			void toolsButtonToggle(string p_toolTip);
 			
@@ -348,6 +350,7 @@
 			void stackDoZoom(PointData p_originBefore, PointData p_originAfter, PointData p_zoomReference, double p_zoomRatio);
 			
 			void New_onClick();
+			bool doDeleteFrame();
 			
 			bool isLayerLocked();
 			unsigned int getCurrentLayer();

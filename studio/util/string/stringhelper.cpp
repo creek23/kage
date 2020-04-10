@@ -98,3 +98,54 @@ bool StringHelper::toBoolean(string p_src) {
 		return false;
 	}
 }
+
+vector<string> StringHelper::split(const string &p_source, const string &p_delimiter) {
+	vector<string> l_return;
+	if (p_delimiter.empty()) {
+		l_return.push_back(p_source);
+		return l_return;
+	}
+	string::const_iterator substart = p_source.begin(), subend;
+	while (true) {
+		subend = search(substart, p_source.end(), p_delimiter.begin(), p_delimiter.end());
+		string l_temp(substart, subend);
+		if (!l_temp.empty()) {
+			l_return.push_back(StringHelper::trim(l_temp));
+		}
+		if (subend == p_source.end()) {
+			break;
+		}
+		substart = subend + p_delimiter.size();
+	}
+	return l_return;
+}
+
+string StringHelper::trim(string p_source) {
+	string l_source = "";
+	int i;
+	int l_len;
+	//remove "space" before
+	l_len = strlen(p_source.c_str());
+	for (i = 0; i < l_len; ++i) {
+		if (p_source[i] == ' ') {
+			//skip to next...
+		}
+		else {
+			l_source = p_source.substr(i, l_len - i);
+			break;
+		}
+	}
+
+	//remove "space" after
+	l_len = strlen(l_source.c_str());
+	for (i = l_len - 1; i > 0; --i) {
+		if (l_source[i] == ' ') {
+			//skip to next...
+		}
+		else {
+			l_source = l_source.substr(0, i + 1);
+			break;
+		}
+	}
+	return l_source;
+}

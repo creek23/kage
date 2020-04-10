@@ -42,28 +42,35 @@ void KageFramesetManager::deleteFrameset(unsigned int p_layer) {
 }
 
 bool KageFramesetManager::addFrame() {
-	unsigned int l_count = 1;
-	if (_framesets.size() > 0) {
-		l_count = _framesets.size();
-	}
 	unsigned int l_currentLayer = getCurrentLayer();
-	if (_framesets[l_currentLayer-1]->addFrame() == true) {
-		for (unsigned int i = 0; i < l_count; ++i) {
-			if (i != l_currentLayer-1) {
-				_framesets[i]->addFrame();
-			}
-		}
+	if (_framesets[l_currentLayer-1]->canReUseNextFrame() == false) {
+		extendFrame();
 	}
+	_framesets[l_currentLayer-1]->duplicateFrame();
+	switchToNextFrame();
+	
+	KageFrame *l_frame = _framesets[l_currentLayer-1]->getFrameAt(getCurrentFrame());
+	if (l_frame) {
+		_framesets[l_currentLayer-1]->setSelected(l_frame);
+		win->doDeleteFrame();
+	}
+	
 	return true;
 }
 
 bool KageFramesetManager::duplicateFrame() {
-	//TODO: add Frame ONLY if next frame is NOT EMPTY or next frame is NULL
 	unsigned int l_currentLayer = getCurrentLayer();
-	if (_framesets[l_currentLayer-1]->canDuplicateNextFrame() == false) {
+	if (_framesets[l_currentLayer-1]->canReUseNextFrame() == false) {
 		addFrame();
 	}
 	_framesets[l_currentLayer-1]->duplicateFrame();
+	
+	switchToNextFrame();
+	
+	KageFrame *l_frame = _framesets[l_currentLayer-1]->getFrameAt(getCurrentFrame());
+	if (l_frame) {
+		_framesets[l_currentLayer-1]->setSelected(l_frame);
+	}
 	
 	return true;
 }

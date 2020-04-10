@@ -56,14 +56,14 @@
 			bool switchToNextFrame(); ///Called by FrameSet for navigating to Next Frame
 			bool switchToNextFrame(unsigned int p_frameID); ///Called by KageFrame for navigating to Next Frame
 			bool isCurrentFrame(unsigned int p_frameID); ///Called by KageFrame when rendering
-			bool canDuplicateNextFrame(); ///Called by KageFramesetManager when duplicating Frame
+			bool canReUseNextFrame(); ///Called by KageFramesetManager when duplicating Frame
 			
 			void setFrameExtension(KageFrame::extension p_extension);
 		protected:
 			unsigned int layerID;
 //			unsigned int layerCtr;
 			unsigned int frameCtr;
-			std::vector<KageFrame*> frames;
+			std::vector<KageFrame*> _frames;
 			KageFramePadding frame_padding;
 			
 			KageFramesetManager *fsm;

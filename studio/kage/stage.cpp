@@ -226,6 +226,10 @@ bool KageStage::on_event(GdkEvent *e) {
 				win->propNodeXYSetVisible(true);
 			} else {
 				win->stackDo();
+				
+				//reset selected Node's control-point
+				mouseOnNodeIndex = 0;
+				mouseOnNode = UINT_MAX;
 			}
 			_isModifyingShape = false;
 			render();
@@ -2199,12 +2203,16 @@ void KageStage::handleNodes_selection() {
 							v[i].points[2].y + origin.y) == true) {
 						mouseOnNodeHover = i;
 						if (mouseDown == true) {
-							mouseOnNode = i;
+							if (mouseOnNode == UINT_MAX) {
+								mouseOnNode = i;
+							}
 							if (isSelectedNode(i) == false && keyShiftDown == false) {
 								selectedNodes.clear();
 							}
 								addSelectedNode(i);
-							mouseOnNodeIndex = 3;
+							if (mouseOnNodeIndex == 0) {
+								mouseOnNodeIndex = 3;
+							}
 							mouseOnNodeOffset.x = _mouseLocation.x - v[i].points[2].x - origin.x;
 							mouseOnNodeOffset.y = _mouseLocation.y - v[i].points[2].y - origin.y;
 //							((draw1.x - origin.x - mouseOnNodeOffset.x) - v[i].points[2].x)
@@ -2216,7 +2224,9 @@ void KageStage::handleNodes_selection() {
 							v[i].points[0].x + origin.x,
 							v[i].points[0].y + origin.y) == true) {
 						if (mouseDown == true) {
-							mouseOnNode = i;
+							if (mouseOnNode == UINT_MAX) {
+								mouseOnNode = i;
+							}
 							if (keyShiftDown == false) { selectedNodes.clear(); }
 							if (i > 0 && (
 									v[i-1].vectorType == VectorData::TYPE_LINE
@@ -2224,7 +2234,9 @@ void KageStage::handleNodes_selection() {
 									|| v[i-1].vectorType == VectorData::TYPE_CURVE_CUBIC)) {
 								addSelectedNode(i-1);
 							}
-							mouseOnNodeIndex = 1;
+							if (mouseOnNodeIndex == 0) {
+								mouseOnNodeIndex = 1;
+							}
 						}
 					}
 					
@@ -2232,10 +2244,14 @@ void KageStage::handleNodes_selection() {
 							v[i].points[1].x + origin.x,
 							v[i].points[1].y + origin.y) == true) {
 						if (mouseDown == true) {
-							mouseOnNode = i;
+							if (mouseOnNode == UINT_MAX) {
+								mouseOnNode = i;
+							}
 							if (keyShiftDown == false) { selectedNodes.clear(); }
 							addSelectedNode(i);
-							mouseOnNodeIndex = 2;
+							if (mouseOnNodeIndex == 0) {
+								mouseOnNodeIndex = 2;
+							}
 						}
 					}
 					break;
@@ -2319,8 +2335,6 @@ void KageStage::handleNodes_relocation() {
 					
 					if (isMouseOnNode(l_x, l_y) == true) {
 						if (mouseDown == true) {
-							mouseOnNode = i;
-							
 							v[i].points[0].x = draw1.x - origin.x;
 							v[i].points[0].y = draw1.y - origin.y;
 							

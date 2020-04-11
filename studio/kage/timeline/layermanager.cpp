@@ -57,6 +57,11 @@ void KageLayerManager::deleteLayer() {
 			remove(*layers[_currentLayerIndex]);
 			delete layers[_currentLayerIndex];
 			layers.erase (layers.begin() + (_currentLayerIndex));
+			if (_currentLayerIndex < layers.size()) {
+				//do nothing
+			} else if (_currentLayerIndex-1 >= 0) {
+				--_currentLayerIndex;
+			}
 			_currentLayerID = layers[_currentLayerIndex]->layerID;
 			layers[_currentLayerIndex]->setSelected(true);
 		} else {
@@ -71,6 +76,11 @@ void KageLayerManager::deleteLayer() {
 					remove(*layers[i]);
 					delete layers[i];
 					layers.erase (layers.begin() + (i-1));
+					if (_currentLayerIndex < layers.size()) {
+						//do nothing
+					} else if (_currentLayerIndex-1 >= 0) {
+						--_currentLayerIndex;
+					}
 					_currentLayerID = layers[_currentLayerIndex]->layerID;
 					layers[_currentLayerIndex]->setSelected(true);
 					return;

@@ -1065,9 +1065,7 @@ void Kage::Delete_onClick() {
 }
 
 void Kage::AddFrame_onClick() {
-	KageFramesetManager::LOADING_MODE = true;
-		_framesetManager.addFrame();
-	KageFramesetManager::LOADING_MODE = false;
+	_framesetManager.addFrame();
 	
 	show_all();
 }
@@ -1154,11 +1152,13 @@ void Kage::updateFrameLabel() {
 }
 
 void Kage::LayerAdd_onClick() {
-	_framesetManager.addFrameset(_layerManager.addLayer());
-	std::cout << "Layer Count: " << _layerManager.layerCount() << std::endl;
-	show_all();
-	setCurrentFrame(getCurrentFrame());
-	updateStatus("New Layer Added");
+	KageFramesetManager::LOADING_MODE = true;
+		_framesetManager.addFrameset(_layerManager.addLayer());
+		std::cout << "Layer Count: " << _layerManager.layerCount() << std::endl;
+		show_all();
+		setCurrentFrame(getCurrentFrame());
+		updateStatus("New Layer Added");
+	KageFramesetManager::LOADING_MODE = false;
 }
 void Kage::LayerRename_onClick() {
 	_layerManager.renameLayer();

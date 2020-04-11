@@ -120,20 +120,28 @@ void KageFrameset::duplicateFrame() {
 	//			}
 			} else if (l_extension == KageFrame::extension::EXTENSION_START) {
 				_frames[l_currentFrame-1]->setExtension(KageFrame::extension::EXTENSION_NOT);
-				l_extension = _frames[l_currentFrame+1]->getExtension();
-				if (       l_extension == KageFrame::extension::EXTENSION_MID
-						|| l_extension == KageFrame::extension::EXTENSION_END) {
-					_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_START);
-				} else if (l_extension == KageFrame::extension::EXTENSION_NOT
-						|| l_extension == KageFrame::extension::EXTENSION_START) {
+				if (l_currentFrame+1 < _frames.size()) {
+					l_extension = _frames[l_currentFrame+1]->getExtension();
+					if (       l_extension == KageFrame::extension::EXTENSION_MID
+							|| l_extension == KageFrame::extension::EXTENSION_END) {
+						_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_START);
+					} else if (l_extension == KageFrame::extension::EXTENSION_NOT
+							|| l_extension == KageFrame::extension::EXTENSION_START) {
+						_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
+					}
+				} else {
 					_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
 				}
 			} else if (l_extension == KageFrame::extension::EXTENSION_MID) {
 				_frames[l_currentFrame-1]->setExtension(KageFrame::extension::EXTENSION_END);
-				l_extension = _frames[l_currentFrame+1]->getExtension();
-				if (       l_extension == KageFrame::extension::EXTENSION_MID
-						|| l_extension == KageFrame::extension::EXTENSION_END) {
-					_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_START);
+				if (l_currentFrame+1 < _frames.size()) {
+					l_extension = _frames[l_currentFrame+1]->getExtension();
+					if (       l_extension == KageFrame::extension::EXTENSION_MID
+							|| l_extension == KageFrame::extension::EXTENSION_END) {
+						_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_START);
+					}
+				} else {
+					_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
 				}
 			} else if (l_extension == KageFrame::extension::EXTENSION_END) {
 				//keep

@@ -61,7 +61,7 @@ bool KageFramesetManager::addFrame() {
 bool KageFramesetManager::duplicateFrame() {
 	unsigned int l_currentLayer = getCurrentLayer();
 	if (_framesets[l_currentLayer-1]->canReUseNextFrame() == false) {
-		addFrame();
+		extendFrame();
 	}
 	_framesets[l_currentLayer-1]->duplicateFrame();
 	

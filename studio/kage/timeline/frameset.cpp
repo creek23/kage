@@ -18,34 +18,6 @@ KageFrameset::~KageFrameset() {
 
 bool KageFrameset::addFrame() {
 	unsigned int l_currentFrame = getCurrentFrame();
-/*	//TODO: if current layer added FRAME, all other Frame should ADD frame
-	//      if current layer have EXTRA FRAME (currently Extended), no need to add Frame
-	
-	if (l_currentFrame == getFrameCount()) {
-		//proceed add
-	} else {
-		//TODO: if next frame extended?
-		KageFrame::extension l_extension = _frames[l_currentFrame-1]->getExtension();
-		if (l_extension == KageFrame::extension::EXTENSION_NOT) {
-			//proceed add
-		} else if (l_extension == KageFrame::extension::EXTENSION_START) {
-			_frames[l_currentFrame-1]->setExtension(KageFrame::extension::EXTENSION_NOT);
-			l_extension = _frames[l_currentFrame+1]->getExtension();
-			if (       l_extension == KageFrame::extension::EXTENSION_MID
-					|| l_extension == KageFrame::extension::EXTENSION_END) {
-				_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_START);
-			}
-		} else if (l_extension == KageFrame::extension::EXTENSION_MID) {
-			_frames[l_currentFrame-1]->setExtension(KageFrame::extension::EXTENSION_END);
-			l_extension = _frames[l_currentFrame+1]->getExtension();
-			if (       l_extension == KageFrame::extension::EXTENSION_MID
-					|| l_extension == KageFrame::extension::EXTENSION_END) {
-				_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_START);
-			}
-		} else if (l_extension == KageFrame::extension::EXTENSION_END) {
-			//keep
-		}
-	}*/
 	
 	++frameCtr;
 	_frames.push_back(Gtk::manage(new KageFrame(this, layerID, frameCtr)));
@@ -139,12 +111,17 @@ void KageFrameset::duplicateFrame() {
 					if (       l_extension == KageFrame::extension::EXTENSION_MID
 							|| l_extension == KageFrame::extension::EXTENSION_END) {
 						_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_START);
+					} else if (l_extension == KageFrame::extension::EXTENSION_NOT
+							|| l_extension == KageFrame::extension::EXTENSION_START) {
+						_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
 					}
 				} else {
 					_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
 				}
 			} else if (l_extension == KageFrame::extension::EXTENSION_END) {
-				//keep
+				//keep previous
+				cout << " at END with " << _frames[l_currentFrame]->getExtension() << endl;
+				_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
 			}
 		}
 

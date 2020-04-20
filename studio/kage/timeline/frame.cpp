@@ -45,7 +45,7 @@ KageFrame::KageFrame(KageFrameset *p_frameset, unsigned p_layerID, unsigned int 
 	setCurrent(false);
 	setTween(false);
 	setNull(false);
-	setExtension(KageFrame::extension::EXTENSION_NOT);
+	setExtension(KageFrame::EXTENSION_NOT);
 //	add_events(Gdk::KEY_PRESS_MASK    | Gdk::KEY_RELEASE_MASK);
 	add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
 	add_events(Gdk::ENTER_NOTIFY_MASK | Gdk::LEAVE_NOTIFY_MASK);
@@ -174,8 +174,8 @@ bool KageFrame::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 			}
 		}
 		switch (_extension) {
-			case KageFrame::extension::EXTENSION_NOT:
-			case KageFrame::extension::EXTENSION_END:
+			case KageFrame::EXTENSION_NOT:
+			case KageFrame::EXTENSION_END:
 				if (isSelected() == true) {
 					if (_frameset->isCurrentFrame(frameID) == true) {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageSELECTED_CUR, 0, -1);
@@ -208,8 +208,8 @@ bool KageFrame::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 					}
 				}
 				break;
-			case KageFrame::extension::EXTENSION_START:
-			case KageFrame::extension::EXTENSION_MID:
+			case KageFrame::EXTENSION_START:
+			case KageFrame::EXTENSION_MID:
 				if (isSelected() == true) {
 					if (_frameset->isCurrentFrame(frameID) == true) {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageSELECTED_X_CUR, 0, -1);
@@ -297,8 +297,8 @@ VectorDataManager KageFrame::getFrameData() {
 		VectorDataManager l_nullReturn;
 		return l_nullReturn;
 	}
-	if (       _extension == KageFrame::extension::EXTENSION_NOT
-			|| _extension == KageFrame::extension::EXTENSION_START) {
+	if (       _extension == KageFrame::EXTENSION_NOT
+			|| _extension == KageFrame::EXTENSION_START) {
 		return vectorsData;
 	} else {
 		return _frameset->getPreviousFrameData(frameID);
@@ -308,8 +308,8 @@ void KageFrame::setFrameData(VectorDataManager p_vectorsData) {
 	if (_null == true) {
 		setNull(false);
 	}
-	if (       _extension == KageFrame::extension::EXTENSION_NOT
-			|| _extension == KageFrame::extension::EXTENSION_START) {
+	if (       _extension == KageFrame::EXTENSION_NOT
+			|| _extension == KageFrame::EXTENSION_START) {
 		vectorsData = p_vectorsData;
 		render();
 	} else {
@@ -318,8 +318,8 @@ void KageFrame::setFrameData(VectorDataManager p_vectorsData) {
 }
 
 bool KageFrame::isEmpty() {
-	if (       _extension == KageFrame::extension::EXTENSION_NOT
-			|| _extension == KageFrame::extension::EXTENSION_START) {
+	if (       _extension == KageFrame::EXTENSION_NOT
+			|| _extension == KageFrame::EXTENSION_START) {
 		return (vectorsData.getVectorData().size() == 0);
 	} else {
 		return (_frameset->getPreviousFrameData(frameID).getVectorData().size() <= 1);
@@ -361,8 +361,8 @@ bool KageFrame::flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes)
 	return vectorsData.flipVerticalSelectedShape(p_selectedShapes);
 }
 void KageFrame::addDataToFrame(VectorDataManager v) {
-	if (       _extension == KageFrame::extension::EXTENSION_NOT
-			|| _extension == KageFrame::extension::EXTENSION_START) {
+	if (       _extension == KageFrame::EXTENSION_NOT
+			|| _extension == KageFrame::EXTENSION_START) {
 		if (_null == true) {
 			setNull(false);
 		}

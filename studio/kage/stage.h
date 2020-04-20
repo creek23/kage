@@ -64,6 +64,8 @@
 			double propHeight = 0;
 			double nodeX = 0;
 			double nodeY = 0;
+			unsigned int nodeIndexX = 0;
+			unsigned int nodeIndexY = 0;
 			
 			void printVectors();
 			void cleanSlate();
@@ -128,6 +130,7 @@
 			bool deleteSelectedNodes();
 			bool toggleLineSelectedNodes();
 			
+			void updateNodeXY();
 			bool isSelectedNode(unsigned int p_index);
 			void addSelectedNode(unsigned int p_index);
 			bool isSelectedShape(unsigned int p_index);
@@ -143,7 +146,7 @@
 			void updateShapeY(double p_value);
 			void updateShapeWidth(double p_value);
 			void updateShapeHeight(double p_value);
-			void updateNodeX(double p_value);
+			void updateNodeX(double p_value, bool p_stackDo = true);
 			void updateNodeY(double p_value);
 			
 			vector<VectorData> _vectorDataCopyBuffer;
@@ -161,6 +164,7 @@
 			
 			double _zoomRatio;
 			double _zoomValue;
+			double _zoomValueShapeProperty;
 			PointData _zoomReference;
 			PointData __origin;
 			PointData __stageArea;
@@ -178,8 +182,6 @@
 			bool _rotateMode;
 			bool _rotateApply;
 			
-			bool _gotFocus;
-			
 			void setSelectedShapes(vector<unsigned int> p_selectedShapes);
 			vector<unsigned int> getSelectedShapes();
 		protected:
@@ -187,6 +189,7 @@
 			Kage *win;
 			GdkPoint draw1;
 			GdkPoint draw2;
+			GdkPoint drawConstraint;
 			double polyXhead, polyYhead;
 			double polyXtail, polyYtail;
 			VectorDataManager _polyVectors;

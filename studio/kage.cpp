@@ -270,6 +270,16 @@ Kage::Kage() : _layerManager(this),
 		sigc::mem_fun(*this, &Kage::Play_onClick)
 	);
 	m_refActionGroup->add(
+		Gtk::Action::create("PlayFrame", "Play Frame", "Play Animation from this Frame"),
+		Gtk::AccelKey("<control>F9"),
+		sigc::mem_fun(*this, &Kage::PlayFrame_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("Stop", "Stop", "Stop Animation"),
+		Gtk::AccelKey("<shift>F9"),
+		sigc::mem_fun(*this, &Kage::Stop_onClick)
+	);
+	m_refActionGroup->add(
 		Gtk::Action::create("PreviousFrame", "_Previous", "Previous Frame"),
 		Gtk::AccelKey(","),
 		sigc::mem_fun(*this, &Kage::switchToPreviousFrame)
@@ -469,6 +479,8 @@ Kage::Kage() : _layerManager(this),
 		"		</menu>"
 		"		<menu action='TimelineMenu'>"
 		"			<menuitem action='Play'/>"
+		"			<menuitem action='PlayFrame'/>"
+		"			<menuitem action='Stop'/>"
 		"			<menuitem action='NextFrame'/>"
 		"			<menuitem action='PreviousFrame'/>"
 		"			<separator/>"
@@ -519,6 +531,7 @@ Kage::Kage() : _layerManager(this),
 	m_VBoxRoot.pack_start(*pMenuBar, Gtk::PACK_SHRINK);
 	m_VBoxRoot.pack_start(m_HBoxToolbar, Gtk::PACK_EXPAND_WIDGET);
 	m_VBoxRoot.pack_start(m_Statusbar, Gtk::PACK_SHRINK);
+		m_Statusbar.pack_end(_labelStatusMouseXY, Gtk::PACK_SHRINK);
 	m_HBoxToolbar.pack_start(m_VBoxToolbar_Holder, Gtk::PACK_SHRINK);
 		m_VBoxToolbar_Holder.pack_start(m_LblHolder_Toolbar, Gtk::PACK_SHRINK);
 		m_VBoxToolbar_Holder.pack_start(m_Separator_Toolbar1, Gtk::PACK_SHRINK);
@@ -831,6 +844,9 @@ Kage::~Kage() {
 	//
 }
 
+void Kage::displayMouseXY(double p_x, double p_y) {
+	_labelStatusMouseXY.set_text("X: " + StringHelper::doubleToString(p_x) + " Y: " + StringHelper::doubleToString(p_y));
+}
 void Kage::updateStatus(Glib::ustring status_msg) {
 	m_Statusbar.push(status_msg, m_ContextId);
 }
@@ -861,7 +877,7 @@ void Kage::Redo_onClick() {
 }
 void Kage::Cut_onClick() {
 	Kage::timestamp();
-	std::cout << " Kage::Cut_onClick " << m_KageStage._gotFocus << " " << KageFrame::_gotFocus << std::endl;
+	std::cout << " Kage::Cut_onClick " << KageFrame::_gotFocus << std::endl;
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		if (m_KageStage.cutSelectedShapes() == true) {
 			forceRenderFrames();
@@ -870,7 +886,7 @@ void Kage::Cut_onClick() {
 }
 void Kage::Copy_onClick() {
 	Kage::timestamp();
-	std::cout << " Kage::Copy_onClick " << m_KageStage._gotFocus << " " << KageFrame::_gotFocus << std::endl;
+	std::cout << " Kage::Copy_onClick " << KageFrame::_gotFocus << std::endl;
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		if (m_KageStage.copySelectedShapes() == true) {
 			forceRenderFrames();
@@ -879,7 +895,7 @@ void Kage::Copy_onClick() {
 }
 void Kage::Paste_onClick() {
 	Kage::timestamp();
-	std::cout << " Kage::Paste_onClick " << m_KageStage._gotFocus << " " << KageFrame::_gotFocus << std::endl;
+	std::cout << " Kage::Paste_onClick " << KageFrame::_gotFocus << std::endl;
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		if (m_KageStage.pasteSelectedShapes() == true) {
 			forceRenderFrames();
@@ -912,7 +928,9 @@ void Kage::SelectAll_onClick() {
 void Kage::Deselect_onClick() {
 	Kage::timestamp();
 	std::cout << " Kage::Deselect_onClick" << std::endl;
-	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+	if (_isPlaying == true) {
+		Stop_onClick();
+	} else if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		if (m_KageStage.deselectSelectedShapes() == true) {
 			forceRenderFrames();
 		}
@@ -1046,20 +1064,18 @@ void Kage::FlipVertical_onClick() {
 }
 
 void Kage::Delete_onClick() {
-	if (m_KageStage._gotFocus == true) {
-		if (KageStage::toolMode == KageStage::MODE_SELECT) {
-			Kage::timestamp();
-			std::cout << " Kage::Delete_onClick SHAPE" << std::endl;
-			if (m_KageStage.deleteSelectedShapes() == true) {
-				stackDo();
-				forceRenderFrames();
-			}
-		} else if (KageStage::toolMode == KageStage::MODE_NODE) {
-			Kage::timestamp();
-			std::cout << " Kage::Delete_onClick NODE" << std::endl;
-			if (m_KageStage.deleteSelectedNodes() == true) {
-				forceRenderFrames();
-			}
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		Kage::timestamp();
+		std::cout << " Kage::Delete_onClick SHAPE" << std::endl;
+		if (m_KageStage.deleteSelectedShapes() == true) {
+			stackDo();
+			forceRenderFrames();
+		}
+	} else if (KageStage::toolMode == KageStage::MODE_NODE) {
+		Kage::timestamp();
+		std::cout << " Kage::Delete_onClick NODE" << std::endl;
+		if (m_KageStage.deleteSelectedNodes() == true) {
+			forceRenderFrames();
 		}
 	}
 }
@@ -1274,7 +1290,7 @@ void Kage::ToolSelect_onClick() {
 	toolsButtonToggle("Select Tool");
 	propStageSetVisible(true);
 	propFillStrokeSetVisible(false);
-	propLocationSizeSetVisible(false);
+	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	KageStage::toolMode = KageStage::MODE_SELECT;
 	m_KageStage.initNodeTool();
@@ -1285,7 +1301,7 @@ void Kage::ToolNode_onClick() {
 	toolsButtonToggle("Node Tool");
 	propStageSetVisible(false);
 	propFillStrokeSetVisible(false);
-	propLocationSizeSetVisible(false);
+	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(true);
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
@@ -1298,7 +1314,7 @@ void Kage::ToolPoly_onClick() {
 	toolsButtonToggle("Poly Tool");
 	propStageSetVisible(false);
 	propFillStrokeSetVisible(true);
-	propLocationSizeSetVisible(false);
+	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
@@ -1310,7 +1326,7 @@ void Kage::ToolOval_onClick() {
 	toolsButtonToggle("Oval Tool");
 	propStageSetVisible(false);
 	propFillStrokeSetVisible(true);
-	propLocationSizeSetVisible(false);
+	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
@@ -1322,7 +1338,7 @@ void Kage::ToolRectangle_onClick() {
 	toolsButtonToggle("Rectangle Tool");
 	propStageSetVisible(false);
 	propFillStrokeSetVisible(true);
-	propLocationSizeSetVisible(false);
+	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
@@ -1334,7 +1350,7 @@ void Kage::ToolStroke_onClick() {
 	toolsButtonToggle("Stroke Tool");
 	propStageSetVisible(false);
 	propFillStrokeSetVisible(true);
-	propLocationSizeSetVisible(false);
+	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
@@ -1347,7 +1363,7 @@ void Kage::ToolFill_onClick() {
 	toolsButtonToggle("Fill Tool");
 	propStageSetVisible(false);
 	propFillStrokeSetVisible(true);
-	propLocationSizeSetVisible(false);
+	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
@@ -1360,7 +1376,7 @@ void Kage::ToolEyedrop_onClick() {
 	toolsButtonToggle("Eyedrop Tool");
 	m_PropStage.set_visible(false);
 	m_PropFillStroke.set_visible(true);
-	propLocationSizeSetVisible(false);
+	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
@@ -1373,7 +1389,7 @@ void Kage::ToolZoom_onClick() {
 	toolsButtonToggle("Zoom Tool");
 	m_PropStage.set_visible(true);
 	m_PropFillStroke.set_visible(false);
-	propLocationSizeSetVisible(false);
+	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
@@ -1390,11 +1406,13 @@ void Kage::propFillStrokeSetVisible(bool p_visible) {
 	m_PropFillStroke.set_visible(p_visible);
 }
 
-void Kage::propLocationSizeSetVisible(bool p_visible) {
+void Kage::propShapePropertiesSetVisible(bool p_visible) {
+	updateShapeProperties();
 	m_propLocationSize.set_visible(p_visible);
 }
 
 void Kage::propNodeXYSetVisible(bool p_visible) {
+	updateNodeXY();
 	m_propNodeXY.set_visible(p_visible);
 }
 
@@ -1406,7 +1424,7 @@ void Kage::updateColors() {
 	m_EntryStrokeThickness.set_text(StringHelper::unsignedIntegerToString(KageStage::stroke.getThickness()));
 }
 
-void Kage::updateProperties() {
+void Kage::updateShapeProperties() {
 	m_EntryX.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.propX));
 	m_EntryY.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.propY));
 	m_EntryWidth.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.propWidth));
@@ -1414,7 +1432,9 @@ void Kage::updateProperties() {
 }
 
 void Kage::updateNodeXY() {
+	cout << " m_KageStage.nodeX " << m_KageStage.nodeX << endl;
 	m_EntryNodeX.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.nodeX));
+	cout << " m_EntryNodeX " << m_EntryNodeX.get_text() << endl;
 	m_EntryNodeY.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.nodeY));
 }
 
@@ -1449,6 +1469,7 @@ bool Kage::on_delete_event(GdkEventAny* any_event) {
 	}
 	
 	Gtk::MessageDialog l_prompt = Gtk::MessageDialog("Are you sure you want to quit?", false, Gtk::MessageType::MESSAGE_QUESTION, Gtk::ButtonsType::BUTTONS_YES_NO, true);
+		l_prompt.set_position(Gtk::WIN_POS_CENTER);
 		int l_response = l_prompt.run();
 	
 	if (l_response == Gtk::ResponseType::RESPONSE_YES) {
@@ -1628,7 +1649,7 @@ void Kage::New_onClick() {
 	}
 	propStageSetVisible(true);
 	propFillStrokeSetVisible(false);
-	propLocationSizeSetVisible(false);
+	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 
 	_layerManager.removeAllLayers();
@@ -1665,6 +1686,7 @@ bool Kage::continueNewFileWithUnsavedWork() {
 	}
 	
 	Gtk::MessageDialog l_prompt = Gtk::MessageDialog("File is not saved. Do you want to discard unsaved content?", false, Gtk::MessageType::MESSAGE_QUESTION, Gtk::ButtonsType::BUTTONS_YES_NO, true);
+		l_prompt.set_position(Gtk::WIN_POS_CENTER);
 		int l_response = l_prompt.run();
 	
 	if (l_response == Gtk::ResponseType::RESPONSE_YES) {
@@ -1708,7 +1730,7 @@ void Kage::OpenKSF_onClick() {
 			_undoRedoManager.clear();
 			stackDo();
 			propFillStrokeSetVisible(false);
-			propLocationSizeSetVisible(false);
+			propShapePropertiesSetVisible(false);
 			propNodeXYSetVisible(false);
 			set_title(ksfPath + " - " + KageAbout::app_title);
 			break;
@@ -1781,17 +1803,17 @@ void Kage::doSave(string p_filename) {
 				for (j = 1; j <= l_fMax; ++j) {
 					KageFrame *l_frame = _framesetManager.getFrameAt(j);
 					KageFrame::extension l_extension = l_frame->getExtension();
-					if (l_extension == KageFrame::extension::EXTENSION_NOT) {
+					if (l_extension == KageFrame::EXTENSION_NOT) {
 						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + ">");
 						_framesetManager.setCurrentFrame(j);
 						saveKageStudio(ksfPath, saveFrame() + "\n</frame" + StringHelper::unsignedIntegerToString(j) + ">");
-					} else if (l_extension == KageFrame::extension::EXTENSION_START) {
+					} else if (l_extension == KageFrame::EXTENSION_START) {
 						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + " extend=\"start\">");
 						_framesetManager.setCurrentFrame(j);
 						saveKageStudio(ksfPath, saveFrame() + "\n</frame" + StringHelper::unsignedIntegerToString(j) + ">");
-					} else if (l_extension == KageFrame::extension::EXTENSION_MID) {
+					} else if (l_extension == KageFrame::EXTENSION_MID) {
 						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + " extend=\"mid\" />");
-					} else if (l_extension == KageFrame::extension::EXTENSION_END) {
+					} else if (l_extension == KageFrame::EXTENSION_END) {
 						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + " extend=\"end\" />");
 					}
 				}
@@ -2191,7 +2213,7 @@ void Kage::ExportAVI_onClick() {
 	}
 }
 
-void Kage_ExportHTML5_onClick() {
+void Kage::ProjectSave_onClick() {
 	Gtk::FileChooserDialog dialog("Please choose a folder", Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
 //	dialog.set_transient_for( * this);
 	//Add response buttons the the dialog:
@@ -2218,14 +2240,24 @@ void Kage::onActionActivate() {
 }
 
 void Kage::Play_onClick() {
-	if (_isPlaying == true) {
-		m_KageStage.remove_tick_callback(m_tick_id);
-	}
-	std::cout << " Kage::Play_onClick" << std::endl;
+	Stop_onClick();
 	tickCounter = 0;
 	frameCounter = 0;
 	_isPlaying = true;
 	m_tick_id = m_KageStage.add_tick_callback( sigc::mem_fun(*this, &Kage::on_tick) );
+}
+
+void Kage::PlayFrame_onClick() {
+	Play_onClick();
+	tickCounter = 0;
+	frameCounter = getCurrentFrame()-1;
+}
+
+void Kage::Stop_onClick() {
+	if (_isPlaying == true) {
+		m_KageStage.remove_tick_callback(m_tick_id);
+		_isPlaying = false;
+	}
 }
 
 bool Kage::on_tick(const Glib::RefPtr<Gdk::FrameClock>& frame_clock) {
@@ -2788,11 +2820,11 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 			_framesetManager.setCurrentFrame(l_frame);
 			if (l_properties.size() > 0 && (l_properties[0].getName() == "extend")) {
 				if (l_properties[0].getValue() == "start") {
-					_framesetManager.setFrameExtension(KageFrame::extension::EXTENSION_START);
+					_framesetManager.setFrameExtension(KageFrame::EXTENSION_START);
 				} else if (l_properties[0].getValue() == "mid") {
-					_framesetManager.setFrameExtension(KageFrame::extension::EXTENSION_MID);
+					_framesetManager.setFrameExtension(KageFrame::EXTENSION_MID);
 				} else if (l_properties[0].getValue() == "end") {
-					_framesetManager.setFrameExtension(KageFrame::extension::EXTENSION_END);
+					_framesetManager.setFrameExtension(KageFrame::EXTENSION_END);
 				}
 			}
 		} else if (l_tagname == "init") {

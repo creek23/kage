@@ -123,6 +123,7 @@
 			void ExportPNGTransparent_onClick();
 			void ExportPNGSequence_onClick();
 			void ExportAVI_onClick();
+			void ProjectSave_onClick(); //place holder
 			
 			virtual bool on_delete_event(GdkEventAny* any_event);
 			
@@ -277,6 +278,7 @@
 			Gtk::VPaned m_VPane_Timeline;
 			Gtk::HPaned m_HPane_DrawingArea;
 			Gtk::Statusbar m_Statusbar;
+				Gtk::Label _labelStatusMouseXY;
 			
 			unsigned m_ContextId;
 			
@@ -304,6 +306,8 @@
 			bool runExternal(string p_cmd, string p_param);
 			
 			void Play_onClick();
+			void PlayFrame_onClick();
+			void Stop_onClick();
 //			void ToolSelect_onClick();
 			void ToolNode_onClick();
 			void ToolPoly_onClick();
@@ -338,10 +342,10 @@
 			
 			void propStageSetVisible(bool p_visible);
 			void propFillStrokeSetVisible(bool p_visible);
-			void propLocationSizeSetVisible(bool p_visible);
+			void propShapePropertiesSetVisible(bool p_visible);
 			void propNodeXYSetVisible(bool p_visible);
 			void updateColors();
-			void updateProperties();
+			void updateShapeProperties();
 			void updateNodeXY();
 			void updateSelectedShapeColor(bool p_doFill = true, bool p_doStroke = true);
 			
@@ -358,6 +362,8 @@
 			unsigned int getCurrentFrame();
 			void setCurrentLayerByID(unsigned int p_layerID);
 			void setCurrentFrame(unsigned int p_layer);
+			
+			void displayMouseXY(double p_x, double p_y);
 	};
 
 #endif //GTKMM_KAGE_H

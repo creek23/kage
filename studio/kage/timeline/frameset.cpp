@@ -30,9 +30,9 @@ bool KageFrameset::addFrame() {
 	if (l_currentFrame == getFrameCount()) {
 		if (_frames.size() > 1) {
 			KageFrame::extension l_extension = _frames[_frames.size()-2]->getExtension();
-			if (l_extension == KageFrame::extension::EXTENSION_NOT) {
+			if (l_extension == KageFrame::EXTENSION_NOT) {
 				//keep
-			} else if (l_extension == KageFrame::extension::EXTENSION_END) {
+			} else if (l_extension == KageFrame::EXTENSION_END) {
 				//keep
 			}
 		}
@@ -46,23 +46,23 @@ bool KageFrameset::addFrame() {
 		
 		if (_frames.size() > 1) {
 			KageFrame::extension l_extension = _frames[l_currentFrame-1]->getExtension();
-			if (l_extension == KageFrame::extension::EXTENSION_NOT) {
+			if (l_extension == KageFrame::EXTENSION_NOT) {
 				//keep
-			} else if (l_extension == KageFrame::extension::EXTENSION_START) {
-				_frames[l_currentFrame-1]->setExtension(KageFrame::extension::EXTENSION_NOT);
+			} else if (l_extension == KageFrame::EXTENSION_START) {
+				_frames[l_currentFrame-1]->setExtension(KageFrame::EXTENSION_NOT);
 				l_extension = _frames[l_currentFrame+1]->getExtension();
-				if (       l_extension == KageFrame::extension::EXTENSION_MID
-						|| l_extension == KageFrame::extension::EXTENSION_END) {
-					_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_START);
+				if (       l_extension == KageFrame::EXTENSION_MID
+						|| l_extension == KageFrame::EXTENSION_END) {
+					_frames[l_currentFrame  ]->setExtension(KageFrame::EXTENSION_START);
 				}
-			} else if (l_extension == KageFrame::extension::EXTENSION_MID) {
-				_frames[l_currentFrame-1]->setExtension(KageFrame::extension::EXTENSION_END);
+			} else if (l_extension == KageFrame::EXTENSION_MID) {
+				_frames[l_currentFrame-1]->setExtension(KageFrame::EXTENSION_END);
 				l_extension = _frames[l_currentFrame+1]->getExtension();
-				if (       l_extension == KageFrame::extension::EXTENSION_MID
-						|| l_extension == KageFrame::extension::EXTENSION_END) {
-					_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_START);
+				if (       l_extension == KageFrame::EXTENSION_MID
+						|| l_extension == KageFrame::EXTENSION_END) {
+					_frames[l_currentFrame  ]->setExtension(KageFrame::EXTENSION_START);
 				}
-			} else if (l_extension == KageFrame::extension::EXTENSION_END) {
+			} else if (l_extension == KageFrame::EXTENSION_END) {
 				//keep
 			}
 			setCurrentFrame(l_currentFrame); //restore Current Frame because moveToLeft changed Current Frame
@@ -83,45 +83,45 @@ void KageFrameset::duplicateFrame() {
 		unsigned int l_currentFrame = getCurrentFrame()-1;
 		if (_frames.size() > 1) {
 			KageFrame::extension l_extension = _frames[l_currentFrame-1]->getExtension();
-			if (l_extension == KageFrame::extension::EXTENSION_NOT) {
+			if (l_extension == KageFrame::EXTENSION_NOT) {
 				//keep
 	//			l_extension = _frames[l_currentFrame+1]->getExtension();
-	//			if (       l_extension == KageFrame::extension::EXTENSION_MID
-	//					|| l_extension == KageFrame::extension::EXTENSION_END) {
-	//				_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_START);
+	//			if (       l_extension == KageFrame::EXTENSION_MID
+	//					|| l_extension == KageFrame::EXTENSION_END) {
+	//				_frames[l_currentFrame  ]->setExtension(KageFrame::EXTENSION_START);
 	//			}
-			} else if (l_extension == KageFrame::extension::EXTENSION_START) {
-				_frames[l_currentFrame-1]->setExtension(KageFrame::extension::EXTENSION_NOT);
+			} else if (l_extension == KageFrame::EXTENSION_START) {
+				_frames[l_currentFrame-1]->setExtension(KageFrame::EXTENSION_NOT);
 				if (l_currentFrame+1 < _frames.size()) {
 					l_extension = _frames[l_currentFrame+1]->getExtension();
-					if (       l_extension == KageFrame::extension::EXTENSION_MID
-							|| l_extension == KageFrame::extension::EXTENSION_END) {
-						_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_START);
-					} else if (l_extension == KageFrame::extension::EXTENSION_NOT
-							|| l_extension == KageFrame::extension::EXTENSION_START) {
-						_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
+					if (       l_extension == KageFrame::EXTENSION_MID
+							|| l_extension == KageFrame::EXTENSION_END) {
+						_frames[l_currentFrame  ]->setExtension(KageFrame::EXTENSION_START);
+					} else if (l_extension == KageFrame::EXTENSION_NOT
+							|| l_extension == KageFrame::EXTENSION_START) {
+						_frames[l_currentFrame  ]->setExtension(KageFrame::EXTENSION_NOT);
 					}
 				} else {
-					_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
+					_frames[l_currentFrame  ]->setExtension(KageFrame::EXTENSION_NOT);
 				}
-			} else if (l_extension == KageFrame::extension::EXTENSION_MID) {
-				_frames[l_currentFrame-1]->setExtension(KageFrame::extension::EXTENSION_END);
+			} else if (l_extension == KageFrame::EXTENSION_MID) {
+				_frames[l_currentFrame-1]->setExtension(KageFrame::EXTENSION_END);
 				if (l_currentFrame+1 < _frames.size()) {
 					l_extension = _frames[l_currentFrame+1]->getExtension();
-					if (       l_extension == KageFrame::extension::EXTENSION_MID
-							|| l_extension == KageFrame::extension::EXTENSION_END) {
-						_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_START);
-					} else if (l_extension == KageFrame::extension::EXTENSION_NOT
-							|| l_extension == KageFrame::extension::EXTENSION_START) {
-						_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
+					if (       l_extension == KageFrame::EXTENSION_MID
+							|| l_extension == KageFrame::EXTENSION_END) {
+						_frames[l_currentFrame  ]->setExtension(KageFrame::EXTENSION_START);
+					} else if (l_extension == KageFrame::EXTENSION_NOT
+							|| l_extension == KageFrame::EXTENSION_START) {
+						_frames[l_currentFrame  ]->setExtension(KageFrame::EXTENSION_NOT);
 					}
 				} else {
-					_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
+					_frames[l_currentFrame  ]->setExtension(KageFrame::EXTENSION_NOT);
 				}
-			} else if (l_extension == KageFrame::extension::EXTENSION_END) {
+			} else if (l_extension == KageFrame::EXTENSION_END) {
 				//keep previous
 				cout << " at END with " << _frames[l_currentFrame]->getExtension() << endl;
-				_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
+				_frames[l_currentFrame  ]->setExtension(KageFrame::EXTENSION_NOT);
 			}
 		}
 
@@ -160,51 +160,51 @@ bool KageFrameset::removeFrame() {
 					l_extensionNext     = _frames[i+1]->getExtension();
 					switchToNextFrame();
 						l_frameData = getFrameData().clone();
-					if (l_extensionPrevious == KageFrame::extension::EXTENSION_NOT) {
+					if (l_extensionPrevious == KageFrame::EXTENSION_NOT) {
 						//keep Previous
-						if (       l_extensionNext == KageFrame::extension::EXTENSION_START
-								&& l_extensionNext == KageFrame::extension::EXTENSION_MID) {
-							_frames[i  ]->setExtension(KageFrame::extension::EXTENSION_START);
-						} else if (l_extensionNext == KageFrame::extension::EXTENSION_END
-								&& l_extensionNext == KageFrame::extension::EXTENSION_NOT) {
-							_frames[i  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
+						if (       l_extensionNext == KageFrame::EXTENSION_START
+								&& l_extensionNext == KageFrame::EXTENSION_MID) {
+							_frames[i  ]->setExtension(KageFrame::EXTENSION_START);
+						} else if (l_extensionNext == KageFrame::EXTENSION_END
+								&& l_extensionNext == KageFrame::EXTENSION_NOT) {
+							_frames[i  ]->setExtension(KageFrame::EXTENSION_NOT);
 						}
-					} else if (l_extensionPrevious == KageFrame::extension::EXTENSION_START) {
-						if (       l_extensionNext == KageFrame::extension::EXTENSION_MID
-								&& l_extensionNext == KageFrame::extension::EXTENSION_END) {
+					} else if (l_extensionPrevious == KageFrame::EXTENSION_START) {
+						if (       l_extensionNext == KageFrame::EXTENSION_MID
+								&& l_extensionNext == KageFrame::EXTENSION_END) {
 							//keep Previous
 							//keep current
-						} else if (l_extensionNext == KageFrame::extension::EXTENSION_NOT) {
-							_frames[i-1]->setExtension(KageFrame::extension::EXTENSION_NOT);
-							_frames[i  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
-						} else if (l_extensionNext == KageFrame::extension::EXTENSION_START) {
-							_frames[i-1]->setExtension(KageFrame::extension::EXTENSION_END);
-							_frames[i  ]->setExtension(KageFrame::extension::EXTENSION_START);
+						} else if (l_extensionNext == KageFrame::EXTENSION_NOT) {
+							_frames[i-1]->setExtension(KageFrame::EXTENSION_NOT);
+							_frames[i  ]->setExtension(KageFrame::EXTENSION_NOT);
+						} else if (l_extensionNext == KageFrame::EXTENSION_START) {
+							_frames[i-1]->setExtension(KageFrame::EXTENSION_END);
+							_frames[i  ]->setExtension(KageFrame::EXTENSION_START);
 						}
-					} else if (l_extensionPrevious == KageFrame::extension::EXTENSION_MID) {
-						if (       l_extensionNext == KageFrame::extension::EXTENSION_NOT) {
-							_frames[i-1]->setExtension(KageFrame::extension::EXTENSION_END);
-							_frames[i  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
-						} else if (l_extensionNext == KageFrame::extension::EXTENSION_START) {
-							_frames[i-1]->setExtension(KageFrame::extension::EXTENSION_END);
-							_frames[i  ]->setExtension(KageFrame::extension::EXTENSION_START);
-						} else if (l_extensionNext == KageFrame::extension::EXTENSION_MID) {
+					} else if (l_extensionPrevious == KageFrame::EXTENSION_MID) {
+						if (       l_extensionNext == KageFrame::EXTENSION_NOT) {
+							_frames[i-1]->setExtension(KageFrame::EXTENSION_END);
+							_frames[i  ]->setExtension(KageFrame::EXTENSION_NOT);
+						} else if (l_extensionNext == KageFrame::EXTENSION_START) {
+							_frames[i-1]->setExtension(KageFrame::EXTENSION_END);
+							_frames[i  ]->setExtension(KageFrame::EXTENSION_START);
+						} else if (l_extensionNext == KageFrame::EXTENSION_MID) {
 							//keep Previous
 							//keep current
-						} else if (l_extensionNext == KageFrame::extension::EXTENSION_END) {
+						} else if (l_extensionNext == KageFrame::EXTENSION_END) {
 							//keep Previous
-							_frames[i  ]->setExtension(KageFrame::extension::EXTENSION_END);
+							_frames[i  ]->setExtension(KageFrame::EXTENSION_END);
 						}
-					} else if (l_extensionPrevious == KageFrame::extension::EXTENSION_END) {
+					} else if (l_extensionPrevious == KageFrame::EXTENSION_END) {
 						//keep Previous
-						if (       l_extensionNext == KageFrame::extension::EXTENSION_NOT) {
-							_frames[i  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
-						} else if (l_extensionNext == KageFrame::extension::EXTENSION_START) {
-							_frames[i  ]->setExtension(KageFrame::extension::EXTENSION_START);
-						} else if (l_extensionNext == KageFrame::extension::EXTENSION_MID) {
+						if (       l_extensionNext == KageFrame::EXTENSION_NOT) {
+							_frames[i  ]->setExtension(KageFrame::EXTENSION_NOT);
+						} else if (l_extensionNext == KageFrame::EXTENSION_START) {
+							_frames[i  ]->setExtension(KageFrame::EXTENSION_START);
+						} else if (l_extensionNext == KageFrame::EXTENSION_MID) {
 							//keep current
-						} else if (l_extensionNext == KageFrame::extension::EXTENSION_END) {
-							_frames[i  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
+						} else if (l_extensionNext == KageFrame::EXTENSION_END) {
+							_frames[i  ]->setExtension(KageFrame::EXTENSION_NOT);
 						}
 					}
 				} else {
@@ -304,12 +304,12 @@ void KageFrameset::extendFrame() {
 	
 	if (l_currentFrame == getFrameCount()) {
 		KageFrame::extension l_extension = _frames[_frames.size()-2]->getExtension();
-		if (l_extension == KageFrame::extension::EXTENSION_NOT) {
-			_frames[_frames.size()-2]->setExtension(KageFrame::extension::EXTENSION_START);
-			_frames[_frames.size()-1]->setExtension(KageFrame::extension::EXTENSION_END);
-		} else if (l_extension == KageFrame::extension::EXTENSION_END) {
-			_frames[_frames.size()-2]->setExtension(KageFrame::extension::EXTENSION_MID);
-			_frames[_frames.size()-1]->setExtension(KageFrame::extension::EXTENSION_END);
+		if (l_extension == KageFrame::EXTENSION_NOT) {
+			_frames[_frames.size()-2]->setExtension(KageFrame::EXTENSION_START);
+			_frames[_frames.size()-1]->setExtension(KageFrame::EXTENSION_END);
+		} else if (l_extension == KageFrame::EXTENSION_END) {
+			_frames[_frames.size()-2]->setExtension(KageFrame::EXTENSION_MID);
+			_frames[_frames.size()-1]->setExtension(KageFrame::EXTENSION_END);
 		}
 	} else if (l_currentFrame < getFrameCount()) {
 		unsigned int l_frameIndex = getFrameCount();
@@ -320,30 +320,30 @@ void KageFrameset::extendFrame() {
 		}
 		
 		KageFrame::extension l_extension = _frames[l_currentFrame-1]->getExtension();
-		if (l_extension == KageFrame::extension::EXTENSION_NOT) {
-			_frames[l_currentFrame-1]->setExtension(KageFrame::extension::EXTENSION_START);
-			_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_END);
-		} else if (l_extension == KageFrame::extension::EXTENSION_START) {
+		if (l_extension == KageFrame::EXTENSION_NOT) {
+			_frames[l_currentFrame-1]->setExtension(KageFrame::EXTENSION_START);
+			_frames[l_currentFrame  ]->setExtension(KageFrame::EXTENSION_END);
+		} else if (l_extension == KageFrame::EXTENSION_START) {
 			l_extension = _frames[l_currentFrame+1]->getExtension();
-			if (       l_extension == KageFrame::extension::EXTENSION_NOT
-					|| l_extension == KageFrame::extension::EXTENSION_START) {
-				_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_END);
-			} else if (l_extension == KageFrame::extension::EXTENSION_MID
-					|| l_extension == KageFrame::extension::EXTENSION_END) {
-				_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_MID);
+			if (       l_extension == KageFrame::EXTENSION_NOT
+					|| l_extension == KageFrame::EXTENSION_START) {
+				_frames[l_currentFrame  ]->setExtension(KageFrame::EXTENSION_END);
+			} else if (l_extension == KageFrame::EXTENSION_MID
+					|| l_extension == KageFrame::EXTENSION_END) {
+				_frames[l_currentFrame  ]->setExtension(KageFrame::EXTENSION_MID);
 			}
-		} else if (l_extension == KageFrame::extension::EXTENSION_MID) {
+		} else if (l_extension == KageFrame::EXTENSION_MID) {
 			l_extension = _frames[l_currentFrame+1]->getExtension();
-			if (       l_extension == KageFrame::extension::EXTENSION_NOT
-					|| l_extension == KageFrame::extension::EXTENSION_START) {
-				_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_END);
-			} else if (l_extension == KageFrame::extension::EXTENSION_MID
-					|| l_extension == KageFrame::extension::EXTENSION_END) {
-				_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_MID);
+			if (       l_extension == KageFrame::EXTENSION_NOT
+					|| l_extension == KageFrame::EXTENSION_START) {
+				_frames[l_currentFrame  ]->setExtension(KageFrame::EXTENSION_END);
+			} else if (l_extension == KageFrame::EXTENSION_MID
+					|| l_extension == KageFrame::EXTENSION_END) {
+				_frames[l_currentFrame  ]->setExtension(KageFrame::EXTENSION_MID);
 			}
-		} else if (l_extension == KageFrame::extension::EXTENSION_END) {
-			_frames[l_currentFrame-1]->setExtension(KageFrame::extension::EXTENSION_MID);
-			_frames[l_currentFrame  ]->setExtension(KageFrame::extension::EXTENSION_END);
+		} else if (l_extension == KageFrame::EXTENSION_END) {
+			_frames[l_currentFrame-1]->setExtension(KageFrame::EXTENSION_MID);
+			_frames[l_currentFrame  ]->setExtension(KageFrame::EXTENSION_END);
 		}
 		setCurrentFrame(l_currentFrame); //restore Current Frame because moveToLeft changed Current Frame
 	}
@@ -609,8 +609,8 @@ bool KageFrameset::flipVerticalSelectedShape(vector<unsigned int> p_selectedShap
 	return false;
 }
 	bool KageFrameset::doFlipVerticalSelectedShapeOn(unsigned int p_frameIndex, vector<unsigned int> p_selectedShapes) {
-		if (       _frames[p_frameIndex]->getExtension() == KageFrame::extension::EXTENSION_NOT
-				|| _frames[p_frameIndex]->getExtension() == KageFrame::extension::EXTENSION_START) {
+		if (       _frames[p_frameIndex]->getExtension() == KageFrame::EXTENSION_NOT
+				|| _frames[p_frameIndex]->getExtension() == KageFrame::EXTENSION_START) {
 			return _frames[p_frameIndex]->flipVerticalSelectedShape(p_selectedShapes);
 		} else {
 			return doFlipVerticalSelectedShapeOnExtendedFrame(p_frameIndex-1, p_selectedShapes);
@@ -618,8 +618,8 @@ bool KageFrameset::flipVerticalSelectedShape(vector<unsigned int> p_selectedShap
 	}
 	bool KageFrameset::doFlipVerticalSelectedShapeOnExtendedFrame(unsigned int p_frameIndex, vector<unsigned int> p_selectedShapes) {
 		while (p_frameIndex > 0) {
-			if (       _frames[p_frameIndex]->getExtension() == KageFrame::extension::EXTENSION_NOT
-					|| _frames[p_frameIndex]->getExtension() == KageFrame::extension::EXTENSION_START) {
+			if (       _frames[p_frameIndex]->getExtension() == KageFrame::EXTENSION_NOT
+					|| _frames[p_frameIndex]->getExtension() == KageFrame::EXTENSION_START) {
 				return _frames[p_frameIndex]->flipVerticalSelectedShape(p_selectedShapes);
 			} else {
 				--p_frameIndex;
@@ -788,10 +788,10 @@ bool KageFrameset::canReUseNextFrame() {
 	if (_currentFrameIndex+1 == _frames.size()) {
 		return false;
 	} else if (_frames[_currentFrameIndex+1]->isEmpty() == false
-			&& _frames[_currentFrameIndex+1]->getExtension() == KageFrame::extension::EXTENSION_NOT) {
+			&& _frames[_currentFrameIndex+1]->getExtension() == KageFrame::EXTENSION_NOT) {
 		return false;
 	} else if (_frames[_currentFrameIndex+1]->isEmpty() == false
-			&& _frames[_currentFrameIndex+1]->getExtension() == KageFrame::extension::EXTENSION_START) {
+			&& _frames[_currentFrameIndex+1]->getExtension() == KageFrame::EXTENSION_START) {
 		return false;
 	}
 	

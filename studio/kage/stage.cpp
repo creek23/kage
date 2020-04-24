@@ -1726,7 +1726,7 @@ void KageStage::handleShapes_modifyingShapeRotate() {
 					break;
 				} else if (v[i].vectorType == VectorData::TYPE_INIT) {
 					//use as rotation-anchor ONLY if just ONE selected shape
-					if (l_selectedShapes_size == 1) {
+					if (l_selectedShapes_size == 1 && v[i].points.size() == 1) {
 						anchor_center.x = v[i].points[0].x + origin.x;
 						anchor_center.y = v[i].points[0].y + origin.y;
 							l_rotateNew.x = draw2.x - anchor_center.x;
@@ -1930,7 +1930,7 @@ void KageStage::handleShapes_modifyingShape() {
 						break;
 					} else if (v[i].vectorType == VectorData::TYPE_INIT) {
 						//use as rotation-anchor ONLY if just ONE selected shape
-						if (l_selectedShapes_size == 1) {
+						if (l_selectedShapes_size == 1 && v[i].points.size() == 1) {
 							anchor_center.x = v[i].points[0].x + origin.x;
 							anchor_center.y = v[i].points[0].y + origin.y;
 								l_rotateNew.x = draw2.x - anchor_center.x;
@@ -2047,7 +2047,9 @@ void KageStage::handleShapes() {
 					&& i != selectedShapes[l_shapeIndex]) {
 				break;
 			} else if (v[i].vectorType == VectorData::TYPE_INIT) {
-				if (l_selectedShapes_size == 1) {
+				l_anchorX = origin.x;
+				l_anchorY = origin.y;
+				if (l_selectedShapes_size == 1 && v[i].points.size() == 1) {
 					l_anchorX = v[i].points[0].x + origin.x;
 					l_anchorY = v[i].points[0].y + origin.y;
 				}

@@ -617,6 +617,10 @@ vector<unsigned int> VectorDataManager::ungroupSelectedShapes(vector<unsigned in
 						l_vectorData.stroke = StrokeColorData();
 						l_vectorData.fillColor = ColorData();
 					l_vectorDataZOrderBuffer.push_back(l_vectorData);
+						vector<PointData> ps;
+							PointData l_point(0.0, 0.0);
+								ps.push_back(l_point);
+						l_vectorDataZOrderBuffer[l_vectorDataZOrderBuffer.size()-1].setPoints(ps);
 				}
 			}
 			l_vectorDataCopyBuffer.clear();

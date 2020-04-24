@@ -2534,7 +2534,11 @@ string Kage::saveFrame() {
 				l_ostringstream << "\t<closepath/>\n";
 				break;
 			case VectorData::TYPE_INIT:
-				l_ostringstream << "<init>" << v[i].points[0].x << " " << v[i].points[0].y << "</init>\n";
+				if (v[i].points.size() == 1) {
+					l_ostringstream << "<init>" << v[i].points[0].x << " " << v[i].points[0].y << "</init>\n";
+				} else {
+					l_ostringstream << "<init/>\n";
+				}
 				break;
 			case VectorData::TYPE_TEXT: break;
 			case VectorData::TYPE_FILL:

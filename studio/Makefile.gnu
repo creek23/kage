@@ -19,6 +19,11 @@ SOURCES = \
 	./kage/unre/kagedo.cpp \
 	./kage/unre/unre.cpp \
 	./kage/stage.cpp \
+	./kage/stage_node.cpp \
+	./kage/stage_oval.cpp \
+	./kage/stage_poly.cpp \
+	./kage/stage_rect.cpp \
+	./kage/stage_shape.cpp \
 	./kage/vectordatamanager.cpp \
 	./util/xml/xmltoken.cpp \
 	./util/xml/xmltagproperty.cpp \

@@ -1,5 +1,9 @@
 //part of stage.cpp
 
+#include "stage.h"
+#include "../kage.h"
+#include <cairomm/context.h>
+
 void KageStage::setSelectedShapes(vector<unsigned int> p_selectedShapes) {
 	selectedNodes = p_selectedShapes;
 	tryMultiSelectShapes_populateShapes();
@@ -340,7 +344,7 @@ void KageStage::updateShapeColor(bool p_doFill, bool p_doStroke) {
 	render();
 }
 
-void KageStage::updateShapeX(double p_value) {
+void KageStage::updateShapeX(double p_value, bool p_stackDo) {
 	Kage::timestamp();
 	std::cout << " KageStage::updateShapeX " << selectedShapes.size() << " " << p_value << std::endl;
 	
@@ -350,15 +354,28 @@ void KageStage::updateShapeX(double p_value) {
 	
 	vector<VectorData> v = win->getFrameData().getVectorData();
 	
+	propX = DBL_MAX;
+	propXindex1 = UINT_MAX;
+	propXindex2 = UINT_MAX;
+	propY = DBL_MAX;
+	propYindex1 = UINT_MAX;
+	propYindex2 = UINT_MAX;
+	
 	unsigned int vsize = v.size();
 	unsigned int l_selectedShapes_size = selectedShapes.size();
 	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
-		//calling getSelectedShapeViaNode will update propXindex1/propXindex2
+		//calling getSelectedShapeViaNode will update propXindex1/propXindex2 based on left-most VectorData.x
 		getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+3, v);
-		
-		double l_propXprev = v[propXindex1].points[propXindex2].x;
-		double l_propXdiff = p_value - l_propXprev;
-		
+	}
+	
+	double l_propXprev = 0;
+	double l_propXdiff = p_value - l_propXprev;
+	if (propXindex1 != UINT_MAX && propXindex2 != UINT_MAX) {
+		l_propXprev = v[propXindex1].points[propXindex2].x;
+		l_propXdiff = p_value - l_propXprev;
+	}
+	
+	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
 		for (unsigned int i = selectedShapes[l_shapeIndex]; i < vsize; ++i) {
 			if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC) {
 				v[i].points[0].x += l_propXdiff;
@@ -379,11 +396,13 @@ void KageStage::updateShapeX(double p_value) {
 	
 	win->setFrameData(v);
 	
-	win->stackDo();
+	if (p_stackDo) {
+		win->stackDo();
+	}
 	
 	render();
 }
-void KageStage::updateShapeY(double p_value) {
+void KageStage::updateShapeY(double p_value, bool p_stackDo) {
 	Kage::timestamp();
 	std::cout << " KageStage::updateShapeY " << selectedShapes.size() << " " << p_value << std::endl;
 	
@@ -393,15 +412,28 @@ void KageStage::updateShapeY(double p_value) {
 	
 	vector<VectorData> v = win->getFrameData().getVectorData();
 	
+	propX = DBL_MAX;
+	propXindex1 = UINT_MAX;
+	propXindex2 = UINT_MAX;
+	propY = DBL_MAX;
+	propYindex1 = UINT_MAX;
+	propYindex2 = UINT_MAX;
+	
 	unsigned int vsize = v.size();
 	unsigned int l_selectedShapes_size = selectedShapes.size();
 	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
-		//calling getSelectedShapeViaNode will update propXindex1/propXindex2
+		//calling getSelectedShapeViaNode will update propYindex1/propYindex2 based on top-most VectorData.y
 		getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+3, v);
-		
-		double l_propYprev = v[propYindex1].points[propYindex2].y;
-		double l_propYdiff = p_value - l_propYprev;
-		
+	}
+	
+	double l_propYprev = 0;
+	double l_propYdiff = p_value - l_propYprev;
+	if (propYindex1 != UINT_MAX && propYindex2 != UINT_MAX) {
+		l_propYprev = v[propYindex1].points[propYindex2].y;
+		l_propYdiff = p_value - l_propYprev;
+	}
+	
+	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
 		for (unsigned int i = selectedShapes[l_shapeIndex]; i < vsize; ++i) {
 			if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC) {
 				v[i].points[0].y += l_propYdiff;
@@ -422,7 +454,9 @@ void KageStage::updateShapeY(double p_value) {
 	
 	win->setFrameData(v);
 	
-	win->stackDo();
+	if (p_stackDo) {
+		win->stackDo();
+	}
 	
 	render();
 }
@@ -1211,4 +1245,64 @@ bool KageStage::deleteSelectedShapes() {
 	win->setFrameData(v);
 	
 	return true;
+}
+
+void KageStage::updateShapeXY() {
+	vector<VectorData> v = win->getFrameData().getVectorData();
+	
+	propX = DBL_MAX;
+	propXindex1 = UINT_MAX;
+	propXindex2 = UINT_MAX;
+	propY = DBL_MAX;
+	propYindex1 = UINT_MAX;
+	propYindex2 = UINT_MAX;
+	
+	unsigned int vsize = v.size();
+	unsigned int l_selectedShapes_size = selectedShapes.size();
+	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
+		//calling getSelectedShapeViaNode will update propXindex1/propXindex2 based on left-most VectorData.x
+		getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+3, v);
+	}
+	
+	unsigned int nsize = selectedNodes.size();
+	if (nsize == 0) {
+		nodeX = 0;
+		nodeY = 0;
+		nodeIndexX = UINT_MAX;
+		nodeIndexY = UINT_MAX;
+	} else {
+		nodeX = DBL_MAX;
+		nodeY = DBL_MAX;
+		vector<VectorData> v = win->getFrameData().getVectorData();
+		unsigned int vsize = v.size();
+		for (unsigned int i = 0; i < nsize; ++i) {
+			for (unsigned int j = i; j < vsize; ++j) {
+				if (isSelectedNode(j) == true) {
+					if (       v[j].vectorType == VectorData::TYPE_CURVE_QUADRATIC
+							|| v[j].vectorType == VectorData::TYPE_CURVE_CUBIC) {
+						if (v[j].points[2].x < nodeX) {
+							nodeX = v[j].points[2].x;
+							nodeIndexX = j;
+						}
+						if (v[j].points[2].y < nodeY) {
+							nodeY = v[j].points[2].y;
+							nodeIndexY = j;
+						}
+					} else if (v[j].vectorType == VectorData::TYPE_INIT
+							&& j != selectedShapes[i]) {
+						break;
+					}
+				}
+			}
+		}
+		if (nodeX == DBL_MAX) {
+			nodeX = 0;
+			nodeIndexX = UINT_MAX;
+		}
+		if (nodeY == DBL_MAX) {
+			nodeY = 0;
+			nodeIndexY = UINT_MAX;
+		}
+	}
+	win->propNodeXYSetVisible(true);
 }

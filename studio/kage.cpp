@@ -1083,22 +1083,38 @@ void Kage::Delete_onClick() {
 void Kage::AddFrame_onClick() {
 	_framesetManager.addFrame();
 	
-	show_all();
+	refreshUI();
 }
 void Kage::ExtendFrame_onClick() {
 	_framesetManager.extendFrame();
 	
-	show_all();
+	refreshUI();
 }
 void Kage::DuplicateFrame_onClick() {
 	_framesetManager.duplicateFrame();
 	
-	show_all();
+	refreshUI();
 }
 void Kage::RemoveFrame_onClick() {
 	_framesetManager.removeFrame();
 	
+	refreshUI();
+}
+
+void Kage::refreshUI() {
 	show_all();
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		propNodeXYSetVisible(false);
+		propStageSetVisible(false);
+	} else if (KageStage::toolMode == KageStage::MODE_NODE) {
+		propFillStrokeSetVisible(false);
+		propStageSetVisible(false);
+		propShapePropertiesSetVisible(false);
+	} else if (KageStage::toolMode == KageStage::MODE_NONE) {
+		propNodeXYSetVisible(false);
+		propFillStrokeSetVisible(false);
+		propShapePropertiesSetVisible(false);
+	}
 }
 
 /**
@@ -1152,12 +1168,14 @@ void Kage::DeleteFrame_onClick() {
 	}
 void Kage::switchToPreviousFrame() {
 	_framesetManager.switchToPreviousFrame();
-	show_all();
+	
+	refreshUI();
 }
 
 void Kage::switchToNextFrame() {
 	_framesetManager.switchToNextFrame();
-	show_all();
+	
+	refreshUI();
 }
 
 /**
@@ -1171,7 +1189,7 @@ void Kage::LayerAdd_onClick() {
 	KageFramesetManager::LOADING_MODE = true;
 		_framesetManager.addFrameset(_layerManager.addLayer());
 		std::cout << "Layer Count: " << _layerManager.layerCount() << std::endl;
-		show_all();
+		refreshUI();
 		setCurrentFrame(getCurrentFrame());
 		updateStatus("New Layer Added");
 	KageFramesetManager::LOADING_MODE = false;
@@ -1647,11 +1665,7 @@ void Kage::New_onClick() {
 	if (continueNewFileWithUnsavedWork() == false) {
 		return;
 	}
-	propStageSetVisible(true);
-	propFillStrokeSetVisible(false);
-	propShapePropertiesSetVisible(false);
-	propNodeXYSetVisible(false);
-
+	
 	_layerManager.removeAllLayers();
 	_framesetManager.removeAllFrames();
 	_framesetManager.addFrameset(_layerManager.addLayer());
@@ -1659,7 +1673,7 @@ void Kage::New_onClick() {
 	_undoRedoManager.clear();
 	stackDo();
 	
-	show_all();
+	refreshUI();
 	
 	_framesetManager.setCurrentLayer(1);
 	_framesetManager.setCurrentFrame(1);
@@ -2165,6 +2179,7 @@ void Kage::ExportAVI_onClick() {
 						CairoKage::writeToPNG(l_pngSequencePath, surface);
 					}
 					//workaround to FFMPEG-bug: see https://sourceforge.net/p/kage/tickets/25/
+					if (1 == 0) {
 						for (j = 1; j <= (m_KageStage.fps); ++j) {
 							_framesetManager.setCurrentFrame(l_fMax);
 							
@@ -2190,6 +2205,7 @@ void Kage::ExportAVI_onClick() {
 							}
 							CairoKage::writeToPNG(l_pngSequencePath, surface);
 						}
+					}
 					//end of workaround
 				setCurrentFrame(f);
 				setCurrentLayer(t);
@@ -2896,7 +2912,7 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 		}
 	}
 	m_KageStage.render();
-	show_all();
+	refreshUI();
 }
 void Kage::parseKSF(string p_content) {
 	BasicXml _xml;

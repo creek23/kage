@@ -142,13 +142,13 @@
 
 			
 			void updateShapeColor(bool p_doFill = true, bool p_doStroke = true);
-			void updateShapeX(double p_value);
-			void updateShapeY(double p_value);
+			void updateShapeX(double p_value, bool p_stackDo = true);
+			void updateShapeY(double p_value, bool p_stackDo = true);
 			void updateShapeWidth(double p_value);
 			void updateShapeHeight(double p_value);
 			void updateNodeX(double p_value, bool p_stackDo = true);
-			void updateNodeY(double p_value);
-			
+			void updateNodeY(double p_value, bool p_stackDo = true);
+			bool _stackDo = false;
 			vector<VectorData> _vectorDataCopyBuffer;
 			vector<VectorData> _vectorDataZOrderBufferA;
 			vector<VectorData> _vectorDataZOrderBufferB;
@@ -252,5 +252,7 @@
 			
 			int _registerWidth;
 			int _registerHeight;
+			
+			void updateShapeXY();
 	};
 #endif // GTKMM_KAGE_STAGE_H

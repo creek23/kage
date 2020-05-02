@@ -1,5 +1,9 @@
 //part of stage.cpp
 
+#include "stage.h"
+#include "../kage.h"
+#include <cairomm/context.h>
+
 void KageStage::initNodeTool() {
 	selectedNode = -1;
 	selectedShape = -1;
@@ -89,7 +93,7 @@ void KageStage::updateNodeX(double p_value, bool p_stackDo) {
 	
 	render();
 }
-void KageStage::updateNodeY(double p_value) {
+void KageStage::updateNodeY(double p_value, bool p_stackDo) {
 	Kage::timestamp();
 	std::cout << " KageStage::updateNodeY " << selectedNodes.size() << " " << p_value << std::endl;
 	
@@ -133,7 +137,9 @@ void KageStage::updateNodeY(double p_value) {
 	
 	win->setFrameData(v);
 	
-	win->stackDo();
+	if (p_stackDo) {
+		win->stackDo();
+	}
 	
 	render();
 }
@@ -688,12 +694,6 @@ unsigned int KageStage::getSelectedShapeViaNode(unsigned int p_index, vector<Vec
 	
 	unsigned int l_tmp = selectedShape;
 	
-	propX = DBL_MAX;
-	propXindex1 = -1;
-	propXindex2 = -1;
-	propY = DBL_MAX;
-	propYindex1 = -1;
-	propYindex2 = -1;
 	propWidth = 0.0;
 	propHeight = 0.0;
 	for (unsigned int i = p_index; i >= 0; --i) {

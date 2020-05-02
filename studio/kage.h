@@ -329,6 +329,8 @@
 			vector<VectorData> _undoBase;
 			
 			bool continueNewFileWithUnsavedWork();
+			
+			void refreshUI();
 		public:
 			void toolsButtonToggle(string p_toolTip);
 			

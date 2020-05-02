@@ -3,12 +3,6 @@
 #include "../kage.h"
 #include <cairomm/context.h>
 
-#include "stage_node.cpp"
-#include "stage_oval.cpp"
-#include "stage_poly.cpp"
-#include "stage_rect.cpp"
-#include "stage_shape.cpp"
-
 KageStage::KageStage(Kage *p_win) {
 	win = p_win;
 	set_can_focus(true); //to accept key_press
@@ -95,13 +89,17 @@ bool KageStage::on_key_press_event(GdkEventKey *e) {
 				handleShapes_moveShape(l_diffX, l_diffY);
 				propX += l_diffX;
 				propY += l_diffY;
+				//updateShapeX(l_diffX, false);
+				//updateShapeY(l_diffY, false);
 				win->updateShapeProperties();
+				_stackDo = true;
 			} else if (KageStage::toolMode == MODE_NODE) {
 				nodeX += l_diffX;
 				nodeY += l_diffY;
 				updateNodeX(nodeX, false);
-				updateNodeY(nodeY);
+				updateNodeY(nodeY, false);
 				updateNodeXY();
+				_stackDo = true;
 			} else {
 				return true;
 			}
@@ -130,6 +128,10 @@ bool KageStage::on_key_release_event(GdkEventKey *e) {
 		keyShiftDown = false;
 	} else if (e->keyval == GDK_KEY_Control_L || e->keyval == GDK_KEY_Control_R) {
 		keyControlDown = false;
+	}
+	if (_stackDo == true) {
+		win->stackDo();
+		_stackDo = false;
 	}
 	return true;
 }
@@ -941,7 +943,7 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
 	double y2;
 	double x3;
 	double y3;
-	bool l_mouseLocationOnFill = false;
+	bool l_mouseLocationOnShape = false;
 	unsigned int l_mouseLocationShapeIndex = _NO_SELECTION;
 	for (unsigned int i = 0; i < vsize; ++i) {
 		switch (p_vectorData[i].vectorType) {
@@ -954,10 +956,16 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
 				p_context->begin_new_path();
 				break;
 			case VectorData::TYPE_ENDFILL:
-				l_mouseLocationOnFill = p_context->in_fill(_mouseLocation.x, _mouseLocation.y);
-				if (l_mouseLocationOnFill != 0) {
+				l_mouseLocationOnShape = p_context->in_fill(_mouseLocation.x, _mouseLocation.y);
+				if (l_mouseLocationOnShape != 0) {
 					_mouseLocationShapeIndex = l_mouseLocationShapeIndex;
+				} else if (_mouseLocationShapeIndex == _NO_SELECTION) {
+					l_mouseLocationOnShape = p_context->in_stroke(_mouseLocation.x, _mouseLocation.y);
+					if (l_mouseLocationOnShape != 0) {
+						_mouseLocationShapeIndex = l_mouseLocationShapeIndex;
+					}
 				}
+				
 				if (fillCtr > 0) {
 					p_context->set_source_rgba((double)fcolor.getR()/255.0f * p_alpha,
 											   (double)fcolor.getG()/255.0f * p_alpha,
@@ -974,12 +982,6 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
 					p_context->set_line_width(scolor.getThickness() * _zoomValue);
 						p_context->set_line_cap(Cairo::LINE_CAP_ROUND);
 							p_context->stroke();
-				}
-				if (l_mouseLocationShapeIndex == _NO_SELECTION) {
-					l_mouseLocationOnFill = p_context->in_stroke(_mouseLocation.x, _mouseLocation.y);
-					if (l_mouseLocationOnFill != 0) {
-						_mouseLocationShapeIndex = l_mouseLocationShapeIndex;
-					}
 				}
 				break;
 			case VectorData::TYPE_STROKE:

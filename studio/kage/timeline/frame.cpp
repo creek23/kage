@@ -360,6 +360,9 @@ bool KageFrame::flipHorizontalSelectedShape(vector<unsigned int> p_selectedShape
 bool KageFrame::flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes) {
 	return vectorsData.flipVerticalSelectedShape(p_selectedShapes);
 }
+bool KageFrame::recenterRotationPoint(vector<unsigned int> p_selectedShapes) {
+	return vectorsData.recenterRotationPoint(p_selectedShapes);
+}
 void KageFrame::addDataToFrame(VectorDataManager v) {
 	if (       _extension == KageFrame::EXTENSION_NOT
 			|| _extension == KageFrame::EXTENSION_START) {

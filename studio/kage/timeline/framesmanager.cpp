@@ -429,6 +429,18 @@ bool KageFramesetManager::flipVerticalSelectedShape(vector<unsigned int> p_selec
 	return false;
 }
 
+bool KageFramesetManager::recenterRotationPoint(vector<unsigned int> p_selectedShapes) {
+	unsigned int l_currentLayer = win->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
+		//
+	} else {
+		--l_currentLayer; //layer now becomes Layer Index
+		return _framesets[l_currentLayer]->recenterRotationPoint(p_selectedShapes);
+	}
+	
+	return false;
+}
+
 bool KageFramesetManager::addDataToFrame(VectorDataManager p_vectorsData) {
 	unsigned int l_currentLayer = win->getCurrentLayer();
 	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {

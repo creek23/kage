@@ -258,6 +258,10 @@ Kage::Kage() : _layerManager(this),
 		Gtk::AccelKey("V"),
 		sigc::mem_fun(*this, &Kage::FlipVertical_onClick)
 	);
+	m_refActionGroup->add(
+		Gtk::Action::create("RecenterRotationPoint", "Re-center Rotation Point", "RecenterRotationPoint"),
+		sigc::mem_fun(*this, &Kage::RecenterRotationPoint_onClick)
+	);
 	////Add Toggle Actions:
 	//m_refActionGroup->add(
 		//Gtk::ToggleAction::create("Bold", Gtk::Stock::BOLD, "_Bold", "Bold", true /* is_active */),
@@ -476,6 +480,8 @@ Kage::Kage() : _layerManager(this),
 		"			<separator/>"
 		"			<menuitem action='FlipHorizontal'/>"
 		"			<menuitem action='FlipVertical'/>"
+		"			<separator/>"
+		"			<menuitem action='RecenterRotationPoint'/>"
 		"		</menu>"
 		"		<menu action='TimelineMenu'>"
 		"			<menuitem action='Play'/>"
@@ -1063,6 +1069,20 @@ void Kage::FlipVertical_onClick() {
 	}
 }
 
+void Kage::RecenterRotationPoint_onClick() {
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		Kage::timestamp();
+		std::cout << " Kage::RecenterRotationPoint_onClick" << std::endl;
+		
+		if (isLayerLocked() == false) {
+			if (_framesetManager.recenterRotationPoint(m_KageStage.getSelectedShapes()) == true) {
+				stackDo();
+				forceRenderFrames();
+			}
+		}
+	}
+}
+
 void Kage::Delete_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp();
@@ -1103,7 +1123,10 @@ void Kage::RemoveFrame_onClick() {
 
 void Kage::refreshUI() {
 	show_all();
-	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+	if (KageStage::toolMode == KageStage::MODE_SELECT
+			|| KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_RECT
+			|| KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_OVAL
+			|| KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_POLY) {
 		propNodeXYSetVisible(false);
 		propStageSetVisible(false);
 	} else if (KageStage::toolMode == KageStage::MODE_NODE) {
@@ -2218,7 +2241,7 @@ void Kage::ExportAVI_onClick() {
 				if (runExternal("del", "/f \"" + l_pngPath + "*.png\"")) {
 #else
 			if (runExternal("ffmpeg", "-y -framerate " + StringHelper::unsignedIntegerToString(m_KageStage.fps) + " -i '" + l_pngPath + "%05d.png' -b:v 2048k '" + l_pngPath + ".avi'")) {
-				if (runExternal("rm", "-f '" + l_pngPath + "*.png'")) {
+				if (runExternal("find", dialog.get_current_folder() + " -wholename '" + l_pngPath + "*.png' -delete")) {
 #endif
 					updateStatus("Exported to " + l_pngPath + ".avi");
 					return;

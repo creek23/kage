@@ -82,6 +82,8 @@
 			bool flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes);
 			bool flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes);
 			
+			bool recenterRotationPoint(vector<unsigned int> p_selectedShapes);
+			
 			void addDataToFrame(VectorDataManager v);
 		protected:
 			//Override default signal handler:

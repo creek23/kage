@@ -52,6 +52,8 @@
 			vector<unsigned int> duplicateShapes(vector<unsigned int> p_selectedShapes);
 			bool flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes);
 			bool flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes);
+			
+			bool recenterRotationPoint(vector<unsigned int> p_selectedShapes);
 		protected:
 			void add(VectorData::type p_type, ColorData p_fill, StrokeColorData p_stroke);
 			

@@ -43,6 +43,8 @@
 				bool doFlipVerticalSelectedShapeOn(unsigned int p_frameIndex, vector<unsigned int> p_selectedShapes);
 				bool doFlipVerticalSelectedShapeOnExtendedFrame(unsigned int p_frameIndex, vector<unsigned int> p_selectedShapes);
 			
+			bool recenterRotationPoint(vector<unsigned int> p_selectedShapes);
+			
 			bool addDataToFrame(VectorDataManager p_vectorsData);
 			bool setFrameData(VectorDataManager p_vectorsData);
 			VectorDataManager getFrameData();

@@ -18,6 +18,9 @@ void KageStage::handleDrawPolyMouseUp() {
 		_polyVectors.addLinePoly(PointData(polyXhead,polyYhead), polyXtail, polyYtail);
 		_polyVectors.addClosePath();
 		_polyVectors.addEndFill();
+			vector<unsigned int> l_shape;
+				l_shape.push_back(0);
+		_polyVectors.recenterRotationPoint(l_shape);
 		win->addDataToFrame(_polyVectors);
 		drawCtr = 0;
 		_polyVectors.clear();
@@ -27,6 +30,9 @@ void KageStage::handleDrawPolyMouseUp() {
 			&& draw1.x-5 <= polyXtail && draw1.x+5 >= polyXtail
 			&& draw1.y-5 <= polyYtail && draw1.y+5 >= polyYtail) {
 		_polyVectors.addEndFill();
+			vector<unsigned int> l_shape;
+				l_shape.push_back(0);
+		_polyVectors.recenterRotationPoint(l_shape);
 		win->addDataToFrame(_polyVectors);
 		_polyVectors.clear();
 		drawCtr = 0;

@@ -336,8 +336,14 @@ void KageStage::handleNodes_relocation() {
 									v[k+1].points[0].x += l_x;
 									v[k+1].points[0].y += l_y;
 								} else if (k+2 < vsize && v[k+2].vectorType == VectorData::TYPE_ENDFILL) {
-									v[typeMovesIndex+1].points[0].x += l_x;
-									v[typeMovesIndex+1].points[0].y += l_y;
+									///get index of MOVE of selectedNode
+									for (unsigned int l_move_index = k; l_move_index > 0; --l_move_index) {
+										if (v[l_move_index].vectorType == VectorData::TYPE_MOVE) {
+											v[l_move_index+1].points[0].x += l_x;
+											v[l_move_index+1].points[0].y += l_y;
+											break;
+										}
+									}
 								}
 								//move anchor of selected node
 								if (k != typeMovesIndex) {
@@ -403,8 +409,14 @@ void KageStage::handleNodes_relocation() {
 									v[k+1].points[0].x += l_x;
 									v[k+1].points[0].y += l_y;
 								} else if (k+2 < vsize && v[k+2].vectorType == VectorData::TYPE_ENDFILL) {
-									v[typeMovesIndex+1].points[0].x += l_x;
-									v[typeMovesIndex+1].points[0].y += l_y;
+									///get index of MOVE of selectedNode
+									for (unsigned int l_move_index = k; l_move_index > 0; --l_move_index) {
+										if (v[l_move_index].vectorType == VectorData::TYPE_MOVE) {
+											v[l_move_index+1].points[0].x += l_x;
+											v[l_move_index+1].points[0].y += l_y;
+											break;
+										}
+									}
 								}
 								//move anchor of selected node
 								if (k != i) {

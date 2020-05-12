@@ -628,6 +628,21 @@ bool KageFrameset::flipVerticalSelectedShape(vector<unsigned int> p_selectedShap
 		return false;
 	}
 
+bool KageFrameset::recenterRotationPoint(vector<unsigned int> p_selectedShapes) {
+	if (_currentFrameIndex < getFrameCount() && _frames[_currentFrameIndex]->frameID == _currentFrameID) {
+		return _frames[_currentFrameIndex]->recenterRotationPoint(p_selectedShapes);
+	} else {
+		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+			if (_frames[i]->frameID == _currentFrameID) {
+				_currentFrameIndex = i;
+				_currentFrameID = _frames[i]->frameID;
+				return _frames[i]->recenterRotationPoint(p_selectedShapes);
+			}
+		}
+	}
+	
+	return false;
+}
 
 bool KageFrameset::addDataToFrame(VectorDataManager p_vectorsData) {
 	if (_currentFrameIndex < getFrameCount() && _frames[_currentFrameIndex]->frameID == _currentFrameID) {

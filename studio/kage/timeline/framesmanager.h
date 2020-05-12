@@ -50,6 +50,8 @@
 			bool flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes);
 			bool flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes);
 			
+			bool recenterRotationPoint(vector<unsigned int> p_selectedShapes);
+			
 			bool addDataToFrame(VectorDataManager p_vectorsData);
 			bool setFrameData(VectorDataManager p_vectorsData);
 			VectorDataManager getFrameData();

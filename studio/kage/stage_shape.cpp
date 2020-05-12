@@ -1304,5 +1304,9 @@ void KageStage::updateShapeXY() {
 			nodeIndexY = UINT_MAX;
 		}
 	}
-	win->propNodeXYSetVisible(true);
+	if (propX == DBL_MAX && propY == DBL_MAX) {
+		win->propShapePropertiesSetVisible(false);
+	} else {
+		win->propShapePropertiesSetVisible(true);
+	}
 }

@@ -67,6 +67,75 @@ void VectorDataManager::addInit(PointData p_point) {
 	vectorData[vectorData.size()-1].setPoints(ps);
 }
 
+bool VectorDataManager::recenterRotationPoint(vector<unsigned int> p_selectedShapes) {
+	if (p_selectedShapes.size() == 0) {
+		return false;
+	}
+	
+	vector<unsigned int> l_selectedShapesOld(p_selectedShapes);
+		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater <unsigned int>());
+	
+	vector<VectorData> v = getVectorData();
+	
+	unsigned l_initIndex = UINT_MAX;
+	
+	double l_leftMost = DBL_MAX;
+	double l_rightMost = DBL_MIN;
+	double l_topMost = DBL_MAX;
+	double l_bottomMost = DBL_MIN;
+	bool l_return = false;
+	
+	for (unsigned int l_selectedShape = 0; l_selectedShape < l_selectedShapesOld.size(); ++l_selectedShape) {
+		unsigned int vsize = v.size();
+		for (unsigned int i = l_selectedShapesOld[l_selectedShape]; i < vsize; ++i) {
+			if (       v[i].vectorType == VectorData::TYPE_INIT
+					&& i != l_selectedShapesOld[l_selectedShape]) {
+				break;
+			} else if (v[i].vectorType == VectorData::TYPE_INIT) {
+				l_initIndex = i;
+			} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
+				if (v[i].points[0].x < l_leftMost) {
+					l_leftMost   = v[i].points[0].x;
+				} else if (v[i].points[0].x > l_rightMost) {
+					l_rightMost  = v[i].points[0].x;
+				}
+				if (v[i].points[0].y < l_topMost) {
+					l_topMost    = v[i].points[0].y;
+				} else if (v[i].points[0].y > l_bottomMost) {
+					l_bottomMost = v[i].points[0].y;
+				}
+			} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
+					|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
+				for (unsigned int j = 0; j < 3; ++j) {
+					if (       v[i].points[j].x < l_leftMost) {
+						l_leftMost   = v[i].points[j].x;
+					} else if (v[i].points[j].x > l_rightMost) {
+						l_rightMost  = v[i].points[j].x;
+					}
+					if (       v[i].points[j].y < l_topMost) {
+						l_topMost    = v[i].points[j].y;
+					} else if (v[i].points[j].y > l_bottomMost) {
+						l_bottomMost = v[i].points[j].y;
+					}
+				}
+			}
+		}
+		
+		if (l_initIndex != UINT_MAX) {
+			PointData l_point((l_leftMost + l_rightMost ) / 2,
+							  (l_topMost  + l_bottomMost) / 2);
+			vector<PointData> ps;
+				ps.push_back(l_point);
+			v[l_initIndex].setPoints(ps);
+			l_return = true;
+		}
+	}
+	
+	setVectorData(v);
+	
+	return l_return;
+}
+
 void VectorDataManager::addFill(ColorData p_color) {
 	VectorData l_vectorData;
 	if (vectorData.size() > 0) {

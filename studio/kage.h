@@ -105,6 +105,9 @@
 			void LowerToBottom_onClick();
 			void FlipHorizontal_onClick();
 			void FlipVertical_onClick();
+			
+			void RecenterRotationPoint_onClick();
+			
 			void AddFrame_onClick();
 			void ExtendFrame_onClick();
 			void DuplicateFrame_onClick();

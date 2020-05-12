@@ -91,6 +91,7 @@ bool KageStage::on_key_press_event(GdkEventKey *e) {
 				propY += l_diffY;
 				//updateShapeX(l_diffX, false);
 				//updateShapeY(l_diffY, false);
+				updateShapeXY();
 				win->updateShapeProperties();
 				_stackDo = true;
 			} else if (KageStage::toolMode == MODE_NODE) {
@@ -223,6 +224,7 @@ bool KageStage::on_event(GdkEvent *e) {
 				
 				win->stackDo();
 			}
+			updateShapeXY();
 			_isModifyingShape = false;
 			render();
 		} else if (KageStage::toolMode == MODE_NODE) {

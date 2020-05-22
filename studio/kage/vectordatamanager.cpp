@@ -79,13 +79,14 @@ bool VectorDataManager::recenterRotationPoint(vector<unsigned int> p_selectedSha
 	
 	unsigned l_initIndex = UINT_MAX;
 	
-	double l_leftMost = DBL_MAX;
-	double l_rightMost = DBL_MIN;
-	double l_topMost = DBL_MAX;
-	double l_bottomMost = DBL_MIN;
 	bool l_return = false;
 	
 	for (unsigned int l_selectedShape = 0; l_selectedShape < l_selectedShapesOld.size(); ++l_selectedShape) {
+		double l_leftMost = DBL_MAX;
+		double l_rightMost = DBL_MIN;
+		double l_topMost = DBL_MAX;
+		double l_bottomMost = DBL_MIN;
+		
 		unsigned int vsize = v.size();
 		for (unsigned int i = l_selectedShapesOld[l_selectedShape]; i < vsize; ++i) {
 			if (       v[i].vectorType == VectorData::TYPE_INIT

@@ -17,7 +17,7 @@ Open file "demo.ksf" or, check out these links:
 
 Tutorials:
 ==========
-There's none so far but it will come soon.
+Visit https://sourceforge.net/p/kage/wiki/Tutorials/
 
 
 For Kage Studio help, contact author (email address indicated above).
@@ -35,8 +35,8 @@ HOW TO COMPILE Kage Studio (on Windows)
 
 HOW TO COMPILE Kage Studio (on GNU/Linux)
 =========================================
-1 open Terminal and install 'gtkmm3', 'cairo'
-	Ubuntu: libgtkmm-3.0-dev libcairomm-1.0-dev
+1 open Terminal and install 'gtkmm3', 'g++' and 'make' via apt
+	Ubuntu: sudo apt install make libgtkmm-3.0-dev build-essential
 2 cd to this path
-3 type: 'make -f Makefile.gnu resource'
+3 then type: 'make -f Makefile.gnu resource'
 4 finally type: 'make -f Makefile.gnu'

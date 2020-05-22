@@ -959,6 +959,7 @@ void Kage::ShapeGroup_onClick() {
 			vector<unsigned int> l_selectedShapes = _framesetManager.groupSelectedShapes(m_KageStage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
 				m_KageStage.setSelectedShapes(l_selectedShapes);
+				_framesetManager.recenterRotationPoint(l_selectedShapes);
 				stackDo();
 				forceRenderFrames();
 			}
@@ -974,6 +975,7 @@ void Kage::ShapeUngroup_onClick() {
 			vector<unsigned int> l_selectedShapes = _framesetManager.ungroupSelectedShapes(m_KageStage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
 				m_KageStage.setSelectedShapes(l_selectedShapes);
+				_framesetManager.recenterRotationPoint(l_selectedShapes);
 				stackDo();
 				forceRenderFrames();
 			}
@@ -1191,12 +1193,14 @@ void Kage::DeleteFrame_onClick() {
 	}
 void Kage::switchToPreviousFrame() {
 	_framesetManager.switchToPreviousFrame();
+		forceRenderFrames();
 	
 	refreshUI();
 }
 
 void Kage::switchToNextFrame() {
 	_framesetManager.switchToNextFrame();
+		forceRenderFrames();
 	
 	refreshUI();
 }
@@ -1473,9 +1477,9 @@ void Kage::updateShapeProperties() {
 }
 
 void Kage::updateNodeXY() {
-	cout << " m_KageStage.nodeX " << m_KageStage.nodeX << endl;
+//	cout << " m_KageStage.nodeX " << m_KageStage.nodeX << endl;
 	m_EntryNodeX.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.nodeX));
-	cout << " m_EntryNodeX " << m_EntryNodeX.get_text() << endl;
+//	cout << " m_EntryNodeX " << m_EntryNodeX.get_text() << endl;
 	m_EntryNodeY.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.nodeY));
 }
 

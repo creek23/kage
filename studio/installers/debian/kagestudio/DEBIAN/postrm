@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+# Unregister MIME type
+if [ "$1" = "configure" ] && [ -x "`which update-mime-database 2>/dev/null`" ]; then
+	update-mime-database /usr/share/mime
+fi
+
+# Unregister application
+if [ "$1" = "configure" ] && [ -x "`which update-desktop-database 2>/dev/null`" ]; then
+	update-desktop-database
+fi
+

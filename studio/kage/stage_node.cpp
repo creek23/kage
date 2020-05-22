@@ -33,7 +33,9 @@ void KageStage::addSelectedNode(unsigned int p_index) {
 	if (p_index == _NO_SELECTION) return;
 	if (isSelectedNode(p_index) == false) {
 		selectedNodes.push_back(p_index);
-		updateNodeXY();
+		if (KageStage::toolMode == MODE_NODE) {
+			updateNodeXY();
+		}
 	}
 }
 
@@ -780,7 +782,7 @@ unsigned int KageStage::getSelectedShapeViaNode(unsigned int p_index, vector<Vec
 						if (propX < p_v[j].points[0].x
 								&& propWidth < (p_v[j].points[0].x - propX)) {
 							propWidth = p_v[j].points[0].x - propX;
-							cout << "\npropWidth " << propWidth << " _zoomValueShapeProperty " << _zoomValueShapeProperty << endl;
+//							cout << "\npropWidth " << propWidth << " _zoomValueShapeProperty " << _zoomValueShapeProperty << endl;
 							propWidth = propWidth * _zoomValueShapeProperty;
 						}
 						if (propY < p_v[j].points[0].y
@@ -793,7 +795,7 @@ unsigned int KageStage::getSelectedShapeViaNode(unsigned int p_index, vector<Vec
 							if (propX < p_v[j].points[k].x
 									&& propWidth < (p_v[j].points[k].x - propX)) {
 								propWidth = p_v[j].points[k].x - propX;
-								cout << "\npropWidth " << propWidth << " _zoomValueShapeProperty " << _zoomValueShapeProperty << endl;
+//								cout << "\npropWidth " << propWidth << " _zoomValueShapeProperty " << _zoomValueShapeProperty << endl;
 								propWidth = propWidth * _zoomValueShapeProperty;
 							}
 							if (propY < p_v[j].points[k].y

@@ -57,6 +57,10 @@
 			VectorDataManager getFrameData();
 			VectorDataManager getFrameDataAt(unsigned int p_frame);  ///NOTE: "Frame" -- NOT "frame ID"
 			
+			bool forceSetTween(bool p_tween);
+			bool setTween(bool p_tween);
+			bool getTween();
+			
 			void switchToPreviousFrame(); ///Called by Kage for navigating to Previous Frame
 			void switchToPreviousFrame(unsigned int p_frameID); ///Called by KageFrame for navigating to Previous Frame
 			void switchToNextFrame(); ///Called by Kage for navigating to Next Frame

@@ -47,11 +47,18 @@
 			
 			bool addDataToFrame(VectorDataManager p_vectorsData);
 			bool setFrameData(VectorDataManager p_vectorsData);
+			VectorDataManager getFrameTweenData(unsigned int p_frameIndex);
 			VectorDataManager getFrameData();
 			VectorDataManager getFrameDataAt(unsigned int p_frame); ///NOTE: "Frame" -- NOT "frame ID"
 			VectorDataManager getPreviousFrameData(unsigned int p_frameID); ///Called by KageFrame if KageFrame is Extended
 			bool setFrameDataToPreviousFrame(VectorDataManager p_vectorsData, unsigned int p_frameID); ///Called by KageFrame if KageFrame is Extended
 			bool addDataToPreviousFrame(VectorDataManager v, unsigned int p_frameID); ///Called by KageFrame if KageFrame is Extended
+			
+			bool setPreviousFrameTween(unsigned int p_frameID, bool p_tween);
+			bool setExtendedFrameTween(unsigned int p_frameID, bool p_tween);
+			bool forceSetTween(bool p_tween);
+			bool setTween(bool p_tween);
+			bool getTween();
 			
 			bool switchToPreviousFrame(); ///Called by FrameSet for navigating to Previous Frame
 			bool switchToPreviousFrame(unsigned int p_frameID); ///Called by KageFrame for navigating to Previous Frame

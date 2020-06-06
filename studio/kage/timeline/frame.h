@@ -64,6 +64,7 @@
 			bool isNull();
 			void setExtension(KageFrame::extension p_extension);
 			KageFrame::extension getExtension();
+			void forceSetTween(bool p_tween);
 			void setTween(bool p_tween);
 			bool getTween();
 			

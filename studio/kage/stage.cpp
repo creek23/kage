@@ -531,30 +531,31 @@ void KageStage::applyZoom() {
 		for (unsigned int l_layer = 1; l_layer <= l_layerCount; ++l_layer) {
 			win->_framesetManager.setCurrentLayer(l_layer);
 			
-			vector<VectorData> v = win->getFrameData(true).getVectorData();
-			
-			
-			for (unsigned int i = 0; i < v.size(); ++i) {
-				if (v[i].vectorType == VectorData::TYPE_MOVE
-						|| v[i].vectorType == VectorData::TYPE_LINE) {
-					v[i].points[0].x += origin.x;
-					v[i].points[0].y += origin.y;
-						v[i].points[0] = applyZoomRatio(v[i].points[0]);
-					v[i].points[0].x -= __origin.x;
-					v[i].points[0].y -= __origin.y;
-				} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
-						|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
-					for (unsigned int j = 0; j < 3; ++j) {
-						v[i].points[j].x += origin.x;
-						v[i].points[j].y += origin.y;
-							v[i].points[j] = applyZoomRatio(v[i].points[j]);
-						v[i].points[j].x -= __origin.x;
-						v[i].points[j].y -= __origin.y;
+			if (win->getTween() == false) {
+				vector<VectorData> v = win->getFrameData(true).getVectorData();
+				
+				for (unsigned int i = 0; i < v.size(); ++i) {
+					if (v[i].vectorType == VectorData::TYPE_MOVE
+							|| v[i].vectorType == VectorData::TYPE_LINE) {
+						v[i].points[0].x += origin.x;
+						v[i].points[0].y += origin.y;
+							v[i].points[0] = applyZoomRatio(v[i].points[0]);
+						v[i].points[0].x -= __origin.x;
+						v[i].points[0].y -= __origin.y;
+					} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
+							|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
+						for (unsigned int j = 0; j < 3; ++j) {
+							v[i].points[j].x += origin.x;
+							v[i].points[j].y += origin.y;
+								v[i].points[j] = applyZoomRatio(v[i].points[j]);
+							v[i].points[j].x -= __origin.x;
+							v[i].points[j].y -= __origin.y;
+						}
 					}
 				}
+				
+				win->setFrameData(v, true);
 			}
-			
-			win->setFrameData(v, true);
 		}
 	}
 	

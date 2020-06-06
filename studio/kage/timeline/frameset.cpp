@@ -130,7 +130,7 @@ void KageFrameset::duplicateFrame() {
 }
 
 /**
- * If KageFrame is NULL or Last Frame (but not Frame-index0), remove Frame Widget, else, do belows step.
+ * If KageFrame is NULL or Last Frame (but not Frame-index0), remove Frame Widget, else, do below steps.
  * <ol><li>Copy content of Frame+1 to Frame+0; then make Frame+1 as Frame+0</li>
  * <li>If Frame+0 is not Last Frame, repeat 1</li>
  * <li>Set last Frame = NULL</li></ol>
@@ -155,11 +155,12 @@ bool KageFrameset::removeFrame() {
 		VectorDataManager l_frameData;
 		for (unsigned int i = l_currentFrameIndex; i < getFrameCount()-1; ++i) {
 			if (_frames[i]->isNull() == false) {
+				bool l_tween = _frames[i+1]->getTween();
 				if (i > 0) {
-					l_extensionPrevious = _frames[i-1]->getExtension();
-					l_extensionNext     = _frames[i+1]->getExtension();
 					switchToNextFrame();
 						l_frameData = getFrameData().clone();
+					l_extensionPrevious = _frames[i-1]->getExtension();
+					l_extensionNext     = _frames[i+1]->getExtension();
 					if (l_extensionPrevious == KageFrame::EXTENSION_NOT) {
 						//keep Previous
 						if (       l_extensionNext == KageFrame::EXTENSION_START
@@ -170,58 +171,80 @@ bool KageFrameset::removeFrame() {
 							_frames[i  ]->setExtension(KageFrame::EXTENSION_NOT);
 						}
 					} else if (l_extensionPrevious == KageFrame::EXTENSION_START) {
-						if (       l_extensionNext == KageFrame::EXTENSION_MID
-								&& l_extensionNext == KageFrame::EXTENSION_END) {
-							//keep Previous
-							//keep current
-						} else if (l_extensionNext == KageFrame::EXTENSION_NOT) {
+						if (       l_extensionNext == KageFrame::EXTENSION_NOT
+								|| l_extensionNext == KageFrame::EXTENSION_START) {
 							_frames[i-1]->setExtension(KageFrame::EXTENSION_NOT);
-							_frames[i  ]->setExtension(KageFrame::EXTENSION_NOT);
-						} else if (l_extensionNext == KageFrame::EXTENSION_START) {
-							_frames[i-1]->setExtension(KageFrame::EXTENSION_END);
-							_frames[i  ]->setExtension(KageFrame::EXTENSION_START);
+						} else {//if (l_extensionNext == KageFrame::EXTENSION_MID
+								//&& l_extensionNext == KageFrame::EXTENSION_END) {
+						  //keep Previous
 						}
+						//simply copy Next Frame to Current
+						KageFrame::extension l_temp = _frames[i+1]->getExtension();
+						_frames[i  ]->setExtension(l_temp);
 					} else if (l_extensionPrevious == KageFrame::EXTENSION_MID) {
-						if (       l_extensionNext == KageFrame::EXTENSION_NOT) {
+						if (       l_extensionNext == KageFrame::EXTENSION_NOT
+								|| l_extensionNext == KageFrame::EXTENSION_START) {
 							_frames[i-1]->setExtension(KageFrame::EXTENSION_END);
-							_frames[i  ]->setExtension(KageFrame::EXTENSION_NOT);
-						} else if (l_extensionNext == KageFrame::EXTENSION_START) {
-							_frames[i-1]->setExtension(KageFrame::EXTENSION_END);
-							_frames[i  ]->setExtension(KageFrame::EXTENSION_START);
-						} else if (l_extensionNext == KageFrame::EXTENSION_MID) {
+						} else {//if (l_extensionNext == KageFrame::EXTENSION_MID
+								//|| l_extensionNext == KageFrame::EXTENSION_END) {
 							//keep Previous
-							//keep current
-						} else if (l_extensionNext == KageFrame::EXTENSION_END) {
-							//keep Previous
-							_frames[i  ]->setExtension(KageFrame::EXTENSION_END);
 						}
+						//simply copy Next Frame to Current
+						KageFrame::extension l_temp = _frames[i+1]->getExtension();
+						_frames[i  ]->setExtension(l_temp);
 					} else if (l_extensionPrevious == KageFrame::EXTENSION_END) {
 						//keep Previous
-						if (       l_extensionNext == KageFrame::EXTENSION_NOT) {
+						if (       l_extensionNext == KageFrame::EXTENSION_NOT
+								|| l_extensionNext == KageFrame::EXTENSION_END) {
 							_frames[i  ]->setExtension(KageFrame::EXTENSION_NOT);
-						} else if (l_extensionNext == KageFrame::EXTENSION_START) {
+						} else if (l_extensionNext == KageFrame::EXTENSION_START
+								|| l_extensionNext == KageFrame::EXTENSION_MID) {
 							_frames[i  ]->setExtension(KageFrame::EXTENSION_START);
-						} else if (l_extensionNext == KageFrame::EXTENSION_MID) {
-							//keep current
-						} else if (l_extensionNext == KageFrame::EXTENSION_END) {
-							_frames[i  ]->setExtension(KageFrame::EXTENSION_NOT);
 						}
 					}
 				} else {
 					l_extensionNext = _frames[i+1]->getExtension();
 					_frames[i]->setExtension(l_extensionNext);
 				}
-				//do copy Next Frame to This Frame
+				
+				//do copy Next Frame content to This Frame
 					switchToPreviousFrame();
+					_frames[i]->forceSetTween(l_tween);
+					if (l_tween == false ||
+						l_tween == true && _frames[i+1]->getExtension() == KageFrame::EXTENSION_START) {
 						setFrameData(l_frameData.clone());
+					}
 				switchToNextFrame();
+				
+				//loop to the rest of the frameset
+				KageFrame::extension l_extension;
+				for (unsigned int j = i+1; j < getFrameCount()-1; ++j) {
+					l_tween     = _frames[j+1]->getTween();
+					l_extension = _frames[j+1]->getExtension();
+					_frames[j  ]->setExtension(l_extension);
+					switchToNextFrame();
+						l_frameData = getFrameData().clone();
+					switchToPreviousFrame();
+						_frames[j]->forceSetTween(l_tween);
+						if (l_tween == false ||
+							l_tween == true && _frames[j+1]->getExtension() == KageFrame::EXTENSION_START) {
+							setFrameData(l_frameData.clone());
+						}
+					switchToNextFrame(); //should it be here?
+				}
+				break;
 			} else {
+				_frames[i-1]->forceSetTween(false);
 				_frames[i-1]->setNull(true); //when willl Frame be NULL if not the Last Frame
 				break;
 			}
 		}
+		_frames[getFrameCount()-1]->forceSetTween(false);
 		_frames[getFrameCount()-1]->setNull(true);
 		setCurrentFrame(l_currentFrame);
+	} else if (getFrameCount() == 1) {
+		VectorDataManager l_frameData;
+		setFrameData(l_frameData);
 	}
 	
 	return false;
@@ -304,13 +327,14 @@ void KageFrameset::extendFrame() {
 	
 	if (l_currentFrame == getFrameCount()) {
 		KageFrame::extension l_extension = _frames[_frames.size()-2]->getExtension();
+		bool l_tween = _frames[_frames.size()-2]->getTween();
+		_frames[_frames.size()-1]->forceSetTween(l_tween);
 		if (l_extension == KageFrame::EXTENSION_NOT) {
 			_frames[_frames.size()-2]->setExtension(KageFrame::EXTENSION_START);
-			_frames[_frames.size()-1]->setExtension(KageFrame::EXTENSION_END);
 		} else if (l_extension == KageFrame::EXTENSION_END) {
 			_frames[_frames.size()-2]->setExtension(KageFrame::EXTENSION_MID);
-			_frames[_frames.size()-1]->setExtension(KageFrame::EXTENSION_END);
 		}
+		_frames[_frames.size()-1]->setExtension(KageFrame::EXTENSION_END);
 	} else if (l_currentFrame < getFrameCount()) {
 		unsigned int l_frameIndex = getFrameCount();
 		while (l_frameIndex > l_currentFrame+1) {
@@ -320,6 +344,8 @@ void KageFrameset::extendFrame() {
 		}
 		
 		KageFrame::extension l_extension = _frames[l_currentFrame-1]->getExtension();
+		bool l_tween = _frames[l_currentFrame-1]->getTween();
+		_frames[l_currentFrame]->forceSetTween(l_tween);
 		if (l_extension == KageFrame::EXTENSION_NOT) {
 			_frames[l_currentFrame-1]->setExtension(KageFrame::EXTENSION_START);
 			_frames[l_currentFrame  ]->setExtension(KageFrame::EXTENSION_END);
@@ -680,19 +706,77 @@ bool KageFrameset::setFrameData(VectorDataManager p_vectorsData) {
 	return false;
 }
 
+VectorDataManager KageFrameset::getFrameTweenData(unsigned int p_frameIndex) {
+	bool                     l_tween = _frames[p_frameIndex]->getTween();
+	KageFrame::extension l_extension = _frames[p_frameIndex]->getExtension();
+	cout << " l_tween " << l_tween << " l_extension " << l_extension << " ? " << KageFrame::EXTENSION_NOT << " | " << KageFrame::EXTENSION_START << " | " << KageFrame::EXTENSION_MID << " | " << KageFrame::EXTENSION_END  << endl;
+	if (       l_tween
+			&& (l_extension == KageFrame::EXTENSION_MID
+			||  l_extension == KageFrame::EXTENSION_END)) {
+		unsigned int l_tweenHead = UINT_MAX;
+		unsigned int l_tweenTail = UINT_MAX;
+		
+		for (unsigned int j = p_frameIndex-1; j >= 0 && j != UINT_MAX; --j) {
+			if (_frames[j]->getExtension() == KageFrame::EXTENSION_START) {
+				l_tweenHead = j;
+				break;
+			}
+		}
+		for (unsigned int j = p_frameIndex+1; j < getFrameCount(); ++j) {
+			l_extension = _frames[j]->getExtension();
+			if (	   l_extension == KageFrame::EXTENSION_START
+					|| l_extension == KageFrame::EXTENSION_NOT) {
+				l_tweenTail = j;
+				break;
+			}
+		}
+		VectorDataManager l_dataHead;
+		VectorDataManager l_dataTail;
+		if (l_tweenHead != UINT_MAX) {
+			l_dataHead = _frames[l_tweenHead]->getFrameData();
+		}
+		if (l_tweenTail != UINT_MAX) {
+			l_dataTail = _frames[l_tweenTail]->getFrameData();
+		}
+		vector<VectorData> l_vHead = l_dataHead.getVectorData();
+		vector<VectorData> l_vTail = l_dataTail.getVectorData();
+		unsigned int l_tweenDistance    =        l_tweenTail - l_tweenHead;
+		unsigned int l_tweenInterpolate = p_frameIndex - l_tweenHead;
+		if (l_vHead.size() == l_vTail.size()) {
+			for (unsigned int j = 0; j < l_vHead.size(); ++j) {
+				if (       (l_vHead[j].vectorType == VectorData::TYPE_INIT && l_vTail[j].vectorType == VectorData::TYPE_INIT)
+						|| (l_vHead[j].vectorType == VectorData::TYPE_MOVE && l_vTail[j].vectorType == VectorData::TYPE_MOVE)) {
+					l_vHead[j].points[0].x += (l_vTail[j].points[0].x - l_vHead[j].points[0].x) * l_tweenInterpolate / l_tweenDistance;
+					l_vHead[j].points[0].y += (l_vTail[j].points[0].y - l_vHead[j].points[0].y) * l_tweenInterpolate / l_tweenDistance;
+				} else if ((l_vHead[j].vectorType == VectorData::TYPE_CURVE_CUBIC     && l_vTail[j].vectorType == VectorData::TYPE_CURVE_CUBIC)
+						|| (l_vHead[j].vectorType == VectorData::TYPE_CURVE_QUADRATIC && l_vTail[j].vectorType == VectorData::TYPE_CURVE_QUADRATIC)) {
+					for (unsigned int k = 0; k < 3; ++k) {
+						l_vHead[j].points[k].x += (l_vTail[j].points[k].x - l_vHead[j].points[k].x) * l_tweenInterpolate / l_tweenDistance;
+						l_vHead[j].points[k].y += (l_vTail[j].points[k].y - l_vHead[j].points[k].y) * l_tweenInterpolate / l_tweenDistance;
+					}
+				}
+			}
+		}
+		l_dataHead.setVectorData(l_vHead);
+		return l_dataHead;
+	} else {
+		return _frames[p_frameIndex]->getFrameData();
+	}
+}
+
 VectorDataManager KageFrameset::getFrameData() {
 	if (_currentFrameIndex < getFrameCount() && _frames[_currentFrameIndex]->frameID == _currentFrameID) {
-		return _frames[_currentFrameIndex]->getFrameData();
+		return getFrameTweenData(_currentFrameIndex);
 	} else {
 		for (unsigned int i = 0; i < getFrameCount(); ++i) {
 			if (_frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				_currentFrameID = _frames[i]->frameID;
-				return _frames[i]->getFrameData();
+				return getFrameTweenData(i);
 			}
 		}
 	}
-	
+	cout << "getFrameData is returning empty";
 	VectorDataManager l_nullReturn;
 	return l_nullReturn;
 }
@@ -705,6 +789,7 @@ VectorDataManager KageFrameset::getFrameDataAt(unsigned int p_frame) {
 	VectorDataManager l_nullReturn;
 	return l_nullReturn;
 }
+
 VectorDataManager KageFrameset::getPreviousFrameData(unsigned int p_frameID) {
 	for (unsigned int i = 1; i < getFrameCount(); ++i) {
 		if (_frames[i]->frameID == p_frameID) {
@@ -732,6 +817,88 @@ bool KageFrameset::addDataToPreviousFrame(VectorDataManager p_vectorsData, unsig
 		if (_frames[i]->frameID == p_frameID) {
 			_frames[i-1]->addDataToFrame(p_vectorsData);
 			return true;
+		}
+	}
+	
+	return false;
+}
+
+bool KageFrameset::setPreviousFrameTween(unsigned int p_frameID, bool p_tween) {
+	cout << " KageFrameset::setPreviousFrameTween() " << p_frameID << endl;
+	for (unsigned int i = 1; i < getFrameCount(); ++i) {
+		if (_frames[i]->frameID == p_frameID) {
+			_frames[i-1]->setTween(p_tween);
+			return true;
+		}
+	}
+	
+	return false;
+}
+bool KageFrameset::setExtendedFrameTween(unsigned int p_frameID, bool p_tween) {
+	cout << " KageFrameset::setExtendedFrameTween() " << p_frameID << endl;
+	for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		if (_frames[i]->frameID == p_frameID) {
+			for (unsigned int j = i+1; j < getFrameCount(); ++j) {
+				_frames[j]->forceSetTween(p_tween);
+				if (_frames[j]->getExtension() == KageFrame::EXTENSION_END) {
+					break;
+				}
+			}
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+bool KageFrameset::forceSetTween(bool p_tween) {
+	cout << " KageFrameset::forceSetTween() " << endl;
+	if (_currentFrameIndex < getFrameCount() && _frames[_currentFrameIndex]->frameID == _currentFrameID) {
+		_frames[_currentFrameIndex]->forceSetTween(p_tween);
+		return true;
+	} else {
+		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+			if (_frames[i]->frameID == _currentFrameID) {
+				_currentFrameIndex = i;
+				_currentFrameID = _frames[i]->frameID;
+				_frames[i]->forceSetTween(p_tween);
+				return true;
+			}
+		}
+	}
+	
+	return false;
+}
+
+bool KageFrameset::setTween(bool p_tween) {
+	cout << " KageFrameset::setTween() " << endl;
+	if (_currentFrameIndex < getFrameCount() && _frames[_currentFrameIndex]->frameID == _currentFrameID) {
+		_frames[_currentFrameIndex]->setTween(p_tween);
+		return true;
+	} else {
+		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+			if (_frames[i]->frameID == _currentFrameID) {
+				_currentFrameIndex = i;
+				_currentFrameID = _frames[i]->frameID;
+				_frames[i]->setTween(p_tween);
+				return true;
+			}
+		}
+	}
+	
+	return false;
+}
+bool KageFrameset::getTween() {
+	cout << " KageFrameset::getTween() " << endl;
+	if (_currentFrameIndex < getFrameCount() && _frames[_currentFrameIndex]->frameID == _currentFrameID) {
+		return _frames[_currentFrameIndex]->getTween();
+	} else {
+		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+			if (_frames[i]->frameID == _currentFrameID) {
+				_currentFrameIndex = i;
+				_currentFrameID = _frames[i]->frameID;
+				return _frames[i]->getTween();
+			}
 		}
 	}
 	

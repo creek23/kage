@@ -66,6 +66,8 @@
 			string saveFrame();
 			string dumpFrame(bool bKS);
 			
+			bool getTween();
+			
 			string int255ToHex(unsigned int p);
 			char int15ToHex(unsigned int p);
 			
@@ -116,6 +118,8 @@
 			void CopyFrame_onClick();
 			void PasteFrame_onClick();
 			void DeleteFrame_onClick();
+			void TweenFrame_onClick();
+			void RemoveTweenFrame_onClick();
 //			void New_onClick();
 			void OpenKSF_onClick();
 			void Save_onClick();

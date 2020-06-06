@@ -334,6 +334,16 @@ Kage::Kage() : _layerManager(this),
 		sigc::mem_fun(*this, &Kage::DeleteFrame_onClick)
 	);
 	m_refActionGroup->add(
+		Gtk::Action::create("TweenFrame", "_Frame Tween", "Tween Frame"),
+		Gtk::AccelKey("<control>T"),
+		sigc::mem_fun(*this, &Kage::TweenFrame_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("RemoveTweenFrame", "Remove Frame Tween", "Remove Tween Frame"),
+		Gtk::AccelKey("<control><shift>T"),
+		sigc::mem_fun(*this, &Kage::RemoveTweenFrame_onClick)
+	);
+	m_refActionGroup->add(
 		Gtk::Action::create("AddLayer", "_Add Layer", "Add Layer"),
 		Gtk::AccelKey("<control>F7"),
 		sigc::mem_fun(*this, &Kage::LayerAdd_onClick)
@@ -499,6 +509,9 @@ Kage::Kage() : _layerManager(this),
 		"			<menuitem action='CopyFrame'/>"
 		"			<menuitem action='PasteFrame'/>"
 		"			<menuitem action='DeleteFrame'/>"
+		"			<separator/>"
+		"			<menuitem action='TweenFrame'/>"
+		"			<menuitem action='RemoveTweenFrame'/>"
 		"			<separator/>"
 		"			<menuitem action='AddLayer'/>"
 		"			<menuitem action='DeleteLayer'/>"
@@ -924,6 +937,9 @@ void Kage::Duplicate_onClick() {
 }
 void Kage::SelectAll_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+		ToolSelect_onClick();
+	}
+	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp();
 		std::cout << " Kage::SelectAll_onClick" << std::endl;
 		if (m_KageStage.selectAllShapes() == true) {
@@ -1109,6 +1125,7 @@ void Kage::AddFrame_onClick() {
 }
 void Kage::ExtendFrame_onClick() {
 	_framesetManager.extendFrame();
+	switchToNextFrame();
 	
 	refreshUI();
 }
@@ -1119,6 +1136,7 @@ void Kage::DuplicateFrame_onClick() {
 }
 void Kage::RemoveFrame_onClick() {
 	_framesetManager.removeFrame();
+		forceRenderFrames();
 	
 	refreshUI();
 }
@@ -1191,6 +1209,31 @@ void Kage::DeleteFrame_onClick() {
 		}
 		return false;
 	}
+
+void Kage::TweenFrame_onClick() {
+	Kage::timestamp();
+	std::cout << " Kage::TweenFrame_onClick" << std::endl;
+	
+	if (isLayerLocked() == false) {
+		if (_framesetManager.setTween(true) == true) {
+//			stackDo();
+			forceRenderFrames();
+		}
+	}
+}
+
+void Kage::RemoveTweenFrame_onClick() {
+	Kage::timestamp();
+	std::cout << " Kage::RemoveTweenFrame_onClick" << std::endl;
+	
+	if (isLayerLocked() == false) {
+		if (_framesetManager.setTween(false) == true) {
+//			stackDo();
+			forceRenderFrames();
+		}
+	}
+}
+
 void Kage::switchToPreviousFrame() {
 	_framesetManager.switchToPreviousFrame();
 		forceRenderFrames();
@@ -1568,6 +1611,10 @@ void Kage::setFrameData(VectorDataManager p_vectorsData, bool p_force) {
 	}
 }
 
+bool Kage::getTween() {
+	return _framesetManager.getTween();
+}
+
 bool Kage::isFrameEmpty() {
 	return (_framesetManager.getFrameData().getVectorData().size() > 0);
 }
@@ -1844,18 +1891,22 @@ void Kage::doSave(string p_filename) {
 				for (j = 1; j <= l_fMax; ++j) {
 					KageFrame *l_frame = _framesetManager.getFrameAt(j);
 					KageFrame::extension l_extension = l_frame->getExtension();
+					string l_tween = "";
+					if (l_frame->getTween()) {
+						l_tween = " tween=\"true\"";
+					}
 					if (l_extension == KageFrame::EXTENSION_NOT) {
-						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + ">");
+						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + l_tween + ">");
 						_framesetManager.setCurrentFrame(j);
-						saveKageStudio(ksfPath, saveFrame() + "\n</frame" + StringHelper::unsignedIntegerToString(j) + ">");
+						saveKageStudio(ksfPath, saveFrame() + "</frame" + StringHelper::unsignedIntegerToString(j) + ">");
 					} else if (l_extension == KageFrame::EXTENSION_START) {
-						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + " extend=\"start\">");
+						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + " extend=\"start\"" + l_tween + ">");
 						_framesetManager.setCurrentFrame(j);
-						saveKageStudio(ksfPath, saveFrame() + "\n</frame" + StringHelper::unsignedIntegerToString(j) + ">");
+						saveKageStudio(ksfPath, saveFrame() + "</frame" + StringHelper::unsignedIntegerToString(j) + ">");
 					} else if (l_extension == KageFrame::EXTENSION_MID) {
-						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + " extend=\"mid\" />");
+						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + " extend=\"mid\"" + l_tween + " />");
 					} else if (l_extension == KageFrame::EXTENSION_END) {
-						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + " extend=\"end\" />");
+						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + " extend=\"end\"" + l_tween + " />");
 					}
 				}
 				saveKageStudio(ksfPath, "</layer" + StringHelper::unsignedIntegerToString(i) + ">");
@@ -2334,14 +2385,22 @@ bool Kage::on_tick(const Glib::RefPtr<Gdk::FrameClock>& frame_clock) {
 	return true;
 }
 void Kage::FillAlpha_onChange() {
-	double l_fillAlpha = _scaleFillAplha.get_value();
-	KageStage::fillColor.setA((int) (l_fillAlpha * 256.0f/ 100.0f));
+	double l_alpha = _scaleFillAplha.get_value();
+	Gdk::RGBA l_rgba = m_ColorButtonFill.get_rgba();
+		l_rgba.set_alpha( l_alpha / 100.f );
+	m_ColorButtonFill.set_rgba(l_rgba);
+	
+	KageStage::fillColor.setA((int) (l_alpha * 256.0f/ 100.0f));
 	m_KageStage.updateShapeColor();
 }
 
 void Kage::StrokeAlpha_onChange() {
-	double l_strokeAlpha = _scaleStrokeAlpha.get_value();
-	KageStage::stroke.setA((int) (l_strokeAlpha * 256.0f/ 100.0f));
+	double l_alpha = _scaleStrokeAlpha.get_value();
+	Gdk::RGBA l_rgba = m_ColorButtonStroke.get_rgba();
+		l_rgba.set_alpha( l_alpha / 100.f );
+	m_ColorButtonStroke.set_rgba(l_rgba);
+	
+	KageStage::stroke.setA((int) (l_alpha * 256.0f/ 100.0f));
 	m_KageStage.updateShapeColor();
 }
 
@@ -2528,12 +2587,24 @@ void Kage::ColorButtonStage_onClick() {
 	m_KageStage.setStageBG(m_Color);
 }
 void Kage::ColorButtonFill_onClick() {
-	m_Color = m_ColorButtonFill.get_color();
+	m_Color = m_ColorButtonFill.get_color(); //<-- deprecate this
+	Gdk::RGBA l_rgba = m_ColorButtonFill.get_rgba();
+	double l_alpha = l_rgba.get_alpha();
+	
+	_scaleFillAplha.set_value(l_alpha * 100.0f);
+	KageStage::fillColor.setA((int) (l_alpha * 256.0f));
+	
 	m_KageStage.setFill(m_Color);
 	m_KageStage.updateShapeColor();
 }
 void Kage::ColorButtonStroke_onClick() {
-	m_Color = m_ColorButtonStroke.get_color();
+	m_Color = m_ColorButtonStroke.get_color(); //<-- deprecate this
+	Gdk::RGBA l_rgba = m_ColorButtonStroke.get_rgba();
+	double l_alpha = l_rgba.get_alpha();
+	
+	_scaleStrokeAlpha.set_value(l_alpha * 100.0f);
+	KageStage::stroke.setA((int) (l_alpha * 256.0f));
+	
 	m_KageStage.setStroke(m_Color);
 	m_KageStage.updateShapeColor();
 }
@@ -2865,13 +2936,21 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 				_framesetManager.addFrame();
 			}
 			_framesetManager.setCurrentFrame(l_frame);
-			if (l_properties.size() > 0 && (l_properties[0].getName() == "extend")) {
-				if (l_properties[0].getValue() == "start") {
-					_framesetManager.setFrameExtension(KageFrame::EXTENSION_START);
-				} else if (l_properties[0].getValue() == "mid") {
-					_framesetManager.setFrameExtension(KageFrame::EXTENSION_MID);
-				} else if (l_properties[0].getValue() == "end") {
-					_framesetManager.setFrameExtension(KageFrame::EXTENSION_END);
+			for (unsigned int l_propertyIndex = 0; l_propertyIndex < l_properties.size(); ++l_propertyIndex) {
+				if (l_properties[l_propertyIndex].getName() == "extend") {
+					if (l_properties[l_propertyIndex].getValue() == "start") {
+						_framesetManager.setFrameExtension(KageFrame::EXTENSION_START);
+					} else if (l_properties[l_propertyIndex].getValue() == "mid") {
+						_framesetManager.setFrameExtension(KageFrame::EXTENSION_MID);
+					} else if (l_properties[l_propertyIndex].getValue() == "end") {
+						_framesetManager.setFrameExtension(KageFrame::EXTENSION_END);
+					}
+				} else if (l_properties[l_propertyIndex].getName() == "tween") {
+					if (l_properties[l_propertyIndex].getValue() == "true") {
+						_framesetManager.forceSetTween(true);
+					} else if (l_properties[l_propertyIndex].getValue() == "false") {
+						_framesetManager.forceSetTween(false);
+					}
 				}
 			}
 		} else if (l_tagname == "init") {

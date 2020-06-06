@@ -1,0 +1,54 @@
+<KageStudio version="2020.03.10">
+<stage width="600.01" height="600.01" background="rgb(255, 255, 255)" fps="12" layers="1" frames="1" />
+<layer1 label="Layer 1" visible="true" locked="false">
+<frame1>
+<init>301.52 299.43</init>
+<fill color="rgba(245, 35, 17, 255)">
+	<stroke color="rgba(255, 0, 0, 0)" thickness="3"/>
+	<move>69.98 9.25</move>
+	<curve>302.51 9.25 302.51 9.25 535.01 9.25</curve>
+	<curve>535.01 299.99 535.01 299.99 535.01 591.51</curve>
+	<curve>302.51 591.51 302.51 591.51 69.98 591.51</curve>
+	<curve>69.98 299.99 69.98 299.99 69.98 9.25</curve>
+	<closepath/>
+</fill>
+<init>297.5 208.09</init>
+<fill color="rgba(167, 11, 8, 130)">
+	<stroke color="rgba(167, 11, 8, 0)" thickness="3"/>
+	<move>77 14.99</move>
+	<curve>297.5 14.99 297.5 14.99 518 14.99</curve>
+	<curve>211.88 78.09 418 497 77 573</curve>
+	<curve>77 378.98 77 208.64 77 14.99</curve>
+	<closepath/>
+</fill>
+<init>303 400.27</init>
+<fill color="rgba(167, 11, 8, 66)">
+	<stroke color="rgba(167, 11, 8, 0)" thickness="3"/>
+	<move>529.01 575.99</move>
+	<curve>303 575.99 303 575.99 77 575.99</curve>
+	<curve>516.01 527 307 309 529.01 308</curve>
+	<curve>529.01 400.76 529.01 482.4 529.01 575.99</curve>
+	<closepath/>
+</fill>
+<init>323.5 293</init>
+<fill color="rgba(103, 16, 4, 255)">
+	<stroke color="rgba(167, 11, 8, 0)" thickness="3"/>
+	<move>200 100</move>
+	<curve>200 305 200 285 200 490.01</curve>
+	<curve>198 534.01 260 535.99 260 490.01</curve>
+	<curve>260 440.01 260 460.01 260 410.01</curve>
+	<curve>284.75 390.01 284.75 390.01 309.5 370.01</curve>
+	<curve>352.75 435.51 352.75 435.51 396.01 500.99</curve>
+	<curve>421.01 540.01 473 510.01 445.01 468</curve>
+	<curve>399.51 401.01 399.51 401.01 354 334.01</curve>
+	<curve>399.51 293.5 399.51 293.5 445.01 253</curve>
+	<curve>480.01 220 437.01 182 401.01 212</curve>
+	<curve>330.5 273.5 330.5 273.5 260 335.01</curve>
+	<curve>260 224.5 260 210.5 260 100</curve>
+	<curve>261 60.99 199 61.99 200 100</curve>
+	<closepath/>
+</fill>
+
+</frame1>
+</layer1>
+</KageStudio>

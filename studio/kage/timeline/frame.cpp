@@ -43,7 +43,7 @@ KageFrame::KageFrame(KageFrameset *p_frameset, unsigned p_layerID, unsigned int 
 	set_size_request(8, 23);
 	setSelected(false);
 	setCurrent(false);
-	setTween(false);
+	forceSetTween(false);
 	setNull(false);
 	setExtension(KageFrame::EXTENSION_NOT);
 //	add_events(Gdk::KEY_PRESS_MASK    | Gdk::KEY_RELEASE_MASK);
@@ -273,9 +273,23 @@ void KageFrame::setNull(bool p_null) {
 bool KageFrame::isNull() {
 	return _null;
 }
-void KageFrame::setTween(bool p_tween) {
+void KageFrame::forceSetTween(bool p_tween) {
 	_tween = p_tween;
 	render();
+}
+void KageFrame::setTween(bool p_tween) {
+	if (_null == true) {
+		return;
+	}
+	cout << " KageFrame::setTween() " << frameID << " " << p_tween << endl;
+	if (       _extension == KageFrame::EXTENSION_NOT) {
+		forceSetTween(p_tween);
+	} else if (_extension == KageFrame::EXTENSION_START) {
+		forceSetTween(p_tween);
+		_frameset->setExtendedFrameTween(frameID, p_tween);
+	} else {
+		_frameset->setPreviousFrameTween(frameID, p_tween);
+	}
 }
 bool KageFrame::getTween() {
 	return _tween;
@@ -294,6 +308,7 @@ bool KageFrame::isCurrent() {
 
 VectorDataManager KageFrame::getFrameData() {
 	if (_null == true) {
+		cout << "KageFrame::getFrameData is returning empty" << endl;
 		VectorDataManager l_nullReturn;
 		return l_nullReturn;
 	}

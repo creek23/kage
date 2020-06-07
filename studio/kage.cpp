@@ -1,3 +1,23 @@
+/*
+ * Kage Studio - a simple free and open source vector-based 2D animation software
+ * Copyright (C) 2011~2020  Mj Mendoza IV
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301, USA.  Or, see <https://www.gnu.org/licenses/>.
+ * 
+ */
 
 #include "kage.h"
 
@@ -70,6 +90,7 @@ Kage::Kage() : _layerManager(this),
 	m_refActionGroup->add( Gtk::Action::create("ExportMenu", "_Export...") ); 
 	m_refActionGroup->add( Gtk::Action::create("ExportPNGMenu", "_PNG...") ); 
 	m_refActionGroup->add( Gtk::Action::create("EditMenu", "_Edit") );
+	m_refActionGroup->add( Gtk::Action::create("ViewMenu", "_View") );
 	m_refActionGroup->add( Gtk::Action::create("LayerMenu", "_Layer") );
 	m_refActionGroup->add( Gtk::Action::create("ObjectMenu", "_Object") );
 	m_refActionGroup->add( Gtk::Action::create("TimelineMenu", "_Timeline") );
@@ -174,6 +195,16 @@ Kage::Kage() : _layerManager(this),
 		Gtk::Action::create("Deselect", "D_eselect", "Deselect"),
 		Gtk::AccelKey("Escape"),
 		sigc::mem_fun(*this, &Kage::Deselect_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("ToggleTimeline", "Toggle _Timeline", "ToggleTimeline"),
+//		Gtk::AccelKey("Escape"),
+		sigc::mem_fun(*this, &Kage::ToggleTimeline_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("ToggleProperties", "Toggle _Properties", "ToggleProperties"),
+//		Gtk::AccelKey("Escape"),
+		sigc::mem_fun(*this, &Kage::ToggleProperties_onClick)
 	);
 	//==================================================================
 	m_refActionGroup->add(
@@ -466,6 +497,10 @@ Kage::Kage() : _layerManager(this),
 		"			<separator/>"
 		"			<menuitem action='SelectAll'/>"
 		"			<menuitem action='Deselect'/>"
+		"		</menu>"
+		"		<menu action='ViewMenu'>"
+		"			<menuitem action='ToggleTimeline'/>"
+		"			<menuitem action='ToggleProperties'/>"
 		"		</menu>"
 		"		<menu action='LayerMenu'>"
 		"			<menuitem action='LayerAdd'/>"
@@ -857,6 +892,14 @@ Kage::Kage() : _layerManager(this),
 						_btnToggleLine.signal_clicked().connect(sigc::mem_fun(*this, &Kage::ToggleLine_onClick));
 	
 	New_onClick();
+	
+	registerPropertiesPane();
+	m_HPane_DrawingArea.property_position() = _area_properties_pane2;
+}
+
+void Kage::registerPropertiesPane() {
+	_area_properties_pane1  = m_HPane_DrawingArea.get_width() - 30;
+	_area_properties_pane2 = m_HPane_DrawingArea.get_width() - 200;
 }
 
 Kage::~Kage() {
@@ -895,8 +938,7 @@ void Kage::Redo_onClick() {
 	}
 }
 void Kage::Cut_onClick() {
-	Kage::timestamp();
-	std::cout << " Kage::Cut_onClick " << KageFrame::_gotFocus << std::endl;
+	Kage::timestamp(); std::cout << " Kage::Cut_onClick " << KageFrame::_gotFocus << std::endl;
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		if (m_KageStage.cutSelectedShapes() == true) {
 			forceRenderFrames();
@@ -904,8 +946,7 @@ void Kage::Cut_onClick() {
 	}
 }
 void Kage::Copy_onClick() {
-	Kage::timestamp();
-	std::cout << " Kage::Copy_onClick " << KageFrame::_gotFocus << std::endl;
+	Kage::timestamp(); std::cout << " Kage::Copy_onClick " << KageFrame::_gotFocus << std::endl;
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		if (m_KageStage.copySelectedShapes() == true) {
 			forceRenderFrames();
@@ -913,8 +954,7 @@ void Kage::Copy_onClick() {
 	}
 }
 void Kage::Paste_onClick() {
-	Kage::timestamp();
-	std::cout << " Kage::Paste_onClick " << KageFrame::_gotFocus << std::endl;
+	Kage::timestamp(); std::cout << " Kage::Paste_onClick " << KageFrame::_gotFocus << std::endl;
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		if (m_KageStage.pasteSelectedShapes() == true) {
 			forceRenderFrames();
@@ -923,8 +963,7 @@ void Kage::Paste_onClick() {
 }
 void Kage::Duplicate_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp();
-		std::cout << " Kage::Duplicate_onClick" << std::endl;
+		Kage::timestamp(); std::cout << " Kage::Duplicate_onClick" << std::endl;
 		if (isLayerLocked() == false) {
 			vector<unsigned int> l_selectedShapes = _framesetManager.duplicateShapes(m_KageStage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
@@ -940,16 +979,14 @@ void Kage::SelectAll_onClick() {
 		ToolSelect_onClick();
 	}
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp();
-		std::cout << " Kage::SelectAll_onClick" << std::endl;
+		Kage::timestamp(); std::cout << " Kage::SelectAll_onClick" << std::endl;
 		if (m_KageStage.selectAllShapes() == true) {
 			forceRenderFrames();
 		}
 	}
 }
 void Kage::Deselect_onClick() {
-	Kage::timestamp();
-	std::cout << " Kage::Deselect_onClick" << std::endl;
+	Kage::timestamp(); std::cout << " Kage::Deselect_onClick" << std::endl;
 	if (_isPlaying == true) {
 		Stop_onClick();
 	} else if (KageStage::toolMode == KageStage::MODE_SELECT) {
@@ -967,10 +1004,29 @@ void Kage::Deselect_onClick() {
 	}
 }
 
+void Kage::ToggleTimeline_onClick() {
+	Kage::timestamp(); std::cout << " Kage::ToggleTimeline_onClick" << std::endl;
+	if (m_VPane_Timeline.property_position() == 30) {
+		m_VPane_Timeline.property_position() = _area_timeline_pane;
+	} else {
+		_area_timeline_pane = m_VPane_Timeline.property_position();
+		m_VPane_Timeline.property_position() = 30;
+	}
+	forceRenderFrames();
+}
+void Kage::ToggleProperties_onClick() {
+	Kage::timestamp(); std::cout << " Kage::ToggleProperties_onClick" << std::endl;
+	if (m_HPane_DrawingArea.property_position() == _area_properties_pane1) {
+		m_HPane_DrawingArea.property_position() = _area_properties_pane2;
+	} else {
+		m_HPane_DrawingArea.property_position() = _area_properties_pane1;
+	}
+	forceRenderFrames();
+}
+
 void Kage::ShapeGroup_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp();
-		std::cout << " Kage::ShapeGroup_onClick" << std::endl;
+		Kage::timestamp(); std::cout << " Kage::ShapeGroup_onClick" << std::endl;
 		if (isLayerLocked() == false) {
 			vector<unsigned int> l_selectedShapes = _framesetManager.groupSelectedShapes(m_KageStage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
@@ -984,8 +1040,7 @@ void Kage::ShapeGroup_onClick() {
 }
 void Kage::ShapeUngroup_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp();
-		std::cout << " Kage::ShapeUngroup_onClick" << std::endl;
+		Kage::timestamp(); std::cout << " Kage::ShapeUngroup_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
 			vector<unsigned int> l_selectedShapes = _framesetManager.ungroupSelectedShapes(m_KageStage.getSelectedShapes());
@@ -1001,8 +1056,7 @@ void Kage::ShapeUngroup_onClick() {
 
 void Kage::Raise_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp();
-		std::cout << " Kage::Raise_onClick" << std::endl;
+		Kage::timestamp(); std::cout << " Kage::Raise_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
 			vector<unsigned int> l_selectedShapes = _framesetManager.raiseSelectedShape(m_KageStage.getSelectedShapes());
@@ -1016,8 +1070,7 @@ void Kage::Raise_onClick() {
 }
 void Kage::Lower_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp();
-		std::cout << " Kage::Lower_onClick" << std::endl;
+		Kage::timestamp(); std::cout << " Kage::Lower_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
 			vector<unsigned int> l_selectedShapes = _framesetManager.lowerSelectedShape(m_KageStage.getSelectedShapes());
@@ -1031,8 +1084,7 @@ void Kage::Lower_onClick() {
 }
 void Kage::RaiseToTop_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp();
-		std::cout << " Kage::RaiseToTop_onClick" << std::endl;
+		Kage::timestamp(); std::cout << " Kage::RaiseToTop_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
 			vector<unsigned int> l_selectedShapes = _framesetManager.raiseToTopSelectedShape(m_KageStage.getSelectedShapes());
@@ -1046,8 +1098,7 @@ void Kage::RaiseToTop_onClick() {
 }
 void Kage::LowerToBottom_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp();
-		std::cout << " Kage::LowerToBottom_onClick" << std::endl;
+		Kage::timestamp(); std::cout << " Kage::LowerToBottom_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
 			vector<unsigned int> l_selectedShapes = _framesetManager.lowerToBottomSelectedShape(m_KageStage.getSelectedShapes());
@@ -1062,8 +1113,7 @@ void Kage::LowerToBottom_onClick() {
 
 void Kage::FlipHorizontal_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp();
-		std::cout << " Kage::FlipHorizontal_onClick" << std::endl;
+		Kage::timestamp(); std::cout << " Kage::FlipHorizontal_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
 			if (_framesetManager.flipHorizontalSelectedShape(m_KageStage.getSelectedShapes()) == true) {
@@ -1075,8 +1125,7 @@ void Kage::FlipHorizontal_onClick() {
 }
 void Kage::FlipVertical_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp();
-		std::cout << " Kage::FlipVertical_onClick" << std::endl;
+		Kage::timestamp(); std::cout << " Kage::FlipVertical_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
 			if (_framesetManager.flipVerticalSelectedShape(m_KageStage.getSelectedShapes()) == true) {
@@ -1089,8 +1138,7 @@ void Kage::FlipVertical_onClick() {
 
 void Kage::RecenterRotationPoint_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp();
-		std::cout << " Kage::RecenterRotationPoint_onClick" << std::endl;
+		Kage::timestamp(); std::cout << " Kage::RecenterRotationPoint_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
 			if (_framesetManager.recenterRotationPoint(m_KageStage.getSelectedShapes()) == true) {
@@ -1103,15 +1151,13 @@ void Kage::RecenterRotationPoint_onClick() {
 
 void Kage::Delete_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp();
-		std::cout << " Kage::Delete_onClick SHAPE" << std::endl;
+		Kage::timestamp(); std::cout << " Kage::Delete_onClick SHAPE" << std::endl;
 		if (m_KageStage.deleteSelectedShapes() == true) {
 			stackDo();
 			forceRenderFrames();
 		}
 	} else if (KageStage::toolMode == KageStage::MODE_NODE) {
-		Kage::timestamp();
-		std::cout << " Kage::Delete_onClick NODE" << std::endl;
+		Kage::timestamp(); std::cout << " Kage::Delete_onClick NODE" << std::endl;
 		if (m_KageStage.deleteSelectedNodes() == true) {
 			forceRenderFrames();
 		}
@@ -1211,8 +1257,7 @@ void Kage::DeleteFrame_onClick() {
 	}
 
 void Kage::TweenFrame_onClick() {
-	Kage::timestamp();
-	std::cout << " Kage::TweenFrame_onClick" << std::endl;
+	Kage::timestamp(); std::cout << " Kage::TweenFrame_onClick" << std::endl;
 	
 	if (isLayerLocked() == false) {
 		if (_framesetManager.setTween(true) == true) {
@@ -1223,8 +1268,7 @@ void Kage::TweenFrame_onClick() {
 }
 
 void Kage::RemoveTweenFrame_onClick() {
-	Kage::timestamp();
-	std::cout << " Kage::RemoveTweenFrame_onClick" << std::endl;
+	Kage::timestamp(); std::cout << " Kage::RemoveTweenFrame_onClick" << std::endl;
 	
 	if (isLayerLocked() == false) {
 		if (_framesetManager.setTween(false) == true) {
@@ -2454,8 +2498,7 @@ void Kage::EntryNodeY_onEnter() {
 }
 
 void Kage::ToggleLine_onClick() {
-	Kage::timestamp();
-	std::cout << " Kage::ToggleLine_onClick" << std::endl;
+	Kage::timestamp(); std::cout << " Kage::ToggleLine_onClick" << std::endl;
 	if (m_KageStage.toggleLineSelectedNodes() == true) {
 		forceRenderFrames();
 	}

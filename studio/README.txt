@@ -1,4 +1,4 @@
-Current version is v0.3.200512
+Current version is v0.3.200608
 Kage Studio is a simple, Free and Open Source 2D Animation Software
 written by Mj Mendoza IV <mj.mendoza.iv at gmail dot com>
 
@@ -40,3 +40,21 @@ HOW TO COMPILE Kage Studio (on GNU/Linux)
 2 cd to this path
 3 then type: 'make -f Makefile.gnu resource'
 4 finally type: 'make -f Makefile.gnu'
+
+License:
+========
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.  Or, see <https://www.gnu.org/licenses/>.
+

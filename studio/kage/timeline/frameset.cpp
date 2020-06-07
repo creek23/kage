@@ -1,3 +1,23 @@
+/*
+ * Kage Studio - a simple free and open source vector-based 2D animation software
+ * Copyright (C) 2011~2020  Mj Mendoza IV
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301, USA.  Or, see <https://www.gnu.org/licenses/>.
+ * 
+ */
 
 #include "frameset.h"
 #include "framesmanager.h"
@@ -709,7 +729,7 @@ bool KageFrameset::setFrameData(VectorDataManager p_vectorsData) {
 VectorDataManager KageFrameset::getFrameTweenData(unsigned int p_frameIndex) {
 	bool                     l_tween = _frames[p_frameIndex]->getTween();
 	KageFrame::extension l_extension = _frames[p_frameIndex]->getExtension();
-	cout << " l_tween " << l_tween << " l_extension " << l_extension << " ? " << KageFrame::EXTENSION_NOT << " | " << KageFrame::EXTENSION_START << " | " << KageFrame::EXTENSION_MID << " | " << KageFrame::EXTENSION_END  << endl;
+	
 	if (       l_tween
 			&& (l_extension == KageFrame::EXTENSION_MID
 			||  l_extension == KageFrame::EXTENSION_END)) {
@@ -754,6 +774,62 @@ VectorDataManager KageFrameset::getFrameTweenData(unsigned int p_frameIndex) {
 						l_vHead[j].points[k].x += (l_vTail[j].points[k].x - l_vHead[j].points[k].x) * l_tweenInterpolate / l_tweenDistance;
 						l_vHead[j].points[k].y += (l_vTail[j].points[k].y - l_vHead[j].points[k].y) * l_tweenInterpolate / l_tweenDistance;
 					}
+				} else if ((l_vHead[j].vectorType == VectorData::TYPE_FILL   && l_vTail[j].vectorType == VectorData::TYPE_FILL)
+						|| (l_vHead[j].vectorType == VectorData::TYPE_STROKE && l_vTail[j].vectorType == VectorData::TYPE_STROKE)) {
+					ColorData l_fillColor;
+					if (l_vTail[j].fillColor.getR() == l_vHead[j].fillColor.getR()) {
+						l_fillColor.setR(l_vTail[j].fillColor.getR());
+					} else {
+						l_fillColor.setR((int)(l_vTail[j].fillColor.getR() - l_vHead[j].fillColor.getR()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].fillColor.getR());
+					}
+					if (l_vTail[j].fillColor.getG() == l_vHead[j].fillColor.getG()) {
+						l_fillColor.setG(l_vTail[j].fillColor.getG());
+					} else {
+						l_fillColor.setG((int)(l_vTail[j].fillColor.getG() - l_vHead[j].fillColor.getG()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].fillColor.getG());
+					}
+					if (l_vTail[j].fillColor.getB() == l_vHead[j].fillColor.getB()) {
+						l_fillColor.setB(l_vTail[j].fillColor.getB());
+					} else {
+						l_fillColor.setB((int)(l_vTail[j].fillColor.getB() - l_vHead[j].fillColor.getB()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].fillColor.getB());
+					}
+					if (l_vTail[j].fillColor.getA() == l_vHead[j].fillColor.getA()) {
+						l_fillColor.setA(l_vTail[j].fillColor.getA());
+					} else {
+						l_fillColor.setA((int)(l_vTail[j].fillColor.getA() - l_vHead[j].fillColor.getA()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].fillColor.getA());
+					}
+					
+					StrokeColorData l_strokeColor;
+					if (l_vTail[j].stroke.getR() == l_vHead[j].stroke.getR()) {
+						l_strokeColor.setR(l_vTail[j].stroke.getR());
+					} else {
+						l_strokeColor.setR((int)(l_vTail[j].stroke.getR() - l_vHead[j].stroke.getR()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].stroke.getR());
+					}
+					if (l_vTail[j].stroke.getG() == l_vHead[j].stroke.getG()) {
+						l_strokeColor.setG(l_vTail[j].stroke.getG());
+					} else {
+						l_strokeColor.setG((int)(l_vTail[j].stroke.getG() - l_vHead[j].stroke.getG()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].stroke.getG());
+					}
+					if (l_vTail[j].stroke.getB() == l_vHead[j].stroke.getB()) {
+						l_strokeColor.setB(l_vTail[j].stroke.getB());
+					} else {
+						l_strokeColor.setB((int)(l_vTail[j].stroke.getB() - l_vHead[j].stroke.getB()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].stroke.getB());
+					}
+					if (l_vTail[j].stroke.getA() == l_vHead[j].stroke.getA()) {
+						l_strokeColor.setA(l_vTail[j].stroke.getA());
+					} else {
+						l_strokeColor.setA((int)(l_vTail[j].stroke.getA() - l_vHead[j].stroke.getA()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].stroke.getA());
+					}
+					
+					if (l_vHead[j].vectorType == VectorData::TYPE_STROKE) {
+						if (l_vTail[j].stroke.getThickness() == l_vHead[j].stroke.getThickness()) {
+							l_strokeColor.setThickness(l_vTail[j].stroke.getThickness());
+						} else {
+							l_strokeColor.setThickness((l_vTail[j].stroke.getThickness() - l_vHead[j].stroke.getThickness()) * l_tweenInterpolate / l_tweenDistance + l_vHead[j].stroke.getThickness());
+						}
+					}
+					
+					l_vHead[j].fillColor = l_fillColor.clone();
+					l_vHead[j].stroke    = l_strokeColor.clone();
 				}
 			}
 		}

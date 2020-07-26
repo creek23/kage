@@ -3,7 +3,7 @@ Version: 0.3.200512
 Architecture: amd64
 Maintainer: Mj Mendoza IV <mj.mendoza.iv@gmail.com>
 Installed-Size: 1379056
-Depends: libgtkmm-3.0, ffmpeg
+Depends: libgtkmm-3.0-1v5, ffmpeg
 Section: Graphics
 Priority: Optional
 Description: Kage Studio

@@ -1,3 +1,9 @@
+kagestudio (2020.07.27) focal; urgency=low
+
+  * last 0.3 maintenance package.
+
+ -- Mj Mendoza IV <mj.mendoza.iv@gmail.com>  Mon, 27 July 2020 06:04:52 +0800 
+
 kagestudio (2020.05.12) focal; urgency=low
 
   * first Kage Studio deb release.

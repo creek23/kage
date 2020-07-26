@@ -85,9 +85,9 @@
 			bool isNull();
 			void setExtension(KageFrame::extension p_extension);
 			KageFrame::extension getExtension();
-			void forceSetTween(bool p_tween);
-			void setTween(bool p_tween);
-			bool getTween();
+			void forceSetTween(unsigned int p_tween);
+			void setTween(unsigned int p_tween);
+			unsigned int getTween();
 			
 			void forceRender();
 			virtual bool render();
@@ -117,7 +117,8 @@
 			
 			Glib::ustring sCode;
 			bool _null;
-			bool _tween;
+			unsigned int _tweenX;
+			unsigned int _tweenY;
 			bool _selected;
 			bool _current;
 			

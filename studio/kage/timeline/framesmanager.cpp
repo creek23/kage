@@ -505,7 +505,7 @@ VectorDataManager KageFramesetManager::getFrameDataAt(unsigned int p_frame) {
 	return l_nullReturn;
 }
 
-bool KageFramesetManager::forceSetTween(bool p_tween) {
+bool KageFramesetManager::forceSetTween(unsigned int p_tween) {
 	cout << " KageFramesetManager::setTween() " << endl;
 	unsigned int l_currentLayer = win->getCurrentLayer();
 	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
@@ -518,7 +518,7 @@ bool KageFramesetManager::forceSetTween(bool p_tween) {
 	return false;
 }
 
-bool KageFramesetManager::setTween(bool p_tween) {
+bool KageFramesetManager::setTween(unsigned int p_tween) {
 	cout << " KageFramesetManager::setTween() " << endl;
 	unsigned int l_currentLayer = win->getCurrentLayer();
 	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
@@ -531,7 +531,7 @@ bool KageFramesetManager::setTween(bool p_tween) {
 	return false;
 }
 
-bool KageFramesetManager::getTween() {
+unsigned int KageFramesetManager::getTween() {
 	cout << " KageFramesetManager::getTween() " << endl;
 	unsigned int l_currentLayer = win->getCurrentLayer();
 	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
@@ -541,7 +541,7 @@ bool KageFramesetManager::getTween() {
 		return _framesets[l_currentLayer]->getTween();
 	}
 	
-	return false;
+	return 0;
 }
 
 void KageFramesetManager::switchToPreviousFrame() {

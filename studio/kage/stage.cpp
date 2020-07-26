@@ -551,7 +551,7 @@ void KageStage::applyZoom() {
 		for (unsigned int l_layer = 1; l_layer <= l_layerCount; ++l_layer) {
 			win->_framesetManager.setCurrentLayer(l_layer);
 			
-			if (win->getTween() == false) {
+			if (win->getTween() == 0) {
 				vector<VectorData> v = win->getFrameData(true).getVectorData();
 				
 				for (unsigned int i = 0; i < v.size(); ++i) {

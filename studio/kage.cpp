@@ -68,6 +68,8 @@ Kage::Kage() : _layerManager(this),
 			   m_LabelNodeY("Y"),
 			   m_LabelToggleLine("Straighten"),
 			   m_LblHolder_Toolbar("Toolbar"),
+			   m_LabelTweenX("Tween X"),
+			   m_LabelTweenY("Tween Y"),
 			   m_KageStage(this),
 			   _adjustFill( Gtk::Adjustment::create(0.0, 0.0, 101.0, 0.1, 1.0, 1.0) ),
 			   _adjustStroke( Gtk::Adjustment::create(0.0, 0.0, 101.0, 0.1, 1.0, 1.0) ),
@@ -891,6 +893,29 @@ Kage::Kage() : _layerManager(this),
 						_btnToggleLine.set_focus_on_click(false);
 						_btnToggleLine.signal_clicked().connect(sigc::mem_fun(*this, &Kage::ToggleLine_onClick));
 	
+			//Frame Tween
+ 			m_Box1.pack_start(m_propFrameTween, Gtk::PACK_SHRINK);
+				m_propFrameTween.set_border_width(10);
+				m_propFrameTween.pack_start(m_propFrameTweenV1);
+					m_propFrameTweenV1.set_border_width(4);
+					m_propFrameTweenV1.set_spacing(4);
+					m_propFrameTweenV1.pack_start(m_LabelTweenX);
+					m_propFrameTweenV1.pack_start(m_LabelTweenY);
+				m_propFrameTween.pack_start(m_propFrameTweenV2);
+					m_propFrameTweenV2.set_border_width(4);
+					m_propFrameTweenV2.set_spacing(4);
+					m_propFrameTweenV2.pack_start(m_ComboX);
+						m_ComboX.append("Linear");
+						m_ComboX.append("Ease In");
+						m_ComboX.append("Ease Out");
+						m_ComboX.set_active_text("Linear");
+						m_ComboX.signal_changed().connect( sigc::mem_fun(*this, &Kage::FrameTween_onChange) );
+					m_propFrameTweenV2.pack_start(m_ComboY);
+						m_ComboY.append("Linear");
+						m_ComboY.append("Ease In");
+						m_ComboY.append("Ease Out");
+						m_ComboY.set_active_text("Linear");
+						m_ComboY.signal_changed().connect( sigc::mem_fun(*this, &Kage::FrameTween_onChange) );
 	New_onClick();
 	
 	registerPropertiesPane();
@@ -1204,6 +1229,8 @@ void Kage::refreshUI() {
 		propFillStrokeSetVisible(false);
 		propShapePropertiesSetVisible(false);
 	}
+	
+	propFrameTweenSetVisible(getTween());
 }
 
 /**
@@ -1258,10 +1285,13 @@ void Kage::DeleteFrame_onClick() {
 
 void Kage::TweenFrame_onClick() {
 	Kage::timestamp(); std::cout << " Kage::TweenFrame_onClick" << std::endl;
-	
+	unsigned int l_tweenType  = 11;
+	m_ComboX.set_active_text("Linear");
+	m_ComboY.set_active_text("Linear");
 	if (isLayerLocked() == false) {
-		if (_framesetManager.setTween(true) == true) {
+		if (_framesetManager.setTween(l_tweenType) == true) {
 //			stackDo();
+			propFrameTweenSetVisible(true);
 			forceRenderFrames();
 		}
 	}
@@ -1271,8 +1301,9 @@ void Kage::RemoveTweenFrame_onClick() {
 	Kage::timestamp(); std::cout << " Kage::RemoveTweenFrame_onClick" << std::endl;
 	
 	if (isLayerLocked() == false) {
-		if (_framesetManager.setTween(false) == true) {
+		if (_framesetManager.setTween(0) == true) {
 //			stackDo();
+			propFrameTweenSetVisible(false);
 			forceRenderFrames();
 		}
 	}
@@ -1548,6 +1579,10 @@ void Kage::propNodeXYSetVisible(bool p_visible) {
 	m_propNodeXY.set_visible(p_visible);
 }
 
+void Kage::propFrameTweenSetVisible(bool p_visible) {
+	m_propFrameTween.set_visible(p_visible);
+}
+
 void Kage::updateColors() {
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	_scaleFillAplha.set_value((double) KageStage::fillColor.getA()*100.0f/256.0f);
@@ -1655,7 +1690,7 @@ void Kage::setFrameData(VectorDataManager p_vectorsData, bool p_force) {
 	}
 }
 
-bool Kage::getTween() {
+unsigned int Kage::getTween() {
 	return _framesetManager.getTween();
 }
 
@@ -1664,6 +1699,31 @@ bool Kage::isFrameEmpty() {
 }
 
 void Kage::forceRenderFrames() {
+	unsigned int l_tween = getTween();
+	if (l_tween > 0) {
+		unsigned int l_tweenX = l_tween / 10;
+		unsigned int l_tweenY = l_tween - (l_tweenX * 10);
+		
+		if (l_tweenX == 1) {
+			m_ComboX.set_active_text("Linear");
+		} else if (l_tweenX == 2) {
+			m_ComboX.set_active_text("Ease In");
+		} else if (l_tweenX == 3) {
+			m_ComboX.set_active_text("Ease Out");
+		}
+		
+		if (l_tweenY == 1) {
+			m_ComboY.set_active_text("Linear");
+		} else if (l_tweenY == 2) {
+			m_ComboY.set_active_text("Ease In");
+		} else if (l_tweenY == 3) {
+			m_ComboY.set_active_text("Ease Out");
+		}
+		
+		propFrameTweenSetVisible(true);
+	} else {
+		propFrameTweenSetVisible(false);
+	}
 	m_KageStage.render();
 	renderFrames();
 }
@@ -1936,8 +1996,8 @@ void Kage::doSave(string p_filename) {
 					KageFrame *l_frame = _framesetManager.getFrameAt(j);
 					KageFrame::extension l_extension = l_frame->getExtension();
 					string l_tween = "";
-					if (l_frame->getTween()) {
-						l_tween = " tween=\"true\"";
+					if (l_frame->getTween() > 0) {
+						l_tween = " tween=\"" + StringHelper::unsignedIntegerToString(l_frame->getTween()) + "\"";
 					}
 					if (l_extension == KageFrame::EXTENSION_NOT) {
 						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + l_tween + ">");
@@ -2375,6 +2435,30 @@ void Kage::ProjectSave_onClick() {
 
 void Kage::onActionActivate() {
 	std::cout << "Action activated." << std::endl;
+}
+
+void Kage::FrameTween_onChange() {
+	Glib::ustring nameX = m_ComboX.get_active_text();
+	Glib::ustring nameY = m_ComboY.get_active_text();
+	unsigned int l_tweenX = 0;
+	unsigned int l_tweenY = 0;
+	if (nameX == "Linear") {
+		l_tweenX = 10;
+	} else if (nameX == "Ease In") {
+		l_tweenX = 20;
+	} else if (nameX == "Ease Out") {
+		l_tweenX = 30;
+	}
+	if (nameY == "Linear") {
+		l_tweenY = 1;
+	} else if (nameY == "Ease In") {
+		l_tweenY = 2;
+	} else if (nameY == "Ease Out") {
+		l_tweenY = 3;
+	}
+	
+	_framesetManager.setTween(l_tweenX + l_tweenY);
+	std::cout << "FrameTween_onChange X = " << nameX << " Y = " << nameY << " l_tweenX " << (l_tweenX+l_tweenY) << std::endl;
 }
 
 void Kage::Play_onClick() {
@@ -2989,10 +3073,13 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 						_framesetManager.setFrameExtension(KageFrame::EXTENSION_END);
 					}
 				} else if (l_properties[l_propertyIndex].getName() == "tween") {
-					if (l_properties[l_propertyIndex].getValue() == "true") {
-						_framesetManager.forceSetTween(true);
-					} else if (l_properties[l_propertyIndex].getValue() == "false") {
-						_framesetManager.forceSetTween(false);
+					string l_tweenValue = l_properties[l_propertyIndex].getValue();
+					if (l_tweenValue == "true") {
+						_framesetManager.forceSetTween(11);
+					} else if (l_tweenValue == "false") {
+						_framesetManager.forceSetTween(0);
+					} else {
+						_framesetManager.forceSetTween(StringHelper::toUnsignedInteger(l_tweenValue));
 					}
 				}
 			}

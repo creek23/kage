@@ -175,7 +175,7 @@ bool KageFrameset::removeFrame() {
 		VectorDataManager l_frameData;
 		for (unsigned int i = l_currentFrameIndex; i < getFrameCount()-1; ++i) {
 			if (_frames[i]->isNull() == false) {
-				bool l_tween = _frames[i+1]->getTween();
+				unsigned int l_tween = _frames[i+1]->getTween();
 				if (i > 0) {
 					switchToNextFrame();
 						l_frameData = getFrameData().clone();
@@ -347,7 +347,7 @@ void KageFrameset::extendFrame() {
 	
 	if (l_currentFrame == getFrameCount()) {
 		KageFrame::extension l_extension = _frames[_frames.size()-2]->getExtension();
-		bool l_tween = _frames[_frames.size()-2]->getTween();
+		unsigned int l_tween = _frames[_frames.size()-2]->getTween();
 		_frames[_frames.size()-1]->forceSetTween(l_tween);
 		if (l_extension == KageFrame::EXTENSION_NOT) {
 			_frames[_frames.size()-2]->setExtension(KageFrame::EXTENSION_START);
@@ -364,7 +364,7 @@ void KageFrameset::extendFrame() {
 		}
 		
 		KageFrame::extension l_extension = _frames[l_currentFrame-1]->getExtension();
-		bool l_tween = _frames[l_currentFrame-1]->getTween();
+		unsigned int l_tween = _frames[l_currentFrame-1]->getTween();
 		_frames[l_currentFrame]->forceSetTween(l_tween);
 		if (l_extension == KageFrame::EXTENSION_NOT) {
 			_frames[l_currentFrame-1]->setExtension(KageFrame::EXTENSION_START);
@@ -727,10 +727,10 @@ bool KageFrameset::setFrameData(VectorDataManager p_vectorsData) {
 }
 
 VectorDataManager KageFrameset::getFrameTweenData(unsigned int p_frameIndex) {
-	bool                     l_tween = _frames[p_frameIndex]->getTween();
+	unsigned int             l_tween = _frames[p_frameIndex]->getTween();
 	KageFrame::extension l_extension = _frames[p_frameIndex]->getExtension();
 	
-	if (       l_tween
+	if (       l_tween > 0
 			&& (l_extension == KageFrame::EXTENSION_MID
 			||  l_extension == KageFrame::EXTENSION_END)) {
 		unsigned int l_tweenHead = UINT_MAX;
@@ -760,19 +760,61 @@ VectorDataManager KageFrameset::getFrameTweenData(unsigned int p_frameIndex) {
 		}
 		vector<VectorData> l_vHead = l_dataHead.getVectorData();
 		vector<VectorData> l_vTail = l_dataTail.getVectorData();
-		unsigned int l_tweenDistance    =        l_tweenTail - l_tweenHead;
+		unsigned int l_tweenDistance    =  l_tweenTail - l_tweenHead;
 		unsigned int l_tweenInterpolate = p_frameIndex - l_tweenHead;
+		double l_progress = (double) l_tweenInterpolate / (double) l_tweenDistance;
+			if (p_frameIndex < l_tweenHead) l_progress = 0.0;
+			if (p_frameIndex > l_tweenTail) l_progress = 1.0;
+		
 		if (l_vHead.size() == l_vTail.size()) {
+			unsigned int l_tweenX = l_tween / 10;
+			unsigned int l_tweenY = l_tween - (l_tweenX * 10);
 			for (unsigned int j = 0; j < l_vHead.size(); ++j) {
 				if (       (l_vHead[j].vectorType == VectorData::TYPE_INIT && l_vTail[j].vectorType == VectorData::TYPE_INIT)
 						|| (l_vHead[j].vectorType == VectorData::TYPE_MOVE && l_vTail[j].vectorType == VectorData::TYPE_MOVE)) {
-					l_vHead[j].points[0].x += (l_vTail[j].points[0].x - l_vHead[j].points[0].x) * l_tweenInterpolate / l_tweenDistance;
-					l_vHead[j].points[0].y += (l_vTail[j].points[0].y - l_vHead[j].points[0].y) * l_tweenInterpolate / l_tweenDistance;
+					double l_xDistance = l_vTail[j].points[0].x - l_vHead[j].points[0].x;
+					if (l_tweenX == 1) l_vHead[j].points[0].x += l_xDistance * l_progress;
+					if (l_tweenX == 2) l_vHead[j].points[0].x += l_xDistance * pow(0.66667, l_tweenDistance-l_tweenInterpolate);
+					if (l_tweenX == 3) {
+						double l_xMult = l_xDistance * 0.3334;
+						for (unsigned int l_tweenCtr = 1; l_tweenCtr < l_tweenInterpolate; ++l_tweenCtr) {
+							l_xMult = l_xMult * 0.6667;
+						}
+						l_vHead[j].points[0].x += (l_xDistance - l_xMult);
+					}
+					double l_yDistance = l_vTail[j].points[0].y - l_vHead[j].points[0].y;
+					if (l_tweenY == 1) l_vHead[j].points[0].y += l_yDistance * l_progress;
+					if (l_tweenY == 2) l_vHead[j].points[0].y += l_yDistance * pow(0.66667, l_tweenDistance-l_tweenInterpolate);
+					if (l_tweenY == 3) {
+						double l_yMult = l_yDistance * 0.3334;
+						for (unsigned int l_tweenCtr = 1; l_tweenCtr < l_tweenInterpolate; ++l_tweenCtr) {
+							l_yMult = l_yMult * 0.6667;
+						}
+						l_vHead[j].points[0].y += (l_yDistance - l_yMult);
+					}
 				} else if ((l_vHead[j].vectorType == VectorData::TYPE_CURVE_CUBIC     && l_vTail[j].vectorType == VectorData::TYPE_CURVE_CUBIC)
 						|| (l_vHead[j].vectorType == VectorData::TYPE_CURVE_QUADRATIC && l_vTail[j].vectorType == VectorData::TYPE_CURVE_QUADRATIC)) {
 					for (unsigned int k = 0; k < 3; ++k) {
-						l_vHead[j].points[k].x += (l_vTail[j].points[k].x - l_vHead[j].points[k].x) * l_tweenInterpolate / l_tweenDistance;
-						l_vHead[j].points[k].y += (l_vTail[j].points[k].y - l_vHead[j].points[k].y) * l_tweenInterpolate / l_tweenDistance;
+						double l_xDistance = l_vTail[j].points[k].x - l_vHead[j].points[k].x;
+						if (l_tweenX == 1) l_vHead[j].points[k].x += l_xDistance * l_progress;
+						if (l_tweenX == 2) l_vHead[j].points[k].x += l_xDistance * pow(0.66667, l_tweenDistance-l_tweenInterpolate);
+						if (l_tweenX == 3) {
+							double l_xMult = l_xDistance * 0.3334;
+							for (unsigned int l_tweenCtr = 1; l_tweenCtr < l_tweenInterpolate; ++l_tweenCtr) {
+								l_xMult = l_xMult * 0.6667;
+							}
+							l_vHead[j].points[k].x += (l_xDistance - l_xMult);
+						}
+						double l_yDistance = l_vTail[j].points[k].y - l_vHead[j].points[k].y;
+						if (l_tweenY == 1) l_vHead[j].points[k].y += l_yDistance * l_progress;
+						if (l_tweenY == 2) l_vHead[j].points[k].y += l_yDistance * pow(0.66667, l_tweenDistance-l_tweenInterpolate);
+						if (l_tweenY == 3) {
+							double l_yMult = l_yDistance * 0.3334;
+							for (unsigned int l_tweenCtr = 1; l_tweenCtr < l_tweenInterpolate; ++l_tweenCtr) {
+								l_yMult = l_yMult * 0.6667;
+							}
+							l_vHead[j].points[k].y += (l_yDistance - l_yMult);
+						}
 					}
 				} else if ((l_vHead[j].vectorType == VectorData::TYPE_FILL   && l_vTail[j].vectorType == VectorData::TYPE_FILL)
 						|| (l_vHead[j].vectorType == VectorData::TYPE_STROKE && l_vTail[j].vectorType == VectorData::TYPE_STROKE)) {
@@ -780,51 +822,51 @@ VectorDataManager KageFrameset::getFrameTweenData(unsigned int p_frameIndex) {
 					if (l_vTail[j].fillColor.getR() == l_vHead[j].fillColor.getR()) {
 						l_fillColor.setR(l_vTail[j].fillColor.getR());
 					} else {
-						l_fillColor.setR((int)(l_vTail[j].fillColor.getR() - l_vHead[j].fillColor.getR()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].fillColor.getR());
+						if (l_tweenX == 1) l_fillColor.setR((int)(l_vTail[j].fillColor.getR() - l_vHead[j].fillColor.getR()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].fillColor.getR());
 					}
 					if (l_vTail[j].fillColor.getG() == l_vHead[j].fillColor.getG()) {
 						l_fillColor.setG(l_vTail[j].fillColor.getG());
 					} else {
-						l_fillColor.setG((int)(l_vTail[j].fillColor.getG() - l_vHead[j].fillColor.getG()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].fillColor.getG());
+						if (l_tweenX == 1) l_fillColor.setG((int)(l_vTail[j].fillColor.getG() - l_vHead[j].fillColor.getG()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].fillColor.getG());
 					}
 					if (l_vTail[j].fillColor.getB() == l_vHead[j].fillColor.getB()) {
 						l_fillColor.setB(l_vTail[j].fillColor.getB());
 					} else {
-						l_fillColor.setB((int)(l_vTail[j].fillColor.getB() - l_vHead[j].fillColor.getB()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].fillColor.getB());
+						if (l_tweenX == 1) l_fillColor.setB((int)(l_vTail[j].fillColor.getB() - l_vHead[j].fillColor.getB()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].fillColor.getB());
 					}
 					if (l_vTail[j].fillColor.getA() == l_vHead[j].fillColor.getA()) {
 						l_fillColor.setA(l_vTail[j].fillColor.getA());
 					} else {
-						l_fillColor.setA((int)(l_vTail[j].fillColor.getA() - l_vHead[j].fillColor.getA()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].fillColor.getA());
+						if (l_tweenX == 1) l_fillColor.setA((int)(l_vTail[j].fillColor.getA() - l_vHead[j].fillColor.getA()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].fillColor.getA());
 					}
 					
 					StrokeColorData l_strokeColor;
 					if (l_vTail[j].stroke.getR() == l_vHead[j].stroke.getR()) {
 						l_strokeColor.setR(l_vTail[j].stroke.getR());
 					} else {
-						l_strokeColor.setR((int)(l_vTail[j].stroke.getR() - l_vHead[j].stroke.getR()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].stroke.getR());
+						if (l_tweenX == 1) l_strokeColor.setR((int)(l_vTail[j].stroke.getR() - l_vHead[j].stroke.getR()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].stroke.getR());
 					}
 					if (l_vTail[j].stroke.getG() == l_vHead[j].stroke.getG()) {
 						l_strokeColor.setG(l_vTail[j].stroke.getG());
 					} else {
-						l_strokeColor.setG((int)(l_vTail[j].stroke.getG() - l_vHead[j].stroke.getG()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].stroke.getG());
+						if (l_tweenX == 1) l_strokeColor.setG((int)(l_vTail[j].stroke.getG() - l_vHead[j].stroke.getG()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].stroke.getG());
 					}
 					if (l_vTail[j].stroke.getB() == l_vHead[j].stroke.getB()) {
 						l_strokeColor.setB(l_vTail[j].stroke.getB());
 					} else {
-						l_strokeColor.setB((int)(l_vTail[j].stroke.getB() - l_vHead[j].stroke.getB()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].stroke.getB());
+						if (l_tweenX == 1) l_strokeColor.setB((int)(l_vTail[j].stroke.getB() - l_vHead[j].stroke.getB()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].stroke.getB());
 					}
 					if (l_vTail[j].stroke.getA() == l_vHead[j].stroke.getA()) {
 						l_strokeColor.setA(l_vTail[j].stroke.getA());
 					} else {
-						l_strokeColor.setA((int)(l_vTail[j].stroke.getA() - l_vHead[j].stroke.getA()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].stroke.getA());
+						if (l_tweenX == 1) l_strokeColor.setA((int)(l_vTail[j].stroke.getA() - l_vHead[j].stroke.getA()) * (double) l_tweenInterpolate / (double) l_tweenDistance + l_vHead[j].stroke.getA());
 					}
 					
 					if (l_vHead[j].vectorType == VectorData::TYPE_STROKE) {
 						if (l_vTail[j].stroke.getThickness() == l_vHead[j].stroke.getThickness()) {
 							l_strokeColor.setThickness(l_vTail[j].stroke.getThickness());
 						} else {
-							l_strokeColor.setThickness((l_vTail[j].stroke.getThickness() - l_vHead[j].stroke.getThickness()) * l_tweenInterpolate / l_tweenDistance + l_vHead[j].stroke.getThickness());
+							if (l_tweenX == 1) l_strokeColor.setThickness((l_vTail[j].stroke.getThickness() - l_vHead[j].stroke.getThickness()) * l_tweenInterpolate / l_tweenDistance + l_vHead[j].stroke.getThickness());
 						}
 					}
 					
@@ -899,7 +941,7 @@ bool KageFrameset::addDataToPreviousFrame(VectorDataManager p_vectorsData, unsig
 	return false;
 }
 
-bool KageFrameset::setPreviousFrameTween(unsigned int p_frameID, bool p_tween) {
+bool KageFrameset::setPreviousFrameTween(unsigned int p_frameID, unsigned int p_tween) {
 	cout << " KageFrameset::setPreviousFrameTween() " << p_frameID << endl;
 	for (unsigned int i = 1; i < getFrameCount(); ++i) {
 		if (_frames[i]->frameID == p_frameID) {
@@ -910,7 +952,7 @@ bool KageFrameset::setPreviousFrameTween(unsigned int p_frameID, bool p_tween) {
 	
 	return false;
 }
-bool KageFrameset::setExtendedFrameTween(unsigned int p_frameID, bool p_tween) {
+bool KageFrameset::setExtendedFrameTween(unsigned int p_frameID, unsigned int p_tween) {
 	cout << " KageFrameset::setExtendedFrameTween() " << p_frameID << endl;
 	for (unsigned int i = 0; i < getFrameCount(); ++i) {
 		if (_frames[i]->frameID == p_frameID) {
@@ -927,7 +969,7 @@ bool KageFrameset::setExtendedFrameTween(unsigned int p_frameID, bool p_tween) {
 	return false;
 }
 
-bool KageFrameset::forceSetTween(bool p_tween) {
+bool KageFrameset::forceSetTween(unsigned int p_tween) {
 	cout << " KageFrameset::forceSetTween() " << endl;
 	if (_currentFrameIndex < getFrameCount() && _frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		_frames[_currentFrameIndex]->forceSetTween(p_tween);
@@ -946,7 +988,7 @@ bool KageFrameset::forceSetTween(bool p_tween) {
 	return false;
 }
 
-bool KageFrameset::setTween(bool p_tween) {
+bool KageFrameset::setTween(unsigned int p_tween) {
 	cout << " KageFrameset::setTween() " << endl;
 	if (_currentFrameIndex < getFrameCount() && _frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		_frames[_currentFrameIndex]->setTween(p_tween);
@@ -964,7 +1006,7 @@ bool KageFrameset::setTween(bool p_tween) {
 	
 	return false;
 }
-bool KageFrameset::getTween() {
+unsigned int KageFrameset::getTween() {
 	cout << " KageFrameset::getTween() " << endl;
 	if (_currentFrameIndex < getFrameCount() && _frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return _frames[_currentFrameIndex]->getTween();
@@ -978,7 +1020,7 @@ bool KageFrameset::getTween() {
 		}
 	}
 	
-	return false;
+	return 0;
 }
 
 bool KageFrameset::switchToPreviousFrame() {

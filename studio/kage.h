@@ -42,6 +42,9 @@
 	#include <gtkmm/filechooserdialog.h>
 	#include <gtkmm/colorbutton.h>
 	#include <gtkmm/colorselection.h>
+	#include <gtkmm/colorchooser.h>
+	#include <gtkmm/comboboxtext.h>
+	#include <gtkmm/liststore.h>
 	#include <gtkmm/scale.h>
 	#include "kage/timeline/layermanager.h"
 	//#include "kage/timeline/layer.h"
@@ -86,7 +89,7 @@
 			string saveFrame();
 			string dumpFrame(bool bKS);
 			
-			bool getTween();
+			unsigned int getTween();
 			
 			string int255ToHex(unsigned int p);
 			char int15ToHex(unsigned int p);
@@ -221,6 +224,7 @@
 				Gtk::Entry m_EntryStageHgt;
 					void EntryStageArea_onEnter();
 				Gtk::ColorButton m_ColorButtonStage;
+//				Gtk::ColorChooser m_ColorChooser;
 				Gtk::ColorSelection m_ColorSelectionStage;
 					void ColorButtonStage_onClick();
 				Gtk::Entry m_EntryStageFPS;
@@ -281,6 +285,16 @@
 					Gtk::Image                _btnToggleLine_img;
 					Glib::RefPtr<Gdk::Pixbuf> _btnToggleLine_pixbuf;
 					void ToggleLine_onClick();
+			
+			//Frame's properties
+				Gtk::HBox m_propFrameTween;
+				Gtk::VBox m_propFrameTweenV1;
+				Gtk::VBox m_propFrameTweenV2;
+				Gtk::Label m_LabelTweenX;
+				Gtk::ComboBoxText m_ComboX;
+				Gtk::Label m_LabelTweenY;
+				Gtk::ComboBoxText m_ComboY;
+					void FrameTween_onChange();
 			
 			Gtk::Label m_LblHolder_Toolbar;
 			KageStage m_KageStage;
@@ -380,6 +394,7 @@
 			void propFillStrokeSetVisible(bool p_visible);
 			void propShapePropertiesSetVisible(bool p_visible);
 			void propNodeXYSetVisible(bool p_visible);
+			void propFrameTweenSetVisible(bool p_visible);
 			void updateColors();
 			void updateShapeProperties();
 			void updateNodeXY();

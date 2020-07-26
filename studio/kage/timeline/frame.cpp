@@ -208,7 +208,7 @@ bool KageFrame::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 					} else {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK, 0, -1);
 					}
-				} else if (getTween() == true) {
+				} else if (getTween() > 0) {
 					if (_frameset->isCurrentFrame(frameID) == true) {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageTWEEN_CUR, 0, -1);
 					} else {
@@ -242,7 +242,7 @@ bool KageFrame::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 					} else {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK_X, 0, -1);
 					}
-				} else if (getTween() == true) {
+				} else if (getTween() > 0) {
 					if (_frameset->isCurrentFrame(frameID) == true) {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageTWEEN_X_CUR, 0, -1);
 					} else {
@@ -293,11 +293,14 @@ void KageFrame::setNull(bool p_null) {
 bool KageFrame::isNull() {
 	return _null;
 }
-void KageFrame::forceSetTween(bool p_tween) {
-	_tween = p_tween;
+void KageFrame::forceSetTween(unsigned int p_tween) {
+	_tweenX = p_tween/10;
+	_tweenY = p_tween - (_tweenX*10);
+	cout << " KageFrame::setTween() " << _tweenX << " " << _tweenY << endl;
+	
 	render();
 }
-void KageFrame::setTween(bool p_tween) {
+void KageFrame::setTween(unsigned int p_tween) {
 	if (_null == true) {
 		return;
 	}
@@ -311,8 +314,9 @@ void KageFrame::setTween(bool p_tween) {
 		_frameset->setPreviousFrameTween(frameID, p_tween);
 	}
 }
-bool KageFrame::getTween() {
-	return _tween;
+unsigned int KageFrame::getTween() {
+	cout << " KageFrame::getTween() " << _tweenX << " " << _tweenY << " | " << ((_tweenX * 10) + _tweenY) << endl;
+	return (_tweenX * 10) + _tweenY;
 }
 
 void KageFrame::setCurrent(bool p_current) {

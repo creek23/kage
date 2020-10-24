@@ -218,11 +218,10 @@ void KageFramesetManager::setCurrentFrameByID(unsigned int p_frameID) {
 }
 
 void KageFramesetManager::renderStage() {
-	Kage::timestamp();
+	Kage::timestamp_IN();
 	cout << " KageFramesetManager::renderStage <" << endl;
 	win->forceRenderFrames();
-	Kage::timestamp();
-	cout << " KageFramesetManager::renderStage >" << endl;
+	Kage::timestamp_OUT();
 }
 
 void KageFramesetManager::selectAll(bool p_selectAll) {
@@ -532,14 +531,18 @@ bool KageFramesetManager::setTween(unsigned int p_tween) {
 }
 
 unsigned int KageFramesetManager::getTween() {
-	cout << " KageFramesetManager::getTween() " << endl;
+	Kage::timestamp_IN(); cout << " KageFramesetManager::getTween() " << endl;
 	unsigned int l_currentLayer = win->getCurrentLayer();
 	if (l_currentLayer < 1 || l_currentLayer > _framesets.size()) {
 		//
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
-		return _framesets[l_currentLayer]->getTween();
+		unsigned int l_ret = _framesets[l_currentLayer]->getTween();
+		Kage::timestamp_OUT();
+		return l_ret;
 	}
+	
+	Kage::timestamp_OUT();
 	
 	return 0;
 }

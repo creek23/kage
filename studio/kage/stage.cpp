@@ -59,7 +59,8 @@ bool KageStage::on_key_press_event(GdkEventKey *e) {
 		if (KageStage::toolMode == MODE_SELECT
 				|| KageStage::toolMode == MODE_NODE
 				|| KageStage::toolMode == MODE_ZOOM
-				|| KageStage::toolMode == MODE_DRAW_POLY) { //why restrict key down handling to these tools?
+				|| KageStage::toolMode == MODE_DRAW_POLY
+				|| KageStage::toolMode == MODE_DRAW_PENCIL) { //why restrict keydown handling to these tools?
 			if (e->keyval == GDK_KEY_Up || e->keyval == GDK_KEY_KP_Up) {
 				keyUpDown = true;
 				keyDownDown = false;
@@ -170,10 +171,16 @@ bool KageStage::on_expose_event(GdkEventExpose* e) {
 
 bool KageStage::on_event(GdkEvent *e) {
 	if (e->type == GDK_ENTER_NOTIFY) {
+		Kage::timestamp_IN();
+		cout << " mouse enter" << endl;
 		render();
+		Kage::timestamp_OUT();
 		//mouse hover in
 	} else if (e->type == GDK_LEAVE_NOTIFY) {
+		Kage::timestamp_IN();
+		cout << " mouse leave" << endl;
 		render();
+		Kage::timestamp_OUT();
 		//mouse hover out
 	} else if (e->type == GDK_KEY_PRESS) {
 		on_key_press_event((GdkEventKey*) e);
@@ -194,6 +201,8 @@ bool KageStage::on_event(GdkEvent *e) {
 				|| KageStage::toolMode == MODE_DRAW_RECT) {
 			draw2.x = e->button.x;
 			draw2.y = e->button.y;
+		} else if (KageStage::toolMode == MODE_DRAW_PENCIL) {
+			handleDrawPencilMouseDown(PointData(draw1));
 		} else if (KageStage::toolMode == MODE_SELECT) {
 			draw2.x = e->button.x;
 			draw2.y = e->button.y;
@@ -317,6 +326,8 @@ bool KageStage::on_event(GdkEvent *e) {
 			handleDrawOvalMouseUp();
 		} else if (KageStage::toolMode == MODE_DRAW_RECT) {
 			handleDrawRectMouseUp();
+		} else if (KageStage::toolMode == MODE_DRAW_PENCIL) {
+			handleDrawPencilMouseUp();
 		} else if (KageStage::toolMode == MODE_DRAW_POLY) {
 			if (keyControlDown == true) {
 				draw1.x = drawConstraint.x - origin.x;
@@ -336,7 +347,7 @@ bool KageStage::on_event(GdkEvent *e) {
 				draw1.y = drawConstraint.y;
 			}
 		}
-	} else if (e->type == GDK_MOTION_NOTIFY) { ///mouse move
+	} else if (e->type == GDK_MOTION_NOTIFY) { //mouse move
 		_mouseLocation.x = e->button.x;
 		_mouseLocation.y = e->button.y;
 		
@@ -360,6 +371,10 @@ bool KageStage::on_event(GdkEvent *e) {
 				
 				render();
 			}
+		} else if (KageStage::toolMode == MODE_DRAW_PENCIL) {
+			draw2.x = e->button.x;
+			draw2.y = e->button.y;
+			handleDrawPencilMouseMove(PointData(e->button.x, e->button.y));
 		} else if (KageStage::toolMode == MODE_DRAW_POLY) {
 			if (drawCtr > 0) {
 				draw2.x = (e->button.x);
@@ -635,7 +650,7 @@ Gdk::Color KageStage::getStroke() {
 }
 
 void KageStage::printVectors() {
-	Kage::timestamp();
+	Kage::timestamp_IN();
 	std::cout << " KageStage::printVectors <" << std::endl;
 	vector<VectorData> v = win->getFrameData().getVectorData();
 	
@@ -740,8 +755,7 @@ void KageStage::printVectors() {
 				break;
 		}
 	}
-	Kage::timestamp();
-	std::cout << " KageStage::printVectors >" << std::endl;
+	Kage::timestamp_OUT();
 }
 
 void KageStage::cleanSlate() {
@@ -787,7 +801,9 @@ void KageStage::cleanSlate() {
 }
 
 void KageStage::render() {
-	if (!window) {
+	Kage::timestamp_IN();
+	cout << " KageStage::render " << endl;
+		if (!window) {
 		window = get_window();
 	}
 	
@@ -797,9 +813,11 @@ void KageStage::render() {
 				get_allocation().get_height());
 		window->invalidate_rect(r, false);
 	}
+	Kage::timestamp_OUT();
 }
 
 bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
+	Kage::timestamp_IN(); cout << " KageStage::on_draw" << endl;
 	if (!window) {
 		window = get_window();
 	}
@@ -851,6 +869,8 @@ bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
 			handleNodes();
 		} else if (KageStage::toolMode == MODE_DRAW_POLY) {
 			handlePoly();
+		} else if (KageStage::toolMode == MODE_DRAW_PENCIL) {
+			handlePencil();
 		} else if (KageStage::toolMode == MODE_DRAW_RECT && mouseDown == true) {
 			handleRect();
 		} else if (KageStage::toolMode == MODE_DRAW_OVAL && mouseDown == true) {
@@ -864,6 +884,9 @@ bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
 			win->renderFramesAboveCurrentLayer();
 		}
 	}
+	
+	Kage::timestamp_OUT();
+	
 	return true;
 }
 
@@ -944,19 +967,30 @@ void KageStage::renderFrameToPNG(Cairo::RefPtr<Cairo::Context> p_context) {
 	renderFrame(p_context, true);
 }
 void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, bool p_force) {
+	Kage::timestamp_IN();
+	cout << " KageStage::renderFrame p_force " << p_force << endl;
 	vector<VectorData> v = win->getFrameData(p_force).getVectorData();
 	renderFrame(p_context, v);
 	if (_polyVectors.isEmpty() == false) {
+		Kage::timestamp_IN();
+		cout << " KageStage::renderFrame _polyVectors " << _polyVectors.getVectorData().size() << endl;
 		renderFrame(p_context, _polyVectors.getVectorData());
+		Kage::timestamp_OUT();
 	}
+	Kage::timestamp_OUT();
 }
 /**
  * For use by Kage, when Onion Skin is toggled
  */
 void KageStage::renderOnionFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> p_vectorData, double p_alpha) {
+	Kage::timestamp_IN();
+	cout << " KageStage::renderOnionFrame v " << p_vectorData.size() << endl;
 	renderFrame(p_context, p_vectorData, p_alpha);
+	Kage::timestamp_OUT();
 }
 void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> p_vectorData, double p_alpha) {
+	Kage::timestamp_IN();
+	cout << " KageStage::renderFrame v " << p_vectorData.size() << " " << endl;
 	unsigned int vsize = p_vectorData.size();
 	unsigned int fillCtr = 0;
 	ColorData fcolor;
@@ -1071,6 +1105,8 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
 				break;
 		}
 	}
+	
+	Kage::timestamp_OUT();
 }
 
 void KageStage::drawSelectionArea() {
@@ -1115,10 +1151,11 @@ void KageStage::handleFillMouseUp() {
 }
 
 void KageStage::handleEyedrop() {
-	Kage::timestamp();
+	Kage::timestamp_IN();
 	std::cout << " KageStage::handleEyedrop " << selectedShape << std::endl;
 	
 	if (selectedShape == _NO_SELECTION) {
+		Kage::timestamp_OUT();
 		return;
 	}
 	
@@ -1179,13 +1216,16 @@ void KageStage::handleEyedrop() {
 		
 		win->stackDo();
 	}
+	
+	Kage::timestamp_OUT();
 }
 
 void KageStage::handleEyedropMouseMove() {
-//	Kage::timestamp();
+//	Kage::timestamp_IN();
 //	std::cout << " KageStage::handleEyedropMouseMove ??? " << std::endl;
 //	handleNodesMouseUp();
 //	win->updateColors();
+//	Kage::timestamp_OUT();
 }
 
 void KageStage::handleEyedropMouseUp() {

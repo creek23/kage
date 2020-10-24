@@ -69,10 +69,10 @@
 	
 	#include <gdkmm/cursor.h>
 	#include <gdkmm/frameclock.h>
-
+	
 	class Kage : public Gtk::Window {
 		public:
-			Kage();
+			Kage(string p_filePath);
 			virtual ~Kage();
 			
 			void addDataToFrame(VectorDataManager v, bool p_force = false);
@@ -159,6 +159,7 @@
 			
 			virtual bool on_delete_event(GdkEventAny* any_event);
 			
+			void doOpen();
 			void doSaveDialog(string p_title);
 			void doSave(string p_filename);
 			
@@ -354,6 +355,7 @@
 //			void ToolSelect_onClick();
 			void ToolNode_onClick();
 			void ToolPoly_onClick();
+			void ToolPencil_onClick();
 			void ToolOval_onClick();
 			void ToolRectangle_onClick();
 			void ToolStroke_onClick();
@@ -385,6 +387,9 @@
 			void ToolSelect_onClick();
 			
 			static void timestamp();
+			static void timestamp_IN();
+			static void timestamp_OUT();
+			static unsigned int TAB_COUNT;
 			
 			void switchToPreviousFrame();
 			void switchToNextFrame();

@@ -61,10 +61,11 @@ void KageStage::addSelectedNode(unsigned int p_index) {
 }
 
 void KageStage::updateNodeX(double p_value, bool p_stackDo) {
-	Kage::timestamp();
+	Kage::timestamp_IN();
 	std::cout << " KageStage::updateNodeX " << selectedNodes.size() << " " << p_value << std::endl;
 	
 	if (selectedNodes.size() == 0) {
+		Kage::timestamp_OUT();
 		return;
 	}
 	
@@ -115,12 +116,15 @@ void KageStage::updateNodeX(double p_value, bool p_stackDo) {
 	}
 	
 	render();
+	
+	Kage::timestamp_OUT();
 }
 void KageStage::updateNodeY(double p_value, bool p_stackDo) {
-	Kage::timestamp();
+	Kage::timestamp_IN();
 	std::cout << " KageStage::updateNodeY " << selectedNodes.size() << " " << p_value << std::endl;
 	
 	if (selectedNodes.size() == 0) {
+		Kage::timestamp_OUT();
 		return;
 	}
 	
@@ -165,6 +169,8 @@ void KageStage::updateNodeY(double p_value, bool p_stackDo) {
 	}
 	
 	render();
+	
+	Kage::timestamp_OUT();
 }
 
 
@@ -926,7 +932,7 @@ bool KageStage::isMouseOnNode(double p_x, double p_y, unsigned int p_buffer) {
 }
 
 bool KageStage::deselectSelectedNodes() {
-	Kage::timestamp();
+	Kage::timestamp_IN();
 	std::cout << " KageStage::deselectSelectedNodes " << selectedNodes.size() << std::endl;
 	
 	if (selectedNodes.size() == 0) {
@@ -936,6 +942,8 @@ bool KageStage::deselectSelectedNodes() {
 	initNodeTool();
 	win->propStageSetVisible(true);
 	win->propNodeXYSetVisible(false);
+	
+	Kage::timestamp_OUT();
 	
 	return true;
 }
@@ -950,15 +958,16 @@ bool KageStage::deleteSelectedNodes() {
 		return false;
 	}
 	
-	Kage::timestamp();
+	Kage::timestamp_IN();
 	std::cout << " KageStage::deleteSelectedNodes " << selectedNodes.size() << endl;
 	
 	sort(selectedNodes.begin(), selectedNodes.end(), greater <unsigned int>());
 	
 	for (unsigned int l_selectedNode = 0; l_selectedNode < selectedNodes.size(); ++l_selectedNode) {
-	Kage::timestamp();
-	std::cout << " KageStage::deleteSelectedNodes " << l_selectedNode << " " << selectedNodes.size() << endl;
-		l_return = deleteSelectedNode(selectedNodes[l_selectedNode]);
+		Kage::timestamp_IN();
+		std::cout << " KageStage::deleteSelectedNodes " << l_selectedNode << " " << selectedNodes.size() << endl;
+			l_return = deleteSelectedNode(selectedNodes[l_selectedNode]);
+		Kage::timestamp_OUT();
 	}
 	
 	selectedNodes.clear();
@@ -966,6 +975,8 @@ bool KageStage::deleteSelectedNodes() {
 	if (l_return == true) {
 		win->stackDo();
 	}
+	
+	Kage::timestamp_OUT();
 	
 	return l_return;
 }

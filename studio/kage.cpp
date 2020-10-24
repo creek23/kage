@@ -22,8 +22,8 @@
 #include "kage.h"
 
 ColorData KageStage::stageBG(255, 255, 255);
-ColorData KageStage::fillColor(0, 0, 255, 255);
-StrokeColorData KageStage::stroke(255, 0, 0, 255);
+ColorData KageStage::fillColor(239, 41, 41, 255);
+StrokeColorData KageStage::stroke(164, 0, 0, 255);
 KageStage::ToolMode KageStage::toolMode = MODE_NONE;
 GdkPoint KageStage::moveStageXY;
 unsigned int PointData::debug_pts;
@@ -48,7 +48,10 @@ bool KageFrame::_gotFocus;
 
 unsigned int VectorDataManager::idmaker;
 
-Kage::Kage() : _layerManager(this),
+unsigned int Kage::TAB_COUNT = 0;
+
+Kage::Kage(string p_filePath) :
+			   _layerManager(this),
 			   _framesetManager(this),
 			   m_LabelProp("Properties"),
 			   m_LabelStageWid("Width"),
@@ -403,6 +406,11 @@ Kage::Kage() : _layerManager(this),
 		sigc::mem_fun(*this, &Kage::ToolPoly_onClick)
 	);
 	m_refActionGroup->add(
+		Gtk::RadioAction::create(group_tools, "ToolPencil", "Pencil", "Pencil Tool"),
+		Gtk::AccelKey("B"),
+		sigc::mem_fun(*this, &Kage::ToolPencil_onClick)
+	);
+	m_refActionGroup->add(
 		Gtk::RadioAction::create(group_tools, "ToolOval", "_Oval", "Oval Tool"),
 		Gtk::AccelKey("O"),
 		sigc::mem_fun(*this, &Kage::ToolOval_onClick)
@@ -557,6 +565,7 @@ Kage::Kage() : _layerManager(this),
 		"			<menuitem action='ToolSelect'/>"
 		"			<menuitem action='ToolNode'/>"
 		"			<menuitem action='ToolPoly'/>"
+		"			<menuitem action='ToolPencil'/>"
 		"			<menuitem action='ToolOval'/>"
 		"			<menuitem action='ToolRectangle'/>"
 		"			<menuitem action='ToolStroke'/>"
@@ -598,6 +607,7 @@ Kage::Kage() : _layerManager(this),
 		m_VBoxToolbar_Holder.pack_start(m_Separator_Toolbar2, Gtk::PACK_SHRINK);
 //		addToolButton("Text"); //TODO: implement tool
 		addToolButton("Poly");
+		addToolButton("Pencil");
 		addToolButton("Oval");
 		addToolButton("Rectangle");
 		m_VBoxToolbar_Holder.pack_start(m_Separator_Toolbar3, Gtk::PACK_SHRINK);
@@ -920,6 +930,11 @@ Kage::Kage() : _layerManager(this),
 	
 	registerPropertiesPane();
 	m_HPane_DrawingArea.property_position() = _area_properties_pane2;
+	
+	if (p_filePath != "") {
+		ksfPath = p_filePath;
+		doOpen();
+	}
 }
 
 void Kage::registerPropertiesPane() {
@@ -963,32 +978,35 @@ void Kage::Redo_onClick() {
 	}
 }
 void Kage::Cut_onClick() {
-	Kage::timestamp(); std::cout << " Kage::Cut_onClick " << KageFrame::_gotFocus << std::endl;
+	Kage::timestamp_IN(); std::cout << " Kage::Cut_onClick " << KageFrame::_gotFocus << std::endl;
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		if (m_KageStage.cutSelectedShapes() == true) {
 			forceRenderFrames();
 		}
 	}
+	Kage::timestamp_OUT();
 }
 void Kage::Copy_onClick() {
-	Kage::timestamp(); std::cout << " Kage::Copy_onClick " << KageFrame::_gotFocus << std::endl;
+	Kage::timestamp_IN(); std::cout << " Kage::Copy_onClick " << KageFrame::_gotFocus << std::endl;
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		if (m_KageStage.copySelectedShapes() == true) {
 			forceRenderFrames();
 		}
 	}
+	Kage::timestamp_OUT();
 }
 void Kage::Paste_onClick() {
-	Kage::timestamp(); std::cout << " Kage::Paste_onClick " << KageFrame::_gotFocus << std::endl;
+	Kage::timestamp_IN(); std::cout << " Kage::Paste_onClick " << KageFrame::_gotFocus << std::endl;
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		if (m_KageStage.pasteSelectedShapes() == true) {
 			forceRenderFrames();
 		}
 	}
+	Kage::timestamp_OUT();
 }
 void Kage::Duplicate_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp(); std::cout << " Kage::Duplicate_onClick" << std::endl;
+		Kage::timestamp_IN(); std::cout << " Kage::Duplicate_onClick" << std::endl;
 		if (isLayerLocked() == false) {
 			vector<unsigned int> l_selectedShapes = _framesetManager.duplicateShapes(m_KageStage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
@@ -997,6 +1015,7 @@ void Kage::Duplicate_onClick() {
 				forceRenderFrames();
 			}
 		}
+		Kage::timestamp_OUT();
 	}
 }
 void Kage::SelectAll_onClick() {
@@ -1004,14 +1023,15 @@ void Kage::SelectAll_onClick() {
 		ToolSelect_onClick();
 	}
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp(); std::cout << " Kage::SelectAll_onClick" << std::endl;
+		Kage::timestamp_IN(); std::cout << " Kage::SelectAll_onClick" << std::endl;
 		if (m_KageStage.selectAllShapes() == true) {
 			forceRenderFrames();
 		}
+		Kage::timestamp_OUT();
 	}
 }
 void Kage::Deselect_onClick() {
-	Kage::timestamp(); std::cout << " Kage::Deselect_onClick" << std::endl;
+	Kage::timestamp_IN(); std::cout << " Kage::Deselect_onClick" << std::endl;
 	if (_isPlaying == true) {
 		Stop_onClick();
 	} else if (KageStage::toolMode == KageStage::MODE_SELECT) {
@@ -1027,10 +1047,12 @@ void Kage::Deselect_onClick() {
 			forceRenderFrames();
 		}
 	}
+	
+	Kage::timestamp_OUT();
 }
 
 void Kage::ToggleTimeline_onClick() {
-	Kage::timestamp(); std::cout << " Kage::ToggleTimeline_onClick" << std::endl;
+	Kage::timestamp_IN(); std::cout << " Kage::ToggleTimeline_onClick" << std::endl;
 	if (m_VPane_Timeline.property_position() == 30) {
 		m_VPane_Timeline.property_position() = _area_timeline_pane;
 	} else {
@@ -1038,20 +1060,24 @@ void Kage::ToggleTimeline_onClick() {
 		m_VPane_Timeline.property_position() = 30;
 	}
 	forceRenderFrames();
+	
+	Kage::timestamp_OUT();
 }
 void Kage::ToggleProperties_onClick() {
-	Kage::timestamp(); std::cout << " Kage::ToggleProperties_onClick" << std::endl;
+	Kage::timestamp_IN(); std::cout << " Kage::ToggleProperties_onClick" << std::endl;
 	if (m_HPane_DrawingArea.property_position() == _area_properties_pane1) {
 		m_HPane_DrawingArea.property_position() = _area_properties_pane2;
 	} else {
 		m_HPane_DrawingArea.property_position() = _area_properties_pane1;
 	}
 	forceRenderFrames();
+	
+	Kage::timestamp_OUT();
 }
 
 void Kage::ShapeGroup_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp(); std::cout << " Kage::ShapeGroup_onClick" << std::endl;
+		Kage::timestamp_IN(); std::cout << " Kage::ShapeGroup_onClick" << std::endl;
 		if (isLayerLocked() == false) {
 			vector<unsigned int> l_selectedShapes = _framesetManager.groupSelectedShapes(m_KageStage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
@@ -1061,11 +1087,12 @@ void Kage::ShapeGroup_onClick() {
 				forceRenderFrames();
 			}
 		}
+		Kage::timestamp_OUT();
 	}
 }
 void Kage::ShapeUngroup_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp(); std::cout << " Kage::ShapeUngroup_onClick" << std::endl;
+		Kage::timestamp_IN(); std::cout << " Kage::ShapeUngroup_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
 			vector<unsigned int> l_selectedShapes = _framesetManager.ungroupSelectedShapes(m_KageStage.getSelectedShapes());
@@ -1076,12 +1103,13 @@ void Kage::ShapeUngroup_onClick() {
 				forceRenderFrames();
 			}
 		}
+		Kage::timestamp_OUT();
 	}
 }
 
 void Kage::Raise_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp(); std::cout << " Kage::Raise_onClick" << std::endl;
+		Kage::timestamp_IN(); std::cout << " Kage::Raise_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
 			vector<unsigned int> l_selectedShapes = _framesetManager.raiseSelectedShape(m_KageStage.getSelectedShapes());
@@ -1091,11 +1119,12 @@ void Kage::Raise_onClick() {
 				forceRenderFrames();
 			}
 		}
+		Kage::timestamp_OUT();
 	}
 }
 void Kage::Lower_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp(); std::cout << " Kage::Lower_onClick" << std::endl;
+		Kage::timestamp_IN(); std::cout << " Kage::Lower_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
 			vector<unsigned int> l_selectedShapes = _framesetManager.lowerSelectedShape(m_KageStage.getSelectedShapes());
@@ -1105,11 +1134,12 @@ void Kage::Lower_onClick() {
 				forceRenderFrames();
 			}
 		}
+		Kage::timestamp_OUT();
 	}
 }
 void Kage::RaiseToTop_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp(); std::cout << " Kage::RaiseToTop_onClick" << std::endl;
+		Kage::timestamp_IN(); std::cout << " Kage::RaiseToTop_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
 			vector<unsigned int> l_selectedShapes = _framesetManager.raiseToTopSelectedShape(m_KageStage.getSelectedShapes());
@@ -1119,11 +1149,12 @@ void Kage::RaiseToTop_onClick() {
 				forceRenderFrames();
 			}
 		}
+		Kage::timestamp_OUT();
 	}
 }
 void Kage::LowerToBottom_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp(); std::cout << " Kage::LowerToBottom_onClick" << std::endl;
+		Kage::timestamp_IN(); std::cout << " Kage::LowerToBottom_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
 			vector<unsigned int> l_selectedShapes = _framesetManager.lowerToBottomSelectedShape(m_KageStage.getSelectedShapes());
@@ -1133,12 +1164,13 @@ void Kage::LowerToBottom_onClick() {
 				forceRenderFrames();
 			}
 		}
+		Kage::timestamp_OUT();
 	}
 }
 
 void Kage::FlipHorizontal_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp(); std::cout << " Kage::FlipHorizontal_onClick" << std::endl;
+		Kage::timestamp_IN(); std::cout << " Kage::FlipHorizontal_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
 			if (_framesetManager.flipHorizontalSelectedShape(m_KageStage.getSelectedShapes()) == true) {
@@ -1146,11 +1178,13 @@ void Kage::FlipHorizontal_onClick() {
 				forceRenderFrames();
 			}
 		}
+		
+		Kage::timestamp_OUT();
 	}
 }
 void Kage::FlipVertical_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp(); std::cout << " Kage::FlipVertical_onClick" << std::endl;
+		Kage::timestamp_IN(); std::cout << " Kage::FlipVertical_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
 			if (_framesetManager.flipVerticalSelectedShape(m_KageStage.getSelectedShapes()) == true) {
@@ -1158,12 +1192,14 @@ void Kage::FlipVertical_onClick() {
 				forceRenderFrames();
 			}
 		}
+		
+		Kage::timestamp_OUT();
 	}
 }
 
 void Kage::RecenterRotationPoint_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp(); std::cout << " Kage::RecenterRotationPoint_onClick" << std::endl;
+		Kage::timestamp_IN(); std::cout << " Kage::RecenterRotationPoint_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
 			if (_framesetManager.recenterRotationPoint(m_KageStage.getSelectedShapes()) == true) {
@@ -1171,21 +1207,25 @@ void Kage::RecenterRotationPoint_onClick() {
 				forceRenderFrames();
 			}
 		}
+		
+		Kage::timestamp_OUT();
 	}
 }
 
 void Kage::Delete_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp(); std::cout << " Kage::Delete_onClick SHAPE" << std::endl;
+		Kage::timestamp_IN(); std::cout << " Kage::Delete_onClick SHAPE" << std::endl;
 		if (m_KageStage.deleteSelectedShapes() == true) {
 			stackDo();
 			forceRenderFrames();
 		}
+		Kage::timestamp_OUT();
 	} else if (KageStage::toolMode == KageStage::MODE_NODE) {
-		Kage::timestamp(); std::cout << " Kage::Delete_onClick NODE" << std::endl;
+		Kage::timestamp_IN(); std::cout << " Kage::Delete_onClick NODE" << std::endl;
 		if (m_KageStage.deleteSelectedNodes() == true) {
 			forceRenderFrames();
 		}
+		Kage::timestamp_OUT();
 	}
 }
 
@@ -1217,7 +1257,8 @@ void Kage::refreshUI() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT
 			|| KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_RECT
 			|| KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_OVAL
-			|| KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_POLY) {
+			|| KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_POLY
+			|| KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_PENCIL) {
 		propNodeXYSetVisible(false);
 		propStageSetVisible(false);
 	} else if (KageStage::toolMode == KageStage::MODE_NODE) {
@@ -1284,7 +1325,7 @@ void Kage::DeleteFrame_onClick() {
 	}
 
 void Kage::TweenFrame_onClick() {
-	Kage::timestamp(); std::cout << " Kage::TweenFrame_onClick" << std::endl;
+	Kage::timestamp_IN(); std::cout << " Kage::TweenFrame_onClick" << std::endl;
 	unsigned int l_tweenType  = 11;
 	m_ComboX.set_active_text("Linear");
 	m_ComboY.set_active_text("Linear");
@@ -1295,10 +1336,12 @@ void Kage::TweenFrame_onClick() {
 			forceRenderFrames();
 		}
 	}
+	
+	Kage::timestamp_OUT();
 }
 
 void Kage::RemoveTweenFrame_onClick() {
-	Kage::timestamp(); std::cout << " Kage::RemoveTweenFrame_onClick" << std::endl;
+	Kage::timestamp_IN(); std::cout << " Kage::RemoveTweenFrame_onClick" << std::endl;
 	
 	if (isLayerLocked() == false) {
 		if (_framesetManager.setTween(0) == true) {
@@ -1307,6 +1350,8 @@ void Kage::RemoveTweenFrame_onClick() {
 			forceRenderFrames();
 		}
 	}
+	
+	Kage::timestamp_OUT();
 }
 
 void Kage::switchToPreviousFrame() {
@@ -1434,6 +1479,8 @@ void Kage::ToolButtons_onClick(Gtk::ToggleButton *p_sourceButton) {
 			ToolOval_onClick();
 		} else if (p_sourceButton->get_tooltip_text() == "Rectangle Tool") {
 			ToolRectangle_onClick();
+		} else if (p_sourceButton->get_tooltip_text() == "Pencil Tool") {
+			ToolPencil_onClick();
 		} else if (p_sourceButton->get_tooltip_text() == "Stroke Tool") {
 			ToolStroke_onClick();
 		} else if (p_sourceButton->get_tooltip_text() == "Fill Tool") {
@@ -1482,6 +1529,18 @@ void Kage::ToolPoly_onClick() {
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
 	KageStage::toolMode = KageStage::MODE_DRAW_POLY;
+	m_KageStage.initNodeTool();
+}
+
+void Kage::ToolPencil_onClick() {
+	toolsButtonToggle("Pencil Tool");
+	propStageSetVisible(false);
+	propFillStrokeSetVisible(true);
+	propShapePropertiesSetVisible(false);
+	propNodeXYSetVisible(false);
+	m_ColorButtonFill.set_color(m_KageStage.getFill());
+	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
+	KageStage::toolMode = KageStage::MODE_DRAW_PENCIL;
 	m_KageStage.initNodeTool();
 }
 
@@ -1699,6 +1758,7 @@ bool Kage::isFrameEmpty() {
 }
 
 void Kage::forceRenderFrames() {
+	Kage::timestamp_IN(); cout << " Kage::forceRenderFrames " << endl;
 	unsigned int l_tween = getTween();
 	if (l_tween > 0) {
 		unsigned int l_tweenX = l_tween / 10;
@@ -1726,10 +1786,13 @@ void Kage::forceRenderFrames() {
 	}
 	m_KageStage.render();
 	renderFrames();
+
+	Kage::timestamp_OUT();
 }
 
 
 void Kage::renderOnionFrames() {
+	Kage::timestamp_IN(); std::cout << " Kage::renderOnionFrames" << std::endl;
 	unsigned int l_layerCount = _layerManager.layerCount();
 	unsigned int l_frameCount = _framesetManager.frameCount();
 	
@@ -1755,12 +1818,16 @@ void Kage::renderOnionFrames() {
 			}
 		}
 	setCurrentLayer(l_currentLayer);
+	Kage::timestamp_OUT();
 }
 /**
- * TODO: review when is usually it called?
- * renders all frameN in all layers, where frameN is the currentFrame
+ * Called on any Stage activity to update displayed shapes.
+ * This renders all frameN in all layers, where frameN is the currentFrame
  */
 void Kage::renderFrames() {
+	Kage::timestamp_IN();
+	cout << " Kage::renderFrames" << endl;
+	
 	m_KageStage.clearScreen(m_KageStage.cr);
 	
 	if (_toggleOnion.get_active() == true) {
@@ -1775,13 +1842,18 @@ void Kage::renderFrames() {
 			m_KageStage.renderFrame(m_KageStage.cr);
 		}
 	setCurrentLayer(l_currentLayer);
+	
+	Kage::timestamp_OUT();
 }
 
 void Kage::renderFramesBelowCurrentLayer() {
+	Kage::timestamp_IN();
+	cout << " Kage::renderFramesBelowCurrentLayer" << endl;
 	m_KageStage.clearScreen(m_KageStage.cr);
 	
 	if (_toggleOnion.get_active() == true) {
 		renderOnionFrames();
+		Kage::timestamp_OUT();
 		return;
 	}
 	
@@ -1796,8 +1868,12 @@ void Kage::renderFramesBelowCurrentLayer() {
 			}
 		}
 	setCurrentLayer(l_currentLayer);
+	
+	Kage::timestamp_OUT();
 }
 void Kage::renderFramesAboveCurrentLayer() {
+	Kage::timestamp_IN();
+	cout << " Kage::renderFramesAboveCurrentLayer" << endl;
 	unsigned int l_layerCount = _layerManager.layerCount();
 	unsigned int l_currentLayer = getCurrentLayer();
 		for (unsigned int i = (l_currentLayer + 1); i <= l_layerCount; ++i) {
@@ -1810,6 +1886,7 @@ void Kage::renderFramesAboveCurrentLayer() {
 			}
 		}
 	setCurrentLayer(l_currentLayer);
+	Kage::timestamp_OUT();
 }
 
 bool Kage::isLayerLocked() {
@@ -1820,9 +1897,15 @@ unsigned int Kage::getCurrentLayer() {
 }
 
 void Kage::setCurrentLayer(unsigned int p_layer) {
-	cout << "setting undoBase A setCurrentLayer " << endl;
-	_undoBase = getFrameData(true).getVectorData(); //for use later by stackDo()
-	_layerManager.setCurrentLayer(p_layer);
+	if (_layerManager.getCurrentLayer() != p_layer) {
+		std::cout << "setting undoBase A setCurrentLayer" << std::endl;
+		_undoBase = getFrameData(true).getVectorData(); //for use later by stackDo()
+		_layerManager.setCurrentLayer(p_layer);
+	} else {
+		Kage::timestamp_IN();
+		std::cout << "same layer!" << std::endl;
+		Kage::timestamp_OUT();
+	}
 }
 unsigned int Kage::getCurrentFrame() {
 	return _framesetManager.getCurrentFrame();
@@ -1908,27 +1991,30 @@ void Kage::OpenKSF_onClick() {
 		case Gtk::RESPONSE_OK:
 			New_onClick();
 			ksfPath = dialog.get_filename();
-			
-			int l_len = strlen(ksfPath.c_str()) - 4;
-			if (StringHelper::toLower(ksfPath).substr(l_len, 4) != ".ksf") {
-				ksfPath = ksfPath + ".ksf";
-			}
 			cout << "uri:" << dialog.get_uri() << endl;
 			
-			string l_ksfContent = BasicXml::openXMLFile(ksfPath);
-			
-			//cout << "Loaded... \n" << l_ksfContent << endl;
-			parseKSF(l_ksfContent);
-			_undoRedoManager.clear();
-			stackDo();
-			propFillStrokeSetVisible(false);
-			propShapePropertiesSetVisible(false);
-			propNodeXYSetVisible(false);
-			set_title(ksfPath + " - " + KageAbout::app_title);
+			doOpen();
 			break;
 //		default:
 //			std::cout << "clicked " << result << endl;
 	}
+}
+void Kage::doOpen() {
+	int l_len = strlen(ksfPath.c_str()) - 4;
+	if (StringHelper::toLower(ksfPath).substr(l_len, 4) != ".ksf") {
+		ksfPath = ksfPath + ".ksf";
+	}
+	
+	string l_ksfContent = BasicXml::openXMLFile(ksfPath);
+	
+	//cout << "Loaded... \n" << l_ksfContent << endl;
+	parseKSF(l_ksfContent);
+	_undoRedoManager.clear();
+	stackDo();
+	propFillStrokeSetVisible(false);
+	propShapePropertiesSetVisible(false);
+	propNodeXYSetVisible(false);
+	set_title(ksfPath + " - " + KageAbout::app_title);
 }
 void Kage::Save_onClick() {
 	if (ksfPath != "Untitled") {
@@ -2582,10 +2668,11 @@ void Kage::EntryNodeY_onEnter() {
 }
 
 void Kage::ToggleLine_onClick() {
-	Kage::timestamp(); std::cout << " Kage::ToggleLine_onClick" << std::endl;
+	Kage::timestamp_IN(); std::cout << " Kage::ToggleLine_onClick" << std::endl;
 	if (m_KageStage.toggleLineSelectedNodes() == true) {
 		forceRenderFrames();
 	}
+	Kage::timestamp_OUT();
 }
 
 void Kage::addToolButton(const Glib::ustring &label) {
@@ -3199,10 +3286,56 @@ bool Kage::runExternal(string p_cmd, string p_param) {
 	return false;
 }
 
+typedef std::chrono::system_clock Clock;
+
 void Kage::timestamp() {
-	time_t rawtime;
-	time(&rawtime);
-	struct tm * timeinfo = localtime (&rawtime);
+//	time_t rawtime;
+//	time(&rawtime);
+//	struct tm * timeinfo = localtime (&rawtime);
 	
-	std::cout << timeinfo->tm_hour << ":" << timeinfo->tm_min << ":" << timeinfo->tm_sec; // << " " << *timeinfo;
+	auto now = Clock::now();
+	auto seconds = std::chrono::time_point_cast<std::chrono::seconds>(now);
+	auto fraction = now - seconds;
+	time_t cnow = Clock::to_time_t(now);
+	struct tm * timeinfo = localtime (&cnow);
+	
+	auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(fraction);
+	
+	if (timeinfo->tm_hour < 10) {
+		std::cout << "0";
+	}
+	std::cout << timeinfo->tm_hour << ":";
+	
+	if (timeinfo->tm_min < 10) {
+		std::cout << "0";
+	}
+	std::cout << timeinfo->tm_min << ":";
+	
+	if (timeinfo->tm_sec < 10) {
+		std::cout << "0";
+	}
+	std::cout << timeinfo->tm_sec << ".";
+	
+	int l_ms = milliseconds.count();
+	if (l_ms < 10) {
+		std::cout << "0";
+	}
+	if (l_ms < 100) {
+		std::cout << "0";
+	}
+	std::cout << l_ms << " ";
+	
+	//std::cout << timeinfoB->tm_hour << ":" << timeinfoB->tm_min << ":" << timeinfoB->tm_sec << "." << milliseconds.count();
+	for (unsigned int i = 0; i < Kage::TAB_COUNT; ++i) {
+		std::cout << "    ";
+	}
+}
+
+void Kage::timestamp_IN() {
+	Kage::TAB_COUNT++;
+	Kage::timestamp();
+}
+
+void Kage::timestamp_OUT() {
+	Kage::TAB_COUNT--;
 }

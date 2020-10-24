@@ -23,6 +23,7 @@ SOURCES = \
 	./kage/stage_oval.cpp \
 	./kage/stage_poly.cpp \
 	./kage/stage_rect.cpp \
+	./kage/stage_pencil.cpp \
 	./kage/stage_shape.cpp \
 	./kage/vectordatamanager.cpp \
 	./util/xml/xmltoken.cpp \

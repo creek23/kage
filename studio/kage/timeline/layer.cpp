@@ -72,11 +72,12 @@ void KageLayer::txtLabel_onEnter() {
 }
 
 bool KageLayer::on_key_press_event(GdkEventKey *e) {
-	Kage::timestamp();
+	Kage::timestamp_IN();
 	std::cout << " KageFrame(L " << layerID << ") on_key_press_event" << std::endl;
 	if (e->keyval == GDK_KEY_period) {
 	} else if (e->keyval == GDK_KEY_comma) {
 	}
+	Kage::timestamp_OUT();
 	return true;
 }
 bool KageLayer::on_expose_event(GdkEventExpose* e) {
@@ -92,13 +93,15 @@ bool KageLayer::on_expose_event(GdkEventExpose* e) {
 
 bool KageLayer::on_event(GdkEvent *e) {
 	if (e->type == GDK_ENTER_NOTIFY) {
-		Kage::timestamp();
+		Kage::timestamp_IN();
 		std::cout << " KageLayer(L " << layerID << ") on_event enter" << std::endl;
 		render();
+		Kage::timestamp_OUT();
 	} else if (e->type == GDK_LEAVE_NOTIFY) {
-		Kage::timestamp();
+		Kage::timestamp_IN();
 		std::cout << " KageLayer(L " << layerID << ") on_event leave" << std::endl;
 		render();
+		Kage::timestamp_OUT();
 	} else if (e->type == GDK_DOUBLE_BUTTON_PRESS) {
 		if (e->button.x > 36) {
 			_layerManager->renameLayer(this);
@@ -135,9 +138,12 @@ bool KageLayer::on_event(GdkEvent *e) {
 
 
 void KageLayer::forceRender() {
+	Kage::timestamp_IN(); cout << " KageLayer::forceRender()" << endl;
 	render();
+	Kage::timestamp_OUT();
 }
 bool KageLayer::render() {
+	Kage::timestamp_IN(); cout << " KageLayer::render()" << endl;
 	if (!window) {
 		window = get_window();
 	}
@@ -150,6 +156,9 @@ bool KageLayer::render() {
 	} catch (std::exception& e) {
 		std::cerr << "Exception caught : " << e.what() << std::endl;
 	}
+	
+	Kage::timestamp_OUT();
+	
 	return true;
 }
 

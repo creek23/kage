@@ -366,10 +366,11 @@ void KageStage::updateShapeColor(bool p_doFill, bool p_doStroke) {
 }
 
 void KageStage::updateShapeX(double p_value, bool p_stackDo) {
-	Kage::timestamp();
+	Kage::timestamp_IN();
 	std::cout << " KageStage::updateShapeX " << selectedShapes.size() << " " << p_value << std::endl;
 	
 	if (selectedShapes.size() == 0) {
+		Kage::timestamp_OUT();
 		return;
 	}
 	
@@ -422,12 +423,15 @@ void KageStage::updateShapeX(double p_value, bool p_stackDo) {
 	}
 	
 	render();
+	
+	Kage::timestamp_OUT();
 }
 void KageStage::updateShapeY(double p_value, bool p_stackDo) {
-	Kage::timestamp();
+	Kage::timestamp_IN();
 	std::cout << " KageStage::updateShapeY " << selectedShapes.size() << " " << p_value << std::endl;
 	
 	if (selectedShapes.size() == 0) {
+		Kage::timestamp_OUT();
 		return;
 	}
 	
@@ -478,6 +482,8 @@ void KageStage::updateShapeY(double p_value, bool p_stackDo) {
 	if (p_stackDo) {
 		win->stackDo();
 	}
+	
+	Kage::timestamp_OUT();
 	
 	render();
 }
@@ -1107,25 +1113,30 @@ bool KageStage::cutSelectedShapes() {
 	if (win->isLayerLocked() == true) {
 		return false;
 	}
-	Kage::timestamp();
+	Kage::timestamp_IN();
 	std::cout << " KageStage::cutSelectedShapes " << selectedShapes.size() << std::endl;
 	
 	if (selectedShapes.size() == 0) {
+		Kage::timestamp_OUT();
 		return false;
 	}
 	
 	if (copySelectedShapes() == true) {
+		Kage::timestamp_OUT();
 		return deleteSelectedShapes();
 	}
+	
+	Kage::timestamp_OUT();
 	
 	return false;
 }
 
 bool KageStage::copySelectedShapes() {
-	Kage::timestamp();
+	Kage::timestamp_IN();
 	std::cout << " KageStage::copySelectedShapes " << selectedShapes.size() << std::endl;
 	
 	if (selectedShapes.size() == 0) {
+		Kage::timestamp_OUT();
 		return false;
 	}
 	
@@ -1150,15 +1161,18 @@ bool KageStage::copySelectedShapes() {
 	_copyBufferMouse.x = draw2.x - origin.x;
 	_copyBufferMouse.y = draw2.y - origin.y;
 	
+	Kage::timestamp_OUT();
+	
 	return true;
 }
 
 bool KageStage::selectAllShapes() {
-	Kage::timestamp();
+	Kage::timestamp_IN();
 	std::cout << " KageStage::selectAllShapes " << selectedShapes.size() << std::endl;
 	
 	unsigned int vsize = win->getFrameData().getVectorData().size();
 	if (vsize == 0) {
+		Kage::timestamp_OUT();
 		return false;
 	}
 	
@@ -1170,6 +1184,8 @@ bool KageStage::selectAllShapes() {
 	tryMultiSelectShapes_populateShapes();
 	selectedNodes.clear();
 	
+	Kage::timestamp_OUT();
+	
 	return true;
 }
 
@@ -1177,10 +1193,11 @@ bool KageStage::deselectSelectedShapes() {
 	if (win->isLayerLocked() == true) {
 		return false;
 	}
-	Kage::timestamp();
+	Kage::timestamp_IN();
 	std::cout << " KageStage::deselectSelectedShapes " << selectedShapes.size() << std::endl;
 	
 	if (selectedShapes.size() == 0) {
+		Kage::timestamp_OUT();
 		return false;
 	}
 	
@@ -1188,6 +1205,8 @@ bool KageStage::deselectSelectedShapes() {
 	win->propStageSetVisible(true);
 	win->propFillStrokeSetVisible(false);
 	win->propShapePropertiesSetVisible(false);
+	
+	Kage::timestamp_OUT();
 	
 	return true;
 }
@@ -1197,10 +1216,11 @@ bool KageStage::pasteSelectedShapes() {
 		return false;
 	}
 	unsigned int l_vectorDataCopyBuffer_size = _vectorDataCopyBuffer.size();
-	Kage::timestamp();
+	Kage::timestamp_IN();
 	std::cout << " KageStage::pasteSelectedShapes " << l_vectorDataCopyBuffer_size << std::endl;
 	
 	if (l_vectorDataCopyBuffer_size == 0) {
+		Kage::timestamp_OUT();
 		return false;
 	}
 	
@@ -1220,6 +1240,8 @@ bool KageStage::pasteSelectedShapes() {
 	tryMultiSelectShapes_populateShapes();
 	selectedNodes.clear();
 	
+	Kage::timestamp_OUT();
+	
 	return true;
 }
 
@@ -1228,10 +1250,11 @@ bool KageStage::deleteSelectedShapes() {
 		return false;
 	}
 	unsigned int l_selectedShapes_size = selectedShapes.size();
-	Kage::timestamp();
+	Kage::timestamp_IN();
 	std::cout << " KageStage::deleteSelectedShapes " << l_selectedShapes_size << std::endl;
 	
 	if (l_selectedShapes_size == 0) {
+		Kage::timestamp_OUT();
 		return false;
 	}
 	
@@ -1264,7 +1287,7 @@ bool KageStage::deleteSelectedShapes() {
 	selectedShapes.clear();
 	
 	win->setFrameData(v);
-	
+	Kage::timestamp_OUT();
 	return true;
 }
 

@@ -22,6 +22,8 @@
 #include "frameset.h"
 #include "framesmanager.h"
 
+#include "../../kage.h"
+
 KageFrameset::KageFrameset(KageFramesetManager *p_fsm, unsigned int p_layerID, unsigned int p_frameCount) {
 	pack_start(frame_padding, Gtk::PACK_SHRINK);
 	fsm = p_fsm;
@@ -1007,9 +1009,11 @@ bool KageFrameset::setTween(unsigned int p_tween) {
 	return false;
 }
 unsigned int KageFrameset::getTween() {
-	cout << " KageFrameset::getTween() " << endl;
+	Kage::timestamp_IN(); std::cout << " KageFrameset::getTween() " << endl;
 	if (_currentFrameIndex < getFrameCount() && _frames[_currentFrameIndex]->frameID == _currentFrameID) {
-		return _frames[_currentFrameIndex]->getTween();
+		unsigned int l_ret = _frames[_currentFrameIndex]->getTween();
+		Kage::timestamp_OUT();
+		return l_ret;
 	} else {
 		for (unsigned int i = 0; i < getFrameCount(); ++i) {
 			if (_frames[i]->frameID == _currentFrameID) {
@@ -1019,6 +1023,8 @@ unsigned int KageFrameset::getTween() {
 			}
 		}
 	}
+	
+	Kage::timestamp_OUT();
 	
 	return 0;
 }

@@ -65,7 +65,8 @@
 				MODE_DRAW_TEXT,
 				MODE_DRAW_POLY,
 				MODE_DRAW_OVAL,
-				MODE_DRAW_LINE
+				MODE_DRAW_LINE,
+				MODE_DRAW_PENCIL
 			};
 			const unsigned int _NO_SELECTION = -1;
 			static ColorData stageBG; ///direct use for get only
@@ -126,9 +127,13 @@
 			void handleDrawOvalMouseUp();
 			void handleDrawRectMouseUp();
 			void handleDrawPolyMouseUp();
-			void handlePoly();
-			void handleRect();
+			void handleDrawPencilMouseDown(PointData p_point);
+			void handleDrawPencilMouseMove(PointData p_point);
+			void handleDrawPencilMouseUp();
 			void handleOval();
+			void handleRect();
+			void handlePoly();
+			void handlePencil();
 			void handleStroke(); //needed?
 			void handleStrokeMouseMove();
 			void handleStrokeMouseUp();
@@ -210,6 +215,11 @@
 			Kage *win;
 			GdkPoint draw1;
 			GdkPoint draw2;
+			GdkPoint drawFree1;
+			GdkPoint drawFree2;
+			GdkPoint drawFree3;
+			GdkPoint drawFree4;
+			short int drawFreeCtr;
 			GdkPoint drawConstraint;
 			double polyXhead, polyYhead;
 			double polyXtail, polyYtail;

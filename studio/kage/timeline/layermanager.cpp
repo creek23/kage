@@ -246,11 +246,10 @@ void KageLayerManager::setCurrentLayerByID(unsigned int p_layerID) {
  * this function will be called to reflect Layer's visibility on stage.
  */
 void KageLayerManager::renderStage() {
-	Kage::timestamp();
+	Kage::timestamp_IN();
 	cout << " KageLayerManager::renderStage <" << endl;
 	win->forceRenderFrames();
-	Kage::timestamp();
-	cout << " KageLayerManager::renderStage >" << endl;
+	Kage::timestamp_OUT();
 }
 
 /** For use of Kage when exporting/saving to file.

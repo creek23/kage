@@ -78,7 +78,7 @@ KageFrame::~KageFrame() {
 }
 
 bool KageFrame::on_key_press_event(GdkEventKey *e) {
-	Kage::timestamp();
+	Kage::timestamp_IN();
 	std::cout << " KageFrame(F " << frameID << " L " << layerID << ") on_key_press_event" << std::endl;
 	if (e->keyval == GDK_KEY_period) {
 		_frameset->getFsm()->switchToNextFrame(frameID);
@@ -87,6 +87,7 @@ bool KageFrame::on_key_press_event(GdkEventKey *e) {
 		_frameset->getFsm()->switchToPreviousFrame(frameID);
 		_frameset->getFsm()->renderStage();
 	}
+	Kage::timestamp_OUT();
 	return true;
 }
 bool KageFrame::on_expose_event(GdkEventExpose* e) {
@@ -102,13 +103,15 @@ bool KageFrame::on_expose_event(GdkEventExpose* e) {
 
 bool KageFrame::on_event(GdkEvent *e) {
 	if (e->type == GDK_ENTER_NOTIFY) {
-		Kage::timestamp();
+		Kage::timestamp_IN();
 		std::cout << " KageFrame(F " << frameID << " L " << layerID << ") on_event enter" << std::endl;
 		render();
+		Kage::timestamp_OUT();
 	} else if (e->type == GDK_LEAVE_NOTIFY) {
-		Kage::timestamp();
+		Kage::timestamp_IN();
 		std::cout << " KageFrame(F " << frameID << " L " << layerID << ") on_event leave" << std::endl;
 		render();
+		Kage::timestamp_OUT();
 	} else if (e->type == GDK_BUTTON_RELEASE) {
 		KageFrame::mouseIsDown = false;
 		grab_focus();
@@ -147,6 +150,7 @@ void KageFrame::forceRender() {
 	render();
 }
 bool KageFrame::render() {
+	Kage::timestamp_IN(); cout << " KageFrame::render()" << endl;
 	if (!window) {
 		window = get_window();
 	}
@@ -157,6 +161,9 @@ bool KageFrame::render() {
 				get_allocation().get_height());
 		window->invalidate_rect(r, false);
 	}
+	
+	Kage::timestamp_OUT();
+	
 	return true;
 }
 
@@ -315,7 +322,7 @@ void KageFrame::setTween(unsigned int p_tween) {
 	}
 }
 unsigned int KageFrame::getTween() {
-	cout << " KageFrame::getTween() " << _tweenX << " " << _tweenY << " | " << ((_tweenX * 10) + _tweenY) << endl;
+//	cout << " KageFrame::getTween() " << _tweenX << " " << _tweenY << " | " << ((_tweenX * 10) + _tweenY) << endl;
 	return (_tweenX * 10) + _tweenY;
 }
 

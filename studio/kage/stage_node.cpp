@@ -932,12 +932,11 @@ bool KageStage::isMouseOnNode(double p_x, double p_y, unsigned int p_buffer) {
 }
 
 bool KageStage::deselectSelectedNodes() {
-	Kage::timestamp_IN();
-	std::cout << " KageStage::deselectSelectedNodes " << selectedNodes.size() << std::endl;
-	
 	if (selectedNodes.size() == 0) {
 		return false;
 	}
+	Kage::timestamp_IN();
+	std::cout << " KageStage::deselectSelectedNodes " << selectedNodes.size() << std::endl;
 	
 	initNodeTool();
 	win->propStageSetVisible(true);

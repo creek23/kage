@@ -1267,6 +1267,7 @@ bool KageStage::deleteSelectedShapes() {
 	std::cout << " vectordata size " << vsize << std::endl;
 	if (vsize < l_selectedShapes_size) { //attempt to fix https://sourceforge.net/p/kage/tickets/15/
 		initNodeTool();
+		Kage::timestamp_OUT();
 		return false;
 	}
 	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {

@@ -1832,6 +1832,7 @@ void Kage::renderFrames() {
 	
 	if (_toggleOnion.get_active() == true) {
 		renderOnionFrames();
+		Kage::timestamp_OUT();
 		return;
 	}
 	

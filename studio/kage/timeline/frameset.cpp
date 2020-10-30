@@ -1019,7 +1019,9 @@ unsigned int KageFrameset::getTween() {
 			if (_frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				_currentFrameID = _frames[i]->frameID;
-				return _frames[i]->getTween();
+				unsigned int l_ret = _frames[i]->getTween();
+				Kage::timestamp_OUT();
+				return l_ret;
 			}
 		}
 	}

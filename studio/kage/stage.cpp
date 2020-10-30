@@ -1151,13 +1151,11 @@ void KageStage::handleFillMouseUp() {
 }
 
 void KageStage::handleEyedrop() {
-	Kage::timestamp_IN();
-	std::cout << " KageStage::handleEyedrop " << selectedShape << std::endl;
-	
 	if (selectedShape == _NO_SELECTION) {
-		Kage::timestamp_OUT();
 		return;
 	}
+	Kage::timestamp_IN();
+	std::cout << " KageStage::handleEyedrop " << selectedShape << std::endl;
 	
 	vector<VectorData> v = win->getFrameData().getVectorData();
 	bool l_move = false;

@@ -285,7 +285,7 @@ Kage::Kage(string p_filePath) :
 		sigc::mem_fun(*this, &Kage::LowerToBottom_onClick)
 	);
 	m_refActionGroup->add(
-		Gtk::Action::create("FlipHorizontal", "Flip _Vertical", "FlipHorizontal"),
+		Gtk::Action::create("FlipHorizontal", "Flip _Horizontal", "FlipHorizontal"),
 		Gtk::AccelKey("H"),
 		sigc::mem_fun(*this, &Kage::FlipHorizontal_onClick)
 	);

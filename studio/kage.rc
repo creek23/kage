@@ -1,7 +1,7 @@
 id ICON "kage.ico"
 1 VERSIONINFO
-FILEVERSION     0,4,2010,24
-PRODUCTVERSION  0,4,2010,24
+FILEVERSION     0,4,2104,16
+PRODUCTVERSION  0,4,2104,16
 BEGIN
   BLOCK "StringFileInfo"
   BEGIN
@@ -9,12 +9,12 @@ BEGIN
     BEGIN
       VALUE "CompanyName", "Krixware Studios"
       VALUE "FileDescription", "Kage Animation Tool"
-      VALUE "FileVersion", "0.4.2010"
+      VALUE "FileVersion", "0.4.2104"
       VALUE "InternalName", "kage_studio"
       VALUE "LegalCopyright", "Copyright © 2011-2020 Krixware Studios"
       VALUE "OriginalFilename", "kagestudio.exe"
       VALUE "ProductName", "Kage Studio"
-      VALUE "ProductVersion", "0.4.2010"
+      VALUE "ProductVersion", "0.4.2104"
     END
   END
 

@@ -733,7 +733,21 @@ unsigned int KageStage::getSelectedShapeViaNode(unsigned int p_index, vector<Vec
 		return UINT_MAX;
 	}
 	
-	unsigned int l_tmp = selectedShape;
+	unsigned int l_tmp = selectedShape; //why store -- seems not being replaced anyway?
+	
+	//start ticket#8 -- added since updateX/Y/Width/Height re-use this code for updating X/Y/Width/Height
+	//we just want to select the next shape the code after this for-loop will select backwards, back to this shape
+	unsigned int l_index = p_index;
+	for (unsigned int i = p_index; i < p_v.size(); ++i) {
+		if (p_v[i].vectorType == VectorData::TYPE_INIT) {
+			p_index = i-1;
+		}
+	}
+	//we're assuming that the currently-selected item is the last one in stack, so we just try to select the last node in the array
+	if (l_index == p_index) {
+		p_index = p_v.size()-1;
+	}
+	//end ticket#8
 	
 	propWidth = 0.0;
 	propHeight = 0.0;

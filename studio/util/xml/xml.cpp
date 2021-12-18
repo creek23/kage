@@ -83,6 +83,17 @@ unsigned int BasicXml::expectFor(unsigned int p_index, string p_token) {
 	return -1;
 }
 
+unsigned int BasicXml::lookFor(unsigned int p_index, string p_token) {
+	unsigned int l_len = _tokens.size();
+	for (unsigned int i = p_index; i < l_len; ++i) {
+		i = skipWhitespace(i);
+		if (_tokens[i].getValue() == p_token) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 unsigned int BasicXml::getPreviousIndex(unsigned int p_index) {
 	unsigned int l_len = _tokens.size();
 	for (unsigned int i = p_index; i >= 0; --i) {
@@ -138,10 +149,11 @@ bool BasicXml::parse() {
 				&& (_xmlContent[l_index] == '0' || _xmlContent[l_index] == '.' || _xmlContent[l_index] == '-'
 				|| _xmlContent[l_index] >= '1' && _xmlContent[l_index] <= '9')) {
 			l_token += _xmlContent[l_index];
-		} else if (_xmlContent[l_index] >= 'a' && _xmlContent[l_index] <= 'z'
-				|| _xmlContent[l_index] >= 'A' && _xmlContent[l_index] <= 'Z'
+		} else if ((_xmlContent[l_index] >= 'a' && _xmlContent[l_index] <= 'z')
+				|| (_xmlContent[l_index] >= 'A' && _xmlContent[l_index] <= 'Z')
 				|| _xmlContent[l_index] == '0' || _xmlContent[l_index] == '_'
-				|| _xmlContent[l_index] >= '1' && _xmlContent[l_index] <= '9') {
+				|| (_xmlContent[l_index] >= '1' && _xmlContent[l_index] <= '9')
+				|| _xmlContent[l_index] == ':' || _xmlContent[l_index] == '-' ) {//added support for `tagproperty:sub-property' for SVG
 			//alpha-numeric
 			l_token += _xmlContent[l_index];
 		} else if (_xmlContent[l_index] == ' ' || _xmlContent[l_index] == '\t') {
@@ -328,7 +340,9 @@ string BasicXml::getXML() {
 
 void BasicXml::debugToken(unsigned int p_index) {
 	for (unsigned int i = 0; i < p_index; ++i) {
-		std::cout << i << "\t? " << _tokens[i].getValue() << endl;
+		if (_tokens[i].getValue() != " " && _tokens[i].getValue() != "\t") {
+			std::cout << i << "\t? " << _tokens[i].getValue() << endl;
+		}
 	}
 }
 
@@ -346,6 +360,15 @@ unsigned int BasicXml::createTag(unsigned int p_index, XmlTag &p_xmlTagParent) {
 			if (i == -1) {
 				cout << "unable to parse; XML is incomplete." << endl;
 				return i;
+			}
+			
+			//parse: <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+			if (_tokens[i].getValue() == "?") {
+				i = lookFor(i+1, "?");
+				i = lookFor(i+1, ">");
+
+				i = lookFor(i+1, "<");
+				i = skipWhitespace(i+1);
 			}
 			
 			p_xmlTagParent.setName(_tokens[i].getValue());
@@ -370,6 +393,7 @@ unsigned int BasicXml::createTag(unsigned int p_index, XmlTag &p_xmlTagParent) {
 						//possibly XML TAG-property
 						XmlTagProperty l_xmlTagProperty;
 						l_xmlTagProperty.setName(_tokens[i].getValue());
+						
 						unsigned int l_debug = i+1;
 						i = expectFor(i+1, "=");
 						if (i == -1) {
@@ -450,7 +474,7 @@ unsigned int BasicXml::createTag(unsigned int p_index, XmlTag &p_xmlTagParent) {
 						p_xmlTagParent._children.push_back(l_xmlTagChild);
 						i = createTag(i, p_xmlTagParent._children[p_xmlTagParent._children.size()-1]);
 						if (i == -1) {
-							cout << "unable to create child Tag for " << p_xmlTagParent.getName() << endl;
+							cout << "unable to create Child Tag for " << p_xmlTagParent.getName() << endl;
 							return i;
 						}
 					}

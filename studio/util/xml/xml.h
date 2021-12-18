@@ -68,6 +68,7 @@
 			unsigned int createTag(unsigned int p_index, XmlTag &p_xmlTagParent);
 			unsigned int skipWhitespace(unsigned int p_index);
 			unsigned int expectFor(unsigned int p_index, string p_token);
+			unsigned int lookFor(unsigned int p_index, string p_token);
 			unsigned int getPreviousIndex(unsigned int p_index);
 			void listChildren(vector<XmlTag> p_tags, string p_tab);
 			string getXMLChildren(vector<XmlTag> p_children, string p_tab);

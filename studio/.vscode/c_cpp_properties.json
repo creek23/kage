@@ -1,0 +1,51 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/msys64/mingw64/include/gtkmm-3.0",
+                "C:/msys64/mingw64/lib/gtkmm-3.0/include",
+                "C:/msys64/mingw64/include/giomm-2.4",
+                "C:/msys64/mingw64/lib/giomm-2.4/include",
+                "C:/msys64/mingw64/include",
+                "C:/msys64/mingw64/include/glib-2.0",
+                "C:/msys64/mingw64/lib/glib-2.0/include",
+                "C:/msys64/mingw64/include/glibmm-2.4",
+                "C:/msys64/mingw64/lib/glibmm-2.4/include",
+                "C:/msys64/mingw64/include/sigc++-2.0",
+                "C:/msys64/mingw64/lib/sigc++-2.0/include",
+                "C:/msys64/mingw64/include/gtk-3.0",
+                "C:/msys64/mingw64/include/pango-1.0",
+                "C:/msys64/mingw64/include/harfbuzz",
+                "C:/msys64/mingw64/include/freetype2",
+                "C:/msys64/mingw64/include/libpng16",
+                "C:/msys64/mingw64/include/fribidi",
+                "C:/msys64/mingw64/include/cairo",
+                "C:/msys64/mingw64/include/lzo",
+                "C:/msys64/mingw64/include/pixman-1",
+                "C:/msys64/mingw64/include/gdk-pixbuf-2.0",
+                "C:/msys64/mingw64/include/atk-1.0",
+                "C:/msys64/mingw64/include/cairomm-1.0",
+                "C:/msys64/mingw64/lib/cairomm-1.0/include",
+                "C:/msys64/mingw64/include/pangomm-1.4",
+                "C:/msys64/mingw64/lib/pangomm-1.4/include",
+                "C:/msys64/mingw64/include/atkmm-1.6",
+                "C:/msys64/mingw64/lib/atkmm-1.6/include",
+                "C:/msys64/mingw64/include/gdkmm-3.0",
+                "C:/msys64/mingw64/lib/gdkmm-3.0/include",
+                "C:/msys64/mingw64/lib/gtkmm-3.0/include"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "C:\\msys64\\mingw64\\bin\\gcc.exe",
+            "cStandard": "gnu17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "windows-gcc-x64"
+        }
+    ],
+    "version": 4
+}

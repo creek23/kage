@@ -110,6 +110,10 @@ Kage::Kage(string p_filePath) :
 		sigc::mem_fun(*this, &Kage::OpenKSF_onClick)
 	);
 	m_refActionGroup->add(
+		Gtk::Action::create("ImportSVG", "_Import SVG", "Import SVG file"),
+		sigc::mem_fun(*this, &Kage::ImportSVG_onClick)
+	);
+	m_refActionGroup->add(
 		Gtk::Action::create("Save", Gtk::Stock::SAVE, "_Save", "Save current file"),
 		sigc::mem_fun(*this, &Kage::Save_onClick)
 	);
@@ -126,6 +130,10 @@ Kage::Kage(string p_filePath) :
 		Gtk::Action::create("ExportHTML5", "Export HTML5", "Export to HTML5"),
 		Gtk::AccelKey("<control>5"),
 		sigc::mem_fun(*this, &Kage::ExportHTML5_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("ExportSVG", "Export SVG", "Export to SVG"),
+		sigc::mem_fun(*this, &Kage::ExportSVG_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("ExportPNG", "Single PNG", "Export to Single PNG"),
@@ -478,9 +486,12 @@ Kage::Kage(string p_filePath) :
 		"			<menuitem action='Save'/>"
 		"			<menuitem action='SaveAs'/>"
 		"			<separator/>"
+		"			<menuitem action='ImportSVG'/>"
+		"			<separator/>"
 		"			<menu action='ExportMenu'>"
 		"				<menuitem action='ExportAVI'/>"
 		"				<menuitem action='ExportHTML5'/>"
+		"				<menuitem action='ExportSVG'/>"
 		"				<menuitem action='ExportKS'/>"
 		"				<menu action='ExportPNGMenu'>"
 		"					<menuitem action='ExportPNG'/>"
@@ -1973,7 +1984,7 @@ bool Kage::continueNewFileWithUnsavedWork() {
 }
 
 void Kage::OpenKSF_onClick() {
-	Gtk::FileChooserDialog dialog("Open File", Gtk::FILE_CHOOSER_ACTION_OPEN);
+	Gtk::FileChooserDialog dialog("Open Kage Studio File", Gtk::FILE_CHOOSER_ACTION_OPEN);
 	dialog.set_transient_for( * this);
 		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 		dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
@@ -2017,6 +2028,53 @@ void Kage::doOpen() {
 	propNodeXYSetVisible(false);
 	set_title(ksfPath + " - " + KageAbout::app_title);
 }
+
+void Kage::ImportSVG_onClick() {
+	Gtk::FileChooserDialog dialog("Import SVG", Gtk::FILE_CHOOSER_ACTION_OPEN);
+	dialog.set_transient_for( * this);
+		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+		dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
+		dialog.set_default_size(800, 600);
+	
+	auto filter_svg = Gtk::FileFilter::create();
+		filter_svg->set_name("Scalable Vector Graphics Files");
+		filter_svg->add_mime_type("text/x-svg");
+		filter_svg->add_pattern("*.svg");
+			dialog.add_filter(filter_svg);
+	//Show the dialog and wait for a user response:
+	int result = dialog.run();
+	
+	//Handle the response:
+	switch (result) {
+		case Gtk::RESPONSE_OK:
+			New_onClick();
+			ksfPath = dialog.get_filename();
+			cout << "uri:" << dialog.get_uri() << endl;
+			
+			doImportSVG();
+			break;
+//		default:
+//			std::cout << "clicked " << result << endl;
+	}
+}
+void Kage::doImportSVG() {
+	int l_len = strlen(ksfPath.c_str()) - 4;
+	if (StringHelper::toLower(ksfPath).substr(l_len, 4) != ".html") {
+		ksfPath = ksfPath + ".html";
+	}
+	
+	string l_ksfContent = BasicXml::openXMLFile(ksfPath);
+	
+	//cout << "Loaded... \n" << l_ksfContent << endl;
+	parseSVG(l_ksfContent);
+	_undoRedoManager.clear();
+	stackDo();
+	propFillStrokeSetVisible(false);
+	propShapePropertiesSetVisible(false);
+	propNodeXYSetVisible(false);
+	set_title(ksfPath + " - " + KageAbout::app_title);
+}
+
 void Kage::Save_onClick() {
 	if (ksfPath != "Untitled") {
 		doSave(ksfPath);
@@ -2124,7 +2182,7 @@ void Kage::ExportKS_onClick() {
 		dialog.set_filename(ksfPath);
 	
 	auto filter_ks = Gtk::FileFilter::create();
-		filter_ks->set_name("KonsolScript files");
+		filter_ks->set_name("KonsolScript Files");
 		filter_ks->add_mime_type("text/konsolscript");
 		filter_ks->add_pattern("*.ks");
 			dialog.add_filter(filter_ks);
@@ -2158,6 +2216,7 @@ void Kage::ExportKS_onClick() {
 			break;
 	}
 }
+
 void Kage::ExportHTML5_onClick() {
 	Gtk::FileChooserDialog dialog("Export to HTML5", Gtk::FILE_CHOOSER_ACTION_SAVE);
 	dialog.set_transient_for( * this);
@@ -2167,8 +2226,9 @@ void Kage::ExportHTML5_onClick() {
 		dialog.set_do_overwrite_confirmation(true);
 	
 	auto filter_html5 = Gtk::FileFilter::create();
-		filter_html5->set_name("HTML5");
+		filter_html5->set_name("HTML5 Files");
 		filter_html5->add_mime_type("text/html");
+		filter_html5->add_pattern("*.html");
 			dialog.add_filter(filter_html5);
 	int result = dialog.run();
 	
@@ -2226,6 +2286,59 @@ void Kage::ExportHTML5_onClick() {
 				setCurrentLayer(t);
 			exportHtml5(expPath, "function main() {\n\t//add variable initialization...\n}");
 			if (exportHtml5(expPath, "</script>\n</head>\n<body align='center' onload='kagestudio();' bgcolor='#101010'>\n<canvas id='screen' width='" + StringHelper::doubleToString(m_KageStage.stageWidth) + "' height='" + StringHelper::doubleToString(m_KageStage.stageHeight) + "' style='display: block; margin: auto;'></canvas>\n</body>\n</html>") == true) {
+				updateStatus("Exported to " + expPath);
+			} else {
+				updateStatus("Unable to export!  Please try a different directory.");
+			}
+			break;
+	}
+}
+
+//https://www.w3schools.com/graphics/svg_reference.asp
+void Kage::ExportSVG_onClick() {
+	Gtk::FileChooserDialog dialog("Export to Scalable Vector Graphics", Gtk::FILE_CHOOSER_ACTION_SAVE);
+	dialog.set_transient_for( * this);
+		//Add response buttons the the dialog:
+		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+		dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
+		dialog.set_do_overwrite_confirmation(true);
+	
+	auto filter_svg = Gtk::FileFilter::create();
+		filter_svg->set_name("SVG Files");
+		filter_svg->add_mime_type("image/svg+xml");
+		filter_svg->add_pattern("*.svg");
+			dialog.add_filter(filter_svg);
+	int result = dialog.run();
+	
+	switch (result) {
+		case Gtk::RESPONSE_OK:
+			expPath = dialog.get_filename();
+			cout << "uri:" << dialog.get_uri() << endl;
+			expInited = false;
+			expFile.close();
+			
+			unsigned int l_lMax = _layerManager.layerCount();
+			unsigned int i;
+				unsigned int l_fMax = _framesetManager.frameCount();
+				unsigned int j;
+					unsigned int t;
+			
+			exportSvg(expPath, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>");
+			exportSvg(expPath, "<!-- Created with " + KageAbout::app_title + " v" + KageAbout::app_version + " (" + KageAbout::app_website + ") -->\n");
+			exportSvg(expPath, "<svg width=\"" + StringHelper::doubleToString(m_KageStage.stageWidth) + "\" height=\"" + StringHelper::doubleToString(m_KageStage.stageHeight) + "\" version=\"1.1\">");
+
+				t = getCurrentLayer();
+				unsigned int f = getCurrentFrame();
+					//for (j = 1; j <= l_fMax; ++j) {
+					//	_framesetManager.setCurrentFrame(j);
+						for (i = 1; i <= l_lMax; i++) {
+							_framesetManager.setCurrentLayer(i);
+							exportSvg(expPath, "\t\t\n" + dumpFrameToSvg() + "\t");
+						}
+					//}
+				setCurrentLayer(t);
+			
+			if (exportSvg(expPath, "</svg>") == true) {
 				updateStatus("Exported to " + expPath);
 			} else {
 				updateStatus("Unable to export!  Please try a different directory.");
@@ -2765,6 +2878,14 @@ bool Kage::exportHtml5(string p_path, string p_msg) {
 	
 	return fileWrite(p_path, p_msg, expFile, expInited);
 }
+bool Kage::exportSvg(string p_path, string p_msg) {
+	int l_len = strlen(p_path.c_str()) - 4;
+	if (StringHelper::toLower(p_path).substr(l_len, 4) != ".svg") {
+		p_path = p_path + ".svg";
+	}
+	
+	return fileWrite(p_path, p_msg, expFile, expInited);
+}
 
 bool Kage::exportKonsolScript(string p_path, string p_msg) {
 	int l_len = strlen(p_path.c_str()) - 3;
@@ -3047,6 +3168,109 @@ string Kage::dumpFrame(bool bKS) {
 	return l_ostringstream.str();
 }
 
+string Kage::dumpFrameToSvg() {
+	vector<VectorData> v = getFrameData(true).getVectorData();
+	
+	ostringstream l_ostringstream;
+	unsigned int vsize = v.size();
+	unsigned int fillCtr = 0;
+	ColorData fcolor;
+	ColorData fcolorPrev(0, 0, 0);
+	StrokeColorData scolor;
+	StrokeColorData scolorPrev(0, 0, 0);
+		scolorPrev.setThickness(0);
+	PointData p;
+	bool l_donePrevFColor = false;
+	bool l_initPrevFColor = false;
+	bool l_donePrevSColor = false;
+	bool l_initPrevSColor = false;
+	bool l_donePrevLine = false;
+	bool l_initFlag = false;
+	for (unsigned int i = 0; i < vsize; ++i) {
+		switch (v[i].vectorType) {
+			case VectorData::TYPE_CLOSE_PATH:
+				l_ostringstream << "\"";
+				if (fillCtr > 0) {
+					l_ostringstream << " fill=\"#" << int255ToHex(fcolor.getR()) << int255ToHex(fcolor.getG()) << int255ToHex(fcolor.getB()) << "\"";
+
+					fcolorPrev = fcolor.clone();
+				}
+					if (scolor.getThickness() > 0) {
+						l_ostringstream << " stroke=\"#" << int255ToHex(scolor.getR()) << int255ToHex(scolor.getG()) << int255ToHex(scolor.getB()) << "\"";
+						l_ostringstream << " stroke-width=\"" << scolor.getThickness() << "\"";
+						
+						scolorPrev = scolor.clone();
+					}
+				if (fillCtr > 0) {
+					fillCtr--;
+				}
+				l_ostringstream << " />\n";
+				
+				break;
+			case VectorData::TYPE_INIT:
+				if (l_initFlag == true) {
+					l_ostringstream << "\t</g>\n";
+					l_initFlag = false;
+				}
+				
+				l_ostringstream << "\t<g>\n";
+				l_initFlag = true;
+				if (v[i].points.size() == 1) {
+//					l_ostringstream << "<init>" << v[i].points[0].x << " " << v[i].points[0].y << "</init>\n";
+				}
+				break;
+			case VectorData::TYPE_TEXT: break;
+			case VectorData::TYPE_FILL:
+				fcolor = v[i].fillColor;
+				l_ostringstream << "\t\t<path d=\"";
+
+				l_donePrevFColor = false;
+				fillCtr++;
+				break;
+			case VectorData::TYPE_ENDFILL: break;
+			case VectorData::TYPE_STROKE:
+				scolor = v[i].stroke.clone();
+					if (scolorPrev.equalTo(scolor) == false) {
+						l_donePrevSColor = false;
+					}
+					if (scolorPrev.getThickness() != scolor.getThickness()) {
+						l_donePrevLine = false;
+					}
+				break;
+			case VectorData::TYPE_MOVE:
+				l_ostringstream << " M " << v[i].points[0].x << " " << v[i].points[0].y;
+				
+				p.x = v[i].points[0].x;
+				p.y = v[i].points[0].y;
+				break;
+			case VectorData::TYPE_LINE:
+				l_ostringstream << " L " << v[i].points[0].x << " " << v[i].points[0].y;
+				
+				p.x = v[i].points[0].x;
+				p.y = v[i].points[0].y;
+				break;
+			case VectorData::TYPE_CURVE_QUADRATIC:
+				l_ostringstream << " Q " << p.x << " " << p.y << " " << v[i].points[0].x << " " << v[i].points[0].y << " " << v[i].points[1].x << " " << v[i].points[1].y;
+				
+				p.x = v[i].points[1].x;
+				p.y = v[i].points[1].y;
+				break;
+			case VectorData::TYPE_CURVE_CUBIC:
+				l_ostringstream << "C " << v[i].points[0].x << " " << v[i].points[0].y << " " << v[i].points[1].x << " " << v[i].points[1].y << " " << v[i].points[2].x << " " << v[i].points[2].y;
+				
+				break;
+			case VectorData::TYPE_IMAGE:
+				//2 '1st is for X/Y, 2nd is for width/height  -- ?!?
+				break;
+		}
+	}
+	
+	if (l_initFlag == true) {
+		l_ostringstream << "\t</g>";
+	}
+	return l_ostringstream.str();
+}
+
 string Kage::int255ToHex(unsigned int p) {
 	int l;
 	string r = "";
@@ -3260,14 +3484,175 @@ void Kage::parseKSF(string p_content) {
 				}
 			}
 		} else {
-		//unable to tokenize KSF
-		updateStatus("Loading Error 1: Unabe to load " + ksfPath);
+			//unable to tokenize KSF
+			updateStatus("Loading Error 1: Unabe to load " + ksfPath);
 		}
 	} else {
 		//unable to parse KSF
 		updateStatus("Loading Error 2: Unabe to load " + ksfPath);
 	}
 }
+
+void Kage::parseSVG_Children(vector<XmlTag> p_children) {
+	for (unsigned int i = 0; i < p_children.size(); ++i) {
+		string l_tagname = p_children[i].getName();
+		vector<XmlTagProperty> l_properties = p_children[i].getProperties();
+		if (l_tagname == "g") {
+			unsigned int l_layer = 0;
+			StringHelper::toUnsignedInteger(l_tagname.substr(5));
+			
+			
+			
+			
+			
+			cout << "inkscape:label";
+
+
+
+
+
+			cout << "\t\t\t\t\tl_tagname LAYER\t" << l_layer << "\t" << l_properties.size() << endl;
+			while (l_layer > _framesetManager.layerCount()) {
+				_framesetManager.addFrameset(_layerManager.addLayer());
+				_framesetManager.setCurrentLayer(_layerManager.layerCount());
+			}
+			
+			for (unsigned int l_propertyIndex = 0; l_propertyIndex < l_properties.size(); ++l_propertyIndex) {
+				cout << "\t\t\t\t\t\tA l_properties[" << l_propertyIndex << "].getName() " << l_properties[l_propertyIndex].getName() << " = " << l_properties[l_propertyIndex].getValue() << " ? " << StringHelper::toBoolean(l_properties[l_propertyIndex].getValue()) << endl;
+				if (l_properties[l_propertyIndex].getName() == "label") {
+					_layerManager.setLabel(l_properties[l_propertyIndex].getValue());
+				} else if (l_properties[l_propertyIndex].getName() == "visible") {
+					_layerManager.setVisible(StringHelper::toBoolean(l_properties[l_propertyIndex].getValue()));
+				} else if (l_properties[l_propertyIndex].getName() == "locked") {
+					_layerManager.setLock(StringHelper::toBoolean(l_properties[l_propertyIndex].getValue()));
+				}
+			}
+			_framesetManager.setCurrentLayer(l_layer);
+		} else if (l_tagname.substr(0, 5) == "frame") {
+			unsigned int l_frame = StringHelper::toUnsignedInteger(l_tagname.substr(5));
+			while (l_frame > _framesetManager.frameCount()) {
+				_framesetManager.addFrame();
+			}
+			_framesetManager.setCurrentFrame(l_frame);
+			for (unsigned int l_propertyIndex = 0; l_propertyIndex < l_properties.size(); ++l_propertyIndex) {
+				if (l_properties[l_propertyIndex].getName() == "extend") {
+					if (l_properties[l_propertyIndex].getValue() == "start") {
+						_framesetManager.setFrameExtension(KageFrame::EXTENSION_START);
+					} else if (l_properties[l_propertyIndex].getValue() == "mid") {
+						_framesetManager.setFrameExtension(KageFrame::EXTENSION_MID);
+					} else if (l_properties[l_propertyIndex].getValue() == "end") {
+						_framesetManager.setFrameExtension(KageFrame::EXTENSION_END);
+					}
+				} else if (l_properties[l_propertyIndex].getName() == "tween") {
+					string l_tweenValue = l_properties[l_propertyIndex].getValue();
+					if (l_tweenValue == "true") {
+						_framesetManager.forceSetTween(11);
+					} else if (l_tweenValue == "false") {
+						_framesetManager.forceSetTween(0);
+					} else {
+						_framesetManager.forceSetTween(StringHelper::toUnsignedInteger(l_tweenValue));
+					}
+				}
+			}
+		} else if (l_tagname == "init") {
+			VectorDataManager v;
+			
+			vector<double> l_numbers = parseNumbers(p_children[i]._value); //XY for rotation anchor
+			if (l_numbers.size() == 2) {
+				v.addInit(PointData(l_numbers[0], l_numbers[1]));
+			} else {
+				v.addInit();
+			}
+			addDataToFrame(v, true);
+		} else if (l_tagname == "fill") {
+			VectorDataManager v;
+			vector<int> l_colors = parseColorString(l_properties[0].getValue()); //color
+				v.addFill(ColorData(l_colors[0], l_colors[1], l_colors[2], l_colors[3]));
+			addDataToFrame(v, true);
+		} else if (l_tagname == "stroke") {
+			VectorDataManager v;
+			vector<int> l_colors = parseColorString(l_properties[0].getValue()); //color
+				StrokeColorData l_stroke = StrokeColorData(l_colors[0], l_colors[1], l_colors[2], l_colors[3]);
+				l_stroke.setThickness(StringHelper::toDouble(l_properties[1].getValue()));//thickness
+				v.addLineStyle(l_stroke);
+			addDataToFrame(v, true);
+		} else if (l_tagname == "move") {
+			VectorDataManager v;
+			vector<double> l_numbers = parseNumbers(p_children[i]._value); //XY
+				v.addMove(PointData(l_numbers[0], l_numbers[1]));
+			addDataToFrame(v, true);
+		} else if (l_tagname == "cubiccurve" || l_tagname == "curve") {
+			VectorDataManager v;
+			vector<double> l_numbers = parseNumbers(p_children[i]._value); //XYs
+				v.addCubic(
+					PointData(l_numbers[0], l_numbers[1]),
+					PointData(l_numbers[2], l_numbers[3]),
+					PointData(l_numbers[4], l_numbers[5]));
+			addDataToFrame(v, true);
+		} else if (l_tagname == "closepath") {
+			VectorDataManager v;
+				v.addClosePath();
+			addDataToFrame(v, true);
+		} else if (l_tagname == "stage") {
+			for (unsigned int j = 0; j < l_properties.size(); ++j) {
+				if (l_properties[j].getName() == "width") {
+					m_KageStage.stageWidth = StringHelper::toUnsignedInteger(l_properties[j].getValue());
+					m_EntryStageWid.set_text(StringHelper::unsignedIntegerToString(m_KageStage.stageWidth));
+				} else if (l_properties[j].getName() == "height") {
+					m_KageStage.stageHeight = StringHelper::toUnsignedInteger(l_properties[j].getValue());
+					m_EntryStageHgt.set_text(StringHelper::unsignedIntegerToString(m_KageStage.stageHeight));
+				} else if (l_properties[j].getName() == "fps") {
+					m_KageStage.fps = StringHelper::toUnsignedInteger(l_properties[j].getValue());
+					m_EntryStageFPS.set_text(StringHelper::unsignedIntegerToString(m_KageStage.fps));
+				} else if (l_properties[j].getName() == "background") {
+					vector<int> l_colors = parseColorString(l_properties[j].getValue());
+					m_KageStage.stageBG = ColorData(l_colors[0], l_colors[1], l_colors[2]);
+					m_ColorButtonStage.set_color(m_KageStage.getStageBG());
+				}
+			}
+		}
+		parseSVG_Children(p_children[i]._children);
+		if (l_tagname == "fill") {
+			VectorDataManager v;
+				v.addEndFill();
+			addDataToFrame(v, true);
+		}
+	}
+	m_KageStage.render();
+	refreshUI();
+}
+void Kage::parseSVG(string p_content) {
+	BasicXml _xml;
+	std::cout << "parsing... " << p_content.length() << std::endl;
+	if (_xml.parse(p_content)) {
+		if (_xml.tokenize()) {
+			XmlTag l_root = _xml.getRoot();
+			if (l_root.getName() == "svg") {
+				/*vector<XmlTagProperty> l_xmlTagProperties = l_root.getProperties();
+				if (l_xmlTagProperties.size() > 0
+						&& l_xmlTagProperties[0].getName() == "version"
+						&&
+						(	   l_xmlTagProperties[0].getValue() == "2019.10.14"
+							|| l_xmlTagProperties[0].getValue() == "2020.03.10"
+						)
+					) {*/
+					KageFramesetManager::LOADING_MODE = true;
+						parseSVG_Children(l_root._children);
+						updateStatus("Loaded " + ksfPath);
+					KageFramesetManager::LOADING_MODE = false;
+				//}
+			}
+		} else {
+			cout << _xml.getXML();
+			//unable to tokenize SVG
+			updateStatus("Loading Error 1: Unabe to load " + ksfPath);
+		}
+	} else {
+		//unable to parse SVG
+		updateStatus("Loading Error 2: Unabe to load " + ksfPath);
+	}
+}
+
 bool Kage::runExternal(string p_cmd, string p_param) {
 	string l_cmd = p_cmd + " " + p_param;
 	

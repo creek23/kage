@@ -15,7 +15,7 @@ Section "Core (2.3 MB)" SEC01
   File "${FILE_PATH}\kagestudio.exe"
   File "${FILE_PATH}\LICENSE.txt"
   File "${FILE_PATH}\README.txt"
-  File "${FILE_PATH}\kage.ico"
+  File "${FILE_PATH}\ksf.ico"
 
   ;Store installation folder
   WriteRegStr HKLM "Software\Kage Studio" "" $INSTDIR
@@ -170,7 +170,7 @@ Section -Post
     WriteRegStr HKCR ".ksf\ShellNew" "NullFile" ""
     WriteRegStr HKCR "KageStudio.File" "" "Kage Studio File"
     WriteRegStr HKCR "KageStudio.File\shell\Open\command" "" "$INSTDIR\kagestudio.exe %1"
-    WriteRegStr HKCR "KageStudio.File\DefaultIcon" "" "$INSTDIR\kage.ico"
+    WriteRegStr HKCR "KageStudio.File\DefaultIcon" "" "$INSTDIR\ksf.ico"
     
     ;WriteRegStr HKCR "dir" "entry" "value" -- template
     

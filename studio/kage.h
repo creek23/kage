@@ -150,7 +150,6 @@
 			void OpenKSF_onClick();
 			void Save_onClick();
 			void SaveAs_onClick();
-			void ImportSVG_onClick();
 			void ExportKS_onClick();
 			void ExportHTML5_onClick();
 			void ExportSVG_onClick();
@@ -163,7 +162,6 @@
 			virtual bool on_delete_event(GdkEventAny* any_event);
 			
 			void doOpen();
-			void doImportSVG();
 			void doSaveDialog(string p_title);
 			void doSave(string p_filename);
 			
@@ -352,8 +350,6 @@
 			vector<int> parseColorString(string p_color);
 			void parseKSF_Children(vector<XmlTag> p_children);
 			void parseKSF(string p_content);
-			void parseSVG_Children(vector<XmlTag> p_children);
-			void parseSVG(string p_content);
 			bool runExternal(string p_cmd, string p_param);
 			
 			void Play_onClick();

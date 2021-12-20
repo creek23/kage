@@ -110,10 +110,6 @@ Kage::Kage(string p_filePath) :
 		sigc::mem_fun(*this, &Kage::OpenKSF_onClick)
 	);
 	m_refActionGroup->add(
-		Gtk::Action::create("ImportSVG", "_Import SVG", "Import SVG file"),
-		sigc::mem_fun(*this, &Kage::ImportSVG_onClick)
-	);
-	m_refActionGroup->add(
 		Gtk::Action::create("Save", Gtk::Stock::SAVE, "_Save", "Save current file"),
 		sigc::mem_fun(*this, &Kage::Save_onClick)
 	);
@@ -485,8 +481,6 @@ Kage::Kage(string p_filePath) :
 		"			<separator/>"
 		"			<menuitem action='Save'/>"
 		"			<menuitem action='SaveAs'/>"
-		"			<separator/>"
-		"			<menuitem action='ImportSVG'/>"
 		"			<separator/>"
 		"			<menu action='ExportMenu'>"
 		"				<menuitem action='ExportAVI'/>"
@@ -2029,52 +2023,6 @@ void Kage::doOpen() {
 	set_title(ksfPath + " - " + KageAbout::app_title);
 }
 
-void Kage::ImportSVG_onClick() {
-	Gtk::FileChooserDialog dialog("Import SVG", Gtk::FILE_CHOOSER_ACTION_OPEN);
-	dialog.set_transient_for( * this);
-		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-		dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
-		dialog.set_default_size(800, 600);
-	
-	auto filter_svg = Gtk::FileFilter::create();
-		filter_svg->set_name("Scalable Vector Graphics Files");
-		filter_svg->add_mime_type("text/x-svg");
-		filter_svg->add_pattern("*.svg");
-			dialog.add_filter(filter_svg);
-	//Show the dialog and wait for a user response:
-	int result = dialog.run();
-	
-	//Handle the response:
-	switch (result) {
-		case Gtk::RESPONSE_OK:
-			New_onClick();
-			ksfPath = dialog.get_filename();
-			cout << "uri:" << dialog.get_uri() << endl;
-			
-			doImportSVG();
-			break;
-//		default:
-//			std::cout << "clicked " << result << endl;
-	}
-}
-void Kage::doImportSVG() {
-	int l_len = strlen(ksfPath.c_str()) - 4;
-	if (StringHelper::toLower(ksfPath).substr(l_len, 4) != ".html") {
-		ksfPath = ksfPath + ".html";
-	}
-	
-	string l_ksfContent = BasicXml::openXMLFile(ksfPath);
-	
-	//cout << "Loaded... \n" << l_ksfContent << endl;
-	parseSVG(l_ksfContent);
-	_undoRedoManager.clear();
-	stackDo();
-	propFillStrokeSetVisible(false);
-	propShapePropertiesSetVisible(false);
-	propNodeXYSetVisible(false);
-	set_title(ksfPath + " - " + KageAbout::app_title);
-}
-
 void Kage::Save_onClick() {
 	if (ksfPath != "Untitled") {
 		doSave(ksfPath);
@@ -3489,166 +3437,6 @@ void Kage::parseKSF(string p_content) {
 		}
 	} else {
 		//unable to parse KSF
-		updateStatus("Loading Error 2: Unabe to load " + ksfPath);
-	}
-}
-
-void Kage::parseSVG_Children(vector<XmlTag> p_children) {
-	for (unsigned int i = 0; i < p_children.size(); ++i) {
-		string l_tagname = p_children[i].getName();
-		vector<XmlTagProperty> l_properties = p_children[i].getProperties();
-		if (l_tagname == "g") {
-			unsigned int l_layer = 0;
-			StringHelper::toUnsignedInteger(l_tagname.substr(5));
-			
-			
-			
-			
-			
-			cout << "inkscape:label";
-
-
-
-
-
-			cout << "\t\t\t\t\tl_tagname LAYER\t" << l_layer << "\t" << l_properties.size() << endl;
-			while (l_layer > _framesetManager.layerCount()) {
-				_framesetManager.addFrameset(_layerManager.addLayer());
-				_framesetManager.setCurrentLayer(_layerManager.layerCount());
-			}
-			
-			for (unsigned int l_propertyIndex = 0; l_propertyIndex < l_properties.size(); ++l_propertyIndex) {
-				cout << "\t\t\t\t\t\tA l_properties[" << l_propertyIndex << "].getName() " << l_properties[l_propertyIndex].getName() << " = " << l_properties[l_propertyIndex].getValue() << " ? " << StringHelper::toBoolean(l_properties[l_propertyIndex].getValue()) << endl;
-				if (l_properties[l_propertyIndex].getName() == "label") {
-					_layerManager.setLabel(l_properties[l_propertyIndex].getValue());
-				} else if (l_properties[l_propertyIndex].getName() == "visible") {
-					_layerManager.setVisible(StringHelper::toBoolean(l_properties[l_propertyIndex].getValue()));
-				} else if (l_properties[l_propertyIndex].getName() == "locked") {
-					_layerManager.setLock(StringHelper::toBoolean(l_properties[l_propertyIndex].getValue()));
-				}
-			}
-			_framesetManager.setCurrentLayer(l_layer);
-		} else if (l_tagname.substr(0, 5) == "frame") {
-			unsigned int l_frame = StringHelper::toUnsignedInteger(l_tagname.substr(5));
-			while (l_frame > _framesetManager.frameCount()) {
-				_framesetManager.addFrame();
-			}
-			_framesetManager.setCurrentFrame(l_frame);
-			for (unsigned int l_propertyIndex = 0; l_propertyIndex < l_properties.size(); ++l_propertyIndex) {
-				if (l_properties[l_propertyIndex].getName() == "extend") {
-					if (l_properties[l_propertyIndex].getValue() == "start") {
-						_framesetManager.setFrameExtension(KageFrame::EXTENSION_START);
-					} else if (l_properties[l_propertyIndex].getValue() == "mid") {
-						_framesetManager.setFrameExtension(KageFrame::EXTENSION_MID);
-					} else if (l_properties[l_propertyIndex].getValue() == "end") {
-						_framesetManager.setFrameExtension(KageFrame::EXTENSION_END);
-					}
-				} else if (l_properties[l_propertyIndex].getName() == "tween") {
-					string l_tweenValue = l_properties[l_propertyIndex].getValue();
-					if (l_tweenValue == "true") {
-						_framesetManager.forceSetTween(11);
-					} else if (l_tweenValue == "false") {
-						_framesetManager.forceSetTween(0);
-					} else {
-						_framesetManager.forceSetTween(StringHelper::toUnsignedInteger(l_tweenValue));
-					}
-				}
-			}
-		} else if (l_tagname == "init") {
-			VectorDataManager v;
-			
-			vector<double> l_numbers = parseNumbers(p_children[i]._value); //XY for rotation anchor
-			if (l_numbers.size() == 2) {
-				v.addInit(PointData(l_numbers[0], l_numbers[1]));
-			} else {
-				v.addInit();
-			}
-			addDataToFrame(v, true);
-		} else if (l_tagname == "fill") {
-			VectorDataManager v;
-			vector<int> l_colors = parseColorString(l_properties[0].getValue()); //color
-				v.addFill(ColorData(l_colors[0], l_colors[1], l_colors[2], l_colors[3]));
-			addDataToFrame(v, true);
-		} else if (l_tagname == "stroke") {
-			VectorDataManager v;
-			vector<int> l_colors = parseColorString(l_properties[0].getValue()); //color
-				StrokeColorData l_stroke = StrokeColorData(l_colors[0], l_colors[1], l_colors[2], l_colors[3]);
-				l_stroke.setThickness(StringHelper::toDouble(l_properties[1].getValue()));//thickness
-				v.addLineStyle(l_stroke);
-			addDataToFrame(v, true);
-		} else if (l_tagname == "move") {
-			VectorDataManager v;
-			vector<double> l_numbers = parseNumbers(p_children[i]._value); //XY
-				v.addMove(PointData(l_numbers[0], l_numbers[1]));
-			addDataToFrame(v, true);
-		} else if (l_tagname == "cubiccurve" || l_tagname == "curve") {
-			VectorDataManager v;
-			vector<double> l_numbers = parseNumbers(p_children[i]._value); //XYs
-				v.addCubic(
-					PointData(l_numbers[0], l_numbers[1]),
-					PointData(l_numbers[2], l_numbers[3]),
-					PointData(l_numbers[4], l_numbers[5]));
-			addDataToFrame(v, true);
-		} else if (l_tagname == "closepath") {
-			VectorDataManager v;
-				v.addClosePath();
-			addDataToFrame(v, true);
-		} else if (l_tagname == "stage") {
-			for (unsigned int j = 0; j < l_properties.size(); ++j) {
-				if (l_properties[j].getName() == "width") {
-					m_KageStage.stageWidth = StringHelper::toUnsignedInteger(l_properties[j].getValue());
-					m_EntryStageWid.set_text(StringHelper::unsignedIntegerToString(m_KageStage.stageWidth));
-				} else if (l_properties[j].getName() == "height") {
-					m_KageStage.stageHeight = StringHelper::toUnsignedInteger(l_properties[j].getValue());
-					m_EntryStageHgt.set_text(StringHelper::unsignedIntegerToString(m_KageStage.stageHeight));
-				} else if (l_properties[j].getName() == "fps") {
-					m_KageStage.fps = StringHelper::toUnsignedInteger(l_properties[j].getValue());
-					m_EntryStageFPS.set_text(StringHelper::unsignedIntegerToString(m_KageStage.fps));
-				} else if (l_properties[j].getName() == "background") {
-					vector<int> l_colors = parseColorString(l_properties[j].getValue());
-					m_KageStage.stageBG = ColorData(l_colors[0], l_colors[1], l_colors[2]);
-					m_ColorButtonStage.set_color(m_KageStage.getStageBG());
-				}
-			}
-		}
-		parseSVG_Children(p_children[i]._children);
-		if (l_tagname == "fill") {
-			VectorDataManager v;
-				v.addEndFill();
-			addDataToFrame(v, true);
-		}
-	}
-	m_KageStage.render();
-	refreshUI();
-}
-void Kage::parseSVG(string p_content) {
-	BasicXml _xml;
-	std::cout << "parsing... " << p_content.length() << std::endl;
-	if (_xml.parse(p_content)) {
-		if (_xml.tokenize()) {
-			XmlTag l_root = _xml.getRoot();
-			if (l_root.getName() == "svg") {
-				/*vector<XmlTagProperty> l_xmlTagProperties = l_root.getProperties();
-				if (l_xmlTagProperties.size() > 0
-						&& l_xmlTagProperties[0].getName() == "version"
-						&&
-						(	   l_xmlTagProperties[0].getValue() == "2019.10.14"
-							|| l_xmlTagProperties[0].getValue() == "2020.03.10"
-						)
-					) {*/
-					KageFramesetManager::LOADING_MODE = true;
-						parseSVG_Children(l_root._children);
-						updateStatus("Loaded " + ksfPath);
-					KageFramesetManager::LOADING_MODE = false;
-				//}
-			}
-		} else {
-			cout << _xml.getXML();
-			//unable to tokenize SVG
-			updateStatus("Loading Error 1: Unabe to load " + ksfPath);
-		}
-	} else {
-		//unable to parse SVG
 		updateStatus("Loading Error 2: Unabe to load " + ksfPath);
 	}
 }

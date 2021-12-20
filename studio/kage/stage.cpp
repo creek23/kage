@@ -912,11 +912,6 @@ void KageStage::clearScreen(Cairo::RefPtr<Cairo::Context> p_context) {
 		p_context->line_to(stageWidth + origin.x, origin.y + stageHeight);
 		p_context->line_to(             origin.x, origin.y + stageHeight);
 		
-		bool l_mouseLocationOnFill = p_context->in_fill(_mouseLocation.x, _mouseLocation.y);
-			if (l_mouseLocationOnFill != 0) {
-				_mouseLocationShapeIndex = _NO_SELECTION;
-			}
-		
 		p_context->close_path();
 			p_context->set_source_rgb((double)KageStage::stageBG.getR()/255, (double)KageStage::stageBG.getG()/255, (double)KageStage::stageBG.getB()/255);
 	//		p_context->fill_preserve();
@@ -924,6 +919,8 @@ void KageStage::clearScreen(Cairo::RefPtr<Cairo::Context> p_context) {
 				p_context->set_line_width(0.2f);
 				p_context->set_source_rgb(0.0, 0.0, 0.0);
 				p_context->stroke();
+		
+		_mouseLocationShapeIndex = _NO_SELECTION;
 	}
 }
 

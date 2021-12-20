@@ -94,6 +94,8 @@
 			
 			string int255ToHex(unsigned int p);
 			char int15ToHex(unsigned int p);
+			unsigned int hexToInt255(string p);
+			unsigned int hexToInt15(char p);
 			
 			KageLayerManager _layerManager;
 			KageFramesetManager _framesetManager;
@@ -240,19 +242,51 @@
 				Gtk::Label m_LabelFill;
 				Gtk::ColorButton m_ColorButtonFill;
 					void ColorButtonFill_onClick();
+				Gtk::Label m_LabelFillR;
+				Gtk::Label m_LabelFillG;
+				Gtk::Label m_LabelFillB;
 				Gtk::Label m_LabelFillAlpha;
-				Glib::RefPtr<Gtk::Adjustment> _adjustFill;
-				Glib::RefPtr<Gtk::Adjustment> _adjustStroke;
+				Glib::RefPtr<Gtk::Adjustment> _adjustFillR;
+				Glib::RefPtr<Gtk::Adjustment> _adjustFillG;
+				Glib::RefPtr<Gtk::Adjustment> _adjustFillB;
+				Glib::RefPtr<Gtk::Adjustment> _adjustFillA;
+				Glib::RefPtr<Gtk::Adjustment> _adjustStrokeR;
+				Glib::RefPtr<Gtk::Adjustment> _adjustStrokeG;
+				Glib::RefPtr<Gtk::Adjustment> _adjustStrokeB;
+				Glib::RefPtr<Gtk::Adjustment> _adjustStrokeA;
+				Gtk::Scale _scaleFillR;
+					void FillR_onChange();
+				Gtk::Scale _scaleFillG;
+					void FillG_onChange();
+				Gtk::Scale _scaleFillB;
+					void FillB_onChange();
 				Gtk::Scale _scaleFillAplha;
 					void FillAlpha_onChange();
+				Gtk::Label m_LabelFillRGBA;	
+				Gtk::Entry m_EntryFillRGBA;
+					void EntryFillRGBA_onEnter();
+				void updateEntryFillRGBA();
 				
 				Gtk::Label m_LabelStroke;
 				Gtk::Label m_LabelStrokeThickness;
 				Gtk::Entry m_EntryStrokeThickness;
 					void EntryStrokeThickness_onEnter();
+				Gtk::Label m_LabelStrokeR;
+				Gtk::Label m_LabelStrokeG;
+				Gtk::Label m_LabelStrokeB;
 				Gtk::Label m_LabelStrokeAlpha;
+				Gtk::Scale _scaleStrokeR;
+					void StrokeR_onChange();
+				Gtk::Scale _scaleStrokeG;
+					void StrokeG_onChange();
+				Gtk::Scale _scaleStrokeB;
+					void StrokeB_onChange();
 				Gtk::Scale _scaleStrokeAlpha;
 					void StrokeAlpha_onChange();
+				Gtk::Label m_LabelStrokeRGBA;	
+				Gtk::Entry m_EntryStrokeRGBA;
+					void EntryStrokeRGBA_onEnter();
+				void updateEntryStrokeRGBA();
 				Gtk::ColorButton m_ColorButtonStroke;
 					void ColorButtonStroke_onClick();
 			

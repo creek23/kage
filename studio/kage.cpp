@@ -59,9 +59,17 @@ Kage::Kage(string p_filePath) :
 			   m_LabelStageBG("Background"),
 			   m_LabelStageFPS("FPS"),
 			   m_LabelFill("Fill"),
+			   m_LabelFillR("Fill Red"),
+			   m_LabelFillG("Fill Green"),
+			   m_LabelFillB("Fill Blue"),
 			   m_LabelFillAlpha("Fill Alpha"),
+			   m_LabelFillRGBA("Fill RGBA"),
 			   m_LabelStroke("Stroke"),
+			   m_LabelStrokeR("Stroke Red"),
+			   m_LabelStrokeG("Stroke Green"),
+			   m_LabelStrokeB("Stroke Blue"),
 			   m_LabelStrokeAlpha("Stroke Alpha"),
+			   m_LabelStrokeRGBA("Stroke RGBA"),
 			   m_LabelStrokeThickness("Thickness"),
 			   m_LabelX("X"),
 			   m_LabelY("Y"),
@@ -74,10 +82,22 @@ Kage::Kage(string p_filePath) :
 			   m_LabelTweenX("Tween X"),
 			   m_LabelTweenY("Tween Y"),
 			   m_KageStage(this),
-			   _adjustFill( Gtk::Adjustment::create(0.0, 0.0, 101.0, 0.1, 1.0, 1.0) ),
-			   _adjustStroke( Gtk::Adjustment::create(0.0, 0.0, 101.0, 0.1, 1.0, 1.0) ),
-			   _scaleFillAplha(_adjustFill, Gtk::ORIENTATION_HORIZONTAL),
-			   _scaleStrokeAlpha(_adjustStroke, Gtk::ORIENTATION_HORIZONTAL),
+			   _adjustFillR( Gtk::Adjustment::create(0.0, 0.0, 256.0, 0.1, 1.0, 1.0) ),
+			   _adjustFillG( Gtk::Adjustment::create(0.0, 0.0, 256.0, 0.1, 1.0, 1.0) ),
+			   _adjustFillB( Gtk::Adjustment::create(0.0, 0.0, 256.0, 0.1, 1.0, 1.0) ),
+			   _adjustFillA( Gtk::Adjustment::create(0.0, 0.0, 101.0, 0.1, 1.0, 1.0) ),
+			   _scaleFillR(_adjustFillR, Gtk::ORIENTATION_HORIZONTAL),
+			   _scaleFillG(_adjustFillG, Gtk::ORIENTATION_HORIZONTAL),
+			   _scaleFillB(_adjustFillB, Gtk::ORIENTATION_HORIZONTAL),
+			   _scaleFillAplha(_adjustFillA, Gtk::ORIENTATION_HORIZONTAL),
+			   _adjustStrokeR( Gtk::Adjustment::create(0.0, 0.0, 256.0, 0.1, 1.0, 1.0) ),
+			   _adjustStrokeG( Gtk::Adjustment::create(0.0, 0.0, 256.0, 0.1, 1.0, 1.0) ),
+			   _adjustStrokeB( Gtk::Adjustment::create(0.0, 0.0, 256.0, 0.1, 1.0, 1.0) ),
+			   _adjustStrokeA( Gtk::Adjustment::create(0.0, 0.0, 101.0, 0.1, 1.0, 1.0) ),
+			   _scaleStrokeR(_adjustStrokeR, Gtk::ORIENTATION_HORIZONTAL),
+			   _scaleStrokeG(_adjustStrokeG, Gtk::ORIENTATION_HORIZONTAL),
+			   _scaleStrokeB(_adjustStrokeB, Gtk::ORIENTATION_HORIZONTAL),
+			   _scaleStrokeAlpha(_adjustStrokeA, Gtk::ORIENTATION_HORIZONTAL),
 			   _undoRedoManager() {
 	m_ContextId = m_Statusbar.get_context_id(KageAbout::app_title);
 	KageFrame::_gotFocus = false;
@@ -791,9 +811,17 @@ Kage::Kage(string p_filePath) :
 					m_PropFillStrokeV1.set_border_width(4);
 					m_PropFillStrokeV1.set_spacing(4);
 					m_PropFillStrokeV1.pack_start(m_LabelFill);
+					m_PropFillStrokeV1.pack_start(m_LabelFillR);
+					m_PropFillStrokeV1.pack_start(m_LabelFillG);
+					m_PropFillStrokeV1.pack_start(m_LabelFillB);
 					m_PropFillStrokeV1.pack_start(m_LabelFillAlpha);
+					m_PropFillStrokeV1.pack_start(m_LabelFillRGBA);
 					m_PropFillStrokeV1.pack_start(m_LabelStroke);
+					m_PropFillStrokeV1.pack_start(m_LabelStrokeR);
+					m_PropFillStrokeV1.pack_start(m_LabelStrokeG);
+					m_PropFillStrokeV1.pack_start(m_LabelStrokeB);
 					m_PropFillStrokeV1.pack_start(m_LabelStrokeAlpha);
+					m_PropFillStrokeV1.pack_start(m_LabelStrokeRGBA);
 					m_PropFillStrokeV1.pack_start(m_LabelStrokeThickness);
 				m_PropFillStroke.pack_start(m_PropFillStrokeV2);;
 					m_PropFillStrokeV2.set_border_width(4);
@@ -804,6 +832,27 @@ Kage::Kage(string p_filePath) :
 						m_ColorButtonFill.set_title("Choose Fill Color");
 							m_ColorButtonFill.set_color(m_KageStage.getStageBG());
 						m_ColorButtonFill.signal_color_set().connect(sigc::mem_fun(* this, &Kage::ColorButtonFill_onClick) );
+					m_PropFillStrokeV2.pack_start(_scaleFillR, Gtk::PACK_SHRINK);
+						_scaleFillR.set_digits(0);
+						_scaleFillR.set_value(255);
+						_scaleFillR.set_value_pos(Gtk::POS_TOP);
+						_scaleFillR.set_draw_value();
+						_scaleFillR.signal_value_changed().connect(
+							sigc::mem_fun(*this, &Kage::FillR_onChange));
+					m_PropFillStrokeV2.pack_start(_scaleFillG, Gtk::PACK_SHRINK);
+						_scaleFillG.set_digits(0);
+						_scaleFillG.set_value(255);
+						_scaleFillG.set_value_pos(Gtk::POS_TOP);
+						_scaleFillG.set_draw_value();
+						_scaleFillG.signal_value_changed().connect(
+							sigc::mem_fun(*this, &Kage::FillG_onChange));
+					m_PropFillStrokeV2.pack_start(_scaleFillB, Gtk::PACK_SHRINK);
+						_scaleFillB.set_digits(0);
+						_scaleFillB.set_value(255);
+						_scaleFillB.set_value_pos(Gtk::POS_TOP);
+						_scaleFillB.set_draw_value();
+						_scaleFillB.signal_value_changed().connect(
+							sigc::mem_fun(*this, &Kage::FillB_onChange));
 					m_PropFillStrokeV2.pack_start(_scaleFillAplha, Gtk::PACK_SHRINK);
 						_scaleFillAplha.set_digits(0);
 						_scaleFillAplha.set_value(100);
@@ -811,12 +860,40 @@ Kage::Kage(string p_filePath) :
 						_scaleFillAplha.set_draw_value();
 						_scaleFillAplha.signal_value_changed().connect(
 							sigc::mem_fun(*this, &Kage::FillAlpha_onChange));
+					m_PropFillStrokeV2.pack_start(m_EntryFillRGBA, Gtk::PACK_SHRINK);
+						m_EntryFillRGBA.set_size_request(20, 24);
+						m_EntryFillRGBA.set_width_chars(8);
+						m_EntryFillRGBA.set_max_length(8);
+						//m_EntryFillRGBA.set_text('random hex as color'));
+						m_EntryFillRGBA.signal_activate().connect(
+							sigc::mem_fun(*this, &Kage::EntryFillRGBA_onEnter));
 					m_PropFillStrokeV2.pack_start(m_ColorButtonStroke);
 						m_ColorButtonStroke.set_size_request(32, 32);
 						m_ColorButtonStroke.set_use_alpha(true);
 						m_ColorButtonStroke.set_title("Choose Stroke Color");
 							m_ColorButtonStroke.set_color(m_KageStage.getStageBG());
 						m_ColorButtonStroke.signal_color_set().connect(sigc::mem_fun(* this, &Kage::ColorButtonStroke_onClick) );
+					m_PropFillStrokeV2.pack_start(_scaleStrokeR, Gtk::PACK_SHRINK);
+						_scaleStrokeR.set_digits(0);
+						_scaleStrokeR.set_value(255);
+						_scaleStrokeR.set_value_pos(Gtk::POS_TOP);
+						_scaleStrokeR.set_draw_value();
+						_scaleStrokeR.signal_value_changed().connect(
+							sigc::mem_fun(*this, &Kage::StrokeR_onChange));
+					m_PropFillStrokeV2.pack_start(_scaleStrokeG, Gtk::PACK_SHRINK);
+						_scaleStrokeG.set_digits(0);
+						_scaleStrokeG.set_value(255);
+						_scaleStrokeG.set_value_pos(Gtk::POS_TOP);
+						_scaleStrokeG.set_draw_value();
+						_scaleStrokeG.signal_value_changed().connect(
+							sigc::mem_fun(*this, &Kage::StrokeG_onChange));
+					m_PropFillStrokeV2.pack_start(_scaleStrokeB, Gtk::PACK_SHRINK);
+						_scaleStrokeB.set_digits(0);
+						_scaleStrokeB.set_value(255);
+						_scaleStrokeB.set_value_pos(Gtk::POS_TOP);
+						_scaleStrokeB.set_draw_value();
+						_scaleStrokeB.signal_value_changed().connect(
+							sigc::mem_fun(*this, &Kage::StrokeB_onChange));
 					m_PropFillStrokeV2.pack_start(_scaleStrokeAlpha, Gtk::PACK_SHRINK);
 						_scaleStrokeAlpha.set_digits(0);
 						_scaleStrokeAlpha.set_value(100);
@@ -824,6 +901,13 @@ Kage::Kage(string p_filePath) :
 						_scaleStrokeAlpha.set_draw_value();
 						_scaleStrokeAlpha.signal_value_changed().connect(
 							sigc::mem_fun(*this, &Kage::StrokeAlpha_onChange));
+					m_PropFillStrokeV2.pack_start(m_EntryStrokeRGBA, Gtk::PACK_SHRINK);
+						m_EntryStrokeRGBA.set_size_request(20, 24);
+						m_EntryStrokeRGBA.set_width_chars(8);
+						m_EntryStrokeRGBA.set_max_length(8);
+						//m_EntryStrokeRGBA.set_text('random hex as color'));
+						m_EntryStrokeRGBA.signal_activate().connect(
+							sigc::mem_fun(*this, &Kage::EntryStrokeRGBA_onEnter));
 					m_PropFillStrokeV2.pack_start(m_EntryStrokeThickness, Gtk::PACK_SHRINK);
 						m_EntryStrokeThickness.set_size_request(20, 24);
 						m_EntryStrokeThickness.set_width_chars(2);
@@ -940,6 +1024,26 @@ Kage::Kage(string p_filePath) :
 		ksfPath = p_filePath;
 		doOpen();
 	}
+
+	unsigned int l_R = KageStage::fillColor.getR();
+	unsigned int l_G = KageStage::fillColor.getG();
+	unsigned int l_B = KageStage::fillColor.getB();
+	unsigned int l_A = KageStage::fillColor.getA();
+	m_EntryFillRGBA.set_text(int255ToHex(l_R) + int255ToHex(l_G) + int255ToHex(l_B) + int255ToHex(l_A));
+	_scaleFillR.set_value(l_R);
+	_scaleFillG.set_value(l_G);
+	_scaleFillB.set_value(l_B);
+	_scaleFillAplha.set_value((double) l_A / 256.0f * 100.0f);
+
+	l_R = KageStage::stroke.getR();
+	l_G = KageStage::stroke.getG();
+	l_B = KageStage::stroke.getB();
+	l_A = KageStage::stroke.getA();
+	m_EntryStrokeRGBA.set_text(int255ToHex(l_R) + int255ToHex(l_G) + int255ToHex(l_B) + int255ToHex(l_A));
+	_scaleStrokeR.set_value(l_R);
+	_scaleStrokeG.set_value(l_G);
+	_scaleStrokeB.set_value(l_B);
+	_scaleStrokeAlpha.set_value((double) l_A / 256.0f * 100.0f);
 }
 
 void Kage::registerPropertiesPane() {
@@ -1649,8 +1753,14 @@ void Kage::propFrameTweenSetVisible(bool p_visible) {
 
 void Kage::updateColors() {
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
+	_scaleFillR.set_value(KageStage::fillColor.getR());
+	_scaleFillG.set_value(KageStage::fillColor.getG());
+	_scaleFillB.set_value(KageStage::fillColor.getB());
 	_scaleFillAplha.set_value((double) KageStage::fillColor.getA()*100.0f/256.0f);
 	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
+	_scaleStrokeR.set_value(KageStage::stroke.getR());
+	_scaleStrokeG.set_value(KageStage::stroke.getG());
+	_scaleStrokeB.set_value(KageStage::stroke.getB());
 	_scaleStrokeAlpha.set_value((double) KageStage::stroke.getA()*100.0f/256.0f);
 	m_EntryStrokeThickness.set_text(StringHelper::unsignedIntegerToString(KageStage::stroke.getThickness()));
 }
@@ -2660,6 +2770,43 @@ bool Kage::on_tick(const Glib::RefPtr<Gdk::FrameClock>& frame_clock) {
 	
 	return true;
 }
+void Kage::updateEntryFillRGBA() {
+	unsigned int l_R = KageStage::fillColor.getR();
+	unsigned int l_G = KageStage::fillColor.getG();
+	unsigned int l_B = KageStage::fillColor.getB();
+	unsigned int l_A = KageStage::fillColor.getA();
+	m_EntryFillRGBA.set_text(int255ToHex(l_R) + int255ToHex(l_G) + int255ToHex(l_B) + int255ToHex(l_A));
+}
+void Kage::FillR_onChange() {
+	double l_red = _scaleFillR.get_value();
+	Gdk::RGBA l_rgba = m_ColorButtonFill.get_rgba();
+		l_rgba.set_red( l_red / 255.0f );
+	m_ColorButtonFill.set_rgba(l_rgba);
+	
+	KageStage::fillColor.setR(l_red);
+		updateEntryFillRGBA();
+	m_KageStage.updateShapeColor();
+}
+void Kage::FillG_onChange() {
+	double l_green = _scaleFillG.get_value();
+	Gdk::RGBA l_rgba = m_ColorButtonFill.get_rgba();
+		l_rgba.set_green( l_green / 255.0f );
+	m_ColorButtonFill.set_rgba(l_rgba);
+	
+	KageStage::fillColor.setG(l_green);
+		updateEntryFillRGBA();
+	m_KageStage.updateShapeColor();
+}
+void Kage::FillB_onChange() {
+	double l_blue = _scaleFillB.get_value();
+	Gdk::RGBA l_rgba = m_ColorButtonFill.get_rgba();
+		l_rgba.set_blue( l_blue / 255.0f );
+	m_ColorButtonFill.set_rgba(l_rgba);
+	
+	KageStage::fillColor.setB(l_blue);
+		updateEntryFillRGBA();
+	m_KageStage.updateShapeColor();
+}
 void Kage::FillAlpha_onChange() {
 	double l_alpha = _scaleFillAplha.get_value();
 	Gdk::RGBA l_rgba = m_ColorButtonFill.get_rgba();
@@ -2667,9 +2814,133 @@ void Kage::FillAlpha_onChange() {
 	m_ColorButtonFill.set_rgba(l_rgba);
 	
 	KageStage::fillColor.setA((int) (l_alpha * 256.0f/ 100.0f));
+		updateEntryFillRGBA();
 	m_KageStage.updateShapeColor();
 }
 
+void Kage::EntryFillRGBA_onEnter() {
+	//see: https://sourceforge.net/p/kage/tickets/66/?limit=25#7488
+	string l_input = m_EntryFillRGBA.get_text();
+	unsigned int l_inputLength = l_input.length();
+	unsigned int l_R = 0;
+	unsigned int l_G = 0;
+	unsigned int l_B = 0;
+	unsigned int l_A = KageStage::fillColor.getA();
+	
+	string l_sR = "";
+	string l_sG = "";
+	string l_sB = "";
+	string l_sA = "";
+	
+	if (l_inputLength == 1) {
+		l_sR = l_input + l_input;
+		l_sG = l_input + l_input;
+		l_sB = l_input + l_input;
+	} else if (l_inputLength == 2) {
+		l_sR = l_input;
+		l_sG = l_input;
+		l_sB = l_input;
+	} else if (l_inputLength == 3) {
+		l_sR = l_input.substr(0,1) + l_input.substr(0,1); //get R
+		l_sG = l_input.substr(1,1) + l_input.substr(1,1); //get G
+		l_sB = l_input.substr(2,1) + l_input.substr(2,1); //get B
+	} else if (l_inputLength == 4) {
+		l_sR = l_input.substr(0,1) + l_input.substr(0,1); //get R
+		l_sG = l_input.substr(1,1) + l_input.substr(1,1); //get G
+		l_sB = l_input.substr(2,1) + l_input.substr(2,1); //get B
+		l_sA = l_input.substr(3,1) + l_input.substr(3,1); //get A
+		l_A = hexToInt255(l_sA);
+	} else if (l_inputLength == 5) {
+		l_sR = l_input.substr(0,2); //get R
+		l_sG = l_input.substr(2,2); //get G
+		l_sB = l_input.substr(4,1) + l_input.substr(0,1); //get B
+	} else if (l_inputLength == 6) {
+		l_sR = l_input.substr(0,2); //get R
+		l_sG = l_input.substr(2,2); //get G
+		l_sB = l_input.substr(4,2); //get B
+	} else if (l_inputLength == 7) {
+		//apply as is
+		l_sR = l_input.substr(0,2); //get R
+		l_sG = l_input.substr(2,2); //get G
+		l_sB = l_input.substr(4,2); //get B
+		if (int255ToHex(l_A).length() > 1) {
+			l_sA = l_input.substr(6,1) + int255ToHex(l_A).substr(1,1); //get A
+		} else {
+			l_sA = l_input.substr(6,1) + int255ToHex(l_A); //get A
+		}
+		l_A = hexToInt255(l_sA);
+	} else if (l_inputLength == 8) {
+		//apply as is
+		l_sR = l_input.substr(0,2); //get R
+		l_sG = l_input.substr(2,2); //get G
+		l_sB = l_input.substr(4,2); //get B
+		l_sA = l_input.substr(6,2); //get A
+		l_A = hexToInt255(l_sA);
+	}
+	l_R = hexToInt255(l_sR);
+	l_G = hexToInt255(l_sG);
+	l_B = hexToInt255(l_sB);
+
+	cout << "\n\nRGBA A " << l_sR << "\t" << l_sG << "\t" << l_sB << "\t" << l_sA << endl;
+	cout << "\n\nRGBA B " << l_R  << "\t" << l_G  << "\t" << l_B  << "\t" << l_A << endl << endl << endl;
+	_scaleFillR.set_value(l_R);
+	_scaleFillG.set_value(l_G);
+	_scaleFillB.set_value(l_B);
+	_scaleFillAplha.set_value((double) l_A / 255.0f * 100.0f);
+	KageStage::fillColor.setR(l_R);
+	KageStage::fillColor.setG(l_G);
+	KageStage::fillColor.setB(l_B);
+	KageStage::fillColor.setA(l_A);
+	
+	Gdk::RGBA l_rgba = m_ColorButtonFill.get_rgba();
+		l_rgba.set_red  ( l_R / 255.f );
+		l_rgba.set_blue ( l_G / 255.f );
+		l_rgba.set_green( l_B / 255.f );
+		l_rgba.set_alpha( l_A / 255.f );
+			m_ColorButtonFill.set_rgba(l_rgba);
+	
+	m_KageStage.updateShapeColor();
+}
+
+
+void Kage::updateEntryStrokeRGBA() {
+	unsigned int l_R = KageStage::stroke.getR();
+	unsigned int l_G = KageStage::stroke.getG();
+	unsigned int l_B = KageStage::stroke.getB();
+	unsigned int l_A = KageStage::stroke.getA();
+	m_EntryStrokeRGBA.set_text(int255ToHex(l_R) + int255ToHex(l_G) + int255ToHex(l_B) + int255ToHex(l_A));
+}
+
+void Kage::StrokeR_onChange() {
+	double l_red = _scaleStrokeR.get_value();
+	Gdk::RGBA l_rgba = m_ColorButtonStroke.get_rgba();
+		l_rgba.set_red( l_red / 255.0f );
+	m_ColorButtonStroke.set_rgba(l_rgba);
+	
+	KageStage::stroke.setR(l_red);
+		updateEntryStrokeRGBA();
+	m_KageStage.updateShapeColor();
+}
+void Kage::StrokeG_onChange() {
+	double l_green = _scaleStrokeG.get_value();
+	Gdk::RGBA l_rgba = m_ColorButtonStroke.get_rgba();
+		l_rgba.set_green( l_green / 255.0f );
+	m_ColorButtonStroke.set_rgba(l_rgba);
+	
+	KageStage::stroke.setG(l_green);
+		updateEntryStrokeRGBA();
+	m_KageStage.updateShapeColor();
+}
+void Kage::StrokeB_onChange() {
+	double l_blue = _scaleStrokeB.get_value();
+	Gdk::RGBA l_rgba = m_ColorButtonStroke.get_rgba();
+		l_rgba.set_blue( l_blue / 255.0f );
+	m_ColorButtonStroke.set_rgba(l_rgba);
+	
+	KageStage::stroke.setB(l_blue);
+		updateEntryStrokeRGBA();
+	m_KageStage.updateShapeColor();
+}
 void Kage::StrokeAlpha_onChange() {
 	double l_alpha = _scaleStrokeAlpha.get_value();
 	Gdk::RGBA l_rgba = m_ColorButtonStroke.get_rgba();
@@ -2680,6 +2951,90 @@ void Kage::StrokeAlpha_onChange() {
 	m_KageStage.updateShapeColor();
 }
 
+
+void Kage::EntryStrokeRGBA_onEnter() {
+	//see: https://sourceforge.net/p/kage/tickets/66/?limit=25#7488
+	string l_input = m_EntryStrokeRGBA.get_text();
+	unsigned int l_inputLength = l_input.length();
+	unsigned int l_R = 0;
+	unsigned int l_G = 0;
+	unsigned int l_B = 0;
+	unsigned int l_A = KageStage::stroke.getA();
+	
+	string l_sR = "";
+	string l_sG = "";
+	string l_sB = "";
+	string l_sA = "";
+	
+	if (l_inputLength == 1) {
+		l_sR = l_input + l_input;
+		l_sG = l_input + l_input;
+		l_sB = l_input + l_input;
+	} else if (l_inputLength == 2) {
+		l_sR = l_input;
+		l_sG = l_input;
+		l_sB = l_input;
+	} else if (l_inputLength == 3) {
+		l_sR = l_input.substr(0,1) + l_input.substr(0,1); //get R
+		l_sG = l_input.substr(1,1) + l_input.substr(1,1); //get G
+		l_sB = l_input.substr(2,1) + l_input.substr(2,1); //get B
+	} else if (l_inputLength == 4) {
+		l_sR = l_input.substr(0,1) + l_input.substr(0,1); //get R
+		l_sG = l_input.substr(1,1) + l_input.substr(1,1); //get G
+		l_sB = l_input.substr(2,1) + l_input.substr(2,1); //get B
+		l_sA = l_input.substr(3,1) + l_input.substr(3,1); //get A
+		l_A = hexToInt255(l_sA);
+	} else if (l_inputLength == 5) {
+		l_sR = l_input.substr(0,2); //get R
+		l_sG = l_input.substr(2,2); //get G
+		l_sB = l_input.substr(4,1) + l_input.substr(0,1); //get B
+	} else if (l_inputLength == 6) {
+		l_sR = l_input.substr(0,2); //get R
+		l_sG = l_input.substr(2,2); //get G
+		l_sB = l_input.substr(4,2); //get B
+	} else if (l_inputLength == 7) {
+		//apply as is
+		l_sR = l_input.substr(0,2); //get R
+		l_sG = l_input.substr(2,2); //get G
+		l_sB = l_input.substr(4,2); //get B
+		if (int255ToHex(l_A).length() > 1) {
+			l_sA = l_input.substr(6,1) + int255ToHex(l_A).substr(1,1); //get A
+		} else {
+			l_sA = l_input.substr(6,1) + int255ToHex(l_A); //get A
+		}
+		l_A = hexToInt255(l_sA);
+	} else if (l_inputLength == 8) {
+		//apply as is
+		l_sR = l_input.substr(0,2); //get R
+		l_sG = l_input.substr(2,2); //get G
+		l_sB = l_input.substr(4,2); //get B
+		l_sA = l_input.substr(6,2); //get A
+		l_A = hexToInt255(l_sA);
+	}
+	l_R = hexToInt255(l_sR);
+	l_G = hexToInt255(l_sG);
+	l_B = hexToInt255(l_sB);
+
+	cout << "\n\nRGBA A " << l_sR << "\t" << l_sG << "\t" << l_sB << "\t" << l_sA << endl;
+	cout << "\n\nRGBA B " << l_R  << "\t" << l_G  << "\t" << l_B  << "\t" << l_A << endl << endl << endl;
+	_scaleStrokeR.set_value(l_R);
+	_scaleStrokeG.set_value(l_G);
+	_scaleStrokeB.set_value(l_B);
+	_scaleStrokeAlpha.set_value((double) l_A / 255.0f * 100.0f);
+	KageStage::stroke.setR(l_R);
+	KageStage::stroke.setG(l_G);
+	KageStage::stroke.setB(l_B);
+	KageStage::stroke.setA(l_A);
+	
+	Gdk::RGBA l_rgba = m_ColorButtonStroke.get_rgba();
+		l_rgba.set_red  ( l_R / 255.f );
+		l_rgba.set_blue ( l_G / 255.f );
+		l_rgba.set_green( l_B / 255.f );
+		l_rgba.set_alpha( l_A / 255.f );
+			m_ColorButtonStroke.set_rgba(l_rgba);
+	
+	m_KageStage.updateShapeColor();
+}
 void Kage::EntryStrokeThickness_onEnter() {
 	unsigned int l_uint = StringHelper::toUnsignedInteger(m_EntryStrokeThickness.get_text());
 	KageStage::stroke.setThickness(l_uint);
@@ -2873,9 +3228,18 @@ void Kage::ColorButtonStage_onClick() {
 void Kage::ColorButtonFill_onClick() {
 	m_Color = m_ColorButtonFill.get_color(); //<-- deprecate this
 	Gdk::RGBA l_rgba = m_ColorButtonFill.get_rgba();
+	double l_red = l_rgba.get_red();
+	double l_green = l_rgba.get_green();
+	double l_blue = l_rgba.get_blue();
 	double l_alpha = l_rgba.get_alpha();
 	
+	_scaleFillR.set_value(l_red * 100.0f);
+	_scaleFillG.set_value(l_green * 100.0f);
+	_scaleFillB.set_value(l_blue * 100.0f);
 	_scaleFillAplha.set_value(l_alpha * 100.0f);
+	KageStage::fillColor.setR((int) (l_red * 256.0f));
+	KageStage::fillColor.setG((int) (l_green * 256.0f));
+	KageStage::fillColor.setB((int) (l_blue * 256.0f));
 	KageStage::fillColor.setA((int) (l_alpha * 256.0f));
 	
 	m_KageStage.setFill(m_Color);
@@ -3234,6 +3598,27 @@ string Kage::int255ToHex(unsigned int p) {
 	return rr + r;
 }
 
+unsigned int Kage::hexToInt255(string p) {
+	unsigned int l_A = 0;
+	unsigned int l_B = 0;
+
+	string r  = "0";
+	string rr = "0";
+
+	if (p.length() > 1) {
+		rr = p.substr(0,1); //if AB rr gets A
+		r  = p.substr(1,1); //if AB r  gets B
+	}
+	if (p.length() == 1) {
+		r  = p;
+	}
+	cout << "\n\t A " << rr << "\t" << r << endl;
+	l_A = hexToInt15(rr[0]) * 16;
+	l_B = hexToInt15(r[0]);
+	cout << "\t B " << l_A << "\t" << l_B << "\t" << (l_A + l_B)<< endl;
+	return l_A + l_B;
+}
+
 char Kage::int15ToHex(unsigned int p) {
 	if (p > 15) {
 		return ' ';
@@ -3255,6 +3640,26 @@ char Kage::int15ToHex(unsigned int p) {
 		return '0';
 	}
 	return '\0';
+}
+
+unsigned int Kage::hexToInt15(char p) {
+	if (p == 'F') {
+		return 15;
+	} else if (p == 'E') {
+		return 14;
+	} else if (p == 'D') {
+		return 13;
+	} else if (p == 'C') {
+		return 12;
+	} else if (p == 'B') {
+		return 11;
+	} else if (p == 'A') {
+		return 10;
+	} else if (p > 48 && p <= 57) {
+		return p-48; //change ASCII 1 to 48-48
+	}
+	
+	return 0;
 }
 
 string Kage::openTextFile(string p_path) {

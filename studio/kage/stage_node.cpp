@@ -71,7 +71,7 @@ void KageStage::updateNodeX(double p_value, bool p_stackDo) {
 	
 	double l_propXdiff = 0;
 	vector<VectorData> v = win->getFrameData().getVectorData();
-	cout << " nodeIndexX " << nodeIndexX << " " << isSelectedNode(nodeIndexX) << endl;
+	std::cout << " nodeIndexX " << nodeIndexX << " " << isSelectedNode(nodeIndexX) << endl;
 	//calculate xDIFF from selected base Node
 	for (unsigned int l_selectedNode = 0; l_selectedNode < selectedNodes.size(); ++l_selectedNode) {
 		if (selectedNodes[l_selectedNode] == nodeIndexX) {
@@ -79,7 +79,7 @@ void KageStage::updateNodeX(double p_value, bool p_stackDo) {
 			break;
 		}
 	}
-	cout << " l_propXdiff " << l_propXdiff << endl;
+	std::cout << " l_propXdiff " << l_propXdiff << endl;
 	for (unsigned int l_selectedNode = 0; l_selectedNode < selectedNodes.size(); ++l_selectedNode) {
 //		l_propXdiff = p_value - v[selectedNodes[l_selectedNode]].points[2].x;
 		if (v[selectedNodes[l_selectedNode]].vectorType == VectorData::TYPE_CURVE_CUBIC) {
@@ -741,6 +741,7 @@ unsigned int KageStage::getSelectedShapeViaNode(unsigned int p_index, vector<Vec
 	for (unsigned int i = p_index; i < p_v.size(); ++i) {
 		if (p_v[i].vectorType == VectorData::TYPE_INIT) {
 			p_index = i-1;
+			break; //forgot to add previously. why? o.O
 		}
 	}
 	//we're assuming that the currently-selected item is the last one in stack, so we just try to select the last node in the array
@@ -1036,13 +1037,13 @@ bool KageStage::deleteSelectedNode(unsigned int p_index) {
 		v.erase (v.begin() + selectedShape,
 				 v.begin() + selectedShape + l_sequence);
 		
-		cout << " DELETE A " << endl;
+		std::cout << " DELETE A " << endl;
 //			selectedShapes.erase(selectedShapes.begin() + l_selectedShape);
 	} else if (l_sequence == 7 && l_closepath == true) {
 		v.erase (v.begin() + selectedShape,
 				 v.begin() + selectedShape + l_sequence);
 		
-		cout << " DELETE B " << endl;
+		std::cout << " DELETE B " << endl;
 //			selectedShapes.erase(selectedShapes.begin() + l_selectedShape);
 	} else {
 		if (v[p_index-1].vectorType != VectorData::TYPE_MOVE &&
@@ -1061,7 +1062,7 @@ bool KageStage::deleteSelectedNode(unsigned int p_index) {
 			v[p_index+1].points[0].x = v[p_index].points[0].x;
 			v[p_index+1].points[0].y = v[p_index].points[0].y;
 		}
-		cout << " DELETE C " << endl;
+		std::cout << " DELETE C " << endl;
 		
 		v.erase (v.begin() + p_index);
 	}

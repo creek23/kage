@@ -1,14 +1,13 @@
 Package: kagestudio
-Version: 0.3.200512
+Version: 0.5-211222
 Architecture: amd64
 Maintainer: Mj Mendoza IV <mj.mendoza.iv@gmail.com>
-Installed-Size: 1379056
-Depends: libgtkmm-3.0-1v5, ffmpeg
+Depends: libcairomm-1.0-1v5,libgtkmm-3.0-1v5, libgdk-pixbuf2.0-0, ffmpeg
+Installed-Size: 2379056
 Section: Graphics
 Priority: Optional
-Description: Kage Studio
- A simple Free and Open Source 2D vector animation software.
- You can help in the development of this cross-platform 2D animation software. The engine source code is available via SVN: 
- https://sourceforge.net/p/kage/code/HEAD/tree/studio/
- NOTE: 
- This package does not include any demo files.
+Homepage: https://kage.sourceforge.io
+Description: A simple cross-platform 2D Animation Software for all ages!
+ Kage Studio is a vector-based 2D Animation cross-platform Software for
+ Windows and Ubuntu GNU/Linux suitable for beginners, hobbyists, and soon
+ even professionals.

@@ -784,13 +784,13 @@ Kage::Kage(string p_filePath) :
 						m_EntryStageWid.set_size_request(20, 24);
 						m_EntryStageWid.set_width_chars(4);
 						m_EntryStageWid.set_max_length(4);
-						m_EntryStageWid.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.stageWidth));
+						m_EntryStageWid.set_text(StringHelper::doubleToString(m_KageStage.stageWidth));
 							m_EntryStageWid.signal_activate().connect(
 								sigc::mem_fun(*this, &Kage::EntryStageArea_onEnter) );
 						m_EntryStageHgt.set_size_request(20, 24);
 						m_EntryStageHgt.set_width_chars(4);
 						m_EntryStageHgt.set_max_length(4);
-						m_EntryStageHgt.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.stageHeight));
+						m_EntryStageHgt.set_text(StringHelper::doubleToString(m_KageStage.stageHeight));
 							m_EntryStageHgt.signal_activate().connect(
 								sigc::mem_fun(*this, &Kage::EntryStageArea_onEnter) );
 						m_ColorButtonStage.set_size_request(32, 32);
@@ -932,28 +932,28 @@ Kage::Kage(string p_filePath) :
 						m_EntryX.set_size_request(20, 24);
 						m_EntryX.set_width_chars(9);
 						m_EntryX.set_max_length(9);
-						m_EntryX.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.propX));
+						m_EntryX.set_text(StringHelper::doubleToString(m_KageStage.propX));
 						m_EntryX.signal_activate().connect(
 							sigc::mem_fun(*this, &Kage::EntryX_onEnter));
 					m_propLocationSizeV2.pack_start(m_EntryY, Gtk::PACK_SHRINK);
 						m_EntryY.set_size_request(20, 24);
 						m_EntryY.set_width_chars(9);
 						m_EntryY.set_max_length(9);
-						m_EntryY.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.propY));
+						m_EntryY.set_text(StringHelper::doubleToString(m_KageStage.propY));
 						m_EntryY.signal_activate().connect(
 							sigc::mem_fun(*this, &Kage::EntryY_onEnter));
 					m_propLocationSizeV2.pack_start(m_EntryWidth, Gtk::PACK_SHRINK);
 						m_EntryWidth.set_size_request(20, 24);
 						m_EntryWidth.set_width_chars(9);
 						m_EntryWidth.set_max_length(9);
-						m_EntryWidth.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.propWidth));
+						m_EntryWidth.set_text(StringHelper::doubleToString(m_KageStage.propWidth));
 						m_EntryWidth.signal_activate().connect(
 							sigc::mem_fun(*this, &Kage::EntryWidth_onEnter));
 					m_propLocationSizeV2.pack_start(m_EntryHeight, Gtk::PACK_SHRINK);
 						m_EntryHeight.set_size_request(20, 24);
 						m_EntryHeight.set_width_chars(9);
 						m_EntryHeight.set_max_length(9);
-						m_EntryHeight.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.propHeight));
+						m_EntryHeight.set_text(StringHelper::doubleToString(m_KageStage.propHeight));
 						m_EntryHeight.signal_activate().connect(
 							sigc::mem_fun(*this, &Kage::EntryHeight_onEnter));
 			//X/Y of Node
@@ -972,14 +972,14 @@ Kage::Kage(string p_filePath) :
 						m_EntryNodeX.set_size_request(20, 24);
 						m_EntryNodeX.set_width_chars(9);
 						m_EntryNodeX.set_max_length(9);
-						m_EntryNodeX.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.nodeX));
+						m_EntryNodeX.set_text(StringHelper::doubleToString(m_KageStage.nodeX));
 						m_EntryNodeX.signal_activate().connect(
 							sigc::mem_fun(*this, &Kage::EntryNodeX_onEnter));
 					m_propNodeXYV2.pack_start(m_EntryNodeY, Gtk::PACK_SHRINK);
 						m_EntryNodeY.set_size_request(20, 24);
 						m_EntryNodeY.set_width_chars(9);
 						m_EntryNodeY.set_max_length(9);
-						m_EntryNodeY.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.nodeY));
+						m_EntryNodeY.set_text(StringHelper::doubleToString(m_KageStage.nodeY));
 						m_EntryNodeY.signal_activate().connect(
 							sigc::mem_fun(*this, &Kage::EntryNodeY_onEnter));
 					m_propNodeXYV2.pack_start(_btnToggleLine, Gtk::PACK_SHRINK);
@@ -3615,7 +3615,7 @@ unsigned int Kage::hexToInt255(string p) {
 	cout << "\n\t A " << rr << "\t" << r << endl;
 	l_A = hexToInt15(rr[0]) * 16;
 	l_B = hexToInt15(r[0]);
-	cout << "\t B " << l_A << "\t" << l_B << "\t" << (l_A + l_B)<< endl;
+	cout << "\t B " << l_A << "\t" << l_B << "\t" << (l_A + l_B) << endl;
 	return l_A + l_B;
 }
 

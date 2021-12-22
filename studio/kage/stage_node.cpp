@@ -643,7 +643,7 @@ void KageStage::handleNodesMouseUp() {
 	if (v.size() == 0) {
 		return;
 	}
-	selectedNode = -1;
+	selectedNode = _NO_SELECTION;
 	mouseOnNode = _NO_SELECTION;
 	if (keyShiftDown == false) {
 		selectedShapes.clear();
@@ -740,19 +740,19 @@ unsigned int KageStage::getSelectedShapeViaNode(unsigned int p_index, vector<Vec
 	unsigned int l_index = p_index;
 	for (unsigned int i = p_index; i < p_v.size(); ++i) {
 		if (p_v[i].vectorType == VectorData::TYPE_INIT) {
-			p_index = i-1;
-			break; //forgot to add previously. why? o.O
+			l_index = i-1;
+			break;
 		}
 	}
 	//we're assuming that the currently-selected item is the last one in stack, so we just try to select the last node in the array
 	if (l_index == p_index) {
-		p_index = p_v.size()-1;
+		l_index = p_v.size()-1;
 	}
 	//end ticket#8
 	
 	propWidth = 0.0;
 	propHeight = 0.0;
-	for (unsigned int i = p_index; i >= 0; --i) {
+	for (unsigned int i = l_index; i >= 0; --i) {
 		switch (p_v[i].vectorType) {
 			case VectorData::TYPE_FILL:
 				fillColor = p_v[i].fillColor.clone();

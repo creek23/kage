@@ -483,45 +483,130 @@ void KageStage::updateShapeY(double p_value, bool p_stackDo) {
 		win->stackDo();
 	}
 	
+	render();
+	
 	Kage::timestamp_OUT();
-	
-	render();
 }
+
 void KageStage::updateShapeWidth(double p_value) {
-	std::cout << " KageStage::updateShapeWidth " << selectedShape << " " << p_value << std::endl;
-	p_value = p_value * _zoomValueShapeProperty;
-	GdkPoint l_tmpPt;
-	l_tmpPt.x = draw2.x;
-	draw2.x = propX + p_value + origin.x;
-	mouseOnAnchor = AnchorData::TYPE_EAST;
-	mouseDown = true;
-		handleShapes_modifyingShape();
-	mouseDown = false;
-	mouseOnAnchor = AnchorData::TYPE_NONE;
-	draw2.x = l_tmpPt.x;
+	Kage::timestamp_IN();
+	std::cout << " KageStage::updateShapeWidth " << selectedShapes.size() << " " << p_value << std::endl;
 	
-	handleNodesMouseUp();
-	win->updateShapeProperties();
+	if (selectedShapes.size() == 0) {
+		Kage::timestamp_OUT();
+		return;
+	}
+	
+	vector<VectorData> v = win->getFrameData().getVectorData();
+	
+	propX = DBL_MAX;
+	propXindex1 = UINT_MAX;
+	propXindex2 = UINT_MAX;
+	propY = DBL_MAX;
+	propYindex1 = UINT_MAX;
+	propYindex2 = UINT_MAX;
+	
+	unsigned int vsize = v.size();
+	unsigned int l_selectedShapes_size = selectedShapes.size();
+	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
+		//calling getSelectedShapeViaNode will update propXindex1/propXindex2 based on left-most VectorData.x
+		getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+3, v);
+	}
+	
+	double l_propXprev = 0;
+	double l_propXdiff = p_value - l_propXprev;
+	if (propXindex1 != UINT_MAX && propXindex2 != UINT_MAX) {
+		l_propXprev = v[propXindex1].points[propXindex2].x;
+		l_propXdiff = p_value - l_propXprev;
+	}
+	
+	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
+		for (unsigned int i = selectedShapes[l_shapeIndex]; i < vsize; ++i) {
+			if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC) {
+				v[i].points[0].x = propX + ((v[i].points[0].x-l_propXprev) / propWidth * p_value);
+				v[i].points[1].x = propX + ((v[i].points[1].x-l_propXprev) / propWidth * p_value);
+				v[i].points[2].x = propX + ((v[i].points[2].x-l_propXprev) / propWidth * p_value);
+			} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
+				v[i].points[0].x = propX + ((v[i].points[0].x-l_propXprev) / propWidth * p_value);
+			} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
+				//TODO:handle Y for images
+			} else if (v[i].vectorType == VectorData::TYPE_INIT
+					&& i != selectedShapes[l_shapeIndex]) {
+				break;
+			} else if (v[i].vectorType == VectorData::TYPE_INIT) {
+				v[i].points[0].x = propX + ((v[i].points[0].x-l_propXprev) / propWidth * p_value);
+			}
+		}
+	}
+	
+	win->setFrameData(v);
+	
+	win->stackDo();
 	
 	render();
+	
+	Kage::timestamp_OUT();
 }
 void KageStage::updateShapeHeight(double p_value) {
-	std::cout << " KageStage::updateShapeHeight " << selectedShape << " " << p_value << std::endl;
-	p_value = p_value * _zoomValueShapeProperty;
-	GdkPoint l_tmpPt;
-	l_tmpPt.y = draw2.y;
-	draw2.y = propY + p_value + origin.y;
-	mouseOnAnchor = AnchorData::TYPE_SOUTH;
-	mouseDown = true;
-		handleShapes_modifyingShape();
-	mouseDown = false;
-	mouseOnAnchor = AnchorData::TYPE_NONE;
-	draw2.y = l_tmpPt.y;
+	Kage::timestamp_IN();
+	std::cout << " KageStage::updateShapeHeight " << selectedShapes.size() << " " << p_value << std::endl;
 	
-	handleNodesMouseUp();
-	win->updateShapeProperties();
+	if (selectedShapes.size() == 0) {
+		Kage::timestamp_OUT();
+		return;
+	}
+	
+	vector<VectorData> v = win->getFrameData().getVectorData();
+	
+	propX = DBL_MAX;
+	propXindex1 = UINT_MAX;
+	propXindex2 = UINT_MAX;
+	propY = DBL_MAX;
+	propYindex1 = UINT_MAX;
+	propYindex2 = UINT_MAX;
+	
+	unsigned int vsize = v.size();
+	unsigned int l_selectedShapes_size = selectedShapes.size();
+	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
+		//calling getSelectedShapeViaNode will update propYindex1/propYindex2 based on top-most VectorData.y
+		getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+3, v);
+	}
+	
+	double l_propYprev = 0;
+	double l_propYdiff = p_value - l_propYprev;
+	if (propYindex1 != UINT_MAX && propYindex2 != UINT_MAX) {
+		l_propYprev = v[propYindex1].points[propYindex2].y;
+		l_propYdiff = p_value - l_propYprev;
+	}
+	
+	//targetY = ((targetY-topY) / propHeight * p_value) + topY;
+	//v[i].points[0].y = ((v[i].points[0].y-l_propYprev) / propHeight * p_value) + propY;
+	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
+		for (unsigned int i = selectedShapes[l_shapeIndex]; i < vsize; ++i) {
+			if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC) {
+				v[i].points[0].y = propY + ((v[i].points[0].y-l_propYprev) / propHeight * p_value);
+				v[i].points[1].y = propY + ((v[i].points[1].y-l_propYprev) / propHeight * p_value);
+				v[i].points[2].y = propY + ((v[i].points[2].y-l_propYprev) / propHeight * p_value);
+			} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
+				v[i].points[0].y = propY + ((v[i].points[0].y-l_propYprev) / propHeight * p_value);
+			} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
+				//TODO:handle Y for images
+			} else if (v[i].vectorType == VectorData::TYPE_INIT
+					&& i != selectedShapes[l_shapeIndex]) {
+				break;
+			} else if (v[i].vectorType == VectorData::TYPE_INIT) {
+				v[i].points[0].y = propY + ((v[i].points[0].y-l_propYprev) / propHeight * p_value);
+			}
+		}
+	}
+	
+	win->setFrameData(v);
+	
+	win->stackDo();
 	
 	render();
+	
+	Kage::timestamp_OUT();
 }
 
 void KageStage::handleShapes_modifyingShapeRotate() {

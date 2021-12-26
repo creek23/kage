@@ -58,18 +58,18 @@ Kage::Kage(string p_filePath) :
 			   m_LabelStageHgt("Height"),
 			   m_LabelStageBG("Background"),
 			   m_LabelStageFPS("FPS"),
-			   m_LabelFill("Fill"),
-			   m_LabelFillR("Fill Red"),
-			   m_LabelFillG("Fill Green"),
-			   m_LabelFillB("Fill Blue"),
-			   m_LabelFillAlpha("Fill Alpha"),
-			   m_LabelFillRGBA("Fill RGBA"),
-			   m_LabelStroke("Stroke"),
-			   m_LabelStrokeR("Stroke Red"),
-			   m_LabelStrokeG("Stroke Green"),
-			   m_LabelStrokeB("Stroke Blue"),
-			   m_LabelStrokeAlpha("Stroke Alpha"),
-			   m_LabelStrokeRGBA("Stroke RGBA"),
+			   m_ButtonFill("Fill"),
+			   m_LabelFillR("Red"),
+			   m_LabelFillG("Green"),
+			   m_LabelFillB("Blue"),
+			   m_LabelFillAlpha("Alpha"),
+			   m_LabelFillRGBA("RGBA"),
+			   m_ButtonStroke("Stroke"),
+			   m_LabelStrokeR("Red"),
+			   m_LabelStrokeG("Green"),
+			   m_LabelStrokeB("Blue"),
+			   m_LabelStrokeAlpha("Alpha"),
+			   m_LabelStrokeRGBA("RGBA"),
 			   m_LabelStrokeThickness("Thickness"),
 			   m_LabelX("X"),
 			   m_LabelY("Y"),
@@ -234,6 +234,16 @@ Kage::Kage(string p_filePath) :
 		Gtk::Action::create("ToggleProperties", "Toggle _Properties", "ToggleProperties"),
 //		Gtk::AccelKey("Escape"),
 		sigc::mem_fun(*this, &Kage::ToggleProperties_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("TogglePropertiesFill", "Toggle _Fill Properties", "TogglePropertiesFill"),
+//		Gtk::AccelKey("Escape"),
+		sigc::mem_fun(*this, &Kage::TogglePropertiesFill_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("TogglePropertiesStroke", "Toggle _Stroke Properties", "TogglePropertiesStroke"),
+//		Gtk::AccelKey("Escape"),
+		sigc::mem_fun(*this, &Kage::TogglePropertiesStroke_onClick)
 	);
 	//==================================================================
 	m_refActionGroup->add(
@@ -536,6 +546,8 @@ Kage::Kage(string p_filePath) :
 		"		<menu action='ViewMenu'>"
 		"			<menuitem action='ToggleTimeline'/>"
 		"			<menuitem action='ToggleProperties'/>"
+		"			<menuitem action='TogglePropertiesFill'/>"
+		"			<menuitem action='TogglePropertiesStroke'/>"
 		"		</menu>"
 		"		<menu action='LayerMenu'>"
 		"			<menuitem action='LayerAdd'/>"
@@ -651,8 +663,8 @@ Kage::Kage(string p_filePath) :
 					m_Timeline_Layer_VBox.pack_start(m_Timeline_Layer_ScrolledWindow);//, Gtk::PACK_SHRINK);
 						m_Timeline_Layer_ScrolledWindow.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_EXTERNAL);
 							m_Timeline_Layer_ScrolledWindow.add(_layerManager);
-							m_Timeline_Frame_ScrolledWindow.set_border_width(0);
-							m_Timeline_Frame_ScrolledWindow.set_shadow_type(Gtk::SHADOW_NONE);
+							m_Timeline_Layer_ScrolledWindow.set_border_width(0);
+							m_Timeline_Layer_ScrolledWindow.set_shadow_type(Gtk::SHADOW_NONE);
 							cout << "layer count " << _layerManager.layerCount() << endl;
 					m_Timeline_Layer_VBox.pack_start(m_Timeline_Layer_Add_HBox, Gtk::PACK_SHRINK);
 						m_Timeline_Layer_Add_HBox.pack_start(m_Timeline_Label, Gtk::PACK_EXPAND_WIDGET);
@@ -758,13 +770,24 @@ Kage::Kage(string p_filePath) :
 			m_KageStage.show();
 			m_HPane_DrawingArea.add2(m_Box1);
 			
-			m_LabelProp.set_size_request(200, 20);
-			m_LabelProp.set_alignment(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
-			m_Box1.pack_start(m_LabelProp, Gtk::PACK_SHRINK);
+			m_Box1.pack_start(m_Property_Pane_ScrolledWindow, Gtk::PACK_EXPAND_WIDGET);
 			
-			m_Box1.pack_start(m_Separator, Gtk::PACK_SHRINK);
+				m_Property_Pane_ScrolledWindow.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_EXTERNAL);
+				m_Property_Pane_ScrolledWindow.add(m_PropertyBox);
+				m_Property_Pane_ScrolledWindow.set_border_width(0);
+				m_Property_Pane_ScrolledWindow.set_shadow_type(Gtk::SHADOW_NONE);
+//				m_Property_Pane_ScrolledWindow.set_vadjustment(m_Timeline_Frame_ScrolledWindow.get_vadjustment());
+			m_Box1.pack_start(m_Property_Pane_VScrollbar, Gtk::PACK_SHRINK);
+				m_Property_Pane_VScrollbar.set_adjustment(m_Property_Pane_ScrolledWindow.get_vadjustment());
+			
+			//Property Pane Label
+			m_PropertyBox.pack_start(m_LabelProp, Gtk::PACK_SHRINK);
+				m_LabelProp.set_size_request(200, 20);
+				m_LabelProp.set_alignment(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
+			
+			m_PropertyBox.pack_start(m_Separator, Gtk::PACK_SHRINK);
 			//Stage
-			m_Box1.pack_start(m_PropStage, Gtk::PACK_SHRINK);
+			m_PropertyBox.pack_start(m_PropStage, Gtk::PACK_SHRINK);
 				m_PropStage.set_border_width(10);
 				m_PropStage.pack_start(m_PropStageV1);
 					m_PropStageV1.set_border_width(4);
@@ -804,217 +827,247 @@ Kage::Kage(string p_filePath) :
 						m_EntryStageFPS.set_text(StringHelper::unsignedIntegerToString(m_KageStage.fps));
 							m_EntryStageFPS.signal_activate().connect(
 								sigc::mem_fun(*this, &Kage::EntryStageFPS_onEnter) );
-			//Fill & Stroke
-			m_Box1.pack_start(m_PropFillStroke, Gtk::PACK_SHRINK);
-				m_PropFillStroke.set_border_width(10);
-				m_PropFillStroke.pack_start(m_PropFillStrokeV1);
-					m_PropFillStrokeV1.set_border_width(4);
-					m_PropFillStrokeV1.set_spacing(4);
-					m_PropFillStrokeV1.pack_start(m_LabelFill);
-					m_PropFillStrokeV1.pack_start(m_LabelFillR);
-					m_PropFillStrokeV1.pack_start(m_LabelFillG);
-					m_PropFillStrokeV1.pack_start(m_LabelFillB);
-					m_PropFillStrokeV1.pack_start(m_LabelFillAlpha);
-					m_PropFillStrokeV1.pack_start(m_LabelFillRGBA);
-					m_PropFillStrokeV1.pack_start(m_LabelStroke);
-					m_PropFillStrokeV1.pack_start(m_LabelStrokeR);
-					m_PropFillStrokeV1.pack_start(m_LabelStrokeG);
-					m_PropFillStrokeV1.pack_start(m_LabelStrokeB);
-					m_PropFillStrokeV1.pack_start(m_LabelStrokeAlpha);
-					m_PropFillStrokeV1.pack_start(m_LabelStrokeRGBA);
-					m_PropFillStrokeV1.pack_start(m_LabelStrokeThickness);
-				m_PropFillStroke.pack_start(m_PropFillStrokeV2);;
-					m_PropFillStrokeV2.set_border_width(4);
-					m_PropFillStrokeV2.set_spacing(4);
-					m_PropFillStrokeV2.pack_start(m_ColorButtonFill);
-						m_ColorButtonFill.set_size_request(32, 32);
-						m_ColorButtonFill.set_use_alpha(true);
-						m_ColorButtonFill.set_title("Choose Fill Color");
-							m_ColorButtonFill.set_color(m_KageStage.getStageBG());
-						m_ColorButtonFill.signal_color_set().connect(sigc::mem_fun(* this, &Kage::ColorButtonFill_onClick) );
-					m_PropFillStrokeV2.pack_start(_scaleFillR, Gtk::PACK_SHRINK);
-						_scaleFillR.set_digits(0);
-						_scaleFillR.set_value(255);
-						_scaleFillR.set_value_pos(Gtk::POS_TOP);
-						_scaleFillR.set_draw_value();
-						_scaleFillR.signal_value_changed().connect(
-							sigc::mem_fun(*this, &Kage::FillR_onChange));
-					m_PropFillStrokeV2.pack_start(_scaleFillG, Gtk::PACK_SHRINK);
-						_scaleFillG.set_digits(0);
-						_scaleFillG.set_value(255);
-						_scaleFillG.set_value_pos(Gtk::POS_TOP);
-						_scaleFillG.set_draw_value();
-						_scaleFillG.signal_value_changed().connect(
-							sigc::mem_fun(*this, &Kage::FillG_onChange));
-					m_PropFillStrokeV2.pack_start(_scaleFillB, Gtk::PACK_SHRINK);
-						_scaleFillB.set_digits(0);
-						_scaleFillB.set_value(255);
-						_scaleFillB.set_value_pos(Gtk::POS_TOP);
-						_scaleFillB.set_draw_value();
-						_scaleFillB.signal_value_changed().connect(
-							sigc::mem_fun(*this, &Kage::FillB_onChange));
-					m_PropFillStrokeV2.pack_start(_scaleFillAplha, Gtk::PACK_SHRINK);
-						_scaleFillAplha.set_digits(0);
-						_scaleFillAplha.set_value(100);
-						_scaleFillAplha.set_value_pos(Gtk::POS_TOP);
-						_scaleFillAplha.set_draw_value();
-						_scaleFillAplha.signal_value_changed().connect(
-							sigc::mem_fun(*this, &Kage::FillAlpha_onChange));
-					m_PropFillStrokeV2.pack_start(m_EntryFillRGBA, Gtk::PACK_SHRINK);
-						m_EntryFillRGBA.set_size_request(20, 24);
-						m_EntryFillRGBA.set_width_chars(8);
-						m_EntryFillRGBA.set_max_length(8);
-						//m_EntryFillRGBA.set_text('random hex as color'));
-						m_EntryFillRGBA.signal_activate().connect(
-							sigc::mem_fun(*this, &Kage::EntryFillRGBA_onEnter));
-					m_PropFillStrokeV2.pack_start(m_ColorButtonStroke);
-						m_ColorButtonStroke.set_size_request(32, 32);
-						m_ColorButtonStroke.set_use_alpha(true);
-						m_ColorButtonStroke.set_title("Choose Stroke Color");
-							m_ColorButtonStroke.set_color(m_KageStage.getStageBG());
-						m_ColorButtonStroke.signal_color_set().connect(sigc::mem_fun(* this, &Kage::ColorButtonStroke_onClick) );
-					m_PropFillStrokeV2.pack_start(_scaleStrokeR, Gtk::PACK_SHRINK);
-						_scaleStrokeR.set_digits(0);
-						_scaleStrokeR.set_value(255);
-						_scaleStrokeR.set_value_pos(Gtk::POS_TOP);
-						_scaleStrokeR.set_draw_value();
-						_scaleStrokeR.signal_value_changed().connect(
-							sigc::mem_fun(*this, &Kage::StrokeR_onChange));
-					m_PropFillStrokeV2.pack_start(_scaleStrokeG, Gtk::PACK_SHRINK);
-						_scaleStrokeG.set_digits(0);
-						_scaleStrokeG.set_value(255);
-						_scaleStrokeG.set_value_pos(Gtk::POS_TOP);
-						_scaleStrokeG.set_draw_value();
-						_scaleStrokeG.signal_value_changed().connect(
-							sigc::mem_fun(*this, &Kage::StrokeG_onChange));
-					m_PropFillStrokeV2.pack_start(_scaleStrokeB, Gtk::PACK_SHRINK);
-						_scaleStrokeB.set_digits(0);
-						_scaleStrokeB.set_value(255);
-						_scaleStrokeB.set_value_pos(Gtk::POS_TOP);
-						_scaleStrokeB.set_draw_value();
-						_scaleStrokeB.signal_value_changed().connect(
-							sigc::mem_fun(*this, &Kage::StrokeB_onChange));
-					m_PropFillStrokeV2.pack_start(_scaleStrokeAlpha, Gtk::PACK_SHRINK);
-						_scaleStrokeAlpha.set_digits(0);
-						_scaleStrokeAlpha.set_value(100);
-						_scaleStrokeAlpha.set_value_pos(Gtk::POS_TOP);
-						_scaleStrokeAlpha.set_draw_value();
-						_scaleStrokeAlpha.signal_value_changed().connect(
-							sigc::mem_fun(*this, &Kage::StrokeAlpha_onChange));
-					m_PropFillStrokeV2.pack_start(m_EntryStrokeRGBA, Gtk::PACK_SHRINK);
-						m_EntryStrokeRGBA.set_size_request(20, 24);
-						m_EntryStrokeRGBA.set_width_chars(8);
-						m_EntryStrokeRGBA.set_max_length(8);
-						//m_EntryStrokeRGBA.set_text('random hex as color'));
-						m_EntryStrokeRGBA.signal_activate().connect(
-							sigc::mem_fun(*this, &Kage::EntryStrokeRGBA_onEnter));
-					m_PropFillStrokeV2.pack_start(m_EntryStrokeThickness, Gtk::PACK_SHRINK);
-						m_EntryStrokeThickness.set_size_request(20, 24);
-						m_EntryStrokeThickness.set_width_chars(2);
-						m_EntryStrokeThickness.set_max_length(2);
-						m_EntryStrokeThickness.set_text(StringHelper::integerToString((int)KageStage::stroke.getThickness()));
-						m_EntryStrokeThickness.signal_activate().connect(
-							sigc::mem_fun(*this, &Kage::EntryStrokeThickness_onEnter));
-			//X/Y Width/Height
- 			m_Box1.pack_start(m_propLocationSize, Gtk::PACK_SHRINK);
-				m_propLocationSize.set_border_width(10);
-				m_propLocationSize.pack_start(m_propLocationSizeV1);
-					m_propLocationSizeV1.set_border_width(4);
-					m_propLocationSizeV1.set_spacing(4);
-					m_propLocationSizeV1.pack_start(m_LabelX);
-					m_propLocationSizeV1.pack_start(m_LabelY);
-					m_propLocationSizeV1.pack_start(m_LabelWidth);
-					m_propLocationSizeV1.pack_start(m_LabelHeight);
-				m_propLocationSize.pack_start(m_propLocationSizeV2);
-					m_propLocationSizeV2.set_border_width(4);
-					m_propLocationSizeV2.set_spacing(4);
-					m_propLocationSizeV2.pack_start(m_EntryX, Gtk::PACK_SHRINK);
-						m_EntryX.set_size_request(20, 24);
-						m_EntryX.set_width_chars(9);
-						m_EntryX.set_max_length(9);
-						m_EntryX.set_text(StringHelper::doubleToString(m_KageStage.propX));
-						m_EntryX.signal_activate().connect(
-							sigc::mem_fun(*this, &Kage::EntryX_onEnter));
-					m_propLocationSizeV2.pack_start(m_EntryY, Gtk::PACK_SHRINK);
-						m_EntryY.set_size_request(20, 24);
-						m_EntryY.set_width_chars(9);
-						m_EntryY.set_max_length(9);
-						m_EntryY.set_text(StringHelper::doubleToString(m_KageStage.propY));
-						m_EntryY.signal_activate().connect(
-							sigc::mem_fun(*this, &Kage::EntryY_onEnter));
-					m_propLocationSizeV2.pack_start(m_EntryWidth, Gtk::PACK_SHRINK);
-						m_EntryWidth.set_size_request(20, 24);
-						m_EntryWidth.set_width_chars(9);
-						m_EntryWidth.set_max_length(9);
-						m_EntryWidth.set_text(StringHelper::doubleToString(m_KageStage.propWidth));
-						m_EntryWidth.signal_activate().connect(
-							sigc::mem_fun(*this, &Kage::EntryWidth_onEnter));
-					m_propLocationSizeV2.pack_start(m_EntryHeight, Gtk::PACK_SHRINK);
-						m_EntryHeight.set_size_request(20, 24);
-						m_EntryHeight.set_width_chars(9);
-						m_EntryHeight.set_max_length(9);
-						m_EntryHeight.set_text(StringHelper::doubleToString(m_KageStage.propHeight));
-						m_EntryHeight.signal_activate().connect(
-							sigc::mem_fun(*this, &Kage::EntryHeight_onEnter));
-			//X/Y of Node
- 			m_Box1.pack_start(m_propNodeXY, Gtk::PACK_SHRINK);
-				m_propNodeXY.set_border_width(10);
-				m_propNodeXY.pack_start(m_propNodeXYV1);
-					m_propNodeXYV1.set_border_width(4);
-					m_propNodeXYV1.set_spacing(4);
-					m_propNodeXYV1.pack_start(m_LabelNodeX);
-					m_propNodeXYV1.pack_start(m_LabelNodeY);
-					m_propNodeXYV1.pack_start(m_LabelToggleLine);
-				m_propNodeXY.pack_start(m_propNodeXYV2);
-					m_propNodeXYV2.set_border_width(4);
-					m_propNodeXYV2.set_spacing(4);
-					m_propNodeXYV2.pack_start(m_EntryNodeX, Gtk::PACK_SHRINK);
-						m_EntryNodeX.set_size_request(20, 24);
-						m_EntryNodeX.set_width_chars(9);
-						m_EntryNodeX.set_max_length(9);
-						m_EntryNodeX.set_text(StringHelper::doubleToString(m_KageStage.nodeX));
-						m_EntryNodeX.signal_activate().connect(
-							sigc::mem_fun(*this, &Kage::EntryNodeX_onEnter));
-					m_propNodeXYV2.pack_start(m_EntryNodeY, Gtk::PACK_SHRINK);
-						m_EntryNodeY.set_size_request(20, 24);
-						m_EntryNodeY.set_width_chars(9);
-						m_EntryNodeY.set_max_length(9);
-						m_EntryNodeY.set_text(StringHelper::doubleToString(m_KageStage.nodeY));
-						m_EntryNodeY.signal_activate().connect(
-							sigc::mem_fun(*this, &Kage::EntryNodeY_onEnter));
-					m_propNodeXYV2.pack_start(_btnToggleLine, Gtk::PACK_SHRINK);
-						_btnToggleLine_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/icons/straighten.png");
-							_btnToggleLine_img = Gtk::Image(_btnToggleLine_pixbuf);
-								_btnToggleLine.set_image(_btnToggleLine_img);
-									_btnToggleLine.property_always_show_image();
-									_btnToggleLine.show();
-									_btnToggleLine.set_size_request(20, 20);
-						_btnToggleLine.set_focus_on_click(false);
-						_btnToggleLine.signal_clicked().connect(sigc::mem_fun(*this, &Kage::ToggleLine_onClick));
-	
-			//Frame Tween
- 			m_Box1.pack_start(m_propFrameTween, Gtk::PACK_SHRINK);
-				m_propFrameTween.set_border_width(10);
-				m_propFrameTween.pack_start(m_propFrameTweenV1);
-					m_propFrameTweenV1.set_border_width(4);
-					m_propFrameTweenV1.set_spacing(4);
-					m_propFrameTweenV1.pack_start(m_LabelTweenX);
-					m_propFrameTweenV1.pack_start(m_LabelTweenY);
-				m_propFrameTween.pack_start(m_propFrameTweenV2);
-					m_propFrameTweenV2.set_border_width(4);
-					m_propFrameTweenV2.set_spacing(4);
-					m_propFrameTweenV2.pack_start(m_ComboX);
-						m_ComboX.append("Linear");
-						m_ComboX.append("Ease In");
-						m_ComboX.append("Ease Out");
-						m_ComboX.set_active_text("Linear");
-						m_ComboX.signal_changed().connect( sigc::mem_fun(*this, &Kage::FrameTween_onChange) );
-					m_propFrameTweenV2.pack_start(m_ComboY);
-						m_ComboY.append("Linear");
-						m_ComboY.append("Ease In");
-						m_ComboY.append("Ease Out");
-						m_ComboY.set_active_text("Linear");
-						m_ComboY.signal_changed().connect( sigc::mem_fun(*this, &Kage::FrameTween_onChange) );
+			//Toggle for Fill Properties
+				//	m_Timeline_Frame_ScrolledWindow.set_border_width(0);
+				//	m_Timeline_Frame_ScrolledWindow.set_shadow_type(Gtk::SHADOW_NONE);
+
+				m_PropertyBox.pack_start(m_PropFillLabel, Gtk::PACK_SHRINK);
+					m_PropFillLabel.set_border_width(0);
+					m_PropFillLabel.pack_start(m_PropFillLabelV1);
+						m_PropFillLabelV1.set_border_width(4);
+						m_PropFillLabelV1.set_spacing(4);
+						m_PropFillLabelV1.pack_start(m_ButtonFill);
+							m_ButtonFill.signal_clicked().connect( sigc::mem_fun(*this, &Kage::TogglePropertiesFill_onClick) );
+					m_PropFillLabel.pack_start(m_PropFillLabelV2);
+						m_PropFillLabelV2.set_border_width(4);
+						m_PropFillLabelV2.set_spacing(4);
+						m_PropFillLabelV2.pack_start(m_ColorButtonFill);
+							m_ColorButtonFill.set_size_request(32, 32);
+							m_ColorButtonFill.set_use_alpha(true);
+							m_ColorButtonFill.set_title("Choose Fill Color");
+								m_ColorButtonFill.set_color(m_KageStage.getStageBG());
+							m_ColorButtonFill.signal_color_set().connect(sigc::mem_fun(* this, &Kage::ColorButtonFill_onClick) );
+					
+				m_PropertyBox.pack_start(m_PropFill, Gtk::PACK_SHRINK);
+					m_PropFill.set_border_width(10);
+					m_PropFill.pack_start(m_PropFillV1);
+						m_PropFillV1.set_border_width(4);
+						m_PropFillV1.set_spacing(4);
+						//m_PropFillV1.pack_start(m_LabelFill);
+						m_PropFillV1.pack_start(m_LabelFillR);
+						m_PropFillV1.pack_start(m_LabelFillG);
+						m_PropFillV1.pack_start(m_LabelFillB);
+						m_PropFillV1.pack_start(m_LabelFillAlpha);
+						m_PropFillV1.pack_start(m_LabelFillRGBA);
+					m_PropFill.pack_start(m_PropFillV2);
+						m_PropFillV2.set_border_width(4);
+						m_PropFillV2.set_spacing(4);
+						//m_PropFillV2.pack_start(m_ColorButtonFill);
+						m_PropFillV2.pack_start(_scaleFillR, Gtk::PACK_SHRINK);
+							_scaleFillR.set_digits(0);
+							_scaleFillR.set_value(255);
+							_scaleFillR.set_value_pos(Gtk::POS_TOP);
+							_scaleFillR.set_draw_value();
+							_scaleFillR.signal_value_changed().connect(
+								sigc::mem_fun(*this, &Kage::FillR_onChange));
+						m_PropFillV2.pack_start(_scaleFillG, Gtk::PACK_SHRINK);
+							_scaleFillG.set_digits(0);
+							_scaleFillG.set_value(255);
+							_scaleFillG.set_value_pos(Gtk::POS_TOP);
+							_scaleFillG.set_draw_value();
+							_scaleFillG.signal_value_changed().connect(
+								sigc::mem_fun(*this, &Kage::FillG_onChange));
+						m_PropFillV2.pack_start(_scaleFillB, Gtk::PACK_SHRINK);
+							_scaleFillB.set_digits(0);
+							_scaleFillB.set_value(255);
+							_scaleFillB.set_value_pos(Gtk::POS_TOP);
+							_scaleFillB.set_draw_value();
+							_scaleFillB.signal_value_changed().connect(
+								sigc::mem_fun(*this, &Kage::FillB_onChange));
+						m_PropFillV2.pack_start(_scaleFillAplha, Gtk::PACK_SHRINK);
+							_scaleFillAplha.set_digits(0);
+							_scaleFillAplha.set_value(100);
+							_scaleFillAplha.set_value_pos(Gtk::POS_TOP);
+							_scaleFillAplha.set_draw_value();
+							_scaleFillAplha.signal_value_changed().connect(
+								sigc::mem_fun(*this, &Kage::FillAlpha_onChange));
+						m_PropFillV2.pack_start(m_EntryFillRGBA, Gtk::PACK_SHRINK);
+							m_EntryFillRGBA.set_size_request(20, 24);
+							m_EntryFillRGBA.set_width_chars(8);
+							m_EntryFillRGBA.set_max_length(8);
+							//m_EntryFillRGBA.set_text('random hex as color'));
+							m_EntryFillRGBA.signal_activate().connect(
+								sigc::mem_fun(*this, &Kage::EntryFillRGBA_onEnter));
+				m_PropertyBox.pack_start(m_PropStrokeLabel, Gtk::PACK_SHRINK);
+					m_PropStrokeLabel.set_border_width(0);
+					m_PropStrokeLabel.pack_start(m_PropStrokeLabelV1);
+						m_PropStrokeLabelV1.set_border_width(4);
+						m_PropStrokeLabelV1.set_spacing(4);
+						m_PropStrokeLabelV1.pack_start(m_ButtonStroke);
+							m_ButtonStroke.signal_clicked().connect( sigc::mem_fun(*this, &Kage::TogglePropertiesStroke_onClick) );
+					m_PropStrokeLabel.pack_start(m_PropStrokeLabelV2);
+						m_PropStrokeLabelV2.set_border_width(4);
+						m_PropStrokeLabelV2.set_spacing(4);
+						m_PropStrokeLabelV2.pack_start(m_ColorButtonStroke);
+							m_ColorButtonStroke.set_size_request(32, 32);
+							m_ColorButtonStroke.set_use_alpha(true);
+							m_ColorButtonStroke.set_title("Choose Stroke Color");
+								m_ColorButtonStroke.set_color(m_KageStage.getStageBG());
+							m_ColorButtonStroke.signal_color_set().connect(sigc::mem_fun(* this, &Kage::ColorButtonStroke_onClick) );
+				m_PropertyBox.pack_start(m_PropStroke, Gtk::PACK_SHRINK);
+					m_PropStroke.set_border_width(10);
+					m_PropStroke.pack_start(m_PropStrokeV1);
+						m_PropStrokeV1.pack_start(m_LabelStrokeR);
+						m_PropStrokeV1.pack_start(m_LabelStrokeG);
+						m_PropStrokeV1.pack_start(m_LabelStrokeB);
+						m_PropStrokeV1.pack_start(m_LabelStrokeAlpha);
+						m_PropStrokeV1.pack_start(m_LabelStrokeRGBA);
+						m_PropStrokeV1.pack_start(m_LabelStrokeThickness);
+					m_PropStroke.pack_start(m_PropStrokeV2);
+						m_PropStrokeV2.set_border_width(4);
+						m_PropStrokeV2.set_spacing(4);
+						m_PropStrokeV2.pack_start(_scaleStrokeR, Gtk::PACK_SHRINK);
+							_scaleStrokeR.set_digits(0);
+							_scaleStrokeR.set_value(255);
+							_scaleStrokeR.set_value_pos(Gtk::POS_TOP);
+							_scaleStrokeR.set_draw_value();
+							_scaleStrokeR.signal_value_changed().connect(
+								sigc::mem_fun(*this, &Kage::StrokeR_onChange));
+						m_PropStrokeV2.pack_start(_scaleStrokeG, Gtk::PACK_SHRINK);
+							_scaleStrokeG.set_digits(0);
+							_scaleStrokeG.set_value(255);
+							_scaleStrokeG.set_value_pos(Gtk::POS_TOP);
+							_scaleStrokeG.set_draw_value();
+							_scaleStrokeG.signal_value_changed().connect(
+								sigc::mem_fun(*this, &Kage::StrokeG_onChange));
+						m_PropStrokeV2.pack_start(_scaleStrokeB, Gtk::PACK_SHRINK);
+							_scaleStrokeB.set_digits(0);
+							_scaleStrokeB.set_value(255);
+							_scaleStrokeB.set_value_pos(Gtk::POS_TOP);
+							_scaleStrokeB.set_draw_value();
+							_scaleStrokeB.signal_value_changed().connect(
+								sigc::mem_fun(*this, &Kage::StrokeB_onChange));
+						m_PropStrokeV2.pack_start(_scaleStrokeAlpha, Gtk::PACK_SHRINK);
+							_scaleStrokeAlpha.set_digits(0);
+							_scaleStrokeAlpha.set_value(100);
+							_scaleStrokeAlpha.set_value_pos(Gtk::POS_TOP);
+							_scaleStrokeAlpha.set_draw_value();
+							_scaleStrokeAlpha.signal_value_changed().connect(
+								sigc::mem_fun(*this, &Kage::StrokeAlpha_onChange));
+						m_PropStrokeV2.pack_start(m_EntryStrokeRGBA, Gtk::PACK_SHRINK);
+							m_EntryStrokeRGBA.set_size_request(20, 24);
+							m_EntryStrokeRGBA.set_width_chars(8);
+							m_EntryStrokeRGBA.set_max_length(8);
+							//m_EntryStrokeRGBA.set_text('random hex as color'));
+							m_EntryStrokeRGBA.signal_activate().connect(
+								sigc::mem_fun(*this, &Kage::EntryStrokeRGBA_onEnter));
+						m_PropStrokeV2.pack_start(m_EntryStrokeThickness, Gtk::PACK_SHRINK);
+							m_EntryStrokeThickness.set_size_request(20, 24);
+							m_EntryStrokeThickness.set_width_chars(2);
+							m_EntryStrokeThickness.set_max_length(2);
+							m_EntryStrokeThickness.set_text(StringHelper::integerToString((int)KageStage::stroke.getThickness()));
+							m_EntryStrokeThickness.signal_activate().connect(
+								sigc::mem_fun(*this, &Kage::EntryStrokeThickness_onEnter));
+				//X/Y Width/Height
+				m_PropertyBox.pack_start(m_propLocationSize, Gtk::PACK_SHRINK);
+					m_propLocationSize.set_border_width(10);
+					m_propLocationSize.pack_start(m_propLocationSizeV1);
+						m_propLocationSizeV1.set_border_width(4);
+						m_propLocationSizeV1.set_spacing(4);
+						m_propLocationSizeV1.pack_start(m_LabelX);
+						m_propLocationSizeV1.pack_start(m_LabelY);
+						m_propLocationSizeV1.pack_start(m_LabelWidth);
+						m_propLocationSizeV1.pack_start(m_LabelHeight);
+					m_propLocationSize.pack_start(m_propLocationSizeV2);
+						m_propLocationSizeV2.set_border_width(4);
+						m_propLocationSizeV2.set_spacing(4);
+						m_propLocationSizeV2.pack_start(m_EntryX, Gtk::PACK_SHRINK);
+							m_EntryX.set_size_request(20, 24);
+							m_EntryX.set_width_chars(9);
+							m_EntryX.set_max_length(9);
+							m_EntryX.set_text(StringHelper::doubleToString(m_KageStage.propX));
+							m_EntryX.signal_activate().connect(
+								sigc::mem_fun(*this, &Kage::EntryX_onEnter));
+						m_propLocationSizeV2.pack_start(m_EntryY, Gtk::PACK_SHRINK);
+							m_EntryY.set_size_request(20, 24);
+							m_EntryY.set_width_chars(9);
+							m_EntryY.set_max_length(9);
+							m_EntryY.set_text(StringHelper::doubleToString(m_KageStage.propY));
+							m_EntryY.signal_activate().connect(
+								sigc::mem_fun(*this, &Kage::EntryY_onEnter));
+						m_propLocationSizeV2.pack_start(m_EntryWidth, Gtk::PACK_SHRINK);
+							m_EntryWidth.set_size_request(20, 24);
+							m_EntryWidth.set_width_chars(9);
+							m_EntryWidth.set_max_length(9);
+							m_EntryWidth.set_text(StringHelper::doubleToString(m_KageStage.propWidth));
+							m_EntryWidth.signal_activate().connect(
+								sigc::mem_fun(*this, &Kage::EntryWidth_onEnter));
+						m_propLocationSizeV2.pack_start(m_EntryHeight, Gtk::PACK_SHRINK);
+							m_EntryHeight.set_size_request(20, 24);
+							m_EntryHeight.set_width_chars(9);
+							m_EntryHeight.set_max_length(9);
+							m_EntryHeight.set_text(StringHelper::doubleToString(m_KageStage.propHeight));
+							m_EntryHeight.signal_activate().connect(
+								sigc::mem_fun(*this, &Kage::EntryHeight_onEnter));
+				//X/Y of Node
+				m_PropertyBox.pack_start(m_propNodeXY, Gtk::PACK_SHRINK);
+					m_propNodeXY.set_border_width(10);
+					m_propNodeXY.pack_start(m_propNodeXYV1);
+						m_propNodeXYV1.set_border_width(4);
+						m_propNodeXYV1.set_spacing(4);
+						m_propNodeXYV1.pack_start(m_LabelNodeX);
+						m_propNodeXYV1.pack_start(m_LabelNodeY);
+						m_propNodeXYV1.pack_start(m_LabelToggleLine);
+					m_propNodeXY.pack_start(m_propNodeXYV2);
+						m_propNodeXYV2.set_border_width(4);
+						m_propNodeXYV2.set_spacing(4);
+						m_propNodeXYV2.pack_start(m_EntryNodeX, Gtk::PACK_SHRINK);
+							m_EntryNodeX.set_size_request(20, 24);
+							m_EntryNodeX.set_width_chars(9);
+							m_EntryNodeX.set_max_length(9);
+							m_EntryNodeX.set_text(StringHelper::doubleToString(m_KageStage.nodeX));
+							m_EntryNodeX.signal_activate().connect(
+								sigc::mem_fun(*this, &Kage::EntryNodeX_onEnter));
+						m_propNodeXYV2.pack_start(m_EntryNodeY, Gtk::PACK_SHRINK);
+							m_EntryNodeY.set_size_request(20, 24);
+							m_EntryNodeY.set_width_chars(9);
+							m_EntryNodeY.set_max_length(9);
+							m_EntryNodeY.set_text(StringHelper::doubleToString(m_KageStage.nodeY));
+							m_EntryNodeY.signal_activate().connect(
+								sigc::mem_fun(*this, &Kage::EntryNodeY_onEnter));
+						m_propNodeXYV2.pack_start(_btnToggleLine, Gtk::PACK_SHRINK);
+							_btnToggleLine_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/icons/straighten.png");
+								_btnToggleLine_img = Gtk::Image(_btnToggleLine_pixbuf);
+									_btnToggleLine.set_image(_btnToggleLine_img);
+										_btnToggleLine.property_always_show_image();
+										_btnToggleLine.show();
+										_btnToggleLine.set_size_request(20, 20);
+							_btnToggleLine.set_focus_on_click(false);
+							_btnToggleLine.signal_clicked().connect(sigc::mem_fun(*this, &Kage::ToggleLine_onClick));
+		
+				//Frame Tween
+				m_PropertyBox.pack_start(m_propFrameTween, Gtk::PACK_SHRINK);
+					m_propFrameTween.set_border_width(10);
+					m_propFrameTween.pack_start(m_propFrameTweenV1);
+						m_propFrameTweenV1.set_border_width(4);
+						m_propFrameTweenV1.set_spacing(4);
+						m_propFrameTweenV1.pack_start(m_LabelTweenX);
+						m_propFrameTweenV1.pack_start(m_LabelTweenY);
+					m_propFrameTween.pack_start(m_propFrameTweenV2);
+						m_propFrameTweenV2.set_border_width(4);
+						m_propFrameTweenV2.set_spacing(4);
+						m_propFrameTweenV2.pack_start(m_ComboX);
+							m_ComboX.append("Linear");
+							m_ComboX.append("Ease In");
+							m_ComboX.append("Ease Out");
+							m_ComboX.set_active_text("Linear");
+							m_ComboX.signal_changed().connect( sigc::mem_fun(*this, &Kage::FrameTween_onChange) );
+						m_propFrameTweenV2.pack_start(m_ComboY);
+							m_ComboY.append("Linear");
+							m_ComboY.append("Ease In");
+							m_ComboY.append("Ease Out");
+							m_ComboY.set_active_text("Linear");
+							m_ComboY.signal_changed().connect( sigc::mem_fun(*this, &Kage::FrameTween_onChange) );
 	New_onClick();
 	
 	registerPropertiesPane();
@@ -1048,7 +1101,7 @@ Kage::Kage(string p_filePath) :
 
 void Kage::registerPropertiesPane() {
 	_area_properties_pane1  = m_HPane_DrawingArea.get_width() - 30;
-	_area_properties_pane2 = m_HPane_DrawingArea.get_width() - 200;
+	_area_properties_pane2 = m_HPane_DrawingArea.get_width() - 240;
 }
 
 Kage::~Kage() {
@@ -1182,6 +1235,12 @@ void Kage::ToggleProperties_onClick() {
 	forceRenderFrames();
 	
 	Kage::timestamp_OUT();
+}
+void Kage::TogglePropertiesFill_onClick() {
+	m_PropFill.set_visible(!m_PropFill.get_visible());
+}
+void Kage::TogglePropertiesStroke_onClick() {
+	m_PropStroke.set_visible(!m_PropStroke.get_visible());
 }
 
 void Kage::ShapeGroup_onClick() {
@@ -1705,8 +1764,8 @@ void Kage::ToolFill_onClick() {
 
 void Kage::ToolEyedrop_onClick() {
 	toolsButtonToggle("Eyedrop Tool");
-	m_PropStage.set_visible(false);
-	m_PropFillStroke.set_visible(true);
+	propStageSetVisible(false);
+	propFillStrokeSetVisible(true);
 	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
@@ -1718,8 +1777,8 @@ void Kage::ToolEyedrop_onClick() {
 
 void Kage::ToolZoom_onClick() {
 	toolsButtonToggle("Zoom Tool");
-	m_PropStage.set_visible(true);
-	m_PropFillStroke.set_visible(false);
+	propStageSetVisible(true);
+	propFillStrokeSetVisible(false);
 	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	m_ColorButtonFill.set_color(m_KageStage.getFill());
@@ -1734,7 +1793,10 @@ void Kage::propStageSetVisible(bool p_visible) {
 }
 
 void Kage::propFillStrokeSetVisible(bool p_visible) {
-	m_PropFillStroke.set_visible(p_visible);
+	m_PropFillLabel.set_visible(p_visible);
+	m_PropFill.set_visible(p_visible);
+	m_PropStrokeLabel.set_visible(p_visible);
+	m_PropStroke.set_visible(p_visible);
 }
 
 void Kage::propShapePropertiesSetVisible(bool p_visible) {
@@ -3760,8 +3822,15 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 			addDataToFrame(v, true);
 		} else if (l_tagname == "fill") {
 			VectorDataManager v;
-			vector<int> l_colors = parseColorString(l_properties[0].getValue()); //color
-				v.addFill(ColorData(l_colors[0], l_colors[1], l_colors[2], l_colors[3]));
+			string l_color = l_properties[0].getValue(); 
+			if (l_color.length() > 3 && l_color.substr(0, 3) == "rgb") {
+				//RGB/RGBA
+				vector<int> l_colors = parseColorString(l_properties[0].getValue()); //color
+					v.addFill(ColorData(l_colors[0], l_colors[1], l_colors[2], l_colors[3]));
+			} else {
+				//possible gradient ID
+				v.addFill(l_color);
+			}
 			addDataToFrame(v, true);
 		} else if (l_tagname == "stroke") {
 			VectorDataManager v;

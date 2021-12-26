@@ -49,6 +49,7 @@
 			void addInit();
 			void addInit(PointData p_point);
 			void addFill(ColorData p_color);
+			void addFill(string p_gradientID);
 			void addEndFill();
 			void addClosePath();
 			void addCubic(PointData p_point1, PointData p_point2, PointData p_point3);
@@ -76,6 +77,7 @@
 			bool recenterRotationPoint(vector<unsigned int> p_selectedShapes);
 		protected:
 			void add(VectorData::type p_type, ColorData p_fill, StrokeColorData p_stroke);
+			void add(VectorData::type p_type, string p_fillGradientID, StrokeColorData p_stroke);
 			
 			vector<VectorData> vectorData;
 			

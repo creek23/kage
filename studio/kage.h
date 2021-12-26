@@ -127,6 +127,8 @@
 			void Deselect_onClick();
 			void ToggleTimeline_onClick();
 			void ToggleProperties_onClick();
+				void TogglePropertiesFill_onClick();
+				void TogglePropertiesStroke_onClick();
 			void ShapeGroup_onClick();
 			void ShapeUngroup_onClick();
 			void Raise_onClick();
@@ -209,7 +211,8 @@
 			Gtk::ScrolledWindow m_Timeline_Layer_ScrolledWindow;
 			Gtk::ScrolledWindow m_Timeline_Frame_ScrolledWindow;
 			Gtk::VBox m_VBoxToolbar_Holder;
-			Gtk::VBox m_Box1;
+			Gtk::HBox m_Box1;
+			Gtk::VBox m_PropertyBox;
 			Gtk::HSeparator m_Separator;
 			Gtk::HSeparator m_Separator_Toolbar1;
 			Gtk::HSeparator m_Separator_Toolbar2;
@@ -234,12 +237,14 @@
 					void ColorButtonStage_onClick();
 				Gtk::Entry m_EntryStageFPS;
 					void EntryStageFPS_onEnter();
-			//Fill  & Stroke Property items
-				Gtk::HBox m_PropFillStroke;
-				Gtk::VBox m_PropFillStrokeV1;
-				Gtk::VBox m_PropFillStrokeV2;
+			Gtk::ScrolledWindow m_Property_Pane_ScrolledWindow;
+			Gtk::VScrollbar     m_Property_Pane_VScrollbar;
+			//Fill Property items
+				Gtk::HBox m_PropFill;
+				Gtk::VBox m_PropFillV1;
+				Gtk::VBox m_PropFillV2;
 				
-				Gtk::Label m_LabelFill;
+				Gtk::Button m_ButtonFill;
 				Gtk::ColorButton m_ColorButtonFill;
 					void ColorButtonFill_onClick();
 				Gtk::Label m_LabelFillR;
@@ -250,10 +255,7 @@
 				Glib::RefPtr<Gtk::Adjustment> _adjustFillG;
 				Glib::RefPtr<Gtk::Adjustment> _adjustFillB;
 				Glib::RefPtr<Gtk::Adjustment> _adjustFillA;
-				Glib::RefPtr<Gtk::Adjustment> _adjustStrokeR;
-				Glib::RefPtr<Gtk::Adjustment> _adjustStrokeG;
-				Glib::RefPtr<Gtk::Adjustment> _adjustStrokeB;
-				Glib::RefPtr<Gtk::Adjustment> _adjustStrokeA;
+				
 				Gtk::Scale _scaleFillR;
 					void FillR_onChange();
 				Gtk::Scale _scaleFillG;
@@ -266,8 +268,17 @@
 				Gtk::Entry m_EntryFillRGBA;
 					void EntryFillRGBA_onEnter();
 				void updateEntryFillRGBA();
+			//Stroke Property items
+				Gtk::HBox m_PropStroke;
+				Gtk::VBox m_PropStrokeV1;
+				Gtk::VBox m_PropStrokeV2;
 				
-				Gtk::Label m_LabelStroke;
+				Glib::RefPtr<Gtk::Adjustment> _adjustStrokeR;
+				Glib::RefPtr<Gtk::Adjustment> _adjustStrokeG;
+				Glib::RefPtr<Gtk::Adjustment> _adjustStrokeB;
+				Glib::RefPtr<Gtk::Adjustment> _adjustStrokeA;
+				
+				Gtk::Button m_ButtonStroke;
 				Gtk::Label m_LabelStrokeThickness;
 				Gtk::Entry m_EntryStrokeThickness;
 					void EntryStrokeThickness_onEnter();
@@ -289,6 +300,14 @@
 				void updateEntryStrokeRGBA();
 				Gtk::ColorButton m_ColorButtonStroke;
 					void ColorButtonStroke_onClick();
+			//Toggle for Fill/Stroke Property items
+				Gtk::HBox m_PropFillLabel;
+				Gtk::VBox m_PropFillLabelV1;
+				Gtk::VBox m_PropFillLabelV2;
+
+				Gtk::HBox m_PropStrokeLabel;
+				Gtk::VBox m_PropStrokeLabelV1;
+				Gtk::VBox m_PropStrokeLabelV2;
 			
 			//X/Y Width/Height Shape's properties
 				Gtk::HBox m_propLocationSize;

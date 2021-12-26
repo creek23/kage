@@ -55,6 +55,7 @@
 			vector<PointData> getPoints();
 			StrokeColorData stroke;
 			ColorData fillColor;
+			string fillColorGradientID;
 			unsigned int count;
 			
 			type vectorType;

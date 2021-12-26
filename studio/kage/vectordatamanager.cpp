@@ -63,6 +63,17 @@ void VectorDataManager::add(VectorData::type p_type, ColorData p_fill, StrokeCol
 		l_vectorData.vectorType = p_type;
 		l_vectorData.stroke = p_stroke;
 		l_vectorData.fillColor = p_fill;
+		l_vectorData.fillColorGradientID = "";
+	
+	vectorData.push_back(l_vectorData);
+}
+void VectorDataManager::add(VectorData::type p_type, string p_fillGradientID, StrokeColorData p_stroke) {
+	VectorData l_vectorData;
+	
+		l_vectorData.vectorType = p_type;
+		l_vectorData.stroke = p_stroke;
+		l_vectorData.fillColor = ColorData();
+		l_vectorData.fillColorGradientID = p_fillGradientID;
 	
 	vectorData.push_back(l_vectorData);
 }
@@ -167,6 +178,18 @@ void VectorDataManager::addFill(ColorData p_color) {
 		l_vectorData.stroke = KageStage::stroke;
 	}
 	add(VectorData::TYPE_FILL, p_color, l_vectorData.stroke);
+}
+
+void VectorDataManager::addFill(string p_gradientID) {
+	VectorData l_vectorData;
+	if (vectorData.size() > 0) {
+		l_vectorData = vectorData[vectorData.size()-1];
+	} else {
+		l_vectorData.setType(VectorData::TYPE_INIT);
+		l_vectorData.fillColor = KageStage::fillColor;
+		l_vectorData.stroke = KageStage::stroke;
+	}
+	add(VectorData::TYPE_FILL, p_gradientID, l_vectorData.stroke);
 }
 
 void VectorDataManager::addEndFill() {

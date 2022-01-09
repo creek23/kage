@@ -353,6 +353,7 @@
 					void FrameTween_onChange();
 			
 			Gtk::Label m_LblHolder_Toolbar;
+			Gtk::ScrolledWindow m_Stage_Pane_ScrolledWindow;
 			KageStage m_KageStage;
 			Glib::RefPtr<Gtk::UIManager> m_refUIManager;
 			Glib::RefPtr<Gtk::ActionGroup> m_refActionGroup;

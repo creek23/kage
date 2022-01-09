@@ -171,15 +171,13 @@ bool KageStage::on_expose_event(GdkEventExpose* e) {
 
 bool KageStage::on_event(GdkEvent *e) {
 	if (e->type == GDK_ENTER_NOTIFY) {
-		Kage::timestamp_IN();
-		cout << " mouse enter" << endl;
-		render();
+		Kage::timestamp_IN(); cout << " mouse enter" << endl;
+		//render(); //do we need to render when mouse enters Stage or wait for mouse movement instead?
 		Kage::timestamp_OUT();
 		//mouse hover in
 	} else if (e->type == GDK_LEAVE_NOTIFY) {
-		Kage::timestamp_IN();
-		cout << " mouse leave" << endl;
-		render();
+		Kage::timestamp_IN(); cout << " mouse leave" << endl;
+		//render(); // do we need to render when mouse leaves Stage?!?
 		Kage::timestamp_OUT();
 		//mouse hover out
 	} else if (e->type == GDK_KEY_PRESS) {

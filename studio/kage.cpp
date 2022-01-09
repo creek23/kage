@@ -765,10 +765,13 @@ Kage::Kage(string p_filePath) :
 					m_Timeline_Layer_ScrolledWindow.set_vadjustment(m_Timeline_Frame_ScrolledWindow.get_vadjustment());
 					
 		m_VPane_Timeline.add2(m_HPane_DrawingArea);
-			m_HPane_DrawingArea.add1(m_KageStage);
-			m_KageStage.set_size_request(1280, 700);
-			m_KageStage.show();
-			m_HPane_DrawingArea.add2(m_Box1);
+			m_HPane_DrawingArea.add1(m_Stage_Pane_ScrolledWindow);
+				m_Stage_Pane_ScrolledWindow.add(m_KageStage);
+				m_Stage_Pane_ScrolledWindow.set_border_width(0);
+				m_Stage_Pane_ScrolledWindow.set_shadow_type(Gtk::SHADOW_NONE);
+					m_KageStage.set_size_request(1280, 700);
+					m_KageStage.show();
+					m_HPane_DrawingArea.add2(m_Box1);
 			
 			m_Box1.pack_start(m_Property_Pane_ScrolledWindow, Gtk::PACK_EXPAND_WIDGET);
 			
@@ -2122,8 +2125,8 @@ void Kage::New_onClick() {
 	
 	m_KageStage.cleanSlate();
 	
-	m_EntryStageWid.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.stageWidth));
-	m_EntryStageHgt.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.stageHeight));
+	m_EntryStageWid.set_text(StringHelper::doubleToString(m_KageStage.stageWidth));
+	m_EntryStageHgt.set_text(StringHelper::doubleToString(m_KageStage.stageHeight));
 	m_EntryStageFPS.set_text(StringHelper::unsignedIntegerToString(m_KageStage.fps));
 	
 	m_KageStage.render();
@@ -3307,6 +3310,7 @@ void Kage::ColorButtonFill_onClick() {
 	m_KageStage.setFill(m_Color);
 	m_KageStage.updateShapeColor();
 }
+
 void Kage::ColorButtonStroke_onClick() {
 	m_Color = m_ColorButtonStroke.get_color(); //<-- deprecate this
 	Gdk::RGBA l_rgba = m_ColorButtonStroke.get_rgba();

@@ -48,11 +48,9 @@ void KageFramesetManager::addFrameset(unsigned int p_layer) {
 	if (_framesets.size() > 0) {
 		l_count = (*_framesets.back()).getFrameCount();
 	}
-	KageFramesetManager::LOADING_MODE = true;
-		_framesets.push_back(Gtk::manage(new KageFrameset(this, p_layer, l_count)));
-			pack_end(*_framesets.back(), Gtk::PACK_SHRINK);
-				(*_framesets.back()).set_size_request(100, 23);
-	KageFramesetManager::LOADING_MODE = false;
+	_framesets.push_back(Gtk::manage(new KageFrameset(this, p_layer, l_count)));
+		pack_end(*_framesets.back(), Gtk::PACK_SHRINK);
+			(*_framesets.back()).set_size_request(100, 23);
 }
 
 void KageFramesetManager::deleteFrameset(unsigned int p_layer) {

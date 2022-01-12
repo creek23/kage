@@ -32,6 +32,13 @@ KageFrameset::KageFrameset(KageFramesetManager *p_fsm, unsigned int p_layerID, u
 	for (unsigned int i = 0; i < p_frameCount; ++i) {
 		addFrame();
 	}
+	if (KageFramesetManager::LOADING_MODE == false && p_frameCount > 1) {
+		_frames[0]->setExtension(KageFrame::EXTENSION_START);
+		for (unsigned int i = 1; i < p_frameCount; ++i) {
+			_frames[i]->setExtension(KageFrame::EXTENSION_MID);
+		}
+		_frames[p_frameCount-1]->setExtension(KageFrame::EXTENSION_END);
+	}
 }
 
 KageFrameset::~KageFrameset() {

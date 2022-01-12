@@ -1,9 +1,16 @@
+kagestudio (2022.01.10) focal; urgency=low
+
+  * first 0.5 maintenance package
+
+-- Mj Mendoza IV <mj.mendoza.iv@gmail.com> Wed, 12 January 2022 01:48:36 +0800
+
 kagestudio (2021.12.22) focal; urgency=low
 
   * first 0.5 package
 
 -- Mj Mendoza IV <mj.mendoza.iv@gmail.com>  Wed, 22 December 2021 06:56:13
 +0800
+
 
 kagestudio (2021.04.16) focal; urgency=low
 

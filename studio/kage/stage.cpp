@@ -155,17 +155,13 @@ bool KageStage::on_key_release_event(GdkEventKey *e) {
 		win->stackDo();
 		_stackDo = false;
 	}
+	
 	return true;
 }
 
 bool KageStage::on_expose_event(GdkEventExpose* e) {
-	if (!window) {
-		window = get_window();
-	}
+	render();
 	
-	if (window) {
-		render();
-	}
 	return true;
 }
 
@@ -403,7 +399,7 @@ bool KageStage::on_event(GdkEvent *e) {
 			}
 		} else if (KageStage::toolMode == MODE_STROKE) {
 			handleStrokeMouseMove();
-			render();
+			//render(); //handleStrokeMouseMove will call invalidateToRender()
 		} else if (KageStage::toolMode == MODE_EYEDROP) {
 			draw1.x = (e->button.x);
 			draw1.y = (e->button.y);
@@ -801,7 +797,7 @@ void KageStage::cleanSlate() {
 void KageStage::render() {
 	Kage::timestamp_IN();
 	cout << " KageStage::render " << endl;
-		if (!window) {
+	if (!window) {
 		window = get_window();
 	}
 	

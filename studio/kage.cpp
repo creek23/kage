@@ -1442,7 +1442,32 @@ void Kage::refreshUI() {
 		propShapePropertiesSetVisible(false);
 	}
 	
-	propFrameTweenSetVisible(getTween());
+
+	unsigned int l_tween = getTween();
+	if (l_tween > 0) {
+		unsigned int l_tweenX = l_tween / 10;
+		unsigned int l_tweenY = l_tween - (l_tweenX * 10);
+		
+		if (l_tweenX == 1) {
+			m_ComboX.set_active_text("Linear");
+		} else if (l_tweenX == 2) {
+			m_ComboX.set_active_text("Ease In");
+		} else if (l_tweenX == 3) {
+			m_ComboX.set_active_text("Ease Out");
+		}
+		
+		if (l_tweenY == 1) {
+			m_ComboY.set_active_text("Linear");
+		} else if (l_tweenY == 2) {
+			m_ComboY.set_active_text("Ease In");
+		} else if (l_tweenY == 3) {
+			m_ComboY.set_active_text("Ease Out");
+		}
+		
+		propFrameTweenSetVisible(true);
+	} else {
+		propFrameTweenSetVisible(false);
+	}
 }
 
 /**
@@ -1547,13 +1572,11 @@ void Kage::updateFrameLabel() {
 }
 
 void Kage::LayerAdd_onClick() {
-	KageFramesetManager::LOADING_MODE = true;
-		_framesetManager.addFrameset(_layerManager.addLayer());
-		std::cout << "Layer Count: " << _layerManager.layerCount() << std::endl;
-		refreshUI();
-		setCurrentFrame(getCurrentFrame());
-		updateStatus("New Layer Added");
-	KageFramesetManager::LOADING_MODE = false;
+	_framesetManager.addFrameset(_layerManager.addLayer());
+	std::cout << "Layer Count: " << _layerManager.layerCount() << std::endl;
+	refreshUI();
+	setCurrentFrame(getCurrentFrame());
+	updateStatus("New Layer Added");
 }
 void Kage::LayerRename_onClick() {
 	_layerManager.renameLayer();
@@ -1939,31 +1962,6 @@ bool Kage::isFrameEmpty() {
 
 void Kage::forceRenderFrames() {
 	Kage::timestamp_IN(); cout << " Kage::forceRenderFrames " << endl;
-	unsigned int l_tween = getTween();
-	if (l_tween > 0) {
-		unsigned int l_tweenX = l_tween / 10;
-		unsigned int l_tweenY = l_tween - (l_tweenX * 10);
-		
-		if (l_tweenX == 1) {
-			m_ComboX.set_active_text("Linear");
-		} else if (l_tweenX == 2) {
-			m_ComboX.set_active_text("Ease In");
-		} else if (l_tweenX == 3) {
-			m_ComboX.set_active_text("Ease Out");
-		}
-		
-		if (l_tweenY == 1) {
-			m_ComboY.set_active_text("Linear");
-		} else if (l_tweenY == 2) {
-			m_ComboY.set_active_text("Ease In");
-		} else if (l_tweenY == 3) {
-			m_ComboY.set_active_text("Ease Out");
-		}
-		
-		propFrameTweenSetVisible(true);
-	} else {
-		propFrameTweenSetVisible(false);
-	}
 	m_KageStage.render();
 	renderFrames();
 

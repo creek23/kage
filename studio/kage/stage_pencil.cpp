@@ -106,7 +106,7 @@ void KageStage::handleDrawPencilMouseMove(PointData p_point) {
 //			draw2.y = (e->button.y);
 		}
 		
-		render();
+		invalidateToRender();
 	}
 }
 void KageStage::handleDrawPencilMouseUp() {
@@ -157,7 +157,7 @@ void KageStage::handleDrawPencilMouseUp() {
 		}
 	}
 	
-	render();
+	invalidateToRender();
 	Kage::timestamp_OUT();
 }
 

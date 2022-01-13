@@ -432,12 +432,11 @@
 			
 			bool continueNewFileWithUnsavedWork();
 			
-			void refreshUI();
-			
 			int _area_timeline_pane;
 			int _area_properties_pane1;
 			int _area_properties_pane2;
 			
+			bool _UPDATE_SHAPE_COLORS;
 		public:
 			void toolsButtonToggle(string p_toolTip);
 			
@@ -479,6 +478,8 @@
 			void displayMouseXY(double p_x, double p_y);
 			
 			void registerPropertiesPane();
+			
+			void refreshUI();
 	};
 
 #endif //GTKMM_KAGE_H

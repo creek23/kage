@@ -115,7 +115,7 @@ void KageStage::updateNodeX(double p_value, bool p_stackDo) {
 		win->stackDo();
 	}
 	
-	render();
+	invalidateToRender();
 	
 	Kage::timestamp_OUT();
 }
@@ -168,7 +168,7 @@ void KageStage::updateNodeY(double p_value, bool p_stackDo) {
 		win->stackDo();
 	}
 	
-	render();
+	invalidateToRender();
 	
 	Kage::timestamp_OUT();
 }
@@ -699,7 +699,7 @@ void KageStage::handleNodesMouseUp() {
 		}
 	}
 	
-	render();
+	invalidateToRender();
 }
 bool KageStage::handleNodes_getNearestShape(double p_x, double p_y, unsigned int p_index, vector<VectorData> p_v) {
 	double l_vXdiff, l_vYdiff;

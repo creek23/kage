@@ -81,7 +81,7 @@ void KageStage::handleDrawPolyMouseUp() {
 		++drawCtr;
 	}
 	
-	render();
+	invalidateToRender();
 	
 	Kage::timestamp_OUT();
 }
@@ -137,7 +137,7 @@ bool KageStage::cancelDrawingPoly() {
 	_polyVectors.clear();
 	drawCtr = 0;
 	
-	render();
+	invalidateToRender();
 	
 	return true;
 }

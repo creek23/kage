@@ -249,6 +249,7 @@ void KageLayerManager::renderStage() {
 	Kage::timestamp_IN();
 	cout << " KageLayerManager::renderStage <" << endl;
 	win->forceRenderFrames();
+	win->refreshUI();
 	Kage::timestamp_OUT();
 }
 

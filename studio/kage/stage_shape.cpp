@@ -338,7 +338,9 @@ void KageStage::updateShapeColor(bool p_doFill, bool p_doStroke) {
 	if (selectedShapes.size() == 0) {
 		return;
 	}
-	
+	if (p_doFill == false && p_doStroke == false) {
+		return;
+	}
 	vector<VectorData> v = win->getFrameData().getVectorData();
 	unsigned int vsize = v.size();
 	unsigned int l_selectedShapes_size = selectedShapes.size();
@@ -362,7 +364,7 @@ void KageStage::updateShapeColor(bool p_doFill, bool p_doStroke) {
 	
 	win->stackDo();
 	
-	render();
+	invalidateToRender();
 }
 
 void KageStage::updateShapeX(double p_value, bool p_stackDo) {
@@ -422,7 +424,7 @@ void KageStage::updateShapeX(double p_value, bool p_stackDo) {
 		win->stackDo();
 	}
 	
-	render();
+	invalidateToRender();
 	
 	Kage::timestamp_OUT();
 }
@@ -483,7 +485,7 @@ void KageStage::updateShapeY(double p_value, bool p_stackDo) {
 		win->stackDo();
 	}
 	
-	render();
+	invalidateToRender();
 	
 	Kage::timestamp_OUT();
 }
@@ -543,7 +545,7 @@ void KageStage::updateShapeWidth(double p_value) {
 	
 	win->stackDo();
 	
-	render();
+	invalidateToRender();
 	
 	Kage::timestamp_OUT();
 }
@@ -604,7 +606,7 @@ void KageStage::updateShapeHeight(double p_value) {
 	
 	win->stackDo();
 	
-	render();
+	invalidateToRender();
 	
 	Kage::timestamp_OUT();
 }
@@ -1169,7 +1171,7 @@ void KageStage::tryMultiSelectShapes() {
 		}
 	}
 	
-	render();
+	invalidateToRender();
 }
 
 unsigned int KageStage::getShape(unsigned int p_index, vector<VectorData> p_v) {

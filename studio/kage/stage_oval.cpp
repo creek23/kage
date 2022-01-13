@@ -69,7 +69,7 @@ void KageStage::handleDrawOvalMouseUp() {
 	
 	win->stackDo();
 	
-	render();
+	invalidateToRender();
 }
 
 void KageStage::handleOval() {

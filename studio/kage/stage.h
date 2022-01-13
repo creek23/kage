@@ -91,7 +91,7 @@
 			
 			void printVectors();
 			void cleanSlate();
-			void render();
+			void invalidateToRender();
 			
 			void setStageBG(Gdk::Color p_Color);
 			Gdk::Color getStageBG();

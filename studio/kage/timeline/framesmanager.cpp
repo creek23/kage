@@ -189,6 +189,7 @@ void KageFramesetManager::setCurrentFrame(unsigned int p_frame) {
 		
 		win->updateFrameLabel();
 		win->forceRenderFrames();
+		win->refreshUI();
 	}
 }
 void KageFramesetManager::setCurrentFrameByID(unsigned int p_frameID) {
@@ -212,6 +213,7 @@ void KageFramesetManager::setCurrentFrameByID(unsigned int p_frameID) {
 		
 		win->updateFrameLabel();
 		win->forceRenderFrames();
+		win->refreshUI();
 	}
 }
 
@@ -219,6 +221,7 @@ void KageFramesetManager::renderStage() {
 	Kage::timestamp_IN();
 	cout << " KageFramesetManager::renderStage <" << endl;
 	win->forceRenderFrames();
+	win->refreshUI();
 	Kage::timestamp_OUT();
 }
 
@@ -579,6 +582,7 @@ void KageFramesetManager::switchToPreviousFrame(unsigned int p_frameID) {
 	
 	win->updateFrameLabel();
 	win->forceRenderFrames();
+	win->refreshUI();
 }
 
 void KageFramesetManager::switchToNextFrame() {
@@ -616,6 +620,7 @@ void KageFramesetManager::switchToNextFrame(unsigned int p_frameID) {
 	
 	win->updateFrameLabel();
 	win->forceRenderFrames();
+	win->refreshUI();
 }
 
 void KageFramesetManager::setFrameExtension(KageFrame::extension p_extension) {

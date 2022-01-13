@@ -126,11 +126,12 @@ bool KageStage::on_key_press_event(GdkEventKey *e) {
 				return true;
 			}
 			
-			render();
+			invalidateToRender();
 		} else {
 			std::cout << "stage " << e->keyval << "_" << e->string << std::endl;
 		}
 	}
+	
 	return true;
 }
 bool KageStage::on_key_release_event(GdkEventKey *e) {
@@ -160,7 +161,7 @@ bool KageStage::on_key_release_event(GdkEventKey *e) {
 }
 
 bool KageStage::on_expose_event(GdkEventExpose* e) {
-	render();
+	invalidateToRender();
 	
 	return true;
 }
@@ -168,12 +169,12 @@ bool KageStage::on_expose_event(GdkEventExpose* e) {
 bool KageStage::on_event(GdkEvent *e) {
 	if (e->type == GDK_ENTER_NOTIFY) {
 		Kage::timestamp_IN(); cout << " mouse enter" << endl;
-		//render(); //do we need to render when mouse enters Stage or wait for mouse movement instead?
+		//invalidateToRender(); //do we need to render when mouse enters Stage or wait for mouse movement instead?
 		Kage::timestamp_OUT();
 		//mouse hover in
 	} else if (e->type == GDK_LEAVE_NOTIFY) {
 		Kage::timestamp_IN(); cout << " mouse leave" << endl;
-		//render(); // do we need to render when mouse leaves Stage?!?
+		//invalidateToRender(); // do we need to render when mouse leaves Stage?!?
 		Kage::timestamp_OUT();
 		//mouse hover out
 	} else if (e->type == GDK_KEY_PRESS) {
@@ -203,7 +204,7 @@ bool KageStage::on_event(GdkEvent *e) {
 		} else if (KageStage::toolMode == MODE_NODE) {
 			draw2.x = e->button.x; //added because of multi/single-selection of shape/s
 			draw2.y = e->button.y;
-			render();
+			invalidateToRender();
 		} else if (KageStage::toolMode == MODE_DRAW_POLY) {
 			//
 		} else {
@@ -249,7 +250,7 @@ bool KageStage::on_event(GdkEvent *e) {
 			}
 			updateShapeXY();
 			_isModifyingShape = false;
-			render();
+			invalidateToRender();
 		} else if (KageStage::toolMode == MODE_NODE) {
 			if (_isModifyingShape == false) {
 				if (draw1.x >= draw2.x-5 && draw1.x <= draw2.x+5 && draw1.y >= draw2.y-5 && draw1.y <= draw2.y+5) {
@@ -274,7 +275,7 @@ bool KageStage::on_event(GdkEvent *e) {
 				updateNodeXY();
 			}
 			_isModifyingShape = false;
-			render();
+			invalidateToRender();
 		} else if (KageStage::toolMode == MODE_STROKE) {
 			draw1.x = e->button.x;
 			draw1.y = e->button.y;
@@ -311,7 +312,7 @@ bool KageStage::on_event(GdkEvent *e) {
 			_zoomReference.y = e->button.y;
 			
 			applyZoom();
-			render();
+			invalidateToRender();
 		} else if (KageStage::toolMode == MODE_EYEDROP) {
 			draw1.x = e->button.x;
 			draw1.y = e->button.y;
@@ -349,21 +350,24 @@ bool KageStage::on_event(GdkEvent *e) {
 			draw1.x = e->button.x;
 			draw1.y = e->button.y;
 			
-			render();
+			invalidateToRender();
 		} else if (KageStage::toolMode == MODE_SELECT) {
 			draw2.x = e->button.x;
 			draw2.y = e->button.y;
 			
 			_zoomReference.x = e->button.x;
 			_zoomReference.y = e->button.y;
-			render();
+			
+			if (mouseDown == true) {
+				invalidateToRender();
+			}
 		} else if (KageStage::toolMode == MODE_DRAW_OVAL
 				|| KageStage::toolMode == MODE_DRAW_RECT) {
 			if (mouseDown == true) {
 				draw2.x = (e->button.x);
 				draw2.y = (e->button.y);
 				
-				render();
+				invalidateToRender();
 			}
 		} else if (KageStage::toolMode == MODE_DRAW_PENCIL) {
 			draw2.x = e->button.x;
@@ -395,16 +399,19 @@ bool KageStage::on_event(GdkEvent *e) {
 					cout << "\t drawConstraint.x " << drawConstraint.x << endl;
 				}
 				
-				render();
+				invalidateToRender();
 			}
 		} else if (KageStage::toolMode == MODE_STROKE) {
 			handleStrokeMouseMove();
-			//render(); //handleStrokeMouseMove will call invalidateToRender()
+			//invalidateToRender(); //handleStrokeMouseMove will call invalidateToRender()
 		} else if (KageStage::toolMode == MODE_EYEDROP) {
 			draw1.x = (e->button.x);
 			draw1.y = (e->button.y);
 			handleEyedropMouseMove();
-			render();
+			
+			if (mouseDown == true) {
+				invalidateToRender(); //eyedrop will only pick color of selected item, do we need to invalidate display?
+			}
 		} else if (KageStage::toolMode == MODE_MOVE_STAGE) {
 			double distx = e->button.x - KageStage::moveStageXY.x;
 			double disty = e->button.y - KageStage::moveStageXY.y;
@@ -412,10 +419,11 @@ bool KageStage::on_event(GdkEvent *e) {
 			origin.x += distx;
 			origin.y += disty;
 			
-			render();
+			invalidateToRender();
 		}
 		win->displayMouseXY(e->button.x - origin.x, e->button.y - origin.y);
-		win->forceRenderFrames();
+		//win->forceRenderFrames(); //why there's a need to FORCE render?
+		win->renderFrames(); //trying to work around ^
 		KageStage::moveStageXY.x = e->button.x;
 		KageStage::moveStageXY.y = e->button.y;
 	} else if (e->type == GDK_EXPOSE) {
@@ -602,7 +610,7 @@ void KageStage::setStageBG(Gdk::Color p_c) {
 	KageStage::stageBG.setR(p_c.get_red() / 256);
 	KageStage::stageBG.setG(p_c.get_green() / 256);
 	KageStage::stageBG.setB(p_c.get_blue() / 256);
-	render();
+	invalidateToRender();
 }
 Gdk::Color KageStage::getStageBG() {
 	Gdk::Color l_c;
@@ -617,7 +625,7 @@ void KageStage::setFill(Gdk::Color p_Color) {
 	KageStage::fillColor.setR(p_Color.get_red() / 256);
 	KageStage::fillColor.setG(p_Color.get_green() / 256);
 	KageStage::fillColor.setB(p_Color.get_blue() / 256);
-	render();
+	invalidateToRender();
 }
 Gdk::Color KageStage::getFill() {
 	Gdk::Color tColor;
@@ -632,7 +640,7 @@ void KageStage::setStroke(Gdk::Color p_c) {
 	KageStage::stroke.setR(p_c.get_red() / 256);
 	KageStage::stroke.setG(p_c.get_green() / 256);
 	KageStage::stroke.setB(p_c.get_blue() / 256);
-	render();
+	invalidateToRender();
 }
 Gdk::Color KageStage::getStroke() {
 	Gdk::Color l_c;
@@ -794,9 +802,9 @@ void KageStage::cleanSlate() {
 	mouseOnAnchor = AnchorData::TYPE_NONE;
 }
 
-void KageStage::render() {
+void KageStage::invalidateToRender() {
 	Kage::timestamp_IN();
-	cout << " KageStage::render " << endl;
+	cout << " KageStage::invalidateToRender " << endl;
 	if (!window) {
 		window = get_window();
 	}

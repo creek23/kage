@@ -1080,26 +1080,27 @@ Kage::Kage(string p_filePath) :
 		ksfPath = p_filePath;
 		doOpen();
 	}
+	_UPDATE_SHAPE_COLORS = false;
+		unsigned int l_R = KageStage::fillColor.getR();
+		unsigned int l_G = KageStage::fillColor.getG();
+		unsigned int l_B = KageStage::fillColor.getB();
+		unsigned int l_A = KageStage::fillColor.getA();
+		m_EntryFillRGBA.set_text(int255ToHex(l_R) + int255ToHex(l_G) + int255ToHex(l_B) + int255ToHex(l_A));
+		_scaleFillR.set_value(l_R);
+		_scaleFillG.set_value(l_G);
+		_scaleFillB.set_value(l_B);
+		_scaleFillAplha.set_value((double) l_A / 256.0f * 100.0f);
 
-	unsigned int l_R = KageStage::fillColor.getR();
-	unsigned int l_G = KageStage::fillColor.getG();
-	unsigned int l_B = KageStage::fillColor.getB();
-	unsigned int l_A = KageStage::fillColor.getA();
-	m_EntryFillRGBA.set_text(int255ToHex(l_R) + int255ToHex(l_G) + int255ToHex(l_B) + int255ToHex(l_A));
-	_scaleFillR.set_value(l_R);
-	_scaleFillG.set_value(l_G);
-	_scaleFillB.set_value(l_B);
-	_scaleFillAplha.set_value((double) l_A / 256.0f * 100.0f);
-
-	l_R = KageStage::stroke.getR();
-	l_G = KageStage::stroke.getG();
-	l_B = KageStage::stroke.getB();
-	l_A = KageStage::stroke.getA();
-	m_EntryStrokeRGBA.set_text(int255ToHex(l_R) + int255ToHex(l_G) + int255ToHex(l_B) + int255ToHex(l_A));
-	_scaleStrokeR.set_value(l_R);
-	_scaleStrokeG.set_value(l_G);
-	_scaleStrokeB.set_value(l_B);
-	_scaleStrokeAlpha.set_value((double) l_A / 256.0f * 100.0f);
+		l_R = KageStage::stroke.getR();
+		l_G = KageStage::stroke.getG();
+		l_B = KageStage::stroke.getB();
+		l_A = KageStage::stroke.getA();
+		m_EntryStrokeRGBA.set_text(int255ToHex(l_R) + int255ToHex(l_G) + int255ToHex(l_B) + int255ToHex(l_A));
+		_scaleStrokeR.set_value(l_R);
+		_scaleStrokeG.set_value(l_G);
+		_scaleStrokeB.set_value(l_B);
+		_scaleStrokeAlpha.set_value((double) l_A / 256.0f * 100.0f);
+	_UPDATE_SHAPE_COLORS = true;
 }
 
 void Kage::registerPropertiesPane() {
@@ -1840,17 +1841,19 @@ void Kage::propFrameTweenSetVisible(bool p_visible) {
 }
 
 void Kage::updateColors() {
-	m_ColorButtonFill.set_color(m_KageStage.getFill());
-	_scaleFillR.set_value(KageStage::fillColor.getR());
-	_scaleFillG.set_value(KageStage::fillColor.getG());
-	_scaleFillB.set_value(KageStage::fillColor.getB());
-	_scaleFillAplha.set_value((double) KageStage::fillColor.getA()*100.0f/256.0f);
-	m_ColorButtonStroke.set_color(m_KageStage.getStroke());
-	_scaleStrokeR.set_value(KageStage::stroke.getR());
-	_scaleStrokeG.set_value(KageStage::stroke.getG());
-	_scaleStrokeB.set_value(KageStage::stroke.getB());
-	_scaleStrokeAlpha.set_value((double) KageStage::stroke.getA()*100.0f/256.0f);
-	m_EntryStrokeThickness.set_text(StringHelper::unsignedIntegerToString(KageStage::stroke.getThickness()));
+	_UPDATE_SHAPE_COLORS = false;
+		m_ColorButtonFill.set_color(m_KageStage.getFill());
+		_scaleFillR.set_value(KageStage::fillColor.getR());
+		_scaleFillG.set_value(KageStage::fillColor.getG());
+		_scaleFillB.set_value(KageStage::fillColor.getB());
+		_scaleFillAplha.set_value((double) KageStage::fillColor.getA()*100.0f/256.0f);
+		m_ColorButtonStroke.set_color(m_KageStage.getStroke());
+		_scaleStrokeR.set_value(KageStage::stroke.getR());
+		_scaleStrokeG.set_value(KageStage::stroke.getG());
+		_scaleStrokeB.set_value(KageStage::stroke.getB());
+		_scaleStrokeAlpha.set_value((double) KageStage::stroke.getA()*100.0f/256.0f);
+		m_EntryStrokeThickness.set_text(StringHelper::unsignedIntegerToString(KageStage::stroke.getThickness()));
+	_UPDATE_SHAPE_COLORS = true;
 }
 
 void Kage::updateShapeProperties() {
@@ -1962,7 +1965,7 @@ bool Kage::isFrameEmpty() {
 
 void Kage::forceRenderFrames() {
 	Kage::timestamp_IN(); cout << " Kage::forceRenderFrames " << endl;
-	m_KageStage.render();
+	m_KageStage.invalidateToRender();
 	renderFrames();
 
 	Kage::timestamp_OUT();
@@ -2127,7 +2130,7 @@ void Kage::New_onClick() {
 	m_EntryStageHgt.set_text(StringHelper::doubleToString(m_KageStage.stageHeight));
 	m_EntryStageFPS.set_text(StringHelper::unsignedIntegerToString(m_KageStage.fps));
 	
-	m_KageStage.render();
+	m_KageStage.invalidateToRender();
 	
 	ksfPath = "Untitled";
 	set_title(ksfPath + " - " + KageAbout::app_title);
@@ -2449,12 +2452,19 @@ void Kage::ExportSVG_onClick() {
 			exportSvg(expPath, "<svg width=\"" + StringHelper::doubleToString(m_KageStage.stageWidth) + "\" height=\"" + StringHelper::doubleToString(m_KageStage.stageHeight) + "\" version=\"1.1\">");
 
 				t = getCurrentLayer();
+				string l_layerToSVG = "";
+				string l_frameToSVG = "";
 				unsigned int f = getCurrentFrame();
 					//for (j = 1; j <= l_fMax; ++j) {
 					//	_framesetManager.setCurrentFrame(j);
 						for (i = 1; i <= l_lMax; i++) {
 							_framesetManager.setCurrentLayer(i);
-							exportSvg(expPath, "\t\t\n" + dumpFrameToSvg() + "\t");
+							
+							l_layerToSVG =  "<g\n\tinkscape:label=\"" + _layerManager.getLabel() + "\"\n" +
+											"\tinkscape:groupmode=\"layer\"\n" +
+											"\tid=\"layer" + StringHelper::unsignedIntegerToString(i) + "\">\n";
+							l_frameToSVG = "\t\t\n" + dumpFrameToSvg();
+							exportSvg(expPath, l_layerToSVG + l_frameToSVG + "\n</g>");
 						}
 					//}
 				setCurrentLayer(t);
@@ -2848,7 +2858,7 @@ void Kage::FillR_onChange() {
 	
 	KageStage::fillColor.setR(l_red);
 		updateEntryFillRGBA();
-	m_KageStage.updateShapeColor();
+	m_KageStage.updateShapeColor(_UPDATE_SHAPE_COLORS, _UPDATE_SHAPE_COLORS);
 }
 void Kage::FillG_onChange() {
 	double l_green = _scaleFillG.get_value();
@@ -2858,7 +2868,7 @@ void Kage::FillG_onChange() {
 	
 	KageStage::fillColor.setG(l_green);
 		updateEntryFillRGBA();
-	m_KageStage.updateShapeColor();
+	m_KageStage.updateShapeColor(_UPDATE_SHAPE_COLORS, _UPDATE_SHAPE_COLORS);
 }
 void Kage::FillB_onChange() {
 	double l_blue = _scaleFillB.get_value();
@@ -2868,7 +2878,7 @@ void Kage::FillB_onChange() {
 	
 	KageStage::fillColor.setB(l_blue);
 		updateEntryFillRGBA();
-	m_KageStage.updateShapeColor();
+	m_KageStage.updateShapeColor(_UPDATE_SHAPE_COLORS, _UPDATE_SHAPE_COLORS);
 }
 void Kage::FillAlpha_onChange() {
 	double l_alpha = _scaleFillAplha.get_value();
@@ -2878,7 +2888,7 @@ void Kage::FillAlpha_onChange() {
 	
 	KageStage::fillColor.setA((int) (l_alpha * 256.0f/ 100.0f));
 		updateEntryFillRGBA();
-	m_KageStage.updateShapeColor();
+	m_KageStage.updateShapeColor(_UPDATE_SHAPE_COLORS, _UPDATE_SHAPE_COLORS);
 }
 
 void Kage::EntryFillRGBA_onEnter() {
@@ -2962,7 +2972,7 @@ void Kage::EntryFillRGBA_onEnter() {
 		l_rgba.set_alpha( l_A / 255.f );
 			m_ColorButtonFill.set_rgba(l_rgba);
 	
-	m_KageStage.updateShapeColor();
+	m_KageStage.updateShapeColor(_UPDATE_SHAPE_COLORS, _UPDATE_SHAPE_COLORS);
 }
 
 
@@ -2982,7 +2992,7 @@ void Kage::StrokeR_onChange() {
 	
 	KageStage::stroke.setR(l_red);
 		updateEntryStrokeRGBA();
-	m_KageStage.updateShapeColor();
+	m_KageStage.updateShapeColor(_UPDATE_SHAPE_COLORS, _UPDATE_SHAPE_COLORS);
 }
 void Kage::StrokeG_onChange() {
 	double l_green = _scaleStrokeG.get_value();
@@ -2992,7 +3002,7 @@ void Kage::StrokeG_onChange() {
 	
 	KageStage::stroke.setG(l_green);
 		updateEntryStrokeRGBA();
-	m_KageStage.updateShapeColor();
+	m_KageStage.updateShapeColor(_UPDATE_SHAPE_COLORS, _UPDATE_SHAPE_COLORS);
 }
 void Kage::StrokeB_onChange() {
 	double l_blue = _scaleStrokeB.get_value();
@@ -3002,7 +3012,7 @@ void Kage::StrokeB_onChange() {
 	
 	KageStage::stroke.setB(l_blue);
 		updateEntryStrokeRGBA();
-	m_KageStage.updateShapeColor();
+	m_KageStage.updateShapeColor(_UPDATE_SHAPE_COLORS, _UPDATE_SHAPE_COLORS);
 }
 void Kage::StrokeAlpha_onChange() {
 	double l_alpha = _scaleStrokeAlpha.get_value();
@@ -3011,7 +3021,7 @@ void Kage::StrokeAlpha_onChange() {
 	m_ColorButtonStroke.set_rgba(l_rgba);
 	
 	KageStage::stroke.setA((int) (l_alpha * 256.0f/ 100.0f));
-	m_KageStage.updateShapeColor();
+	m_KageStage.updateShapeColor(_UPDATE_SHAPE_COLORS, _UPDATE_SHAPE_COLORS);
 }
 
 
@@ -3096,13 +3106,13 @@ void Kage::EntryStrokeRGBA_onEnter() {
 		l_rgba.set_alpha( l_A / 255.f );
 			m_ColorButtonStroke.set_rgba(l_rgba);
 	
-	m_KageStage.updateShapeColor();
+	m_KageStage.updateShapeColor(_UPDATE_SHAPE_COLORS, _UPDATE_SHAPE_COLORS);
 }
 void Kage::EntryStrokeThickness_onEnter() {
 	unsigned int l_uint = StringHelper::toUnsignedInteger(m_EntryStrokeThickness.get_text());
 	KageStage::stroke.setThickness(l_uint);
 	m_EntryStrokeThickness.set_text(StringHelper::unsignedIntegerToString(KageStage::stroke.getThickness()));
-	m_KageStage.updateShapeColor();
+	m_KageStage.updateShapeColor(_UPDATE_SHAPE_COLORS, _UPDATE_SHAPE_COLORS);
 }
 
 void Kage::EntryX_onEnter() {
@@ -3273,7 +3283,7 @@ void Kage::EntryStageArea_onEnter() {
 	t = m_EntryStageHgt.get_text();
 		m_KageStage.stageHeight = StringHelper::toDouble(t);
 		m_EntryStageHgt.set_text(StringHelper::doubleToString(m_KageStage.stageHeight));
-	m_KageStage.render();
+	m_KageStage.invalidateToRender();
 }
 void Kage::EntryStageFPS_onEnter() {
 	string t = m_EntryStageFPS.get_text();
@@ -3306,7 +3316,7 @@ void Kage::ColorButtonFill_onClick() {
 	KageStage::fillColor.setA((int) (l_alpha * 256.0f));
 	
 	m_KageStage.setFill(m_Color);
-	m_KageStage.updateShapeColor();
+	m_KageStage.updateShapeColor(_UPDATE_SHAPE_COLORS, _UPDATE_SHAPE_COLORS);
 }
 
 void Kage::ColorButtonStroke_onClick() {
@@ -3318,7 +3328,7 @@ void Kage::ColorButtonStroke_onClick() {
 	KageStage::stroke.setA((int) (l_alpha * 256.0f));
 	
 	m_KageStage.setStroke(m_Color);
-	m_KageStage.updateShapeColor();
+	m_KageStage.updateShapeColor(_UPDATE_SHAPE_COLORS, _UPDATE_SHAPE_COLORS);
 }
 
 void Kage::updateSelectedShapeColor(bool p_doFill, bool p_doStroke) {
@@ -3589,17 +3599,19 @@ string Kage::dumpFrameToSvg() {
 					l_initFlag = false;
 				}
 				
-				l_ostringstream << "\t<g>\n";
 				l_initFlag = true;
 				if (v[i].points.size() == 1) {
-//					l_ostringstream << "<init>" << v[i].points[0].x << " " << v[i].points[0].y << "</init>\n";
+					l_ostringstream << "\t<g inkscape:transform-center-x=\"" << StringHelper::doubleToString(v[i].points[0].x) << "\" " <<
+						                     "inkscape:transform-center-y=\"" << StringHelper::doubleToString(v[i].points[0].y) << "\">\n";
+				} else {
+					l_ostringstream << "\t<g>\n";
 				}
 				break;
 			case VectorData::TYPE_TEXT: break;
 			case VectorData::TYPE_FILL:
 				fcolor = v[i].fillColor;
 				l_ostringstream << "\t\t<path d=\"";
-
+				
 				l_donePrevFColor = false;
 				fillCtr++;
 				break;
@@ -3883,7 +3895,7 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 			addDataToFrame(v, true);
 		}
 	}
-	m_KageStage.render();
+	m_KageStage.invalidateToRender();
 	refreshUI();
 }
 void Kage::parseKSF(string p_content) {

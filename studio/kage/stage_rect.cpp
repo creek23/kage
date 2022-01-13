@@ -52,7 +52,7 @@ void KageStage::handleDrawRectMouseUp() {
 	
 	win->stackDo();
 	
-	render();
+	invalidateToRender();
 }
 
 void KageStage::handleRect() {

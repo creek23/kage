@@ -1249,7 +1249,6 @@ void Kage::TogglePropertiesStroke_onClick() {
 
 void Kage::ShapeGroup_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp_IN(); std::cout << " Kage::ShapeGroup_onClick" << std::endl;
 		if (isLayerLocked() == false) {
 			vector<unsigned int> l_selectedShapes = _framesetManager.groupSelectedShapes(m_KageStage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
@@ -1259,7 +1258,6 @@ void Kage::ShapeGroup_onClick() {
 				forceRenderFrames();
 			}
 		}
-		Kage::timestamp_OUT();
 	}
 }
 void Kage::ShapeUngroup_onClick() {

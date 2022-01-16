@@ -377,37 +377,117 @@ void KageFrame::setFocus() {
 }
 
 vector<unsigned int> KageFrame::raiseSelectedShape(vector<unsigned int> p_selectedShapes) {
-	return vectorsData.raiseSelectedShape(p_selectedShapes);
+	if (       _extension == KageFrame::EXTENSION_NOT
+			|| _extension == KageFrame::EXTENSION_START) {
+		return vectorsData.raiseSelectedShape(p_selectedShapes);
+	} else {
+		VectorDataManager l_vectorData = _frameset->getPreviousFrameData(frameID);
+		vector<unsigned int> l_selectedShapes = l_vectorData.raiseSelectedShape(p_selectedShapes);
+		setFrameData(l_vectorData);
+		return l_selectedShapes;
+	}
 }
 vector<unsigned int> KageFrame::lowerSelectedShape(vector<unsigned int> p_selectedShapes) {
-	return vectorsData.lowerSelectedShape(p_selectedShapes);
+	if (       _extension == KageFrame::EXTENSION_NOT
+			|| _extension == KageFrame::EXTENSION_START) {
+		return vectorsData.lowerSelectedShape(p_selectedShapes);
+	} else {
+		VectorDataManager l_vectorData = _frameset->getPreviousFrameData(frameID);
+		vector<unsigned int> l_selectedShapes = l_vectorData.lowerSelectedShape(p_selectedShapes);
+		setFrameData(l_vectorData);
+		return l_selectedShapes;
+	}
 }
 vector<unsigned int> KageFrame::raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes) {
-	return vectorsData.raiseToTopSelectedShape(p_selectedShapes);
+	if (       _extension == KageFrame::EXTENSION_NOT
+			|| _extension == KageFrame::EXTENSION_START) {
+		return vectorsData.raiseToTopSelectedShape(p_selectedShapes);
+	} else {
+		VectorDataManager l_vectorData = _frameset->getPreviousFrameData(frameID);
+		vector<unsigned int> l_selectedShapes = l_vectorData.raiseToTopSelectedShape(p_selectedShapes);
+		setFrameData(l_vectorData);
+		return l_selectedShapes;
+	}
 }
 vector<unsigned int> KageFrame::lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes) {
-	return vectorsData.lowerToBottomSelectedShape(p_selectedShapes);
+	if (       _extension == KageFrame::EXTENSION_NOT
+			|| _extension == KageFrame::EXTENSION_START) {
+		return vectorsData.lowerToBottomSelectedShape(p_selectedShapes);
+	} else {
+		VectorDataManager l_vectorData = _frameset->getPreviousFrameData(frameID);
+		vector<unsigned int> l_selectedShapes = l_vectorData.lowerToBottomSelectedShape(p_selectedShapes);
+		setFrameData(l_vectorData);
+		return l_selectedShapes;
+	}
 }
 
 vector<unsigned int> KageFrame::groupSelectedShapes(vector<unsigned int> p_selectedShapes) {
-	return vectorsData.groupSelectedShapes(p_selectedShapes);
+	if (       _extension == KageFrame::EXTENSION_NOT
+			|| _extension == KageFrame::EXTENSION_START) {
+		return vectorsData.groupSelectedShapes(p_selectedShapes);
+	} else {
+		VectorDataManager l_vectorData = _frameset->getPreviousFrameData(frameID);
+		vector<unsigned int> l_selectedShapes = l_vectorData.groupSelectedShapes(p_selectedShapes);
+		setFrameData(l_vectorData);
+		return l_selectedShapes;
+	}
 }
 vector<unsigned int> KageFrame::ungroupSelectedShapes(vector<unsigned int> p_selectedShapes) {
-	return vectorsData.ungroupSelectedShapes(p_selectedShapes);
+	if (       _extension == KageFrame::EXTENSION_NOT
+			|| _extension == KageFrame::EXTENSION_START) {
+		return vectorsData.ungroupSelectedShapes(p_selectedShapes);
+	} else {
+		VectorDataManager l_vectorData = _frameset->getPreviousFrameData(frameID);
+		vector<unsigned int> l_selectedShapes = l_vectorData.ungroupSelectedShapes(p_selectedShapes);
+		setFrameData(l_vectorData);
+		return l_selectedShapes;
+	}
 }
 
 vector<unsigned int> KageFrame::duplicateShapes(vector<unsigned int> p_selectedShapes) {
-	return vectorsData.duplicateShapes(p_selectedShapes);
+	if (       _extension == KageFrame::EXTENSION_NOT
+			|| _extension == KageFrame::EXTENSION_START) {
+		return vectorsData.duplicateShapes(p_selectedShapes);
+	} else {
+		VectorDataManager l_vectorData = _frameset->getPreviousFrameData(frameID);
+		vector<unsigned int> l_selectedShapes = l_vectorData.duplicateShapes(p_selectedShapes);
+		setFrameData(l_vectorData);
+		return l_selectedShapes;
+	}
 }
 
 bool KageFrame::flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes) {
-	return vectorsData.flipHorizontalSelectedShape(p_selectedShapes);
+	if (       _extension == KageFrame::EXTENSION_NOT
+			|| _extension == KageFrame::EXTENSION_START) {
+		return vectorsData.flipHorizontalSelectedShape(p_selectedShapes);
+	} else {
+		VectorDataManager l_vectorData = _frameset->getPreviousFrameData(frameID);
+		bool l_selectedShapes = l_vectorData.flipHorizontalSelectedShape(p_selectedShapes);
+		setFrameData(l_vectorData);
+		return l_selectedShapes;
+	}
 }
 bool KageFrame::flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes) {
-	return vectorsData.flipVerticalSelectedShape(p_selectedShapes);
+	if (       _extension == KageFrame::EXTENSION_NOT
+			|| _extension == KageFrame::EXTENSION_START) {
+		return vectorsData.flipVerticalSelectedShape(p_selectedShapes);
+	} else {
+		VectorDataManager l_vectorData = _frameset->getPreviousFrameData(frameID);
+		bool l_selectedShapes = l_vectorData.flipVerticalSelectedShape(p_selectedShapes);
+		setFrameData(l_vectorData);
+		return l_selectedShapes;
+	}
 }
 bool KageFrame::recenterRotationPoint(vector<unsigned int> p_selectedShapes) {
-	return vectorsData.recenterRotationPoint(p_selectedShapes);
+	if (       _extension == KageFrame::EXTENSION_NOT
+			|| _extension == KageFrame::EXTENSION_START) {
+		return vectorsData.recenterRotationPoint(p_selectedShapes);
+	} else {
+		VectorDataManager l_vectorData = _frameset->getPreviousFrameData(frameID);
+		bool l_selectedShapes = l_vectorData.recenterRotationPoint(p_selectedShapes);
+		setFrameData(l_vectorData);
+		return l_selectedShapes;
+	}
 }
 void KageFrame::addDataToFrame(VectorDataManager v) {
 	if (       _extension == KageFrame::EXTENSION_NOT

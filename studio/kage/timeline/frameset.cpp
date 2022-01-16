@@ -347,6 +347,7 @@ bool KageFrameset::moveToLeftMost() {
 void KageFrameset::extendFrame() {
 	++frameCtr;
 	unsigned int l_currentFrame = getCurrentFrame();
+	unsigned int l_frameCount = getFrameCount();
 	_frames.push_back(Gtk::manage(new KageFrame(this, layerID, frameCtr)));
 		pack_start(*_frames.back(), Gtk::PACK_SHRINK);
 	
@@ -354,7 +355,7 @@ void KageFrameset::extendFrame() {
 		return;
 	}
 	
-	if (l_currentFrame == getFrameCount()) {
+	if (l_currentFrame == l_frameCount) {
 		KageFrame::extension l_extension = _frames[_frames.size()-2]->getExtension();
 		unsigned int l_tween = _frames[_frames.size()-2]->getTween();
 		_frames[_frames.size()-1]->forceSetTween(l_tween);
@@ -364,7 +365,7 @@ void KageFrameset::extendFrame() {
 			_frames[_frames.size()-2]->setExtension(KageFrame::EXTENSION_MID);
 		}
 		_frames[_frames.size()-1]->setExtension(KageFrame::EXTENSION_END);
-	} else if (l_currentFrame < getFrameCount()) {
+	} else if (l_currentFrame < l_frameCount) {
 		unsigned int l_frameIndex = getFrameCount();
 		while (l_frameIndex > l_currentFrame+1) {
 			setCurrentFrame(l_frameIndex);

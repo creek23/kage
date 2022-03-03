@@ -29,7 +29,7 @@ Section "Demo (0.1 MB)" SEC02
   
 SectionEnd
 
-Section "Gtkmm (45.3 MB)" SEC03
+Section "Gtkmm (45.4 MB)" SEC03
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
   

@@ -1,8 +1,8 @@
 # Makefile for KageStudio
 BIN = kagestudio.exe
 CXX = g++
-CXXFLAGS = -c -I./ `pkg-config gtkmm-3.0 glibmm-2.4 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -fmax-errors=5 -Wfatal-errors
-CXXLINKS = `pkg-config gtkmm-3.0 glibmm-2.4 --libs | sed 's/ -I/ -isystem /g'`
+CXXFLAGS = -c -I./ `pkg-config gtkmm-3.0 glibmm-2.4 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -fmax-errors=5 -Wfatal-errors -mwindows
+CXXLINKS = `pkg-config gtkmm-3.0 glibmm-2.4 --libs | sed 's/ -I/ -isystem /g'` -mwindows
 RES = windres
 RESFILE = kage.res
 RCFILE = kage.rc

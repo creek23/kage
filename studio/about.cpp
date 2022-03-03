@@ -22,11 +22,11 @@
 #include "about.h"
 
 string KageAbout::app_title = "Kage Studio";
-string KageAbout::app_version = "0.5.220110";
+string KageAbout::app_version = "0.5.220225";
 string KageAbout::app_author = "Mj Mendoza IV";
 string KageAbout::app_contact = "mj.mendoza.iv@gmail.com";
 string KageAbout::app_website = "https://kage.sourceforge.io";
-string KageAbout::app_copyright = "Copyleft 2011~2021";
+string KageAbout::app_copyright = "Copyleft 2011~2022";
 string KageAbout::app_comment = "A Simple Free and Open Source vector-based 2D Animation Software.";
 
 KageAbout::KageAbout(Gtk::Window& parent)

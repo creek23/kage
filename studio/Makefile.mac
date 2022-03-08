@@ -1,7 +1,7 @@
 # Makefile for KageStudio
 BIN = kagestudio
 CXX = g++
-CXXFLAGS = -c -I./ `pkg-config gtkmm-3.0 gdkmm-3.0 glibmm-2.4 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -fmax-errors=5 -Wfatal-errors
+CXXFLAGS = -c -I./ `pkg-config gtkmm-3.0 gdkmm-3.0 glibmm-2.4 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -Wfatal-errors
 CXXLINKS = `pkg-config gtkmm-3.0 gdkmm-3.0 glibmm-2.4 --libs | sed 's/ -I/ -isystem /g'`
 
 SOURCES = \

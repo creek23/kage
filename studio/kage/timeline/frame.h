@@ -110,8 +110,8 @@
 		protected:
 			//Override default signal handler:
 			virtual bool on_expose_event(GdkEventExpose *e);
-			virtual bool on_key_press_event(GdkEventKey *e);
-			virtual bool on_event(GdkEvent *e);
+			virtual bool on_key_press_event(GdkEventKey *e) override;
+			virtual bool on_event(GdkEvent *e) override;
 			
 			bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
 			

@@ -1,5 +1,5 @@
 #!/bin/sh
-cp ../../kagestudio ./kagestudio/usr/local/bin/kagestudio
+cp ../../kagestudio ./kagestudio/usr/bin/kagestudio
 sudo chmod 777 kagestudio*.deb
 sudo rm kagestudio*amd64.deb
 dpkg --build ./kagestudio .

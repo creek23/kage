@@ -358,7 +358,7 @@ vector<VectorData> VectorDataManager::copySelectedShapes(vector<unsigned int> p_
 			}
 		}
 	}
-	
+	Kage::timestamp_OUT();
 	return l_vectorDataCopyBuffer;
 }
 

@@ -270,6 +270,7 @@ bool KageFrameset::removeFrame() {
 		}
 		_frames[getFrameCount()-1]->forceSetTween(false);
 		_frames[getFrameCount()-1]->setNull(true);
+		_frames[getFrameCount()-1]->setExtension(KageFrame::EXTENSION_NOT); //see issue #120 -- https://sourceforge.net/p/kage/tickets/120/
 		setCurrentFrame(l_currentFrame);
 	} else if (getFrameCount() == 1) {
 		VectorDataManager l_frameData;

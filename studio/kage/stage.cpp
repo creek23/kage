@@ -78,7 +78,9 @@ bool KageStage::on_key_press_event(GdkEventKey *e) {
 			} else if (e->keyval == GDK_KEY_Control_L || e->keyval == GDK_KEY_Control_R) {
 				keyControlDown = true;
 			} else {
-				std::cout << "KageStage::::on_key_press_event " << e->keyval << "_" << e->string << std::endl;
+				Kage::timestamp_IN();
+					std::cout << "KageStage::on_key_press_event " << e->keyval << "_" << e->string << std::endl;
+				Kage::timestamp_OUT();
 				return true;
 			}
 			

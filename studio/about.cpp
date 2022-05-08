@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2020  Mj Mendoza IV
+ * Copyright (C) 2011~2022  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include "about.h"
 
 string KageAbout::app_title = "Kage Studio";
-string KageAbout::app_version = "0.5.220225";
+string KageAbout::app_version = "0.5.220508";
 string KageAbout::app_author = "Mj Mendoza IV";
 string KageAbout::app_contact = "mj.mendoza.iv@gmail.com";
 string KageAbout::app_website = "https://kage.sourceforge.io";

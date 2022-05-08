@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2020  Mj Mendoza IV
+ * Copyright (C) 2011~2022  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -609,46 +609,46 @@ void KageStage::applyZoom() {
 }
 
 void KageStage::setStageBG(Gdk::Color p_c) {
-	KageStage::stageBG.setR(p_c.get_red() / 256);
-	KageStage::stageBG.setG(p_c.get_green() / 256);
-	KageStage::stageBG.setB(p_c.get_blue() / 256);
+	KageStage::stageBG.setR(p_c.get_red() / 255);
+	KageStage::stageBG.setG(p_c.get_green() / 255);
+	KageStage::stageBG.setB(p_c.get_blue() / 255);
 	invalidateToRender();
 }
 Gdk::Color KageStage::getStageBG() {
 	Gdk::Color l_c;
-	l_c.set_red((gushort)KageStage::stageBG.getR() * 256);
-	l_c.set_green((gushort)KageStage::stageBG.getG() * 256);
-	l_c.set_blue((gushort)KageStage::stageBG.getB() * 256);
+	l_c.set_red((gushort)KageStage::stageBG.getR() * 255);
+	l_c.set_green((gushort)KageStage::stageBG.getG() * 255);
+	l_c.set_blue((gushort)KageStage::stageBG.getB() * 255);
 	
 	return l_c;
 }
 
 void KageStage::setFill(Gdk::Color p_Color) {
-	KageStage::fillColor.setR(p_Color.get_red() / 256);
-	KageStage::fillColor.setG(p_Color.get_green() / 256);
-	KageStage::fillColor.setB(p_Color.get_blue() / 256);
+	KageStage::fillColor.setR(p_Color.get_red() / 255);
+	KageStage::fillColor.setG(p_Color.get_green() / 255);
+	KageStage::fillColor.setB(p_Color.get_blue() / 255);
 	invalidateToRender();
 }
 Gdk::Color KageStage::getFill() {
 	Gdk::Color tColor;
-	tColor.set_red((gushort)KageStage::fillColor.getR() * 256);
-	tColor.set_green((gushort)KageStage::fillColor.getG() * 256);
-	tColor.set_blue((gushort)KageStage::fillColor.getB() * 256);
+	tColor.set_red((gushort)KageStage::fillColor.getR() * 255);
+	tColor.set_green((gushort)KageStage::fillColor.getG() * 255);
+	tColor.set_blue((gushort)KageStage::fillColor.getB() * 255);
 	
 	return tColor;
 }
 
 void KageStage::setStroke(Gdk::Color p_c) {
-	KageStage::stroke.setR(p_c.get_red() / 256);
-	KageStage::stroke.setG(p_c.get_green() / 256);
-	KageStage::stroke.setB(p_c.get_blue() / 256);
+	KageStage::stroke.setR(p_c.get_red() / 255);
+	KageStage::stroke.setG(p_c.get_green() / 255);
+	KageStage::stroke.setB(p_c.get_blue() / 255);
 	invalidateToRender();
 }
 Gdk::Color KageStage::getStroke() {
 	Gdk::Color l_c;
-	l_c.set_red((gushort)KageStage::stroke.getR() * 256);
-	l_c.set_green((gushort)KageStage::stroke.getG() * 256);
-	l_c.set_blue((gushort)KageStage::stroke.getB() * 256);
+	l_c.set_red((gushort)KageStage::stroke.getR() * 255);
+	l_c.set_green((gushort)KageStage::stroke.getG() * 255);
+	l_c.set_blue((gushort)KageStage::stroke.getB() * 255);
 	
 	return l_c;
 }

@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2020  Mj Mendoza IV
+ * Copyright (C) 2011~2022  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1125,6 +1125,9 @@ void KageStage::trySingleSelectShape() {
 void KageStage::tryMultiSelectShapes_populateShapes() {
 	selectedShapes.clear();
 	vector<VectorData> v = win->getFrameData().getVectorData();
+	if (v.size() == 0) {
+		return;
+	}
 	for (unsigned int i = 0; i < selectedNodes.size(); ++i) {
 		addSelectedShape(getShape(selectedNodes[i], v));
 	}

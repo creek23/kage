@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2020  Mj Mendoza IV
+ * Copyright (C) 2011~2022  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1089,7 +1089,7 @@ Kage::Kage(string p_filePath) :
 		_scaleFillR.set_value(l_R);
 		_scaleFillG.set_value(l_G);
 		_scaleFillB.set_value(l_B);
-		_scaleFillAplha.set_value((double) l_A / 256.0f * 100.0f);
+		_scaleFillAplha.set_value((double) l_A / 255.0f * 100.0f);
 
 		l_R = KageStage::stroke.getR();
 		l_G = KageStage::stroke.getG();
@@ -1099,7 +1099,7 @@ Kage::Kage(string p_filePath) :
 		_scaleStrokeR.set_value(l_R);
 		_scaleStrokeG.set_value(l_G);
 		_scaleStrokeB.set_value(l_B);
-		_scaleStrokeAlpha.set_value((double) l_A / 256.0f * 100.0f);
+		_scaleStrokeAlpha.set_value((double) l_A / 255.0f * 100.0f);
 	_UPDATE_SHAPE_COLORS = true;
 }
 
@@ -1242,9 +1242,11 @@ void Kage::ToggleProperties_onClick() {
 }
 void Kage::TogglePropertiesFill_onClick() {
 	m_PropFill.set_visible(!m_PropFill.get_visible());
+	_propFillVisible = m_PropFill.get_visible();
 }
 void Kage::TogglePropertiesStroke_onClick() {
 	m_PropStroke.set_visible(!m_PropStroke.get_visible());
+	_propStrokeVisible = m_PropStroke.get_visible();
 }
 
 void Kage::ShapeGroup_onClick() {
@@ -1819,9 +1821,14 @@ void Kage::propStageSetVisible(bool p_visible) {
 
 void Kage::propFillStrokeSetVisible(bool p_visible) {
 	m_PropFillLabel.set_visible(p_visible);
-	m_PropFill.set_visible(p_visible);
 	m_PropStrokeLabel.set_visible(p_visible);
-	m_PropStroke.set_visible(p_visible);
+	if (p_visible == true) {
+		m_PropFill.set_visible(_propFillVisible);
+		m_PropStroke.set_visible(_propStrokeVisible);
+	} else {
+		m_PropFill.set_visible(p_visible);
+		m_PropStroke.set_visible(p_visible);
+	}
 }
 
 void Kage::propShapePropertiesSetVisible(bool p_visible) {
@@ -1844,12 +1851,12 @@ void Kage::updateColors() {
 		_scaleFillR.set_value(KageStage::fillColor.getR());
 		_scaleFillG.set_value(KageStage::fillColor.getG());
 		_scaleFillB.set_value(KageStage::fillColor.getB());
-		_scaleFillAplha.set_value((double) KageStage::fillColor.getA()*100.0f/256.0f);
+		_scaleFillAplha.set_value((double) KageStage::fillColor.getA()*100.0f/255.0f);
 		m_ColorButtonStroke.set_color(m_KageStage.getStroke());
 		_scaleStrokeR.set_value(KageStage::stroke.getR());
 		_scaleStrokeG.set_value(KageStage::stroke.getG());
 		_scaleStrokeB.set_value(KageStage::stroke.getB());
-		_scaleStrokeAlpha.set_value((double) KageStage::stroke.getA()*100.0f/256.0f);
+		_scaleStrokeAlpha.set_value((double) KageStage::stroke.getA()*100.0f/255.0f);
 		m_EntryStrokeThickness.set_text(StringHelper::unsignedIntegerToString(KageStage::stroke.getThickness()));
 	_UPDATE_SHAPE_COLORS = true;
 }
@@ -3304,14 +3311,14 @@ void Kage::ColorButtonFill_onClick() {
 	double l_blue = l_rgba.get_blue();
 	double l_alpha = l_rgba.get_alpha();
 	
-	_scaleFillR.set_value(l_red * 100.0f);
-	_scaleFillG.set_value(l_green * 100.0f);
-	_scaleFillB.set_value(l_blue * 100.0f);
-	_scaleFillAplha.set_value(l_alpha * 100.0f);
-	KageStage::fillColor.setR((int) (l_red * 256.0f));
-	KageStage::fillColor.setG((int) (l_green * 256.0f));
-	KageStage::fillColor.setB((int) (l_blue * 256.0f));
-	KageStage::fillColor.setA((int) (l_alpha * 256.0f));
+	_scaleFillR.set_value(l_red * 255.0f);
+	_scaleFillG.set_value(l_green * 255.0f);
+	_scaleFillB.set_value(l_blue * 255.0f);
+	_scaleFillAplha.set_value(l_alpha * 255.0f);
+	KageStage::fillColor.setR((int) (l_red * 255.0f));
+	KageStage::fillColor.setG((int) (l_green * 255.0f));
+	KageStage::fillColor.setB((int) (l_blue * 255.0f));
+	KageStage::fillColor.setA((int) (l_alpha * 255.0f));
 	
 	m_KageStage.setFill(m_Color);
 	m_KageStage.updateShapeColor(_UPDATE_SHAPE_COLORS, _UPDATE_SHAPE_COLORS);
@@ -3323,7 +3330,7 @@ void Kage::ColorButtonStroke_onClick() {
 	double l_alpha = l_rgba.get_alpha();
 	
 	_scaleStrokeAlpha.set_value(l_alpha * 100.0f);
-	KageStage::stroke.setA((int) (l_alpha * 256.0f));
+	KageStage::stroke.setA((int) (l_alpha * 255.0f));
 	
 	m_KageStage.setStroke(m_Color);
 	m_KageStage.updateShapeColor(_UPDATE_SHAPE_COLORS, _UPDATE_SHAPE_COLORS);
@@ -3336,14 +3343,14 @@ void Kage::updateSelectedShapeColor(bool p_doFill, bool p_doStroke) {
 		m_KageStage.setFill  (m_Color);
 		
 		l_alphaValue = _scaleFillAplha.get_value();
-		m_KageStage.fillColor.setA((int) (l_alphaValue * 256.0f/ 100.0f));
+		m_KageStage.fillColor.setA((int) (l_alphaValue * 255.0f/ 100.0f));
 	}
 	if (p_doStroke == true) {
 		m_Color = m_ColorButtonStroke.get_color();
 		m_KageStage.setStroke(m_Color);
 		
 		l_alphaValue = _scaleFillAplha.get_value();
-		m_KageStage.stroke.setA((int) (l_alphaValue * 256.0f/ 100.0f));
+		m_KageStage.stroke.setA((int) (l_alphaValue * 255.0f/ 100.0f));
 		
 		unsigned int l_uint = StringHelper::toUnsignedInteger(m_EntryStrokeThickness.get_text());
 		KageStage::stroke.setThickness(l_uint);
@@ -3993,9 +4000,14 @@ void Kage::timestamp() {
 
 void Kage::timestamp_IN() {
 	Kage::TAB_COUNT++;
-	Kage::timestamp();
+	#ifdef KAGE_DEBUG
+		Kage::timestamp();
+	#endif
 }
 
 void Kage::timestamp_OUT() {
 	Kage::TAB_COUNT--;
+	if (Kage::TAB_COUNT == -1) {
+		Kage::TAB_COUNT = 0;
+	}
 }

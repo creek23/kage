@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2020  Mj Mendoza IV
+ * Copyright (C) 2011~2022  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -241,6 +241,7 @@
 			Gtk::VScrollbar     m_Property_Pane_VScrollbar;
 			//Fill Property items
 				Gtk::HBox m_PropFill;
+					bool _propFillVisible = false;
 				Gtk::VBox m_PropFillV1;
 				Gtk::VBox m_PropFillV2;
 				
@@ -270,6 +271,7 @@
 				void updateEntryFillRGBA();
 			//Stroke Property items
 				Gtk::HBox m_PropStroke;
+					bool _propStrokeVisible = false;
 				Gtk::VBox m_PropStrokeV1;
 				Gtk::VBox m_PropStrokeV2;
 				

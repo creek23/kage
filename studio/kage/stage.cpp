@@ -28,15 +28,11 @@ KageStage::KageStage(Kage *p_win) {
 	set_can_focus(true); //to accept key_press
 	add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
 	add_events(Gdk::ENTER_NOTIFY_MASK | Gdk::LEAVE_NOTIFY_MASK);
+	add_events(Gdk::KEY_PRESS_MASK | Gdk::KEY_RELEASE_MASK);
 	add_events(Gdk::FOCUS_CHANGE_MASK);
 	add_events(Gdk::POINTER_MOTION_MASK);
 	
-	keyUpDown = false;
-	keyDownDown =  false;
-	keyLeftDown =  false;
-	keyRightDown =  false;
-	keyShiftDown = false;
-	keyControlDown = false;
+	unpressKeys();
 }
 
 KageStage::~KageStage() {
@@ -44,6 +40,8 @@ KageStage::~KageStage() {
 }
 
 bool KageStage::on_key_press_event(GdkEventKey *e) {
+	if (e->keyval >= -1) { return false; }
+	
 	if (e->keyval == GDK_KEY_space) { // [hand tool]
 		if (KageStage::toolMode != MODE_MOVE_STAGE) {
 			prevTool = KageStage::toolMode;
@@ -134,9 +132,11 @@ bool KageStage::on_key_press_event(GdkEventKey *e) {
 		}
 	}
 	
-	return true;
+	return Gtk::DrawingArea::on_key_press_event(e);
 }
 bool KageStage::on_key_release_event(GdkEventKey *e) {
+	if (e->keyval >= -1) { return true; }
+	
 	if (e->keyval == GDK_KEY_space) { // [hand tool]
 		KageStage::toolMode = prevTool;
 		Kage::timestamp();
@@ -151,21 +151,91 @@ bool KageStage::on_key_release_event(GdkEventKey *e) {
 		keyRightDown =  false;
 	} else if (e->keyval == GDK_KEY_Shift_L || e->keyval == GDK_KEY_Shift_R) {
 		keyShiftDown = false;
-	} else if (e->keyval == GDK_KEY_Control_L || e->keyval == GDK_KEY_Control_R) {
+	} else if ((e->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK)) == GDK_CONTROL_MASK) {
+		cout << "\n\n\nKEY UP KEY UP KEY UP KEY UP KEY UP\n\n\n";
+		bool operationSuccess = false;
+			if (       e->keyval == GDK_KEY_X || e->keyval == GDK_KEY_x) {
+				operationSuccess = cutSelectedShapes();
+			} else if (e->keyval == GDK_KEY_C || e->keyval == GDK_KEY_c) {
+				operationSuccess = copySelectedShapes();
+			} else if (e->keyval == GDK_KEY_V || e->keyval == GDK_KEY_v) {
+				operationSuccess = pasteSelectedShapes();
+			} else if (e->keyval == GDK_KEY_A || e->keyval == GDK_KEY_a) {
+				if (toolMode != KageStage::MODE_SELECT) {
+					win->ToolSelect_onClick();
+				}
+				operationSuccess = selectAllShapes();
+			/*} else if (e->keyval == GDK_KEY_Z || e->keyval == GDK_KEY_z) {
+				win->Undo_onClick();
+				return true;
+			} else if (e->keyval == GDK_KEY_Y || e->keyval == GDK_KEY_y) {
+				win->Redo_onClick();
+				return true;*/
+			}
+		if (operationSuccess == true) {
+			win->forceRenderFrames();
+			return true;
+		}
+	} else if (e->keyval == GDK_KEY_Delete) {
+		if (toolMode == KageStage::MODE_SELECT) {
+			if (deleteSelectedShapes() == true) {
+				win->stackDo();
+				win->forceRenderFrames();
+				return true;
+			}
+		} else if (KageStage::toolMode == KageStage::MODE_NODE) {
+			if (deleteSelectedNodes() == true) {
+				win->forceRenderFrames();
+				return true;
+			}
+		}
+	}
+	
+	if (e->keyval == GDK_KEY_Control_L || e->keyval == GDK_KEY_Control_R) {
 		keyControlDown = false;
 	}
+	
+	if (e->keyval == GDK_KEY_Escape) {
+		bool operationSuccess = false;
+			if (win->_isPlaying == true) {
+				win->Stop_onClick();
+			} else if (toolMode == KageStage::MODE_SELECT) {
+				operationSuccess = deselectSelectedShapes();
+			} else if (toolMode == KageStage::MODE_NODE) {
+				operationSuccess = deselectSelectedNodes();
+			} else if (toolMode == KageStage::MODE_DRAW_POLY) {
+				operationSuccess = cancelDrawingPoly();
+			}
+		if (operationSuccess == true) {
+			win->forceRenderFrames();
+			return true;
+		}
+	}
+
 	if (_stackDo == true) {
 		win->stackDo();
 		_stackDo = false;
 	}
 	
-	return true;
+	return Gtk::DrawingArea::on_key_release_event(e);
 }
 
 bool KageStage::on_expose_event(GdkEventExpose* e) {
 	invalidateToRender();
 	
 	return true;
+}
+
+void KageStage::unpressKeys() {
+	//dirty hack on fixing KEY event-handling problem with Kage's AccelKeys and KageStage
+	keyControlDown = false;
+	keyShiftDown = false;
+	keyUpDown = false;
+	keyDownDown = false;
+	keyLeftDown = false;
+	keyRightDown = false;
+
+	grab_focus();
 }
 
 bool KageStage::on_event(GdkEvent *e) {
@@ -180,9 +250,9 @@ bool KageStage::on_event(GdkEvent *e) {
 		Kage::timestamp_OUT();
 		//mouse hover out
 	} else if (e->type == GDK_KEY_PRESS) {
-		on_key_press_event((GdkEventKey*) e);
+		return on_key_press_event((GdkEventKey*) e);
 	} else if (e->type == GDK_KEY_RELEASE) {
-		on_key_release_event((GdkEventKey*) e);
+		return on_key_release_event((GdkEventKey*) e);
 	} else if (e->type == GDK_DOUBLE_BUTTON_PRESS) {
 		if (selectedShapes.size() > 0) {
 			if (KageStage::toolMode == MODE_SELECT) {
@@ -784,12 +854,7 @@ void KageStage::cleanSlate() {
 	drawConstraint.x  = 0;
 	drawConstraint.y  = 0;
 	
-	keyControlDown = false;
-	keyShiftDown = false;
-	keyUpDown = false;
-	keyDownDown = false;
-	keyLeftDown = false;
-	keyRightDown = false;
+	unpressKeys();
 	
 	_isModifyingShape = false;
 	

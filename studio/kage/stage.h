@@ -210,6 +210,8 @@
 			
 			void setSelectedShapes(vector<unsigned int> p_selectedShapes);
 			vector<unsigned int> getSelectedShapes();
+
+			void unpressKeys();
 		protected:
 			ToolMode prevTool; //used by Hand-tool shortcut [spacebar]
 			Kage *win;

@@ -192,22 +192,22 @@ Kage::Kage(string p_filePath) :
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("Cut", "Cu_t", "Cut"),
-		Gtk::AccelKey("<control>X"),
+		//Gtk::AccelKey("<control>X"),
 		sigc::mem_fun(*this, &Kage::Cut_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("Copy", "_Copy", "Copy"),
-		Gtk::AccelKey("<control>C"),
+		//Gtk::AccelKey("<control>C"),
 		sigc::mem_fun(*this, &Kage::Copy_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("Paste", "_Paste", "Paste"),
-		Gtk::AccelKey("<control>V"),
+		//Gtk::AccelKey("<control>V"),
 		sigc::mem_fun(*this, &Kage::Paste_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("Delete", "_Delete", "Delete"),
-		Gtk::AccelKey("Delete"),
+		//Gtk::AccelKey("Delete"),
 		sigc::mem_fun(*this, &Kage::Delete_onClick)
 	);
 	m_refActionGroup->add(
@@ -217,12 +217,12 @@ Kage::Kage(string p_filePath) :
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("SelectAll", "Select Al_l", "Select All"),
-		Gtk::AccelKey("<control>A"),
+		//Gtk::AccelKey("<control>A"),
 		sigc::mem_fun(*this, &Kage::SelectAll_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("Deselect", "D_eselect", "Deselect"),
-		Gtk::AccelKey("Escape"),
+		//Gtk::AccelKey("Escape"),
 		sigc::mem_fun(*this, &Kage::Deselect_onClick)
 	);
 	m_refActionGroup->add(
@@ -332,11 +332,6 @@ Kage::Kage(string p_filePath) :
 		Gtk::Action::create("RecenterRotationPoint", "Re-center Rotation Point", "RecenterRotationPoint"),
 		sigc::mem_fun(*this, &Kage::RecenterRotationPoint_onClick)
 	);
-	////Add Toggle Actions:
-	//m_refActionGroup->add(
-		//Gtk::ToggleAction::create("Bold", Gtk::Stock::BOLD, "_Bold", "Bold", true /* is_active */),
-		//sigc::mem_fun(*this, &Kage::onActionActivate)
-	//);
 	
 	m_refActionGroup->add(
 		Gtk::Action::create("Play", "Play", "Play Animation"),
@@ -403,6 +398,11 @@ Kage::Kage(string p_filePath) :
 		Gtk::AccelKey("<control><shift>Delete"),
 		sigc::mem_fun(*this, &Kage::DeleteFrame_onClick)
 	);
+	/*m_refActionGroup->add(
+		Gtk::ToggleAction::create("Tween", "Tween", "Tween", false),
+		Gtk::AccelKey("<control>T"),
+		sigc::mem_fun(*this, &Kage::Tween_onClick)
+	);*/
 	m_refActionGroup->add(
 		Gtk::Action::create("TweenFrame", "_Frame Tween", "Tween Frame"),
 		Gtk::AccelKey("<control>T"),
@@ -592,6 +592,7 @@ Kage::Kage(string p_filePath) :
 		"			<menuitem action='PasteFrame'/>"
 		"			<menuitem action='DeleteFrame'/>"
 		"			<separator/>"
+//		"			<menuitem action='Tween'/>"
 		"			<menuitem action='TweenFrame'/>"
 		"			<menuitem action='RemoveTweenFrame'/>"
 		"			<separator/>"
@@ -1101,6 +1102,17 @@ Kage::Kage(string p_filePath) :
 		_scaleStrokeB.set_value(l_B);
 		_scaleStrokeAlpha.set_value((double) l_A / 255.0f * 100.0f);
 	_UPDATE_SHAPE_COLORS = true;
+
+	signal_key_press_event().connect( sigc::mem_fun(*this, &Kage::on_key_press_event) );
+	signal_key_release_event().connect( sigc::mem_fun(*this, &Kage::on_key_release_event) );
+}
+bool Kage::on_key_press_event(GdkEventKey *e) {
+	cout << "Kage::on_key_press_event " << e->keyval << " " << e->state << endl;
+	return Gtk::Window::on_key_press_event(e);
+}
+bool Kage::on_key_release_event(GdkEventKey *e) {
+	cout << "Kage::on_key_release_event" << e->keyval << " " << e->state << endl;
+	return Gtk::Window::on_key_release_event(e);
 }
 
 void Kage::registerPropertiesPane() {
@@ -1127,46 +1139,42 @@ void Kage::Undo_onClick() {
 	KageDo l_kageDo = _undoRedoManager.undo();
 	if (l_kageDo._layer != -1 && l_kageDo._frame != -1) {
 		_framesetManager.setCurrentLayer(l_kageDo._layer);
-		_framesetManager.setCurrentFrame(l_kageDo._frame);
+		_framesetManager.setCurrentFrame(l_kageDo._frame); //<-- causes to lose focus on KageStage
 		setFrameData(l_kageDo.getVectorData(), true);
 		
 		forceRenderFrames();
+		set_focus(m_KageStage); //return focus on KageStage; should be fixed better when Frame is rewritten
 	}
 }
 void Kage::Redo_onClick() {
 	KageDo l_kageDo = _undoRedoManager.redo();
 	if (l_kageDo._layer != -1 && l_kageDo._frame != -1) {
 		_framesetManager.setCurrentLayer(l_kageDo._layer);
-		_framesetManager.setCurrentFrame(l_kageDo._frame);
+		_framesetManager.setCurrentFrame(l_kageDo._frame); //<-- causes to lose focus on KageStage
 		setFrameData(l_kageDo.getVectorData(), true);
 		
 		forceRenderFrames();
+		set_focus(m_KageStage); //return focus on KageStage; should be fixed better when Frame is rewritten
 	}
 }
 void Kage::Cut_onClick() {
 	Kage::timestamp_IN(); std::cout << " Kage::Cut_onClick " << KageFrame::_gotFocus << std::endl;
-	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		if (m_KageStage.cutSelectedShapes() == true) {
-			forceRenderFrames();
-		}
+	if (m_KageStage.cutSelectedShapes() == true) {
+		forceRenderFrames();
 	}
 	Kage::timestamp_OUT();
 }
 void Kage::Copy_onClick() {
 	Kage::timestamp_IN(); std::cout << " Kage::Copy_onClick " << KageFrame::_gotFocus << std::endl;
-	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		if (m_KageStage.copySelectedShapes() == true) {
-			forceRenderFrames();
-		}
+	if (m_KageStage.copySelectedShapes() == true) {
+		forceRenderFrames();
 	}
 	Kage::timestamp_OUT();
 }
 void Kage::Paste_onClick() {
 	Kage::timestamp_IN(); std::cout << " Kage::Paste_onClick " << KageFrame::_gotFocus << std::endl;
-	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		if (m_KageStage.pasteSelectedShapes() == true) {
-			forceRenderFrames();
-		}
+	if (m_KageStage.pasteSelectedShapes() == true) {
+		forceRenderFrames();
 	}
 	Kage::timestamp_OUT();
 }
@@ -1185,16 +1193,14 @@ void Kage::Duplicate_onClick() {
 	}
 }
 void Kage::SelectAll_onClick() {
-	if (KageStage::toolMode == KageStage::MODE_SELECT) {
+	if (KageStage::toolMode != KageStage::MODE_SELECT) {
 		ToolSelect_onClick();
 	}
-	if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		Kage::timestamp_IN(); std::cout << " Kage::SelectAll_onClick" << std::endl;
-		if (m_KageStage.selectAllShapes() == true) {
-			forceRenderFrames();
-		}
-		Kage::timestamp_OUT();
+	Kage::timestamp_IN(); std::cout << " Kage::SelectAll_onClick" << std::endl;
+	if (m_KageStage.selectAllShapes() == true) {
+		forceRenderFrames();
 	}
+	Kage::timestamp_OUT();
 }
 void Kage::Deselect_onClick() {
 	Kage::timestamp_IN(); std::cout << " Kage::Deselect_onClick" << std::endl;
@@ -1520,7 +1526,30 @@ void Kage::DeleteFrame_onClick() {
 		}
 		return false;
 	}
-
+void Kage::Tween_onClick() {
+/*	Kage::timestamp_IN(); std::cout << " Kage::Tween_onClick" << std::endl;
+	if (isLayerLocked() == false) {
+		if (_framesetManager.getTween() != 0) {
+			//set tween
+			unsigned int l_tweenType  = 11;
+			m_ComboX.set_active_text("Linear");
+			m_ComboY.set_active_text("Linear");
+			if (_framesetManager.setTween(l_tweenType) == true) {
+//				stackDo();
+				propFrameTweenSetVisible(true);
+				
+				forceRenderFrames();
+			}
+		} else if (_framesetManager.setTween(0) == true) {
+//				stackDo();
+				propFrameTweenSetVisible(false);
+				forceRenderFrames();
+			}
+		}
+	}
+	
+	Kage::timestamp_OUT();*/
+}
 void Kage::TweenFrame_onClick() {
 	Kage::timestamp_IN(); std::cout << " Kage::TweenFrame_onClick" << std::endl;
 	unsigned int l_tweenType  = 11;
@@ -1655,6 +1684,7 @@ void Kage::toolsButtonToggle(string p_toolTip) {
 			}
 		}
 	}
+	m_KageStage.unpressKeys();
 }
 
 void Kage::ToolButtons_onClick(Gtk::ToggleButton *p_sourceButton) {
@@ -2697,8 +2727,9 @@ void Kage::ExportAVI_onClick() {
 						CairoKage::writeToPNG(l_pngSequencePath, surface);
 					}
 					//workaround to FFMPEG-bug: see https://sourceforge.net/p/kage/tickets/25/
-					if (1 == 0) {
-						for (j = 1; j <= (m_KageStage.fps); ++j) {
+					if ((l_fMax % m_KageStage.fps) != 0) {
+						unsigned int l_padding = m_KageStage.fps - ((l_fMax % m_KageStage.fps));
+						for (j = 1; j <= l_padding; ++j) {
 							_framesetManager.setCurrentFrame(l_fMax);
 							
 							Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, m_KageStage.stageWidth, m_KageStage.stageHeight);

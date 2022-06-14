@@ -116,8 +116,8 @@
 			void ToggleOnion_onClick();
 			void ToolButtons_onClick(Gtk::ToggleButton *p_sourceButton);
 			void onActionActivate();
-			void Undo_onClick();
-			void Redo_onClick();
+			//void Undo_onClick();
+			//void Redo_onClick();
 			void Cut_onClick();
 			void Copy_onClick();
 			void Paste_onClick();
@@ -139,6 +139,7 @@
 			void FlipVertical_onClick();
 			
 			void RecenterRotationPoint_onClick();
+			void Tween_onClick();
 			
 			void AddFrame_onClick();
 			void ExtendFrame_onClick();
@@ -164,6 +165,8 @@
 			void ProjectSave_onClick(); //place holder
 			
 			virtual bool on_delete_event(GdkEventAny* any_event);
+			virtual bool on_key_press_event(GdkEventKey *e) override;
+			virtual bool on_key_release_event(GdkEventKey *e) override;
 			
 			void doOpen();
 			void doSaveDialog(string p_title);
@@ -410,7 +413,7 @@
 			
 			void Play_onClick();
 			void PlayFrame_onClick();
-			void Stop_onClick();
+//			void Stop_onClick();
 //			void ToolSelect_onClick();
 			void ToolNode_onClick();
 			void ToolPoly_onClick();
@@ -428,7 +431,7 @@
 			const gint64 cycle_time = 3000000; // microseconds
 			guint tickCounter;
 			guint frameCounter;
-			bool _isPlaying;
+			//bool _isPlaying;
 			
 			vector<VectorData> _undoBase;
 			
@@ -440,6 +443,11 @@
 			
 			bool _UPDATE_SHAPE_COLORS;
 		public:
+			void Undo_onClick();
+			void Redo_onClick();
+			void Stop_onClick();
+			bool _isPlaying;
+			
 			void toolsButtonToggle(string p_toolTip);
 			
 			void ToolSelect_onClick();

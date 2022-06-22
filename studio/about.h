@@ -43,6 +43,7 @@
 			static string app_website;
 			static string app_copyright;
 			static string app_comment;
+			static Glib::RefPtr<Gdk::Pixbuf> imageABOUT;
 		
 		protected:
 			//Member widgets:

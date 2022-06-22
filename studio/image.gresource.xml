@@ -7,20 +7,36 @@
 		<file>share/frame/null_x_cur.png</file>
 		<file>share/frame/blank.png</file>
 		<file>share/frame/blank_cur.png</file>
+		<file>share/frame/blank_cur_sel.png</file>
+		<file>share/frame/blank_cur_sel_twn.png</file>
+		<file>share/frame/blank_cur_twn.png</file>
+		<file>share/frame/blank_sel.png</file>
+		<file>share/frame/blank_sel_twn.png</file>
+		<file>share/frame/blank_twn.png</file>
 		<file>share/frame/blank_x.png</file>
 		<file>share/frame/blank_x_cur.png</file>
+		<file>share/frame/blank_x_cur_sel.png</file>
+		<file>share/frame/blank_x_cur_sel_twn.png</file>
+		<file>share/frame/blank_x_cur_twn.png</file>
+		<file>share/frame/blank_x_sel.png</file>
+		<file>share/frame/blank_x_sel_twn.png</file>
+		<file>share/frame/blank_x_twn.png</file>
 		<file>share/frame/drawn.png</file>
 		<file>share/frame/drawn_cur.png</file>
+		<file>share/frame/drawn_cur_sel.png</file>
+		<file>share/frame/drawn_cur_sel_twn.png</file>
+		<file>share/frame/drawn_cur_twn.png</file>
+		<file>share/frame/drawn_sel.png</file>
+		<file>share/frame/drawn_sel_twn.png</file>
+		<file>share/frame/drawn_twn.png</file>
 		<file>share/frame/drawn_x.png</file>
 		<file>share/frame/drawn_x_cur.png</file>
-		<file>share/frame/tween.png</file>
-		<file>share/frame/tween_cur.png</file>
-		<file>share/frame/tween_x.png</file>
-		<file>share/frame/tween_x_cur.png</file>
-		<file>share/frame/selected.png</file>
-		<file>share/frame/selected_cur.png</file>
-		<file>share/frame/selected_x.png</file>
-		<file>share/frame/selected_x_cur.png</file>
+		<file>share/frame/drawn_x_cur_sel.png</file>
+		<file>share/frame/drawn_x_cur_sel_twn.png</file>
+		<file>share/frame/drawn_x_cur_twn.png</file>
+		<file>share/frame/drawn_x_sel.png</file>
+		<file>share/frame/drawn_x_sel_twn.png</file>
+		<file>share/frame/drawn_x_twn.png</file>
 		<file>share/layer/visible_true.png</file>
 		<file>share/layer/visible_false.png</file>
 		<file>share/layer/locked_true.png</file>
@@ -34,6 +50,7 @@
 		<file>share/layer/onion.png</file>
 		<file>share/layer/onion_layer.png</file>
 		<file>share/icons/default.png</file>
+		<file>share/icons/about.png</file>
 		<file>share/icons/Eraser.png</file>
 		<file>share/icons/Eraser_tango.png</file>
 		<file>share/icons/Eyedrop.png</file>

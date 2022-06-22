@@ -264,7 +264,7 @@ bool KageFrameset::removeFrame() {
 				break;
 			} else {
 				_frames[i-1]->forceSetTween(false);
-				_frames[i-1]->setNull(true); //when willl Frame be NULL if not the Last Frame
+				_frames[i-1]->setNull(true); //when will Frame be NULL if not the Last Frame
 				break;
 			}
 		}

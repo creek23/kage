@@ -22,12 +22,13 @@
 #include "about.h"
 
 string KageAbout::app_title = "Kage Studio";
-string KageAbout::app_version = "0.5.220614";
+string KageAbout::app_version = "0.6.220622";
 string KageAbout::app_author = "Mj Mendoza IV";
 string KageAbout::app_contact = "mj.mendoza.iv@gmail.com";
 string KageAbout::app_website = "https://kage.sourceforge.io";
 string KageAbout::app_copyright = "Copyleft 2011~2022";
 string KageAbout::app_comment = "A Simple Free and Open Source vector-based 2D Animation Software.";
+Glib::RefPtr<Gdk::Pixbuf> KageAbout::imageABOUT;
 
 KageAbout::KageAbout(Gtk::Window& parent)
 		: Gtk::Dialog("About Kage Studio", parent, true),
@@ -58,6 +59,10 @@ KageAbout::KageAbout(Gtk::Window& parent)
 	m_Table.set_row_spacings(4);
 	m_Table.set_col_spacings(4);
 	m_HBox.pack_start(m_Table);
+	
+	KageAbout::imageABOUT = Gdk::Pixbuf::create_from_resource("/kage/share/icons/about.png");
+		m_Image.set(KageAbout::imageABOUT);
+	//
 	
 	m_Table.attach(m_Label1, 0, 1, 0, 1);
 	m_Table.attach(m_Label2, 0, 1, 1, 2);

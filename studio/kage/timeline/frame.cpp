@@ -29,7 +29,7 @@
 #include "../../kage.h"
 
 #include <giomm/resource.h>
-				
+
 bool KageFrame::mouseIsDown = false;
 
 Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageNULL;
@@ -38,20 +38,36 @@ Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageNULL_X;
 Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageNULL_X_CUR;
 Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageBLANK;
 Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageBLANK_CUR;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageBLANK_CUR_SEL;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageBLANK_CUR_TWN;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageBLANK_CUR_SEL_TWN;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageBLANK_SEL;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageBLANK_SEL_TWN;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageBLANK_TWN;
 Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageBLANK_X;
 Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageBLANK_X_CUR;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageBLANK_X_CUR_SEL;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageBLANK_X_CUR_TWN;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageBLANK_X_CUR_SEL_TWN;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageBLANK_X_SEL;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageBLANK_X_SEL_TWN;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageBLANK_X_TWN;
 Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageDRAWN;
 Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageDRAWN_CUR;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageDRAWN_CUR_SEL;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageDRAWN_CUR_TWN;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageDRAWN_CUR_SEL_TWN;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageDRAWN_SEL;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageDRAWN_SEL_TWN;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageDRAWN_TWN;
 Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageDRAWN_X;
 Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageDRAWN_X_CUR;
-Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageTWEEN;
-Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageTWEEN_CUR;
-Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageTWEEN_X;
-Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageTWEEN_X_CUR;
-Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageSELECTED;
-Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageSELECTED_CUR;
-Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageSELECTED_X;
-Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageSELECTED_X_CUR;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageDRAWN_X_CUR_SEL;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageDRAWN_X_CUR_TWN;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageDRAWN_X_CUR_SEL_TWN;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageDRAWN_X_SEL;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageDRAWN_X_SEL_TWN;
+Glib::RefPtr<Gdk::Pixbuf> KageFrame::imageDRAWN_X_TWN;
 
 KageFrame::KageFrame(KageFrameset *p_frameset, unsigned p_layerID, unsigned int p_frameID) :
 		vectorsData() {
@@ -178,48 +194,67 @@ bool KageFrame::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 				KageFrame::imageNULL_CUR       = Gdk::Pixbuf::create_from_resource("/kage/share/frame/null_cur.png");
 				KageFrame::imageNULL_X         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/null_x.png");
 				KageFrame::imageNULL_X_CUR     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/null_x_cur.png");
-				KageFrame::imageBLANK          = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank.png");
-				KageFrame::imageBLANK_CUR      = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_cur.png");
-				KageFrame::imageBLANK_X        = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x.png");
-				KageFrame::imageBLANK_X_CUR    = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_cur.png");
-				KageFrame::imageDRAWN          = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn.png");
-				KageFrame::imageDRAWN_CUR      = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_cur.png");
-				KageFrame::imageDRAWN_X        = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x.png");
-				KageFrame::imageDRAWN_X_CUR    = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_cur.png");
-				KageFrame::imageTWEEN          = Gdk::Pixbuf::create_from_resource("/kage/share/frame/tween.png");
-				KageFrame::imageTWEEN_CUR      = Gdk::Pixbuf::create_from_resource("/kage/share/frame/tween_cur.png");
-				KageFrame::imageTWEEN_X        = Gdk::Pixbuf::create_from_resource("/kage/share/frame/tween_x.png");
-				KageFrame::imageTWEEN_X_CUR    = Gdk::Pixbuf::create_from_resource("/kage/share/frame/tween_x_cur.png");
-				KageFrame::imageSELECTED       = Gdk::Pixbuf::create_from_resource("/kage/share/frame/selected.png");
-				KageFrame::imageSELECTED_CUR   = Gdk::Pixbuf::create_from_resource("/kage/share/frame/selected_cur.png");
-				KageFrame::imageSELECTED_X     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/selected_x.png");
-				KageFrame::imageSELECTED_X_CUR = Gdk::Pixbuf::create_from_resource("/kage/share/frame/selected_x_cur.png");
+				KageFrame::imageBLANK             = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank.png");
+				KageFrame::imageBLANK_CUR         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_cur.png");
+				KageFrame::imageBLANK_CUR_SEL     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_cur_sel.png");
+				KageFrame::imageBLANK_CUR_SEL_TWN = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_cur_sel_twn.png");
+				KageFrame::imageBLANK_CUR_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_cur_twn.png");
+				KageFrame::imageBLANK_SEL         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_sel.png");
+				KageFrame::imageBLANK_SEL_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_sel_twn.png");
+				KageFrame::imageBLANK_TWN         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_twn.png");
+				KageFrame::imageBLANK_X             = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x.png");
+				KageFrame::imageBLANK_X_CUR         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_cur.png");
+				KageFrame::imageBLANK_X_CUR_SEL     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_cur_sel.png");
+				KageFrame::imageBLANK_X_CUR_SEL_TWN = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_cur_sel_twn.png");
+				KageFrame::imageBLANK_X_CUR_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_cur_twn.png");
+				KageFrame::imageBLANK_X_SEL         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_sel.png");
+				KageFrame::imageBLANK_X_SEL_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_sel_twn.png");
+				KageFrame::imageBLANK_X_TWN         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_twn.png");
+				KageFrame::imageDRAWN             = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn.png");
+				KageFrame::imageDRAWN_CUR         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_cur.png");
+				KageFrame::imageDRAWN_CUR_SEL     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_cur_sel.png");
+				KageFrame::imageDRAWN_CUR_SEL_TWN = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_cur_sel_twn.png");
+				KageFrame::imageDRAWN_CUR_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_cur_twn.png");
+				KageFrame::imageDRAWN_SEL         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_sel.png");
+				KageFrame::imageDRAWN_SEL_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_sel_twn.png");
+				KageFrame::imageDRAWN_TWN         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_twn.png");
+				KageFrame::imageDRAWN_X             = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x.png");
+				KageFrame::imageDRAWN_X_CUR         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_cur.png");
+				KageFrame::imageDRAWN_X_CUR_SEL     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_cur_sel.png");
+				KageFrame::imageDRAWN_X_CUR_SEL_TWN = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_cur_sel_twn.png");
+				KageFrame::imageDRAWN_X_CUR_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_cur_twn.png");
+				KageFrame::imageDRAWN_X_SEL         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_sel.png");
+				KageFrame::imageDRAWN_X_SEL_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_sel_twn.png");
+				KageFrame::imageDRAWN_X_TWN         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_twn.png");
 			} catch (const Gio::ResourceError &ex) {
 				std::cerr << "KageFrame::ResourceError: " << ex.what() << std::endl;
 			} catch (const Gdk::PixbufError &ex) {
 				std::cerr << "KageFrame::PixbufError: " << ex.what() << std::endl;
 			}
 		}
+		bool l_current = _frameset->isCurrentFrame(frameID);
+		bool l_selected = isSelected();
+		bool l_tween = (getTween() > 0);
 		switch (_extension) {
 			case KageFrame::EXTENSION_NOT:
 			case KageFrame::EXTENSION_END:
-				if (isSelected() == true) {
-					if (_frameset->isCurrentFrame(frameID) == true) {
-						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageSELECTED_CUR, 0, -1);
-					} else {
-						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageSELECTED, 0, -1);
-					}
-				} else if (isEmpty() == true) {
-					if (_frameset->isCurrentFrame(frameID) == true) {
+				if (isEmpty() == true) {
+					if (       l_current == true  && l_selected == false && l_tween == false) {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK_CUR, 0, -1);
+					} else if (l_current == false && l_selected == true  && l_tween == false) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK_SEL, 0, -1);
+					} else if (l_current == false && l_selected == false && l_tween == true ) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK_TWN, 0, -1);
+					} else if (l_current == true  && l_selected == true  && l_tween == false) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK_CUR_SEL, 0, -1);
+					} else if (l_current == true  && l_selected == true  && l_tween == true ) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK_CUR_SEL_TWN, 0, -1);
+					} else if (l_current == true  && l_selected == false && l_tween == true ) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK_CUR_TWN, 0, -1);
+					} else if (l_current == false && l_selected == true  && l_tween == true ) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK_SEL_TWN, 0, -1);
 					} else {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK, 0, -1);
-					}
-				} else if (getTween() > 0) {
-					if (_frameset->isCurrentFrame(frameID) == true) {
-						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageTWEEN_CUR, 0, -1);
-					} else {
-						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageTWEEN, 0, -1);
 					}
 				} else if (isNull() == true) {
 					if (_frameset->isCurrentFrame(frameID) == true) {
@@ -228,8 +263,20 @@ bool KageFrame::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageNULL, 0, -1);
 					}
 				} else {
-					if (_frameset->isCurrentFrame(frameID) == true) {
+					if (       l_current == true  && l_selected == false && l_tween == false) {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN_CUR, 0, -1);
+					} else if (l_current == false && l_selected == true  && l_tween == false) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN_SEL, 0, -1);
+					} else if (l_current == false && l_selected == false && l_tween == true ) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN_TWN, 0, -1);
+					} else if (l_current == true  && l_selected == true  && l_tween == false) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN_CUR_SEL, 0, -1);
+					} else if (l_current == true  && l_selected == true  && l_tween == true ) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN_CUR_SEL_TWN, 0, -1);
+					} else if (l_current == true  && l_selected == false && l_tween == true ) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN_CUR_TWN, 0, -1);
+					} else if (l_current == false && l_selected == true  && l_tween == true ) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN_SEL_TWN, 0, -1);
 					} else {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN, 0, -1);
 					}
@@ -237,23 +284,23 @@ bool KageFrame::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 				break;
 			case KageFrame::EXTENSION_START:
 			case KageFrame::EXTENSION_MID:
-				if (isSelected() == true) {
-					if (_frameset->isCurrentFrame(frameID) == true) {
-						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageSELECTED_X_CUR, 0, -1);
-					} else {
-						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageSELECTED_X, 0, -1);
-					}
-				} else if (isEmpty() == true) {
-					if (_frameset->isCurrentFrame(frameID) == true) {
+				if (isEmpty() == true) {
+					if (       l_current == true  && l_selected == false && l_tween == false) {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK_X_CUR, 0, -1);
+					} else if (l_current == false && l_selected == true  && l_tween == false) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK_X_SEL, 0, -1);
+					} else if (l_current == false && l_selected == false && l_tween == true ) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK_X_TWN, 0, -1);
+					} else if (l_current == true  && l_selected == true  && l_tween == false) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK_X_CUR_SEL, 0, -1);
+					} else if (l_current == true  && l_selected == true  && l_tween == true ) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK_X_CUR_SEL_TWN, 0, -1);
+					} else if (l_current == true  && l_selected == false && l_tween == true ) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK_X_CUR_TWN, 0, -1);
+					} else if (l_current == false && l_selected == true  && l_tween == true ) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK_X_SEL_TWN, 0, -1);
 					} else {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageBLANK_X, 0, -1);
-					}
-				} else if (getTween() > 0) {
-					if (_frameset->isCurrentFrame(frameID) == true) {
-						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageTWEEN_X_CUR, 0, -1);
-					} else {
-						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageTWEEN_X, 0, -1);
 					}
 				} else if (isNull() == true) {
 					if (_frameset->isCurrentFrame(frameID) == true) {
@@ -262,8 +309,20 @@ bool KageFrame::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageNULL_X, 0, -1);
 					}
 				} else {
-					if (_frameset->isCurrentFrame(frameID) == true) {
+					if (       l_current == true  && l_selected == false && l_tween == false) {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN_X_CUR, 0, -1);
+					} else if (l_current == false && l_selected == true  && l_tween == false) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN_X_SEL, 0, -1);
+					} else if (l_current == false && l_selected == false && l_tween == true ) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN_X_TWN, 0, -1);
+					} else if (l_current == true  && l_selected == true  && l_tween == false) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN_X_CUR_SEL, 0, -1);
+					} else if (l_current == true  && l_selected == true  && l_tween == true ) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN_X_CUR_SEL_TWN, 0, -1);
+					} else if (l_current == true  && l_selected == false && l_tween == true ) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN_X_CUR_TWN, 0, -1);
+					} else if (l_current == false && l_selected == true  && l_tween == true ) {
+						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN_X_SEL_TWN, 0, -1);
 					} else {
 						Gdk::Cairo::set_source_pixbuf(cr, KageFrame::imageDRAWN_X, 0, -1);
 					}

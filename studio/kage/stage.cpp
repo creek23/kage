@@ -1045,6 +1045,62 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, bool p_forc
 	}
 	Kage::timestamp_OUT();
 }
+
+
+bool KageStage::renderToPNGOffset(string p_path, bool p_transparent, double p_offsetX, double p_offsetY) {
+	#ifdef CAIRO_HAS_PNG_FUNCTIONS
+		Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, stageWidth, stageHeight);
+		
+		Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
+		
+		GdkPoint l_tempOrigin;
+		l_tempOrigin.x = origin.x;
+		l_tempOrigin.y = origin.y;
+		
+		origin.x = 0;
+		origin.y = 0;
+		
+		if (p_transparent == false) {
+			clearScreen(l_context);
+		}
+		
+		unsigned int l_layerCount = win->_layerManager.layerCount();
+		unsigned int l_currentLayer = win->getCurrentLayer();
+			for (unsigned int i = 1; i <= l_layerCount; ++i) {
+				win->_framesetManager.setCurrentLayer(i);
+				renderFrameToPNGOffset(l_context, p_offsetX, p_offsetY);
+			}
+		win->setCurrentLayer(l_currentLayer);
+		
+		CairoKage::writeToPNG(p_path, surface);
+		
+		origin.x = l_tempOrigin.x;
+		origin.y = l_tempOrigin.y;
+		
+		return true;
+	#else
+		std::cout << "You must compile cairo with PNG support for this example to work." << std::endl;
+		return false;
+	#endif
+}
+void KageStage::renderFrameToPNGOffset(Cairo::RefPtr<Cairo::Context> p_context, double p_offsetX, double p_offsetY) {
+	renderFrameOffset(p_context, true, p_offsetX, p_offsetY);
+}
+
+void KageStage::renderFrameOffset(Cairo::RefPtr<Cairo::Context> p_context, bool p_force, double p_offsetX, double p_offsetY) {
+	Kage::timestamp_IN();
+	cout << " KageStage::renderFrame p_force " << p_force << endl;
+	vector<VectorData> v = win->getFrameData(p_force).getVectorData();
+	renderFrameOffset(p_context, v, 1.0, p_offsetX, p_offsetY);
+	if (_polyVectors.isEmpty() == false) {
+		Kage::timestamp_IN();
+		cout << " KageStage::renderFrame _polyVectors " << _polyVectors.getVectorData().size() << endl;
+		renderFrameOffset(p_context, _polyVectors.getVectorData(), 1.0, p_offsetX, p_offsetY);
+		Kage::timestamp_OUT();
+	}
+	Kage::timestamp_OUT();
+}
+
 /**
  * For use by Kage, when Onion Skin is toggled
  */
@@ -1054,6 +1110,7 @@ void KageStage::renderOnionFrame(Cairo::RefPtr<Cairo::Context> p_context, vector
 	renderFrame(p_context, p_vectorData, p_alpha);
 	Kage::timestamp_OUT();
 }
+
 void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> p_vectorData, double p_alpha) {
 	Kage::timestamp_IN();
 	cout << " KageStage::renderFrame v " << p_vectorData.size() << " " << endl;
@@ -1159,6 +1216,127 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
 					p_context->set_font_size(32);
 					p_context->set_source_rgb(0, 0, 1);
 					p_context->move_to(10, 50);
+					p_context->show_text("Hello, world");
+				break;
+			case VectorData::TYPE_IMAGE:
+				//2 '1st is for X/Y, 2nd is for width/height  -- ?!?
+				break;
+			case VectorData::TYPE_INIT:
+				l_mouseLocationShapeIndex = i;
+				break;
+			default:
+				break;
+		}
+	}
+	
+	Kage::timestamp_OUT();
+}
+
+void KageStage::renderFrameOffset(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> p_vectorData, double p_alpha, double p_offsetX, double p_offsetY) {
+	Kage::timestamp_IN();
+	cout << " KageStage::renderFrame v " << p_vectorData.size() << " " << endl;
+	unsigned int vsize = p_vectorData.size();
+	unsigned int fillCtr = 0;
+	ColorData fcolor;
+	StrokeColorData scolor;
+	PointData p;
+	double x1;
+	double y1;
+	double x2;
+	double y2;
+	double x3;
+	double y3;
+	bool l_mouseLocationOnShape = false;
+	unsigned int l_mouseLocationShapeIndex = _NO_SELECTION;
+	for (unsigned int i = 0; i < vsize; ++i) {
+		switch (p_vectorData[i].vectorType) {
+			case VectorData::TYPE_CLOSE_PATH:
+				p_context->close_path();
+				break;
+			case VectorData::TYPE_FILL:
+				fcolor = p_vectorData[i].fillColor;
+				fillCtr++;
+				p_context->begin_new_path();
+				break;
+			case VectorData::TYPE_ENDFILL:
+				l_mouseLocationOnShape = p_context->in_fill(_mouseLocation.x, _mouseLocation.y);
+				if (l_mouseLocationOnShape != 0) {
+					_mouseLocationShapeIndex = l_mouseLocationShapeIndex;
+				} else if (_mouseLocationShapeIndex == _NO_SELECTION) {
+					l_mouseLocationOnShape = p_context->in_stroke(_mouseLocation.x, _mouseLocation.y);
+					if (l_mouseLocationOnShape != 0) {
+						_mouseLocationShapeIndex = l_mouseLocationShapeIndex;
+					}
+				}
+				
+				if (fillCtr > 0) {
+					p_context->set_source_rgba((double)fcolor.getR()/255.0f * p_alpha,
+											   (double)fcolor.getG()/255.0f * p_alpha,
+											   (double)fcolor.getB()/255.0f * p_alpha,
+											   (double)fcolor.getA()/255.0f * p_alpha);
+					p_context->fill_preserve();
+					fillCtr--;
+				}
+				if (scolor.getThickness() > 0) {
+					p_context->set_source_rgba((double)scolor.getR()/255.0f * p_alpha,
+											   (double)scolor.getG()/255.0f * p_alpha,
+											   (double)scolor.getB()/255.0f * p_alpha,
+											   (double)scolor.getA()/255.0f * p_alpha);
+					p_context->set_line_width(scolor.getThickness() * _zoomValue);
+						p_context->set_line_cap(Cairo::LINE_CAP_ROUND);
+							p_context->stroke();
+				}
+				break;
+			case VectorData::TYPE_STROKE:
+				scolor = p_vectorData[i].stroke;
+				break;
+			case VectorData::TYPE_MOVE:
+				p_context->move_to(p_offsetX + p_vectorData[i].points[0].x + origin.x, p_offsetY + p_vectorData[i].points[0].y + origin.y);
+				
+				p.x = p_vectorData[i].points[0].x;
+				p.y = p_vectorData[i].points[0].y;
+				break;
+			case VectorData::TYPE_LINE:
+				p_context->line_to(p_offsetX + p_vectorData[i].points[0].x + origin.x, p_offsetY + p_vectorData[i].points[0].y + origin.y);
+				
+				p.x = p_vectorData[i].points[0].x;
+				p.y = p_vectorData[i].points[0].y;
+				break;
+			case VectorData::TYPE_CURVE_QUADRATIC:
+				//cubic-to-quad algo borrowed from Mono/Moonlight's moon_quad_curve_to
+				x1 = p_vectorData[i].points[0].x;
+				y1 = p_vectorData[i].points[0].y;
+				x2 = p_vectorData[i].points[1].x;
+				y2 = p_vectorData[i].points[1].y;
+				x3 = x2;
+				y3 = y2;
+				
+				x2 = x1 + (x2 - x1) / 3;
+				y2 = y1 + (y2 - y1) / 3;
+				x1 = p.x + 2 * (x1 - p.x) / 3;
+				y1 = p.y + 2 * (y1 - p.y) / 3;
+				
+				p_context->curve_to(
+						p_offsetX + x1 + origin.x, p_offsetY + y1 + origin.y,
+						p_offsetX + x2 + origin.x, p_offsetY + y2 + origin.y,
+						p_offsetX + x3 + origin.x, p_offsetY + y3 + origin.y
+					);
+				
+				p.x = x3;
+				p.y = y3;
+				break;
+			case VectorData::TYPE_CURVE_CUBIC:
+				p_context->curve_to(
+						p_offsetX + p_vectorData[i].points[0].x + origin.x, p_offsetY + p_vectorData[i].points[0].y + origin.y,
+						p_offsetX + p_vectorData[i].points[1].x + origin.x, p_offsetY + p_vectorData[i].points[1].y + origin.y,
+						p_offsetX + p_vectorData[i].points[2].x + origin.x, p_offsetY + p_vectorData[i].points[2].y + origin.y
+				);
+				break;
+			case VectorData::TYPE_TEXT:
+					p_context->select_font_face ("Verdana", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_BOLD);
+					p_context->set_font_size(32);
+					p_context->set_source_rgb(0, 0, 1);
+					p_context->move_to(p_offsetX + 10, p_offsetY + 50);
 					p_context->show_text("Hello, world");
 				break;
 			case VectorData::TYPE_IMAGE:

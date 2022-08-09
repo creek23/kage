@@ -105,6 +105,8 @@
 			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context, bool p_force = false);
 			void renderOnionFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> p_vectorData, double p_alpha);
 			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> p_vectorData, double p_alpha = 1.0);
+			void renderFrameOffset(Cairo::RefPtr<Cairo::Context> p_context, bool p_force = false, double p_offsetX = 0.0, double p_offsetY = 0.0);
+			void renderFrameOffset(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> p_vectorData, double p_alpha = 1.0, double p_offsetX = 0.0, double p_offsetY = 0.0);
 			void initNodeTool();
 			void handleShapes();
 			void handleShapes_modifyingShapeRotate();
@@ -181,7 +183,9 @@
 			vector<VectorData> _vectorDataZOrderBufferC;
 			
 			bool renderToPNG(string p_path, bool p_transparent);
+			bool renderToPNGOffset(string p_path, bool p_transparent, double p_offsetX = 0.0, double p_offsetY = 0.0);
 			void renderFrameToPNG(Cairo::RefPtr<Cairo::Context> p_context);
+			void renderFrameToPNGOffset(Cairo::RefPtr<Cairo::Context> p_context, double p_offsetX = 0.0, double p_offsetY = 0.0);
 			
 			Cairo::RefPtr<Cairo::Context> cr;
 			PointData origin;

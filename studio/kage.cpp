@@ -162,6 +162,11 @@ Kage::Kage(string p_filePath) :
 		sigc::mem_fun(*this, &Kage::ExportPNGTransparent_onClick)
 	);
 	m_refActionGroup->add(
+		Gtk::Action::create("ExportPNGSpritesheet", "Spritesheet PNG", "Export PNG in Spritesheet format (Transparent Background)"),
+//		Gtk::AccelKey("<control>5"),
+		sigc::mem_fun(*this, &Kage::ExportPNGSpritesheet_onClick)
+	);
+	m_refActionGroup->add(
 		Gtk::Action::create("ExportPNGSequence", "PNG Sequence", "Export PNG Sequence"),
 //		Gtk::AccelKey("<control>5"),
 		sigc::mem_fun(*this, &Kage::ExportPNGSequence_onClick)
@@ -248,8 +253,13 @@ Kage::Kage(string p_filePath) :
 	//==================================================================
 	m_refActionGroup->add(
 		Gtk::Action::create("LayerAdd", "_Add Layer", "Add New Layer"),
-		Gtk::AccelKey("<shift><control>N"),
+		Gtk::AccelKey("<control>F7"),
 		sigc::mem_fun(*this, &Kage::LayerAdd_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("LayerDelete", "_Delete Layer", "Delete Layer"),
+		Gtk::AccelKey("<control>F8"),
+		sigc::mem_fun(*this, &Kage::LayerDel_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("LayerRename", "Re_name Layer", "Rename Current Layer"),
@@ -413,16 +423,6 @@ Kage::Kage(string p_filePath) :
 		Gtk::AccelKey("<control><shift>T"),
 		sigc::mem_fun(*this, &Kage::RemoveTweenFrame_onClick)
 	);
-	m_refActionGroup->add(
-		Gtk::Action::create("AddLayer", "_Add Layer", "Add Layer"),
-		Gtk::AccelKey("<control>F7"),
-		sigc::mem_fun(*this, &Kage::LayerAdd_onClick)
-	);
-	m_refActionGroup->add(
-		Gtk::Action::create("DeleteLayer", "_Delete Layer", "Delete Layer"),
-		Gtk::AccelKey("<control>F8"),
-		sigc::mem_fun(*this, &Kage::LayerDel_onClick)
-	);
 	Gtk::RadioAction::Group group_tools;
 	m_refActionGroup->add(
 		Gtk::RadioAction::create(group_tools, "ToolSelect", "_Select", "Select Tool"),
@@ -520,6 +520,7 @@ Kage::Kage(string p_filePath) :
 		"				<menu action='ExportPNGMenu'>"
 		"					<menuitem action='ExportPNG'/>"
 		"					<menuitem action='ExportPNGTransparent'/>"
+		"					<menuitem action='ExportPNGSpritesheet'/>"
 		"					<menuitem action='ExportPNGSequence'/>"
 		"				</menu>"
 		"			</menu>"
@@ -551,6 +552,7 @@ Kage::Kage(string p_filePath) :
 		"		</menu>"
 		"		<menu action='LayerMenu'>"
 		"			<menuitem action='LayerAdd'/>"
+		"			<menuitem action='LayerDelete'/>"
 		"			<menuitem action='LayerRename'/>"
 		"			<separator/>"
 		"			<menuitem action='ShowHideLayer'/>"
@@ -595,9 +597,6 @@ Kage::Kage(string p_filePath) :
 //		"			<menuitem action='Tween'/>"
 		"			<menuitem action='TweenFrame'/>"
 		"			<menuitem action='RemoveTweenFrame'/>"
-		"			<separator/>"
-		"			<menuitem action='AddLayer'/>"
-		"			<menuitem action='DeleteLayer'/>"
 		"		</menu>"
 		"		<menu action='ToolsMenu'>"
 		"			<menuitem action='ToolSelect'/>"
@@ -2520,6 +2519,7 @@ void Kage::ExportPNG_onClick() {
 void Kage::ExportPNGTransparent_onClick() {
 	doExportPNGDialog("Export to PNG (Transparent)", true);
 }
+
 void Kage::doExportPNGDialog(string p_title, bool p_transparent) {
 	Gtk::FileChooserDialog dialog(p_title, Gtk::FILE_CHOOSER_ACTION_SAVE);
 	dialog.set_transient_for( * this);
@@ -2554,8 +2554,73 @@ void Kage::doExportPNGDialog(string p_title, bool p_transparent) {
 			if (m_KageStage.renderToPNG(l_pngPath, p_transparent) == true) {
 				updateStatus("Exported to " + l_pngPath);
 			} else {
-				updateStatus("Unable to exported!  Please try a different directory.");
+				updateStatus("Unable to export!  Please try a different directory.");
 			}
+			break;
+	}
+}
+
+void Kage::ExportPNGSpritesheet_onClick() {
+	Gtk::FileChooserDialog dialog("Export Spritesheet PNG", Gtk::FILE_CHOOSER_ACTION_SAVE);
+	dialog.set_transient_for( * this);
+		//Add response buttons the the dialog:
+		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+		dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
+	
+	auto filter_png = Gtk::FileFilter::create();
+		filter_png->set_name("Spritesheet Portable Network Graphics");
+		filter_png->add_mime_type("image/png");
+		filter_png->add_pattern("*.png");
+			dialog.add_filter(filter_png);
+	int result = dialog.run();
+	
+	switch (result) {
+		case Gtk::RESPONSE_OK:
+			string l_pngPath = dialog.get_filename();
+			cout << "uri:" << dialog.get_uri() << endl;
+			string l_pngSpritesheetPath;
+			int l_len = strlen(l_pngPath.c_str()) - 4;
+			if (StringHelper::toLower(l_pngPath).substr(l_len, 4) == ".png") {
+				l_pngPath = l_pngPath.substr(0, l_len);
+			}
+			
+			unsigned int l_lMax = _layerManager.layerCount();
+			unsigned int i;
+				unsigned int l_fMax = _framesetManager.frameCount();
+				unsigned int j;
+					unsigned int t;
+					unsigned int f;
+				
+				GdkPoint l_tempOrigin;
+				l_tempOrigin.x = m_KageStage.origin.x;
+				l_tempOrigin.y = m_KageStage.origin.y;
+				
+				m_KageStage.origin.x = 0;
+				m_KageStage.origin.y = 0;
+				
+				t = getCurrentLayer();
+				f = getCurrentFrame();
+					
+					Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, m_KageStage.stageWidth * l_fMax, m_KageStage.stageHeight);
+					Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
+
+					for (j = 1; j <= l_fMax; ++j) {
+						_framesetManager.setCurrentFrame(j);
+						
+						for (i = 1; i <= l_lMax; i++) {
+							_framesetManager.setCurrentLayer(i);
+							m_KageStage.renderFrameOffset(l_context, true, m_KageStage.stageWidth*(j-1));
+						}
+					}
+
+					CairoKage::writeToPNG(l_pngPath + ".png", surface);
+				setCurrentFrame(f);
+				setCurrentLayer(t);
+
+				m_KageStage.origin.x = l_tempOrigin.x;
+				m_KageStage.origin.y = l_tempOrigin.y;
+			
+			updateStatus("Exported to " + l_pngPath);
 			break;
 	}
 }

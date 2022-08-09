@@ -160,6 +160,7 @@
 			void ExportSVG_onClick();
 			void ExportPNG_onClick();
 			void ExportPNGTransparent_onClick();
+			void ExportPNGSpritesheet_onClick();
 			void ExportPNGSequence_onClick();
 			void ExportAVI_onClick();
 			void ProjectSave_onClick(); //place holder

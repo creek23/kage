@@ -1,4 +1,4 @@
-Kage Studio 0.5.22x
+Kage Studio 0.6.22x
 A simple, Free and Open Source 2D Animation Software
 written by Mj Mendoza IV <mj.mendoza.iv at gmail dot com>
 

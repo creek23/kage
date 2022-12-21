@@ -106,7 +106,7 @@
 			unsigned int getTween();
 			
 			void forceRender();
-			virtual bool render();
+			virtual bool invalidateToRender();
 			
 			static bool _gotFocus;
 			

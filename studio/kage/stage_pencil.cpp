@@ -59,33 +59,7 @@ void KageStage::handleDrawPencilMouseMove(PointData p_point) {
 			drawFree4.y = p_point.y;
 			
 			drawCtr = 0;
-			/*
-			if (_polyVectors.getVectorData().size() > 4
-			        && draw1.x-5 <= polyXhead && draw1.x+5 >= polyXhead
-					&& draw1.y-5 <= polyYhead && draw1.y+5 >= polyYhead) {
-				_polyVectors.addCubic(PointData(drawFree2), PointData(drawFree3), PointData(drawFree4));
-				_polyVectors.addClosePath();
-				_polyVectors.addEndFill();
-					vector<unsigned int> l_shape;
-						l_shape.push_back(0);
-				_polyVectors.recenterRotationPoint(l_shape);
-				win->addDataToFrame(_polyVectors);
-				drawCtr = 0;
-				_polyVectors.clear();
-				win->ToolSelect_onClick();
-				win->stackDo();
-			} else {/*if (drawCtr > 0
-					&& draw1.x-5 <= polyXtail && draw1.x+5 >= polyXtail
-					&& draw1.y-5 <= polyYtail && draw1.y+5 >= polyYtail) {
-				_polyVectors.addEndFill();
-					vector<unsigned int> l_shape;
-						l_shape.push_back(0);
-				_polyVectors.recenterRotationPoint(l_shape);
-				win->addDataToFrame(_polyVectors);
-				_polyVectors.clear();
-				drawCtr = 0;
-				win->ToolSelect_onClick();
-				win->stackDo();*/
+			
 				drawFree2.x -= origin.x;
 				drawFree2.y -= origin.y;
 				drawFree3.x -= origin.x;
@@ -93,17 +67,9 @@ void KageStage::handleDrawPencilMouseMove(PointData p_point) {
 				drawFree4.x -= origin.x;
 				drawFree4.y -= origin.y;
 				_polyVectors.addCubic(PointData(drawFree2), PointData(drawFree3), PointData(drawFree4));
-			//}
 			
 			polyXtail = drawFree4.x;
 			polyYtail = drawFree4.y;
-			
-		}
-		
-		if (drawCtr > 0) {
-			//TODO: copied from Draw Poly; is this needed here?
-//			draw2.x = (e->button.x);
-//			draw2.y = (e->button.y);
 		}
 		
 		invalidateToRender();
@@ -130,21 +96,6 @@ void KageStage::handleDrawPencilMouseUp() {
 			_polyVectors.clear();
 			drawCtr = 0;
 			win->stackDo();
-		/*} else if (drawCtr > 0
-				&& draw1.x-5 <= polyXtail && draw1.x+5 >= polyXtail
-				&& draw1.y-5 <= polyYtail && draw1.y+5 >= polyYtail) {
-			_polyVectors.addEndFill();
-				vector<unsigned int> l_shape;
-					l_shape.push_back(0);
-			_polyVectors.recenterRotationPoint(l_shape);
-			win->addDataToFrame(_polyVectors);
-			_polyVectors.clear();
-			drawCtr = 0;
-			win->ToolSelect_onClick();
-			win->stackDo();
-		} else if (drawCtr > 0
-				&& draw1.x-5 <= polyXtail && draw1.x+5 >= polyXtail
-				&& draw1.y-5 <= polyYtail && draw1.y+5 >= polyYtail) {*/
 		} else{
 			_polyVectors.addEndFill();
 				vector<unsigned int> l_shape;

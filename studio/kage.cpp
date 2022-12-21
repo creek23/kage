@@ -1430,6 +1430,9 @@ void Kage::RemoveFrame_onClick() {
 }
 
 void Kage::refreshUI() {
+	if (KageFramesetManager::LOADING_MODE == true) {
+		return;
+	}
 	show_all();
 	if (KageStage::toolMode == KageStage::MODE_SELECT
 			|| KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_RECT
@@ -1998,6 +2001,9 @@ bool Kage::isFrameEmpty() {
 }
 
 void Kage::forceRenderFrames() {
+	if (KageFramesetManager::LOADING_MODE == true) {
+		return;
+	}
 	Kage::timestamp_IN(); cout << " Kage::forceRenderFrames " << endl;
 	m_KageStage.invalidateToRender();
 	renderFrames();
@@ -2040,8 +2046,10 @@ void Kage::renderOnionFrames() {
  * This renders all frameN in all layers, where frameN is the currentFrame
  */
 void Kage::renderFrames() {
-	Kage::timestamp_IN();
-	cout << " Kage::renderFrames" << endl;
+	if (KageFramesetManager::LOADING_MODE == true) {
+		return;
+	}
+	Kage::timestamp_IN(); cout << " Kage::renderFrames" << endl;
 	
 	m_KageStage.clearScreen(m_KageStage.cr);
 	
@@ -4028,6 +4036,7 @@ void Kage::parseKSF(string p_content) {
 		//unable to parse KSF
 		updateStatus("Loading Error 2: Unabe to load " + ksfPath);
 	}
+	refreshUI();
 }
 
 bool Kage::runExternal(string p_cmd, string p_param) {

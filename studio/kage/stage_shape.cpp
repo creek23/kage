@@ -612,6 +612,10 @@ void KageStage::updateShapeHeight(double p_value) {
 }
 
 void KageStage::handleShapes_modifyingShapeRotate() {
+	if (anchor_rotate.x == 0 && anchor_rotate.y == 0) {
+		anchor_rotate.x = anchor_center.x;
+		anchor_rotate.y = anchor_center.y;
+	}
 	PointData l_rotateNew;
 		l_rotateNew.x = draw2.x - anchor_rotate.x;
 		l_rotateNew.y = draw2.y - anchor_rotate.y;
@@ -816,6 +820,10 @@ void KageStage::handleShapes_modifyingShape() {
 	} else if (mouseOnAnchor != AnchorData::TYPE_NONE
 			&& mouseOnAnchor != AnchorData::TYPE_MOVE
 			&& _rotateMode == true) {
+		if (anchor_rotate.x == 0 && anchor_rotate.y == 0) {
+			anchor_rotate.x = anchor_center.x;
+			anchor_rotate.y = anchor_center.y;
+		}
 		PointData l_rotateNew;
 			l_rotateNew.x = draw2.x - anchor_rotate.x;
 			l_rotateNew.y = draw2.y - anchor_rotate.y;

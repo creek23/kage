@@ -58,7 +58,7 @@
 			unsigned int layerID;
 			
 			void forceRender();
-			virtual bool render();
+			virtual bool invalidateToRender();
 			Gtk::Entry _txtLabel;
 			void txtLabel_onEnter();
 			

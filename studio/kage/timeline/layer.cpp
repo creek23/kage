@@ -85,7 +85,7 @@ bool KageLayer::on_expose_event(GdkEventExpose* e) {
 		window = get_window();
 	}
 	if (window) {
-		render();
+		invalidateToRender();
 	}
 	
 	return true;
@@ -95,12 +95,12 @@ bool KageLayer::on_event(GdkEvent *e) {
 	if (e->type == GDK_ENTER_NOTIFY) {
 		Kage::timestamp_IN();
 		std::cout << " KageLayer(L " << layerID << ") on_event enter" << std::endl;
-		render();
+		invalidateToRender();
 		Kage::timestamp_OUT();
 	} else if (e->type == GDK_LEAVE_NOTIFY) {
 		Kage::timestamp_IN();
 		std::cout << " KageLayer(L " << layerID << ") on_event leave" << std::endl;
-		render();
+		invalidateToRender();
 		Kage::timestamp_OUT();
 	} else if (e->type == GDK_DOUBLE_BUTTON_PRESS) {
 		if (e->button.x > 36) {
@@ -110,7 +110,7 @@ bool KageLayer::on_event(GdkEvent *e) {
 	} else if (e->type == GDK_BUTTON_RELEASE) {
 		KageLayer::mouseIsDown = false;
 		grab_focus();
-		render();
+		invalidateToRender();
 	} else if (e->type == GDK_BUTTON_PRESS) {
 		KageLayer::mouseIsDown = true;
 		if (e->button.x < 18) {
@@ -121,7 +121,7 @@ bool KageLayer::on_event(GdkEvent *e) {
 			_layerManager->setSelected(this);
 		}
 		_layerManager->renderStage();
-		render();
+		invalidateToRender();
 	} else if (e->type == GDK_EXPOSE) {
 		on_expose_event((GdkEventExpose*) e);
 	} else if (e->type == GDK_FOCUS_CHANGE) {
@@ -138,12 +138,18 @@ bool KageLayer::on_event(GdkEvent *e) {
 
 
 void KageLayer::forceRender() {
+	if (KageFramesetManager::LOADING_MODE == true) {
+		return;
+	}
 	Kage::timestamp_IN(); cout << " KageLayer::forceRender()" << endl;
-	render();
+	invalidateToRender();
 	Kage::timestamp_OUT();
 }
-bool KageLayer::render() {
-	Kage::timestamp_IN(); cout << " KageLayer::render()" << endl;
+bool KageLayer::invalidateToRender() {
+	if (KageFramesetManager::LOADING_MODE == true) {
+		return true;
+	}
+	Kage::timestamp_IN(); cout << " KageLayer::invalidateToRender()" << endl;
 	if (!window) {
 		window = get_window();
 	}
@@ -223,14 +229,14 @@ bool KageLayer::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 
 void KageLayer::setLabel(string p_label) {
 	_label = p_label;
-	render();
+	invalidateToRender();
 }
 string KageLayer::getLabel() {
 	return _label;
 }
 void KageLayer::setSelected(bool p_selected) {
 	_selected = p_selected;
-	render();
+	invalidateToRender();
 }
 bool KageLayer::isSelected() {
 	return _selected;
@@ -254,7 +260,7 @@ void KageLayer::toggleVisibility() {
 	} else {
 		_visible = true;
 	}
-	render();
+	invalidateToRender();
 }
 
 void KageLayer::toggleLock() {
@@ -263,15 +269,15 @@ void KageLayer::toggleLock() {
 	} else {
 		_lock = true;
 	}
-	render();
+	invalidateToRender();
 }
 
 void KageLayer::setVisible(bool p_visible) {
 	_visible = p_visible;
-	render();
+	invalidateToRender();
 }
 
 void KageLayer::setLock(bool p_lock) {
 	_lock = p_lock;
-	render();
+	invalidateToRender();
 }

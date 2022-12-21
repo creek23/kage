@@ -111,7 +111,7 @@ bool KageFrame::on_expose_event(GdkEventExpose* e) {
 		window = get_window();
 	}
 	if (window) {
-		render();
+		invalidateToRender();
 	}
 	
 	return true;
@@ -121,17 +121,17 @@ bool KageFrame::on_event(GdkEvent *e) {
 	if (e->type == GDK_ENTER_NOTIFY) {
 		Kage::timestamp_IN();
 		std::cout << " KageFrame(F " << frameID << " L " << layerID << ") on_event enter" << std::endl;
-		render();
+		invalidateToRender();
 		Kage::timestamp_OUT();
 	} else if (e->type == GDK_LEAVE_NOTIFY) {
 		Kage::timestamp_IN();
 		std::cout << " KageFrame(F " << frameID << " L " << layerID << ") on_event leave" << std::endl;
-		render();
+		invalidateToRender();
 		Kage::timestamp_OUT();
 	} else if (e->type == GDK_BUTTON_RELEASE) {
 		KageFrame::mouseIsDown = false;
 		grab_focus();
-//		render();
+//		invalidateToRender();
 	} else if (e->type == GDK_BUTTON_PRESS) {
 		KageFrame::mouseIsDown = true;
 		_frameset->setSelected(this);
@@ -163,10 +163,16 @@ bool KageFrame::on_event(GdkEvent *e) {
 
 
 void KageFrame::forceRender() {
-	render();
+	if (KageFramesetManager::LOADING_MODE == true) {
+		return;
+	}
+	invalidateToRender();
 }
-bool KageFrame::render() {
-	Kage::timestamp_IN(); cout << " KageFrame::render()" << endl;
+bool KageFrame::invalidateToRender() {
+	if (KageFramesetManager::LOADING_MODE == true) {
+		return true;
+	}
+	Kage::timestamp_IN(); cout << " KageFrame::invalidateToRender()" << endl;
 	if (!window) {
 		window = get_window();
 	}
@@ -184,6 +190,9 @@ bool KageFrame::render() {
 }
 
 bool KageFrame::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
+	if (KageFramesetManager::LOADING_MODE == true) {
+		return true;
+	}
 	if (!window) {
 		window = get_window();
 	}
@@ -338,7 +347,7 @@ bool KageFrame::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 
 void KageFrame::setSelected(bool p_selected) {
 	_selected = p_selected;
-	render();
+	invalidateToRender();
 }
 bool KageFrame::isSelected() {
 	return _selected;
@@ -346,7 +355,7 @@ bool KageFrame::isSelected() {
 
 void KageFrame::setExtension(KageFrame::extension p_extension) {
 	_extension = p_extension;
-	render();
+	invalidateToRender();
 }
 KageFrame::extension KageFrame::getExtension() {
 	return _extension;
@@ -354,7 +363,7 @@ KageFrame::extension KageFrame::getExtension() {
 
 void KageFrame::setNull(bool p_null) {
 	_null = p_null;
-	render();
+	invalidateToRender();
 }
 bool KageFrame::isNull() {
 	return _null;
@@ -364,7 +373,7 @@ void KageFrame::forceSetTween(unsigned int p_tween) {
 	_tweenY = p_tween - (_tweenX*10);
 	cout << " KageFrame::setTween() " << _tweenX << " " << _tweenY << endl;
 	
-	render();
+	invalidateToRender();
 }
 void KageFrame::setTween(unsigned int p_tween) {
 	if (_null == true) {
@@ -390,7 +399,7 @@ void KageFrame::setCurrent(bool p_current) {
 		grab_focus();
 	}
 	_current = p_current;
-	render();
+	invalidateToRender();
 }
 bool KageFrame::isCurrent() {
 	return _current;
@@ -416,7 +425,7 @@ void KageFrame::setFrameData(VectorDataManager p_vectorsData) {
 	if (       _extension == KageFrame::EXTENSION_NOT
 			|| _extension == KageFrame::EXTENSION_START) {
 		vectorsData = p_vectorsData;
-		render();
+		invalidateToRender();
 	} else {
 		_frameset->setFrameDataToPreviousFrame(p_vectorsData, frameID);
 	}

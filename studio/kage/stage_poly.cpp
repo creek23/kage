@@ -59,7 +59,6 @@ void KageStage::handleDrawPolyMouseUp() {
 			win->ToolSelect_onClick();
 			win->stackDo();
 		} else {
-			cout << "\t\tTEST a " << draw1.x <<  " b " << draw2.x << " and " << drawConstraint.x << " ? " << origin.x << " and " << _mouseLocation.x << endl;
 			PointData p2(draw1);
 				_polyVectors.addLinePoly(p2, polyXtail, polyYtail);
 			

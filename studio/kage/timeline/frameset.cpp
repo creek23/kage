@@ -971,6 +971,9 @@ bool KageFrameset::setExtendedFrameTween(unsigned int p_frameID, unsigned int p_
 				_frames[j]->forceSetTween(p_tween);
 				if (_frames[j]->getExtension() == KageFrame::EXTENSION_END) {
 					break;
+				} else if (_frames[j]->getExtension() == KageFrame::EXTENSION_NOT) {
+					_frames[j]->setExtension(KageFrame::EXTENSION_END);
+					break;
 				}
 			}
 			return true;

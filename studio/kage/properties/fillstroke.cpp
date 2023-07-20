@@ -191,9 +191,9 @@ PropertyFillStroke::PropertyFillStroke(Kage* p_kage) :
                     sigc::mem_fun(*this, &PropertyFillStroke::EntryStrokeRGBA_onEnter));
             m_PropStrokeV2.pack_start(m_EntryStrokeThickness, Gtk::PACK_SHRINK);
                 m_EntryStrokeThickness.set_size_request(20, 24);
-                m_EntryStrokeThickness.set_width_chars(3);
-                m_EntryStrokeThickness.set_max_length(3);
-                m_EntryStrokeThickness.set_text(StringHelper::integerToString((int)KageStage::stroke.getThickness()));
+                m_EntryStrokeThickness.set_width_chars(6); //allows XXX.XX or XXXX.X
+                m_EntryStrokeThickness.set_max_length(6);
+                m_EntryStrokeThickness.set_text(StringHelper::doubleToString((int)KageStage::stroke.getThickness()));
                 m_EntryStrokeThickness.signal_activate().connect(
                     sigc::mem_fun(*this, &PropertyFillStroke::EntryStrokeThickness_onEnter));
 }
@@ -649,7 +649,7 @@ void PropertyFillStroke::setScaleStrokeRGBA(ColorData p_colordata) {
     _scaleStrokeAlpha.set_value((double) p_colordata.getA()*100.0f/255.0f);
 }
 void PropertyFillStroke::setStrokeThicknessText(double p_thickness) {
-	m_EntryStrokeThickness.set_text(StringHelper::unsignedIntegerToString(p_thickness));
+	m_EntryStrokeThickness.set_text(StringHelper::doubleToString(p_thickness));
 }
 string PropertyFillStroke::getStrokeThicknessText() {
 	return m_EntryStrokeThickness.get_text();

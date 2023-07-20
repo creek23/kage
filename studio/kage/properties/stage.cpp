@@ -106,6 +106,7 @@ void PropertyStage::setHeightText(double p_height) {
 
 void PropertyStage::setFPSText(unsigned int p_fps) {
     m_EntryStageFPS.set_text(StringHelper::unsignedIntegerToString(p_fps));
+    _kage->_timeline.forceRender();
 }
 
 void PropertyStage::setBackgroundColor(Gdk::Color p_color) {

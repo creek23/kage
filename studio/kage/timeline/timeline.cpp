@@ -250,8 +250,9 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 		bool l_current = false;
 		bool l_selected = isSelected();
 		bool l_tween = false;
-		//8 is offset
+		//draw background
 		const unsigned int FRAME_WIDTH_OFFSET = 8;
+		const unsigned int FRAME_HEIGHT_OFFSET = 23;
 		p_context->move_to(FRAME_WIDTH_OFFSET,            0);
 		p_context->line_to(       get_width(),            0);
 		p_context->line_to(       get_width(), get_height());
@@ -263,14 +264,13 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 		p_context->stroke();
 
 		unsigned int l_layers = _kage->_document.Scenes[_kage->_document.getActiveSceneID()].Layers.size();
-		double l_y = get_height()-23;//(23 * (l_layers-1));
+		double l_y = get_height() - FRAME_HEIGHT_OFFSET;
 		for (unsigned int i = 0; i < l_layers; ++i) {
 			KageLayer *l_layer = _kage->_document.Scenes[_kage->_document.getActiveSceneID()].Layers[i];
 			unsigned int l_frames = l_layer->Frames.size();
-			double l_x = 8;//offset due to VBox divider mouse-handling
+			double l_x = FRAME_WIDTH_OFFSET;//offset due to VBox divider mouse-handling
 			for (unsigned int j = 0; j < l_frames; ++j) {
 				KageFrame *l_frame = l_layer->Frames[j];
-				//===========BEGINFRAME
 				bool l_current = l_layer->isCurrentFrame(l_frame->frameID);
 				bool l_selected = l_frame->isSelected();
 				bool l_tween = (l_frame->getTween() > 0);
@@ -369,10 +369,9 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 						break;
 				}
 				p_context->paint();
-				l_x += 8;
-				//===========ENDFRAME
+				l_x += FRAME_WIDTH_OFFSET;
 			}
-			l_y -= 23;
+			l_y -= FRAME_HEIGHT_OFFSET;
 		}
 		/*
 			p_context->select_font_face ("Verdana", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_BOLD);

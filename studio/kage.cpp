@@ -2730,9 +2730,9 @@ bool Kage::on_tick(const Glib::RefPtr<Gdk::FrameClock>& frame_clock) {
 	const gint64 current_time = frame_clock->get_frame_time();
 	const double f = ((current_time - m_start_time) % cycle_time) / (double)cycle_time;
 	
-	if (f >= _stage.fpsElapse) {
-		//m_start_time = 0;
-	}
+//	if (f >= _stage.fpsElapse) {
+//		//m_start_time = 0;
+//	}
 	
 	++tickCounter;
 	if (tickCounter >= _stage.fpsElapse) {

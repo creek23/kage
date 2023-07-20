@@ -40,8 +40,6 @@ KageStage::~KageStage() {
 }
 
 bool KageStage::on_key_press_event(GdkEventKey *e) {
-	if (e->keyval >= -1) { return false; }
-	
 	if (e->keyval == GDK_KEY_space) { // [hand tool]
 		if (KageStage::toolMode != MODE_MOVE_STAGE) {
 			prevTool = KageStage::toolMode;
@@ -85,14 +83,14 @@ bool KageStage::on_key_press_event(GdkEventKey *e) {
 			double l_diffX = 0;
 			double l_diffY = 0;
 			if (keyUpDown == true) {
-				l_diffY = -0.5;
+				l_diffY = -1/KageStage::currentScale;
 			} else if (keyDownDown == true) {
-				l_diffY =  0.5;
+				l_diffY =  1/KageStage::currentScale;
 			}
 			if (keyLeftDown == true) {
-				l_diffX = -0.5;
+				l_diffX = -1/KageStage::currentScale;
 			} else if (keyRightDown == true) {
-				l_diffX =  0.5;
+				l_diffX =  1/KageStage::currentScale;
 			}
 			if (keyShiftDown == true) {
 				if (l_diffX != 0) {
@@ -110,11 +108,11 @@ bool KageStage::on_key_press_event(GdkEventKey *e) {
 				handleShapes_moveShape(l_diffX, l_diffY);
 				propX += l_diffX;
 				propY += l_diffY;
-				//updateShapeX(l_diffX, false);
-				//updateShapeY(l_diffY, false);
+				
 				updateShapeXY();
-				win->updateShapeProperties();
+				
 				_stackDo = true;
+				grab_focus();
 			} else if (KageStage::toolMode == MODE_NODE) {
 				nodeX += l_diffX;
 				nodeY += l_diffY;
@@ -132,11 +130,9 @@ bool KageStage::on_key_press_event(GdkEventKey *e) {
 		}
 	}
 	
-	return Gtk::DrawingArea::on_key_press_event(e);
+	return true;
 }
 bool KageStage::on_key_release_event(GdkEventKey *e) {
-	if (e->keyval >= -1) { return true; }
-	
 	if (e->keyval == GDK_KEY_space) { // [hand tool]
 		KageStage::toolMode = prevTool;
 		Kage::timestamp();
@@ -217,7 +213,7 @@ bool KageStage::on_key_release_event(GdkEventKey *e) {
 		_stackDo = false;
 	}
 	
-	return Gtk::DrawingArea::on_key_release_event(e);
+	return true;
 }
 
 bool KageStage::on_expose_event(GdkEventExpose* e) {
@@ -237,7 +233,7 @@ void KageStage::unpressKeys() {
 
 	grab_focus();
 }
-
+#include <iomanip>
 bool KageStage::on_event(GdkEvent *e) {
 	if (e->type == GDK_ENTER_NOTIFY) {
 		Kage::timestamp_IN(); cout << " mouse enter" << endl;
@@ -289,33 +285,34 @@ bool KageStage::on_event(GdkEvent *e) {
 		
 		draw1.x = (draw1.x - origin.x);
 		draw1.y = (draw1.y - origin.y);
-			draw2.x = (draw2.x - origin.x);
-			draw2.y = (draw2.y - origin.y);
+			draw2.x = (e->button.x - origin.x);
+			draw2.y = (e->button.y - origin.y);
 		
 		if (KageStage::toolMode == MODE_SELECT) {
 			if (_isModifyingShape == false) {
-				if (draw1.x >= draw2.x-5 && draw1.x <= draw2.x+5 && draw1.y >= draw2.y-5 && draw1.y <= draw2.y+5) {
+				if (       draw1.x >= draw2.x-(5/KageStage::currentScale / _zoomValue)
+						&& draw1.x <= draw2.x+(5/KageStage::currentScale / _zoomValue)
+						&& draw1.y >= draw2.y-(5/KageStage::currentScale / _zoomValue)
+						&& draw1.y <= draw2.y+(5/KageStage::currentScale / _zoomValue)) {
 					draw1.x = e->button.x;
 					draw1.y = e->button.y;
 						trySingleSelectShape();
 				} else {
-					selectionBox1 = draw1;
-					selectionBox2 = draw2;
+					selectionBox1.x = draw1.x / KageStage::currentScale  / _zoomValue;
+					selectionBox1.y = draw1.y / KageStage::currentScale / _zoomValue;
+						selectionBox2.x = draw2.x / KageStage::currentScale  / _zoomValue;
+						selectionBox2.y = draw2.y / KageStage::currentScale / _zoomValue;
+					
 						tryMultiSelectShapes();
 				}
 			} else {
 				if (_rotateApply == true) {
-					draw1.x = (draw1.x + origin.x);
-					draw1.y = (draw1.y + origin.y);
-						draw2.x = (draw2.x + origin.x);
-						draw2.y = (draw2.y + origin.y);
+					draw1.x = draw1.x / KageStage::currentScale / _zoomValue;
+					draw1.y = draw1.y / KageStage::currentScale / _zoomValue;
+						draw2.x = draw2.x / KageStage::currentScale / _zoomValue;
+						draw2.y = draw2.y / KageStage::currentScale / _zoomValue;
 					
 					handleShapes_modifyingShapeRotate();
-					
-					draw1.x = (draw1.x - origin.x);
-					draw1.y = (draw1.y - origin.y);
-						draw2.x = (draw2.x - origin.x);
-						draw2.y = (draw2.y - origin.y);
 				}
 				
 				win->stackDo();
@@ -325,14 +322,27 @@ bool KageStage::on_event(GdkEvent *e) {
 			invalidateToRender();
 		} else if (KageStage::toolMode == MODE_NODE) {
 			if (_isModifyingShape == false) {
-				if (draw1.x >= draw2.x-5 && draw1.x <= draw2.x+5 && draw1.y >= draw2.y-5 && draw1.y <= draw2.y+5) {
+				if (draw1.x >= draw2.x-(5/KageStage::currentScale)
+						&& draw1.x <= draw2.x+(5/KageStage::currentScale)
+						&& draw1.y >= draw2.y-(5/KageStage::currentScale)
+						&& draw1.y <= draw2.y+(5/KageStage::currentScale)) {
 					draw1.x = e->button.x;
 					draw1.y = e->button.y;
 						trySingleSelectShape();
 				} else {
+					draw1.x = draw1.x / KageStage::currentScale / _zoomValue;
+					draw1.y = draw1.y / KageStage::currentScale / _zoomValue;
+						draw2.x = draw2.x / KageStage::currentScale / _zoomValue;
+						draw2.y = draw2.y / KageStage::currentScale / _zoomValue;
+					
 					selectionBox1 = draw1;
 					selectionBox2 = draw2;
 						tryMultiSelectShapes();
+
+					draw1.x = draw1.x * KageStage::currentScale * _zoomValue;
+					draw1.y = draw1.y * KageStage::currentScale * _zoomValue;
+						draw2.x = e->button.x * KageStage::currentScale * _zoomValue;
+						draw2.y = e->button.y * KageStage::currentScale * _zoomValue;
 				}
 				win->propFillStrokeSetVisible(false);
 				win->propShapePropertiesSetVisible(false);
@@ -361,38 +371,57 @@ bool KageStage::on_event(GdkEvent *e) {
 				if (e->button.button == 3) {
 					_zoomRatio = 1.1;
 					_zoomValue = _zoomValue * 1.1f;
-					_zoomValueShapeProperty = _zoomValueShapeProperty / 1.1f;
 				} else if (e->button.button == 1) {
 					_zoomRatio = 0.909090909f;
 					_zoomValue = _zoomValue / 1.1f;
-					_zoomValueShapeProperty = _zoomValueShapeProperty * 1.1f;
 				}
 			} else {
 				if (e->button.button == 1) {
 					_zoomRatio = 1.1;
 					_zoomValue = _zoomValue * 1.1f;
-					_zoomValueShapeProperty = _zoomValueShapeProperty / 1.1f;
 				} else if (e->button.button == 3) {
 					_zoomRatio = 0.909090909f;
 					_zoomValue = _zoomValue / 1.1f;
-					_zoomValueShapeProperty = _zoomValueShapeProperty * 1.1f;
 				}
 			}
-			cout << "\n_zoomValueShapeProperty " << _zoomValueShapeProperty << endl;
 			e->button.button = 0;
 			_zoomReference.x = e->button.x;
 			_zoomReference.y = e->button.y;
 			
-			applyZoom();
+			//applyZoom();
+			origin = applyZoomRatio(origin); //zoom++
 			invalidateToRender();
 		} else if (KageStage::toolMode == MODE_EYEDROP) {
 			draw1.x = e->button.x;
 			draw1.y = e->button.y;
 				handleEyedropMouseUp();
 		} else if (KageStage::toolMode == MODE_DRAW_OVAL) {
+		
+			draw1.x = draw1.x / KageStage::currentScale / _zoomValue;
+			draw1.y = draw1.y / KageStage::currentScale / _zoomValue;
+				draw2.x = draw2.x / KageStage::currentScale / _zoomValue;
+				draw2.y = draw2.y / KageStage::currentScale / _zoomValue;
+
 			handleDrawOvalMouseUp();
+		
+			draw1.x = draw1.x * KageStage::currentScale * _zoomValue;
+			draw1.y = draw1.y * KageStage::currentScale * _zoomValue;
+				draw2.x = e->button.x * KageStage::currentScale * _zoomValue;
+				draw2.y = e->button.y * KageStage::currentScale * _zoomValue;
+		
 		} else if (KageStage::toolMode == MODE_DRAW_RECT) {
+			draw1.x = draw1.x / KageStage::currentScale / _zoomValue;
+			draw1.y = draw1.y / KageStage::currentScale / _zoomValue;
+				draw2.x = draw2.x / KageStage::currentScale / _zoomValue;
+				draw2.y = draw2.y / KageStage::currentScale / _zoomValue;
+			
 			handleDrawRectMouseUp();
+
+			draw1.x = draw1.x * KageStage::currentScale * _zoomValue;
+			draw1.y = draw1.y * KageStage::currentScale * _zoomValue;
+				draw2.x = e->button.x * KageStage::currentScale * _zoomValue;
+				draw2.y = e->button.y * KageStage::currentScale * _zoomValue;
+		
 		} else if (KageStage::toolMode == MODE_DRAW_PENCIL) {
 			handleDrawPencilMouseUp();
 		} else if (KageStage::toolMode == MODE_DRAW_POLY) {
@@ -400,6 +429,11 @@ bool KageStage::on_event(GdkEvent *e) {
 				draw1.x = drawConstraint.x - origin.x;
 				draw1.y = drawConstraint.y - origin.y;
 			}
+
+			draw1.x = draw1.x / KageStage::currentScale / _zoomValue;
+			draw1.y = draw1.y / KageStage::currentScale / _zoomValue;
+				draw2.x = draw2.x / KageStage::currentScale / _zoomValue;
+				draw2.y = draw2.y / KageStage::currentScale / _zoomValue;
 			
 			handleDrawPolyMouseUp();
 				//TODO: why origin.x/.y is not taken into consideration?
@@ -424,8 +458,10 @@ bool KageStage::on_event(GdkEvent *e) {
 			
 			invalidateToRender();
 		} else if (KageStage::toolMode == MODE_SELECT) {
-			draw2.x = e->button.x;
-			draw2.y = e->button.y;
+			draw2.x = (e->button.x - origin.x) / _zoomValue; //zoom++ : revert this line
+			draw2.y = (e->button.y - origin.y) / _zoomValue; //zoom++ : revert this line
+			//draw2.x = e->button.x;
+			//draw2.y = e->button.y;
 			
 			_zoomReference.x = e->button.x;
 			_zoomReference.y = e->button.y;
@@ -493,7 +529,10 @@ bool KageStage::on_event(GdkEvent *e) {
 			
 			invalidateToRender();
 		}
-		win->displayMouseXY(e->button.x - origin.x, e->button.y - origin.y);
+		win->displayMouseXY(
+				(int) ((e->button.x - origin.x) / _zoomValue),
+				(int) ((e->button.y - origin.y) / _zoomValue)
+			);
 		//win->forceRenderFrames(); //why there's a need to FORCE render?
 		win->renderFrames(); //trying to work around ^
 		KageStage::moveStageXY.x = e->button.x;
@@ -550,73 +589,12 @@ PointData KageStage::applyZoomRatio(PointData p_value) {
 	return p_value.clone();
 }
 
-double KageStage::applyZoomRatioX(double p_value) {
-	if (_zoomRatio == 0.0f) { return p_value; }
-	
-	double l_value;
-	
-	if (p_value < _zoomReference.x) {
-		l_value = (_zoomReference.x - p_value) * _zoomRatio;
-		return _zoomReference.x - l_value;
-	} else if (p_value > _zoomReference.x) {
-		l_value = (p_value - _zoomReference.x) * _zoomRatio;
-		return _zoomReference.x + l_value;
-	}
-	
-	return p_value;
-}
-
-double KageStage::applyZoomRatioY(double p_value) {
-	if (_zoomRatio == 0.0f) { return p_value; }
-	
-	double l_value;
-	
-	if (p_value < _zoomReference.y) {
-		l_value = (_zoomReference.y - p_value) * _zoomRatio;
-		return _zoomReference.y - l_value;
-	} else if (p_value > _zoomReference.y) {
-		l_value = (p_value - _zoomReference.y) * _zoomRatio;
-		return _zoomReference.y + l_value;
-	}
-	
-	return p_value;
-}
-
-double KageStage::getZoomRatioX(double p_value) {
-	if (_zoomRatio == 0.0f) { return p_value; }
-	
-	double l_value;
-	
-	if (p_value < _zoomReference.x) {
-		l_value = (_zoomReference.x - p_value) * _zoomValue;
-		return _zoomReference.x - l_value;
-	} else if (p_value > _zoomReference.x) {
-		l_value = (p_value - _zoomReference.x) * _zoomValue;
-		return _zoomReference.x + l_value;
-	}
-	
-	return p_value;
-}
-
-double KageStage::getZoomRatioY(double p_value) {
-	if (_zoomRatio == 0.0f) { return p_value; }
-	
-	double l_value;
-	
-	if (p_value < _zoomReference.y) {
-		l_value = (_zoomReference.y - p_value) * _zoomValue;
-		return _zoomReference.y - l_value;
-	} else if (p_value > _zoomReference.y) {
-		l_value = (p_value - _zoomReference.y) * _zoomValue;
-		return _zoomReference.y + l_value;
-	}
-	
-	return p_value;
-}
-
 vector<VectorData> KageStage::applyZoom(vector<VectorData> v) {
 	return v;
 }
+/**
+ * zoom++ : TODO: to become obsolete; new zoom implementation makes this useless
+ */
 void KageStage::applyZoom() {
 		
 	PointData __stageArea(stageWidth  + origin.x, stageHeight  + origin.y);
@@ -837,6 +815,9 @@ void KageStage::cleanSlate() {
 	origin.y = 50;
 	stageWidth = 800.0f;
 	stageHeight = 600.0f;
+	
+	currentScale = stageWidth;
+	
 	fps = 12;
 	mouseDown = false;
 	stroke.setThickness(3.0);
@@ -859,7 +840,6 @@ void KageStage::cleanSlate() {
 	_isModifyingShape = false;
 	
 	_zoomValue = 1.0f;
-	_zoomValueShapeProperty = 1.0f;
 	_zoomRatio = 1.0f;
 	__stageArea.x = stageWidth;
 	__stageArea.y = stageHeight;
@@ -870,8 +850,7 @@ void KageStage::cleanSlate() {
 }
 
 void KageStage::invalidateToRender() {
-	Kage::timestamp_IN();
-	cout << " KageStage::invalidateToRender " << endl;
+//	Kage::timestamp_IN(); cout << " KageStage::invalidateToRender()" << endl;
 	if (!window) {
 		window = get_window();
 	}
@@ -882,7 +861,7 @@ void KageStage::invalidateToRender() {
 				get_allocation().get_height());
 		window->invalidate_rect(r, false);
 	}
-	Kage::timestamp_OUT();
+//	Kage::timestamp_OUT();
 }
 
 bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
@@ -976,10 +955,10 @@ void KageStage::clearScreen(Cairo::RefPtr<Cairo::Context> p_context) {
 		p_context->fill();
 		
 		//draw viewable area
-		p_context->move_to(             origin.x, origin.y              );
-		p_context->line_to(stageWidth + origin.x, origin.y              );
-		p_context->line_to(stageWidth + origin.x, origin.y + stageHeight);
-		p_context->line_to(             origin.x, origin.y + stageHeight);
+		p_context->move_to(                            origin.x, origin.y                             );
+		p_context->line_to((stageWidth * _zoomValue) + origin.x, origin.y                             );
+		p_context->line_to((stageWidth * _zoomValue) + origin.x, origin.y + (stageHeight * _zoomValue));
+		p_context->line_to(                            origin.x, origin.y + (stageHeight * _zoomValue));
 		
 		p_context->close_path();
 			p_context->set_source_rgb((double)KageStage::stageBG.getR()/255, (double)KageStage::stageBG.getG()/255, (double)KageStage::stageBG.getB()/255);
@@ -1170,23 +1149,23 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
 				scolor = p_vectorData[i].stroke;
 				break;
 			case VectorData::TYPE_MOVE:
-				p_context->move_to(p_vectorData[i].points[0].x + origin.x, p_vectorData[i].points[0].y + origin.y);
+				p_context->move_to((p_vectorData[i].points[0].x*KageStage::currentScale * _zoomValue) + origin.x, (p_vectorData[i].points[0].y*KageStage::currentScale * _zoomValue) + origin.y);
 				
-				p.x = p_vectorData[i].points[0].x;
-				p.y = p_vectorData[i].points[0].y;
+				p.x = p_vectorData[i].points[0].x*KageStage::currentScale * _zoomValue;
+				p.y = p_vectorData[i].points[0].y*KageStage::currentScale * _zoomValue;
 				break;
 			case VectorData::TYPE_LINE:
 				p_context->line_to(p_vectorData[i].points[0].x + origin.x, p_vectorData[i].points[0].y + origin.y);
 				
-				p.x = p_vectorData[i].points[0].x;
-				p.y = p_vectorData[i].points[0].y;
+				p.x = p_vectorData[i].points[0].x*KageStage::currentScale;
+				p.y = p_vectorData[i].points[0].y*KageStage::currentScale;
 				break;
 			case VectorData::TYPE_CURVE_QUADRATIC:
 				//cubic-to-quad algo borrowed from Mono/Moonlight's moon_quad_curve_to
-				x1 = p_vectorData[i].points[0].x;
-				y1 = p_vectorData[i].points[0].y;
-				x2 = p_vectorData[i].points[1].x;
-				y2 = p_vectorData[i].points[1].y;
+				x1 = p_vectorData[i].points[0].x*KageStage::currentScale * _zoomValue;
+				y1 = p_vectorData[i].points[0].y*KageStage::currentScale * _zoomValue;
+				x2 = p_vectorData[i].points[1].x*KageStage::currentScale * _zoomValue;
+				y2 = p_vectorData[i].points[1].y*KageStage::currentScale * _zoomValue;
 				x3 = x2;
 				y3 = y2;
 				
@@ -1206,9 +1185,9 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
 				break;
 			case VectorData::TYPE_CURVE_CUBIC:
 				p_context->curve_to(
-						p_vectorData[i].points[0].x + origin.x, p_vectorData[i].points[0].y + origin.y,
-						p_vectorData[i].points[1].x + origin.x, p_vectorData[i].points[1].y + origin.y,
-						p_vectorData[i].points[2].x + origin.x, p_vectorData[i].points[2].y + origin.y
+						(p_vectorData[i].points[0].x*KageStage::currentScale*_zoomValue) + origin.x, (p_vectorData[i].points[0].y*KageStage::currentScale*_zoomValue) + origin.y,
+						(p_vectorData[i].points[1].x*KageStage::currentScale*_zoomValue) + origin.x, (p_vectorData[i].points[1].y*KageStage::currentScale*_zoomValue) + origin.y,
+						(p_vectorData[i].points[2].x*KageStage::currentScale*_zoomValue) + origin.x, (p_vectorData[i].points[2].y*KageStage::currentScale*_zoomValue) + origin.y
 				);
 				break;
 			case VectorData::TYPE_TEXT:
@@ -1360,11 +1339,11 @@ void KageStage::drawSelectionArea() {
 	
 	cr->set_dash(dashes, 0.0);
 	//draw bounding rectangle for the shape
-	cr->move_to(draw1.x, draw1.y);
-		cr->line_to(draw2.x, draw1.y);
-		cr->line_to(draw2.x, draw2.y);
-		cr->line_to(draw1.x, draw2.y);
-		cr->line_to(draw1.x, draw1.y);
+	cr->move_to(draw1.x , draw1.y );
+		cr->line_to(draw2.x*_zoomValue+origin.x, draw1.y            );
+		cr->line_to(draw2.x*_zoomValue+origin.x, draw2.y*_zoomValue+origin.y);
+		cr->line_to(draw1.x                    , draw2.y*_zoomValue+origin.y);
+		cr->line_to(draw1.x                    , draw1.y            );
 			cr->set_source_rgba(0.0,0.0,0.0,1.0);
 			cr->set_line_width(1.0);
 				cr->set_line_cap(Cairo::LINE_CAP_ROUND);

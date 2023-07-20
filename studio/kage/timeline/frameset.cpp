@@ -984,7 +984,7 @@ bool KageFrameset::setExtendedFrameTween(unsigned int p_frameID, unsigned int p_
 }
 
 bool KageFrameset::forceSetTween(unsigned int p_tween) {
-	cout << " KageFrameset::forceSetTween() " << endl;
+//	cout << " KageFrameset::forceSetTween() " << p_tween << endl;
 	if (_currentFrameIndex < getFrameCount() && _frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		_frames[_currentFrameIndex]->forceSetTween(p_tween);
 		return true;
@@ -1003,7 +1003,7 @@ bool KageFrameset::forceSetTween(unsigned int p_tween) {
 }
 
 bool KageFrameset::setTween(unsigned int p_tween) {
-	cout << " KageFrameset::setTween() " << endl;
+	cout << " KageFrameset::setTween() " << p_tween << endl;
 	if (_currentFrameIndex < getFrameCount() && _frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		_frames[_currentFrameIndex]->setTween(p_tween);
 		return true;
@@ -1021,10 +1021,9 @@ bool KageFrameset::setTween(unsigned int p_tween) {
 	return false;
 }
 unsigned int KageFrameset::getTween() {
-	Kage::timestamp_IN(); std::cout << " KageFrameset::getTween() " << endl;
+	std::cout << " KageFrameset::getTween() " << endl;
 	if (_currentFrameIndex < getFrameCount() && _frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		unsigned int l_ret = _frames[_currentFrameIndex]->getTween();
-		Kage::timestamp_OUT();
 		return l_ret;
 	} else {
 		for (unsigned int i = 0; i < getFrameCount(); ++i) {
@@ -1032,13 +1031,10 @@ unsigned int KageFrameset::getTween() {
 				_currentFrameIndex = i;
 				_currentFrameID = _frames[i]->frameID;
 				unsigned int l_ret = _frames[i]->getTween();
-				Kage::timestamp_OUT();
 				return l_ret;
 			}
 		}
 	}
-	
-	Kage::timestamp_OUT();
 	
 	return 0;
 }

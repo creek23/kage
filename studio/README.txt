@@ -1,4 +1,4 @@
-Current version is v0.6.220919
+Current version is v0.7.221227
 Kage Studio is a simple, Free and Open Source 2D Animation Software
 written by Mj Mendoza IV <mj.mendoza.iv at gmail dot com>
 
@@ -40,6 +40,17 @@ HOW TO COMPILE Kage Studio (on GNU/Linux)
 2 cd to this path
 3 then type: 'make -f Makefile.gnu resource'
 4 finally type: 'make -f Makefile.gnu'
+
+
+HOW TO COMPILE Kage Studio (on MacOS)
+=====================================
+1 install Homebrew if you haven't already
+	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+2 open Terminal and install 'gtkmm3', 'gcc', 'pkg-config', 'ffmpeg', and 'make' via homebrew
+	brew install gcc gtkmm3 pkg-config make ffmpeg
+3 cd to this path
+4 then type: 'make -f Makefile.mac resource'
+5 finally type: 'make -f Makefile.mac'
 
 License:
 ========

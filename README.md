@@ -12,7 +12,7 @@ Interested individuals may join this project. Join the forums and get involved!
 
 Installer:
 ==========
-*Current version is **v0.6.220808***
+*Current version is **v0.7.221227***
 
 All installers and precompiled binaries are located in [Kage Studio's SourceForge page](https://sourceforge.net/projects/kage/files/).
 

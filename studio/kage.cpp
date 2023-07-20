@@ -1864,8 +1864,8 @@ void Kage::propFillStrokeSetVisible(bool p_visible) {
 }
 
 void Kage::propShapePropertiesSetVisible(bool p_visible) {
-	updateShapeProperties();
 	m_propLocationSize.set_visible(p_visible);
+	updateShapeProperties();
 }
 
 void Kage::propNodeXYSetVisible(bool p_visible) {
@@ -1893,18 +1893,23 @@ void Kage::updateColors() {
 	_UPDATE_SHAPE_COLORS = true;
 }
 
+string sanitizeToZero(double p_value) {
+	if (p_value > -0.001 && p_value < 0.001) {
+		return "0";
+	} else {
+		return StringHelper::doubleToString(p_value);
+	}
+}
 void Kage::updateShapeProperties() {
-	m_EntryX.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.propX));
-	m_EntryY.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.propY));
-	m_EntryWidth.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.propWidth));
-	m_EntryHeight.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.propHeight));
+	m_EntryX.set_text(     sanitizeToZero(m_KageStage.propX      * m_KageStage.stageWidth ));
+	m_EntryY.set_text(     sanitizeToZero(m_KageStage.propY      * m_KageStage.stageHeight));
+	m_EntryWidth.set_text( sanitizeToZero(m_KageStage.propWidth  * m_KageStage.stageWidth ));
+	m_EntryHeight.set_text(sanitizeToZero(m_KageStage.propHeight * m_KageStage.stageHeight));
 }
 
 void Kage::updateNodeXY() {
-//	cout << " m_KageStage.nodeX " << m_KageStage.nodeX << endl;
-	m_EntryNodeX.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.nodeX));
-//	cout << " m_EntryNodeX " << m_EntryNodeX.get_text() << endl;
-	m_EntryNodeY.set_text(StringHelper::StringHelper::doubleToString(m_KageStage.nodeY));
+	m_EntryNodeX.set_text(sanitizeToZero(m_KageStage.nodeX * m_KageStage.stageWidth ));
+	m_EntryNodeY.set_text(sanitizeToZero(m_KageStage.nodeY * m_KageStage.stageHeight));
 }
 
 void Kage::stackDo() {
@@ -2071,8 +2076,7 @@ void Kage::renderFrames() {
 }
 
 void Kage::renderFramesBelowCurrentLayer() {
-	Kage::timestamp_IN();
-	cout << " Kage::renderFramesBelowCurrentLayer" << endl;
+	Kage::timestamp_IN(); cout << " Kage::renderFramesBelowCurrentLayer" << endl;
 	m_KageStage.clearScreen(m_KageStage.cr);
 	
 	if (_toggleOnion.get_active() == true) {
@@ -2096,8 +2100,7 @@ void Kage::renderFramesBelowCurrentLayer() {
 	Kage::timestamp_OUT();
 }
 void Kage::renderFramesAboveCurrentLayer() {
-	Kage::timestamp_IN();
-	cout << " Kage::renderFramesAboveCurrentLayer" << endl;
+	Kage::timestamp_IN(); cout << " Kage::renderFramesAboveCurrentLayer" << endl;
 	unsigned int l_layerCount = _layerManager.layerCount();
 	unsigned int l_currentLayer = getCurrentLayer();
 		for (unsigned int i = (l_currentLayer + 1); i <= l_layerCount; ++i) {
@@ -2122,7 +2125,7 @@ unsigned int Kage::getCurrentLayer() {
 
 void Kage::setCurrentLayer(unsigned int p_layer) {
 	if (_layerManager.getCurrentLayer() != p_layer) {
-		std::cout << "setting undoBase A setCurrentLayer" << std::endl;
+		std::cout << "setting undoBase A setCurrentLayer " << p_layer << std::endl;
 		_undoBase = getFrameData(true).getVectorData(); //for use later by stackDo()
 		_layerManager.setCurrentLayer(p_layer);
 	} else {
@@ -2135,7 +2138,7 @@ unsigned int Kage::getCurrentFrame() {
 	return _framesetManager.getCurrentFrame();
 }
 void Kage::setCurrentLayerByID(unsigned int p_layerID) {
-	cout << "setting undoBase B setCurrentLayerByID " << endl;
+	cout << "setting undoBase B setCurrentLayerByID " << p_layerID << endl;
 	_undoBase = getFrameData(true).getVectorData(); //for use later by stackDo()
 	_layerManager.setCurrentLayerByID(p_layerID);
 }
@@ -3257,6 +3260,7 @@ void Kage::EntryNodeX_onEnter() {
 	
 	m_EntryNodeX.set_text(StringHelper::doubleToString(l_dbl));
 	m_KageStage.updateNodeX(l_dbl);
+	renderFrames();
 }
 
 void Kage::EntryNodeY_onEnter() {
@@ -3264,6 +3268,7 @@ void Kage::EntryNodeY_onEnter() {
 	
 	m_EntryNodeY.set_text(StringHelper::doubleToString(l_dbl));
 	m_KageStage.updateNodeY(l_dbl);
+	renderFrames();
 }
 
 void Kage::ToggleLine_onClick() {
@@ -3480,7 +3485,7 @@ string Kage::saveFrame() {
 				break;
 			case VectorData::TYPE_INIT:
 				if (v[i].points.size() == 1) {
-					l_ostringstream << "<init>" << v[i].points[0].x << " " << v[i].points[0].y << "</init>\n";
+					l_ostringstream << "<init>" << v[i].points[0].x*m_KageStage.currentScale << " " << v[i].points[0].y*m_KageStage.currentScale << "</init>\n";
 				} else {
 					l_ostringstream << "<init/>\n";
 				}
@@ -3508,14 +3513,14 @@ string Kage::saveFrame() {
 					}
 				break;
 			case VectorData::TYPE_MOVE:
-				l_ostringstream << "\t<move>" << v[i].points[0].x << " " << v[i].points[0].y << "</move>\n";
+				l_ostringstream << "\t<move>" << v[i].points[0].x*m_KageStage.currentScale << " " << v[i].points[0].y*m_KageStage.currentScale << "</move>\n";
 				break;
 			case VectorData::TYPE_LINE: //currently not used
-				l_ostringstream << "\t<line>" << v[i].points[0].x << " " << v[i].points[0].y << "</line>\n";
+				l_ostringstream << "\t<line>" << v[i].points[0].x*m_KageStage.currentScale << " " << v[i].points[0].y*m_KageStage.currentScale << "</line>\n";
 				break;
 			case VectorData::TYPE_CURVE_QUADRATIC:
 			case VectorData::TYPE_CURVE_CUBIC:
-				l_ostringstream << "\t<curve>" << v[i].points[0].x << " " << v[i].points[0].y << " " << v[i].points[1].x << " " << v[i].points[1].y << " " << v[i].points[2].x << " " << v[i].points[2].y << "</curve>\n";
+				l_ostringstream << "\t<curve>" << v[i].points[0].x*m_KageStage.currentScale << " " << v[i].points[0].y*m_KageStage.currentScale << " " << v[i].points[1].x*m_KageStage.currentScale << " " << v[i].points[1].y*m_KageStage.currentScale << " " << v[i].points[2].x*m_KageStage.currentScale << " " << v[i].points[2].y*m_KageStage.currentScale << "</curve>\n";
 				break;
 			case VectorData::TYPE_IMAGE:
 				//2 '1st is for X/Y, 2nd is for width/height  -- ?!?
@@ -3616,9 +3621,9 @@ string Kage::dumpFrame(bool bKS) {
 				break;
 			case VectorData::TYPE_MOVE:
 				if (bKS == true) {
-					l_ostringstream << "Draw:MoveTo(" << v[i].points[0].x << ", " << v[i].points[0].y << ", screen)\n";
+					l_ostringstream << "Draw:MoveTo(" << v[i].points[0].x*m_KageStage.currentScale << ", " << v[i].points[0].y*m_KageStage.currentScale << ", screen)\n";
 				} else {
-					l_ostringstream << "screen.moveTo(" << v[i].points[0].x << ", " << v[i].points[0].y << ");\n";
+					l_ostringstream << "screen.moveTo(" << v[i].points[0].x*m_KageStage.currentScale << ", " << v[i].points[0].y*m_KageStage.currentScale << ");\n";
 				}
 				
 				p.x = v[i].points[0].x;
@@ -3626,9 +3631,9 @@ string Kage::dumpFrame(bool bKS) {
 				break;
 			case VectorData::TYPE_LINE:
 				if (bKS == true) {
-					l_ostringstream << "Draw:LineTo(" << v[i].points[0].x << ", " << v[i].points[0].y << ", screen)\n";
+					l_ostringstream << "Draw:LineTo(" << v[i].points[0].x*m_KageStage.currentScale << ", " << v[i].points[0].y*m_KageStage.currentScale << ", screen)\n";
 				} else {
-					l_ostringstream << "screen.lineTo(" << v[i].points[0].x << ", " << v[i].points[0].y << ");\n";
+					l_ostringstream << "screen.lineTo(" << v[i].points[0].x*m_KageStage.currentScale << ", " << v[i].points[0].y*m_KageStage.currentScale << ");\n";
 				}
 				
 				p.x = v[i].points[0].x;
@@ -3636,9 +3641,9 @@ string Kage::dumpFrame(bool bKS) {
 				break;
 			case VectorData::TYPE_CURVE_QUADRATIC:
 				if (bKS == true) {
-					l_ostringstream << "Draw:CurveTo(" << p.x << ", " << p.y << ", " << v[i].points[0].x << ", " << v[i].points[0].y << ", " << v[i].points[1].x << ", " << v[i].points[1].y << ", screen)\n";
+					l_ostringstream << "Draw:CurveTo(" << p.x*m_KageStage.currentScale << ", " << p.y*m_KageStage.currentScale << ", " << v[i].points[0].x*m_KageStage.currentScale << ", " << v[i].points[0].y*m_KageStage.currentScale << ", " << v[i].points[1].x*m_KageStage.currentScale << ", " << v[i].points[1].y*m_KageStage.currentScale << ", screen)\n";
 				} else {
-					l_ostringstream << "screen.quadraticCurveTo(" << p.x << ", " << p.y << ", " << v[i].points[0].x << ", " << v[i].points[0].y << ", " << v[i].points[1].x << ", " << v[i].points[1].y << ");\n";
+					l_ostringstream << "screen.quadraticCurveTo(" << p.x*m_KageStage.currentScale << ", " << p.y*m_KageStage.currentScale << ", " << v[i].points[0].x*m_KageStage.currentScale << ", " << v[i].points[0].y*m_KageStage.currentScale << ", " << v[i].points[1].x*m_KageStage.currentScale << ", " << v[i].points[1].y*m_KageStage.currentScale << ");\n";
 				}
 				
 				p.x = v[i].points[1].x;
@@ -3647,10 +3652,10 @@ string Kage::dumpFrame(bool bKS) {
 			case VectorData::TYPE_CURVE_CUBIC:
 				if (bKS == true) {
 //					l_ostringstream << "Draw:CubicCurveTo(" << p.x << ", " << p.y << ", " << v[i].points[0].x << ", " << v[i].points[0].y << ", " << v[i].points[1].x << ", " << v[i].points[1].y << ", screen)\n";
-					l_ostringstream << "Draw:CubicCurveTo(" << v[i].points[0].x << ", " << v[i].points[0].y << ", " << v[i].points[1].x << ", " << v[i].points[1].y << ", " << v[i].points[2].x << ", " << v[i].points[2].y << ", screen)\n";
+					l_ostringstream << "Draw:CubicCurveTo(" << v[i].points[0].x*m_KageStage.currentScale << ", " << v[i].points[0].y*m_KageStage.currentScale << ", " << v[i].points[1].x*m_KageStage.currentScale << ", " << v[i].points[1].y*m_KageStage.currentScale << ", " << v[i].points[2].x*m_KageStage.currentScale << ", " << v[i].points[2].y*m_KageStage.currentScale << ", screen)\n";
 				} else {
 //					l_ostringstream << "screen.bezierCurveTo(" << p.x << ", " << p.y << ", " << v[i].points[0].x << ", " << v[i].points[0].y << ", " << v[i].points[1].x << ", " << v[i].points[1].y << ");\n";
-					l_ostringstream << "screen.bezierCurveTo(" << v[i].points[0].x << ", " << v[i].points[0].y << ", " << v[i].points[1].x << ", " << v[i].points[1].y << ", " << v[i].points[2].x << ", " << v[i].points[2].y << ");\n";
+					l_ostringstream << "screen.bezierCurveTo(" << v[i].points[0].x*m_KageStage.currentScale << ", " << v[i].points[0].y*m_KageStage.currentScale << ", " << v[i].points[1].x*m_KageStage.currentScale << ", " << v[i].points[1].y*m_KageStage.currentScale << ", " << v[i].points[2].x*m_KageStage.currentScale << ", " << v[i].points[2].y*m_KageStage.currentScale << ");\n";
 				}
 				//p.x = v[i].points[1].x;
 				//p.y = v[i].points[1].y;
@@ -3710,8 +3715,8 @@ string Kage::dumpFrameToSvg() {
 				
 				l_initFlag = true;
 				if (v[i].points.size() == 1) {
-					l_ostringstream << "\t<g inkscape:transform-center-x=\"" << StringHelper::doubleToString(v[i].points[0].x) << "\" " <<
-						                     "inkscape:transform-center-y=\"" << StringHelper::doubleToString(v[i].points[0].y) << "\">\n";
+					l_ostringstream << "\t<g inkscape:transform-center-x=\"" << StringHelper::doubleToString(v[i].points[0].x*m_KageStage.currentScale) << "\" " <<
+						                     "inkscape:transform-center-y=\"" << StringHelper::doubleToString(v[i].points[0].y*m_KageStage.currentScale) << "\">\n";
 				} else {
 					l_ostringstream << "\t<g>\n";
 				}
@@ -3735,25 +3740,25 @@ string Kage::dumpFrameToSvg() {
 					}
 				break;
 			case VectorData::TYPE_MOVE:
-				l_ostringstream << " M " << v[i].points[0].x << " " << v[i].points[0].y;
+				l_ostringstream << " M " << v[i].points[0].x*m_KageStage.currentScale << " " << v[i].points[0].y*m_KageStage.currentScale;
 				
 				p.x = v[i].points[0].x;
 				p.y = v[i].points[0].y;
 				break;
 			case VectorData::TYPE_LINE:
-				l_ostringstream << " L " << v[i].points[0].x << " " << v[i].points[0].y;
+				l_ostringstream << " L " << v[i].points[0].x*m_KageStage.currentScale << " " << v[i].points[0].y*m_KageStage.currentScale;
 				
 				p.x = v[i].points[0].x;
 				p.y = v[i].points[0].y;
 				break;
 			case VectorData::TYPE_CURVE_QUADRATIC:
-				l_ostringstream << " Q " << p.x << " " << p.y << " " << v[i].points[0].x << " " << v[i].points[0].y << " " << v[i].points[1].x << " " << v[i].points[1].y;
+				l_ostringstream << " Q " << p.x*m_KageStage.currentScale << " " << p.y*m_KageStage.currentScale << " " << v[i].points[0].x*m_KageStage.currentScale << " " << v[i].points[0].y*m_KageStage.currentScale << " " << v[i].points[1].x*m_KageStage.currentScale << " " << v[i].points[1].y*m_KageStage.currentScale;
 				
 				p.x = v[i].points[1].x;
 				p.y = v[i].points[1].y;
 				break;
 			case VectorData::TYPE_CURVE_CUBIC:
-				l_ostringstream << "C " << v[i].points[0].x << " " << v[i].points[0].y << " " << v[i].points[1].x << " " << v[i].points[1].y << " " << v[i].points[2].x << " " << v[i].points[2].y;
+				l_ostringstream << "C " << v[i].points[0].x*m_KageStage.currentScale << " " << v[i].points[0].y*m_KageStage.currentScale << " " << v[i].points[1].x*m_KageStage.currentScale << " " << v[i].points[1].y*m_KageStage.currentScale << " " << v[i].points[2].x*m_KageStage.currentScale << " " << v[i].points[2].y*m_KageStage.currentScale;
 				
 				break;
 			case VectorData::TYPE_IMAGE:
@@ -3938,7 +3943,7 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 			
 			vector<double> l_numbers = parseNumbers(p_children[i]._value); //XY for rotation anchor
 			if (l_numbers.size() == 2) {
-				v.addInit(PointData(l_numbers[0], l_numbers[1]));
+				v.addInit(PointData(l_numbers[0]/m_KageStage.currentScale, l_numbers[1]/m_KageStage.currentScale));
 			} else {
 				v.addInit();
 			}
@@ -3965,15 +3970,15 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 		} else if (l_tagname == "move") {
 			VectorDataManager v;
 			vector<double> l_numbers = parseNumbers(p_children[i]._value); //XY
-				v.addMove(PointData(l_numbers[0], l_numbers[1]));
+				v.addMove(PointData(l_numbers[0]/m_KageStage.currentScale, l_numbers[1]/m_KageStage.currentScale));
 			addDataToFrame(v, true);
 		} else if (l_tagname == "cubiccurve" || l_tagname == "curve") {
 			VectorDataManager v;
 			vector<double> l_numbers = parseNumbers(p_children[i]._value); //XYs
 				v.addCubic(
-					PointData(l_numbers[0], l_numbers[1]),
-					PointData(l_numbers[2], l_numbers[3]),
-					PointData(l_numbers[4], l_numbers[5]));
+					PointData(l_numbers[0]/m_KageStage.currentScale, l_numbers[1]/m_KageStage.currentScale),
+					PointData(l_numbers[2]/m_KageStage.currentScale, l_numbers[3]/m_KageStage.currentScale),
+					PointData(l_numbers[4]/m_KageStage.currentScale, l_numbers[5]/m_KageStage.currentScale));
 			addDataToFrame(v, true);
 		} else if (l_tagname == "closepath") {
 			VectorDataManager v;
@@ -4115,4 +4120,8 @@ void Kage::timestamp_OUT() {
 	if (Kage::TAB_COUNT == -1) {
 		Kage::TAB_COUNT = 0;
 	}
+}
+
+void Kage::focusOnStage() {
+	set_focus(m_KageStage);
 }

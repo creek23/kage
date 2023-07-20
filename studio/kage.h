@@ -491,6 +491,8 @@
 			void registerPropertiesPane();
 			
 			void refreshUI();
+		public:
+			void focusOnStage();
 	};
 
 #endif //GTKMM_KAGE_H

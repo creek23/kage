@@ -31,11 +31,11 @@ void KageStage::handleDrawRectMouseUp() {
 	}
 	if (draw1.x == draw2.x && draw1.y == draw2.y) { return; }
 	
-	PointData p1(draw1);
+	PointData p1(draw1.x, draw1.y);
 	PointData p2(draw2.x, draw1.y);
-	PointData p3(draw2);
+	PointData p3(draw2.x, draw2.y);
 	PointData p4(draw1.x, draw2.y);
-	PointData p5(draw1);
+	PointData p5(draw1.x, draw1.y);
 	PointData p_anchor((draw1.x+draw2.x)/2, (draw1.y+draw2.y)/2);
 	VectorDataManager v;
 		v.addInit(p_anchor);
@@ -66,7 +66,7 @@ void KageStage::handleRect() {
 		cr->close_path();
 			cr->set_source_rgba((double)KageStage::fillColor.getR()/255, (double)KageStage::fillColor.getG()/255, (double)KageStage::fillColor.getB()/255, (double)KageStage::fillColor.getA()/255);
 			cr->fill_preserve();
-				cr->set_line_width(stroke.getThickness());
+				cr->set_line_width(stroke.getThickness() * _zoomValue);
 				cr->set_source_rgba((double)KageStage::stroke.getR()/255, (double)KageStage::stroke.getG()/255, (double)KageStage::stroke.getB()/255, (double)KageStage::stroke.getA()/255);
 				cr->stroke();
 }

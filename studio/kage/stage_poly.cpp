@@ -34,8 +34,8 @@ void KageStage::handleDrawPolyMouseUp() {
 	std::cout << " KageStage::handleDrawPolyMouseUp" << std::endl;
 	
 	if (drawCtr > 0) {
-		if (       draw1.x-5 <= polyXhead && draw1.x+5 >= polyXhead
-				&& draw1.y-5 <= polyYhead && draw1.y+5 >= polyYhead) {
+		if (       draw1.x-(5/KageStage::currentScale/_zoomValue) <= polyXhead && draw1.x+(5/KageStage::currentScale/_zoomValue) >= polyXhead
+				&& draw1.y-(5/KageStage::currentScale/_zoomValue) <= polyYhead && draw1.y+(5/KageStage::currentScale/_zoomValue) >= polyYhead) {
 			_polyVectors.addLinePoly(PointData(polyXhead,polyYhead), polyXtail, polyYtail);
 			_polyVectors.addClosePath();
 			_polyVectors.addEndFill();
@@ -47,8 +47,8 @@ void KageStage::handleDrawPolyMouseUp() {
 			_polyVectors.clear();
 			win->ToolSelect_onClick();
 			win->stackDo();
-		} else if (draw1.x-5 <= polyXtail && draw1.x+5 >= polyXtail
-				&& draw1.y-5 <= polyYtail && draw1.y+5 >= polyYtail) {
+		} else if (draw1.x-(5/KageStage::currentScale/_zoomValue) <= polyXtail && draw1.x+(5/KageStage::currentScale/_zoomValue) >= polyXtail
+				&& draw1.y-(5/KageStage::currentScale/_zoomValue) <= polyYtail && draw1.y+(5/KageStage::currentScale/_zoomValue) >= polyYtail) {
 			_polyVectors.addEndFill();
 				vector<unsigned int> l_shape;
 					l_shape.push_back(0);
@@ -103,12 +103,12 @@ void KageStage::handlePoly() {
 	
 	//draw point-of-origin box
 	if (drawCtr > 1
-			&& draw2.x-5 <= polyXhead+origin.x && draw2.x+5 >= polyXhead+origin.x
-			&& draw2.y-5 <= polyYhead+origin.y && draw2.y+5 >= polyYhead+origin.y) {
-		cr->move_to(    polyXhead-5 + origin.x, polyYhead-5 + origin.y);
-			cr->line_to(polyXhead+5 + origin.x, polyYhead-5 + origin.y);
-			cr->line_to(polyXhead+5 + origin.x, polyYhead+5 + origin.y);
-			cr->line_to(polyXhead-5 + origin.x, polyYhead+5 + origin.y);
+			&& draw2.x-5 <= (polyXhead * KageStage::currentScale * _zoomValue)+origin.x && draw2.x+5 >= (polyXhead * KageStage::currentScale * _zoomValue)+origin.x
+			&& draw2.y-5 <= (polyYhead * KageStage::currentScale * _zoomValue)+origin.y && draw2.y+5 >= (polyYhead * KageStage::currentScale * _zoomValue)+origin.y) {
+		cr->move_to(    (polyXhead * KageStage::currentScale * _zoomValue)-5 + origin.x, (polyYhead * KageStage::currentScale * _zoomValue)-5 + origin.y);
+			cr->line_to((polyXhead * KageStage::currentScale * _zoomValue)+5 + origin.x, (polyYhead * KageStage::currentScale * _zoomValue)-5 + origin.y);
+			cr->line_to((polyXhead * KageStage::currentScale * _zoomValue)+5 + origin.x, (polyYhead * KageStage::currentScale * _zoomValue)+5 + origin.y);
+			cr->line_to((polyXhead * KageStage::currentScale * _zoomValue)-5 + origin.x, (polyYhead * KageStage::currentScale * _zoomValue)+5 + origin.y);
 		cr->close_path();
 			cr->set_source_rgb(1.0, 0.0, 0.0);
 			cr->fill_preserve();
@@ -116,10 +116,10 @@ void KageStage::handlePoly() {
 				cr->set_source_rgb(0.0, 0.0, 0.0);
 				cr->stroke();
 	} else {
-		cr->move_to(    polyXhead-3 + origin.x, polyYhead-3 + origin.y);
-			cr->line_to(polyXhead+3 + origin.x, polyYhead-3 + origin.y);
-			cr->line_to(polyXhead+3 + origin.x, polyYhead+3 + origin.y);
-			cr->line_to(polyXhead-3 + origin.x, polyYhead+3 + origin.y);
+		cr->move_to(    (polyXhead * KageStage::currentScale * _zoomValue)-3 + origin.x, (polyYhead * KageStage::currentScale * _zoomValue)-3 + origin.y);
+			cr->line_to((polyXhead * KageStage::currentScale * _zoomValue)+3 + origin.x, (polyYhead * KageStage::currentScale * _zoomValue)-3 + origin.y);
+			cr->line_to((polyXhead * KageStage::currentScale * _zoomValue)+3 + origin.x, (polyYhead * KageStage::currentScale * _zoomValue)+3 + origin.y);
+			cr->line_to((polyXhead * KageStage::currentScale * _zoomValue)-3 + origin.x, (polyYhead * KageStage::currentScale * _zoomValue)+3 + origin.y);
 		cr->close_path();
 			cr->set_source_rgb(1.0, 1.0, 1.0);
 			cr->fill_preserve();

@@ -115,8 +115,6 @@ void KageStage::updateNodeX(double p_value, bool p_stackDo) {
 		win->stackDo();
 	}
 	
-	invalidateToRender();
-	
 	Kage::timestamp_OUT();
 }
 void KageStage::updateNodeY(double p_value, bool p_stackDo) {
@@ -168,8 +166,6 @@ void KageStage::updateNodeY(double p_value, bool p_stackDo) {
 		win->stackDo();
 	}
 	
-	invalidateToRender();
-	
 	Kage::timestamp_OUT();
 }
 
@@ -204,8 +200,8 @@ void KageStage::handleNodes_selection() {
 					if (l_shapeGotClose == false && typeMovesIndex != _NO_SELECTION) {
 						//check if mouse is on Move' location
 						if (isMouseOnNode(
-								v[typeMovesIndex].points[0].x + origin.x,
-								v[typeMovesIndex].points[0].y + origin.y) == true) {
+								(v[typeMovesIndex].points[0].x*KageStage::currentScale * _zoomValue) + origin.x,
+								(v[typeMovesIndex].points[0].y*KageStage::currentScale * _zoomValue) + origin.y) == true) {
 							mouseOnNodeHover = typeMovesIndex;
 							if (mouseDown == true) {
 								if (mouseOnNode == _NO_SELECTION) {
@@ -218,8 +214,8 @@ void KageStage::handleNodes_selection() {
 								if (mouseOnNodeIndex == _NO_SELECTION) {
 									mouseOnNodeIndex = 3;
 								}
-								mouseOnNodeOffset.x = _mouseLocation.x - v[typeMovesIndex].points[0].x - origin.x;
-								mouseOnNodeOffset.y = _mouseLocation.y - v[typeMovesIndex].points[0].y - origin.y;
+								mouseOnNodeOffset.x = _mouseLocation.x - (v[typeMovesIndex].points[0].x*KageStage::currentScale * _zoomValue) - origin.x;
+								mouseOnNodeOffset.y = _mouseLocation.y - (v[typeMovesIndex].points[0].y*KageStage::currentScale * _zoomValue) - origin.y;
 							}
 						}
 					}
@@ -235,8 +231,8 @@ void KageStage::handleNodes_selection() {
 				case VectorData::TYPE_CURVE_CUBIC:
 					//check anchor
 					if (isMouseOnNode(
-							v[i].points[2].x + origin.x,
-							v[i].points[2].y + origin.y) == true) {
+							(v[i].points[2].x*KageStage::currentScale * _zoomValue) + origin.x,
+							(v[i].points[2].y*KageStage::currentScale * _zoomValue) + origin.y) == true) {
 						mouseOnNodeHover = i;
 						if (mouseDown == true) {
 							if (mouseOnNode == _NO_SELECTION) {
@@ -249,15 +245,15 @@ void KageStage::handleNodes_selection() {
 							if (mouseOnNodeIndex == _NO_SELECTION) {
 								mouseOnNodeIndex = 3;
 							}
-							mouseOnNodeOffset.x = _mouseLocation.x - v[i].points[2].x - origin.x;
-							mouseOnNodeOffset.y = _mouseLocation.y - v[i].points[2].y - origin.y;
+							mouseOnNodeOffset.x = _mouseLocation.x - (v[i].points[2].x*KageStage::currentScale * _zoomValue) - origin.x;
+							mouseOnNodeOffset.y = _mouseLocation.y - (v[i].points[2].y*KageStage::currentScale * _zoomValue) - origin.y;
 						}
 					}
 					
 					//check control points
 					if (isMouseOnNode(
-							v[i].points[0].x + origin.x,
-							v[i].points[0].y + origin.y) == true) {
+							(v[i].points[0].x*KageStage::currentScale * _zoomValue) + origin.x,
+							(v[i].points[0].y*KageStage::currentScale * _zoomValue) + origin.y) == true) {
 						if (mouseDown == true) {
 							if (mouseOnNode == _NO_SELECTION) {
 								mouseOnNode = i;
@@ -276,8 +272,8 @@ void KageStage::handleNodes_selection() {
 					}
 					
 					if (isMouseOnNode(
-							v[i].points[1].x + origin.x,
-							v[i].points[1].y + origin.y) == true) {
+							(v[i].points[1].x*KageStage::currentScale * _zoomValue) + origin.x,
+							(v[i].points[1].y*KageStage::currentScale * _zoomValue) + origin.y) == true) {
 						if (mouseDown == true) {
 							if (mouseOnNode == _NO_SELECTION) {
 								mouseOnNode = i;
@@ -349,8 +345,8 @@ void KageStage::handleNodes_relocation() {
 					}
 					if (l_shapeGotClose == false && mouseDown == true && mouseOnNode == typeMovesIndex && mouseOnNodeIndex == 3) {
 						l_editingNode = true;
-							l_x = ((draw1.x - origin.x - mouseOnNodeOffset.x) - v[typeMovesIndex].points[0].x);
-							l_y = ((draw1.y - origin.y - mouseOnNodeOffset.y) - v[typeMovesIndex].points[0].y);
+							l_x = ((draw1.x - origin.x - mouseOnNodeOffset.x) / KageStage::currentScale / _zoomValue) - v[typeMovesIndex].points[0].x;
+							l_y = ((draw1.y - origin.y - mouseOnNodeOffset.y) / KageStage::currentScale / _zoomValue) - v[typeMovesIndex].points[0].y;
 							if (keyControlDown == true) {
 								if (keyShiftDown == true) {
 									l_x = 0; //restraint on X axis
@@ -419,8 +415,8 @@ void KageStage::handleNodes_relocation() {
 					//relocate anchors
 					if (mouseDown == true && mouseOnNode == i && mouseOnNodeIndex == 3) {
 						l_editingNode = true;
-							l_x = ((draw1.x - origin.x - mouseOnNodeOffset.x) - v[i].points[2].x);
-							l_y = ((draw1.y - origin.y - mouseOnNodeOffset.y) - v[i].points[2].y);
+							l_x = ((draw1.x - origin.x - mouseOnNodeOffset.x) / KageStage::currentScale / _zoomValue) - v[i].points[2].x;
+							l_y = ((draw1.y - origin.y - mouseOnNodeOffset.y) / KageStage::currentScale / _zoomValue) - v[i].points[2].y;
 							if (keyControlDown == true) {
 								if (keyShiftDown == true) {
 									l_x = 0; //restraint on X axis
@@ -461,14 +457,14 @@ void KageStage::handleNodes_relocation() {
 					//relocate control points
 					if (mouseDown == true && mouseOnNode == i && mouseOnNodeIndex == 1) {
 						l_editingNode = true;
-						v[i].points[0].x = draw1.x - origin.x;
-						v[i].points[0].y = draw1.y - origin.y;
+						v[i].points[0].x = (draw1.x - origin.x) / KageStage::currentScale / _zoomValue;
+						v[i].points[0].y = (draw1.y - origin.y) / KageStage::currentScale / _zoomValue;
 					}
 					
 					if (mouseDown == true && mouseOnNode == i && mouseOnNodeIndex == 2) {
 						l_editingNode = true;
-						v[i].points[1].x = draw1.x - origin.x;
-						v[i].points[1].y = draw1.y - origin.y;
+						v[i].points[1].x = (draw1.x - origin.x) / KageStage::currentScale / _zoomValue;
+						v[i].points[1].y = (draw1.y - origin.y) / KageStage::currentScale / _zoomValue;
 					}
 					break;
 				case VectorData::TYPE_TEXT:
@@ -511,12 +507,12 @@ void KageStage::handleNodes_rendering() {
 					if (l_shapeGotClose == false && typeMovesIndex != UINT_MAX) {
 						//draw anchors
 						cr->move_to(
-							v[typeMovesIndex].points[0].x + origin.x,
-							v[typeMovesIndex].points[0].y + origin.y
+							(v[typeMovesIndex].points[0].x*KageStage::currentScale * _zoomValue) + origin.x,
+							(v[typeMovesIndex].points[0].y*KageStage::currentScale * _zoomValue) + origin.y
 						);
 						
-						l_x = v[typeMovesIndex].points[0].x + origin.x;
-						l_y = v[typeMovesIndex].points[0].y + origin.y;
+						l_x = (v[typeMovesIndex].points[0].x*KageStage::currentScale * _zoomValue) + origin.x;
+						l_y = (v[typeMovesIndex].points[0].y*KageStage::currentScale * _zoomValue) + origin.y;
 						if (mouseOnNodeHover == typeMovesIndex) {
 							renderNode(l_x, l_y, 1);
 						} else {
@@ -555,12 +551,12 @@ void KageStage::handleNodes_rendering() {
 				case VectorData::TYPE_CURVE_CUBIC:
 					//draw lines to anchor
 					cr->move_to(
-						v[i-1].points[v[i-1].points.size()-1].x + origin.x,
-						v[i-1].points[v[i-1].points.size()-1].y + origin.y
+						(v[i-1].points[v[i-1].points.size()-1].x*KageStage::currentScale * _zoomValue) + origin.x,
+						(v[i-1].points[v[i-1].points.size()-1].y*KageStage::currentScale * _zoomValue) + origin.y
 					);
 						cr->line_to(
-							v[i].points[0].x + origin.x,
-							v[i].points[0].y + origin.y
+							(v[i].points[0].x*KageStage::currentScale * _zoomValue) + origin.x,
+							(v[i].points[0].y*KageStage::currentScale * _zoomValue) + origin.y
 						);
 						cr->set_source_rgba(0.0,0.7,0.7,1.0);
 						cr->set_line_width(1.0);
@@ -568,12 +564,12 @@ void KageStage::handleNodes_rendering() {
 								cr->stroke();
 					
 					cr->move_to(
-						v[i].points[1].x + origin.x,
-						v[i].points[1].y + origin.y
+						(v[i].points[1].x*KageStage::currentScale * _zoomValue) + origin.x,
+						(v[i].points[1].y*KageStage::currentScale * _zoomValue) + origin.y
 					);
 						cr->line_to(
-							v[i].points[2].x + origin.x,
-							v[i].points[2].y + origin.y
+							(v[i].points[2].x*KageStage::currentScale * _zoomValue) + origin.x,
+							(v[i].points[2].y*KageStage::currentScale * _zoomValue) + origin.y
 						);
 						cr->set_source_rgba(0.0,0.7,0.7,1.0);
 						cr->set_line_width(1.0);
@@ -582,12 +578,12 @@ void KageStage::handleNodes_rendering() {
 					
 					//draw anchors
 					cr->move_to(
-						v[i].points[2].x + origin.x,
-						v[i].points[2].y + origin.y
+						(v[i].points[2].x*KageStage::currentScale * _zoomValue) + origin.x,
+						(v[i].points[2].y*KageStage::currentScale * _zoomValue) + origin.y
 					);
 					
-					l_x = v[i].points[2].x + origin.x;
-					l_y = v[i].points[2].y + origin.y;
+					l_x = (v[i].points[2].x*KageStage::currentScale * _zoomValue) + origin.x;
+					l_y = (v[i].points[2].y*KageStage::currentScale * _zoomValue) + origin.y;
 					if (mouseOnNodeHover == i) {
 						renderNode(l_x, l_y, 1);
 					} else {
@@ -611,15 +607,23 @@ void KageStage::handleNodes_rendering() {
 					
 					//draw control points
 					if (mouseDown == true && mouseOnNode == i && mouseOnNodeIndex == 1) {
-						renderNodeControl(v[i].points[0].x + origin.x, v[i].points[0].y + origin.y, true);
+						renderNodeControl(
+							(v[i].points[0].x*KageStage::currentScale * _zoomValue) + origin.x,
+							(v[i].points[0].y*KageStage::currentScale * _zoomValue) + origin.y, true);
 					} else {
-						renderNodeControl(v[i].points[0].x + origin.x, v[i].points[0].y + origin.y, false);
+						renderNodeControl(
+							(v[i].points[0].x*KageStage::currentScale * _zoomValue) + origin.x,
+							(v[i].points[0].y*KageStage::currentScale * _zoomValue) + origin.y, false);
 					}
 					
 					if (mouseDown == true && mouseOnNode == i && mouseOnNodeIndex == 2) {
-						renderNodeControl(v[i].points[1].x + origin.x, v[i].points[1].y + origin.y, true);
+						renderNodeControl(
+							(v[i].points[1].x*KageStage::currentScale * _zoomValue) + origin.x,
+							(v[i].points[1].y*KageStage::currentScale * _zoomValue) + origin.y, true);
 					} else {
-						renderNodeControl(v[i].points[1].x + origin.x, v[i].points[1].y + origin.y, false);
+						renderNodeControl(
+							(v[i].points[1].x*KageStage::currentScale * _zoomValue) + origin.x,
+							(v[i].points[1].y*KageStage::currentScale * _zoomValue) + origin.y, false);
 					}
 					break;
 				case VectorData::TYPE_TEXT:
@@ -824,26 +828,22 @@ unsigned int KageStage::getSelectedShapeViaNode(unsigned int p_index, vector<Vec
 						if (propX < p_v[j].points[0].x
 								&& propWidth < (p_v[j].points[0].x - propX)) {
 							propWidth = p_v[j].points[0].x - propX;
-//							cout << "\npropWidth " << propWidth << " _zoomValueShapeProperty " << _zoomValueShapeProperty << endl;
-							propWidth = propWidth * _zoomValueShapeProperty;
+//							cout << "\npropWidth " << propWidth << endl;
 						}
 						if (propY < p_v[j].points[0].y
 								&& propHeight < (p_v[j].points[0].y - propY)) {
 							propHeight = p_v[j].points[0].y - propY;
-							propHeight = propHeight * _zoomValueShapeProperty;
 						}
 					} else if (p_v[j].vectorType == VectorData::TYPE_CURVE_CUBIC) {
 						for (int k = 0; k < 3; ++k) {
 							if (propX < p_v[j].points[k].x
 									&& propWidth < (p_v[j].points[k].x - propX)) {
 								propWidth = p_v[j].points[k].x - propX;
-//								cout << "\npropWidth " << propWidth << " _zoomValueShapeProperty " << _zoomValueShapeProperty << endl;
-								propWidth = propWidth * _zoomValueShapeProperty;
+//								cout << "\npropWidth " << propWidth << endl;
 							}
 							if (propY < p_v[j].points[k].y
 									&& propHeight < (p_v[j].points[k].y - propY)) {
 								propHeight = p_v[j].points[k].y - propY;
-								propHeight = propHeight * _zoomValueShapeProperty;
 							}
 						}
 					}

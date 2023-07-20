@@ -101,6 +101,7 @@
 			Gdk::Color getStroke();
 			double stageWidth; //direct use for get only
 			double stageHeight; //direct use for get only
+			double currentScale; /// for use with zoom; default value is stageWidth; can be changed as preferred
 			void clearScreen(Cairo::RefPtr<Cairo::Context> p_context);
 			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context, bool p_force = false);
 			void renderOnionFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> p_vectorData, double p_alpha);
@@ -194,7 +195,6 @@
 			
 			double _zoomRatio;
 			double _zoomValue;
-			double _zoomValueShapeProperty;
 			PointData _zoomReference;
 			PointData __origin;
 			PointData __stageArea;
@@ -202,10 +202,6 @@
 			PointData _rotateReference;
 			
 			PointData applyZoomRatio(PointData p_value);
-			double applyZoomRatioX(double p_value);
-			double applyZoomRatioY(double p_value);
-			double getZoomRatioX(double p_value);
-			double getZoomRatioY(double p_value);
 			void applyZoom();
 			vector<VectorData> applyZoom(vector<VectorData> p_v);
 			
@@ -219,12 +215,12 @@
 		protected:
 			ToolMode prevTool; //used by Hand-tool shortcut [spacebar]
 			Kage *win;
-			GdkPoint draw1;
-			GdkPoint draw2;
-			GdkPoint drawFree1;
-			GdkPoint drawFree2;
-			GdkPoint drawFree3;
-			GdkPoint drawFree4;
+			PointData draw1;
+			PointData draw2;
+			PointData drawFree1;
+			PointData drawFree2;
+			PointData drawFree3;
+			PointData drawFree4;
 			short int drawFreeCtr;
 			GdkPoint drawConstraint;
 			double polyXhead, polyYhead;
@@ -247,7 +243,7 @@
 			
 			bool on_timeout();
 			unsigned int mouseOnNode;
-			GdkPoint mouseOnNodeOffset;
+			PointData mouseOnNodeOffset;
 			unsigned int mouseOnNodeHover;
 			unsigned int mouseOnNodeIndex;
 			unsigned int selectedNode;
@@ -261,8 +257,8 @@
 			void renderNodeControl(double p_x, double p_y, bool p_selected);
 			bool isMouseOnNode(double p_x, double p_y, unsigned int p_buffer = 5);
 			
-			GdkPoint selectionBox1;
-			GdkPoint selectionBox2;
+			PointData selectionBox1;
+			PointData selectionBox2;
 			bool isSelectionBoxNormalized();
 			void normalizeSelectionBox();
 			bool isNodeOnSelectionBox(double p_nodeX, double p_nodeY);

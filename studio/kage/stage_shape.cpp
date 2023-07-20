@@ -59,7 +59,7 @@ void KageStage::handleShapes_scaleNorth() {
 		return;
 	}
 	double diffOld = anchor_lowerRight.y - anchor_upperLeft.y;
-	double diffNew = anchor_lowerRight.y - (draw2.y / KageStage::currentScale);
+	double diffNew = anchor_lowerRight.y - ((draw2.y - origin.y) / KageStage::currentScale / _zoomValue);
 	double diffRatio = diffNew / diffOld;
 	if (diffRatio == 0.0) {
 		return;
@@ -106,7 +106,7 @@ void KageStage::handleShapes_scaleNorth() {
 		}
 	}
 	
-	anchor_upperLeft.y = draw2.y / KageStage::currentScale;
+	anchor_upperLeft.y = (draw2.y - origin.y) / KageStage::currentScale / _zoomValue;
 	
 	win->setFrameData(v);
 }
@@ -115,7 +115,7 @@ void KageStage::handleShapes_scaleEast() {
 		return;
 	}
 	double diffOld = anchor_lowerRight.x - anchor_upperLeft.x;
-	double diffNew = (draw2.x / KageStage::currentScale) - anchor_upperLeft.x;
+	double diffNew = ((draw2.x - origin.x) / KageStage::currentScale / _zoomValue) - anchor_upperLeft.x;
 	double diffRatio = diffNew / diffOld;
 	if (diffRatio == 0.0) {
 		return;
@@ -162,7 +162,7 @@ void KageStage::handleShapes_scaleEast() {
 		}
 	}
 	
-	anchor_lowerRight.x = draw2.x / KageStage::currentScale;
+	anchor_lowerRight.x = (draw2.x - origin.x) / KageStage::currentScale / _zoomValue;
 	
 	win->setFrameData(v);
 }
@@ -171,7 +171,7 @@ void KageStage::handleShapes_scaleWest() {
 		return;
 	}
 	double diffOld = anchor_upperLeft.x - anchor_lowerRight.x;
-	double diffNew = (draw2.x / KageStage::currentScale) - anchor_lowerRight.x;
+	double diffNew = ((draw2.x - origin.x) / KageStage::currentScale / _zoomValue) - anchor_lowerRight.x;
 	double diffRatio = diffNew / diffOld;
 	if (diffRatio == 0.0) {
 		return;
@@ -218,7 +218,7 @@ void KageStage::handleShapes_scaleWest() {
 		}
 	}
 	
-	anchor_upperLeft.x = draw2.x / KageStage::currentScale;
+	anchor_upperLeft.x = (draw2.x - origin.x) / KageStage::currentScale / _zoomValue;
 	
 	win->setFrameData(v);
 }
@@ -227,7 +227,7 @@ void KageStage::handleShapes_scaleSouth() {
 		return;
 	}
 	double diffOld = anchor_lowerRight.y - anchor_upperLeft.y;
-	double diffNew = (draw2.y / KageStage::currentScale) - anchor_upperLeft.y;
+	double diffNew = ((draw2.y - origin.y) / KageStage::currentScale / _zoomValue) - anchor_upperLeft.y;
 	double diffRatio = diffNew / diffOld;
 	if (diffRatio == 0.0) {
 		return;
@@ -274,7 +274,7 @@ void KageStage::handleShapes_scaleSouth() {
 		}
 	}
 	
-	anchor_lowerRight.y = draw2.y / KageStage::currentScale;
+	anchor_lowerRight.y = (draw2.y - origin.y) / KageStage::currentScale / _zoomValue;
 	
 	win->setFrameData(v);
 }
@@ -764,11 +764,11 @@ void KageStage::handleShapes_modifyingShape() {
 	} else if (mouseOnAnchor == AnchorData::TYPE_MOVE) {
 		//move the whole shape around
 		handleShapes_moveShape(
-			(draw2.x/KageStage::currentScale) - anchor_center.x,
-			(draw2.y/KageStage::currentScale) - anchor_center.y);
+			((draw2.x - origin.x) / KageStage::currentScale / _zoomValue) - anchor_center.x,
+			((draw2.y - origin.y) / KageStage::currentScale / _zoomValue) - anchor_center.y);
 		
-		anchor_center.x = (draw2.x/KageStage::currentScale);
-		anchor_center.y = (draw2.y/KageStage::currentScale);
+		anchor_center.x = (draw2.x - origin.x) / KageStage::currentScale / _zoomValue;
+		anchor_center.y = (draw2.y - origin.y) / KageStage::currentScale / _zoomValue;
 	} else if (mouseOnAnchor == AnchorData::TYPE_ROTATE) {
 		AnchorData l_anchor;
 		vector<VectorData> v = win->getFrameData().getVectorData();
@@ -783,15 +783,15 @@ void KageStage::handleShapes_modifyingShape() {
 						//do move Rotate-Anchor
 						if (l_selectedShapes_size > 1) {
 							//keep current X/Y for use if anchor value from init is 0/0 which indicates default value
-							anchor_rotate.x = (draw2.x/KageStage::currentScale);
-							anchor_rotate.y = (draw2.y/KageStage::currentScale);
+							anchor_rotate.x = (draw2.x - origin.x) / KageStage::currentScale / _zoomValue;
+							anchor_rotate.y = (draw2.y - origin.y) / KageStage::currentScale / _zoomValue;
 						} else {
-							v[i].points[0].x = (draw2.x/KageStage::currentScale);// - origin.x;
-							v[i].points[0].y = (draw2.y/KageStage::currentScale);// - origin.y;
+							v[i].points[0].x = (draw2.x - origin.x) / KageStage::currentScale / _zoomValue;// - origin.x;
+							v[i].points[0].y = (draw2.y - origin.y) / KageStage::currentScale / _zoomValue;// - origin.y;
 						}
 						
-						l_anchor.x = (draw2.x/KageStage::currentScale);
-						l_anchor.y = (draw2.y/KageStage::currentScale);
+						l_anchor.x = (draw2.x - origin.x) / KageStage::currentScale / _zoomValue;
+						l_anchor.y = (draw2.y - origin.y) / KageStage::currentScale / _zoomValue;
 					}
 				}
 			}
@@ -818,8 +818,8 @@ void KageStage::handleShapes_modifyingShape() {
 			anchor_rotate.y = anchor_center.y;
 		}
 		PointData l_rotateNew;
-			l_rotateNew.x = (draw2.x / KageStage::currentScale) - anchor_rotate.x;
-			l_rotateNew.y = (draw2.y / KageStage::currentScale) - anchor_rotate.y;
+			l_rotateNew.x = (((draw2.x - origin.x) / KageStage::currentScale) / _zoomValue) - anchor_rotate.x;
+			l_rotateNew.y = (((draw2.y - origin.y) / KageStage::currentScale) / _zoomValue) - anchor_rotate.y;
 		double l_angleNew = atan2(l_rotateNew.y, l_rotateNew.x);
 		
 		PointData l_rotateOld;
@@ -842,8 +842,8 @@ void KageStage::handleShapes_modifyingShape() {
 						if (l_selectedShapes_size == 1 && v[i].points.size() == 1) {
 							anchor_center.x = v[i].points[0].x;
 							anchor_center.y = v[i].points[0].y;
-								l_rotateNew.x = (draw2.x / KageStage::currentScale) - anchor_center.x;
-								l_rotateNew.y = (draw2.y / KageStage::currentScale) - anchor_center.y;
+								l_rotateNew.x = (((draw2.x - origin.x) / KageStage::currentScale) / _zoomValue) - anchor_center.x;
+								l_rotateNew.y = (((draw2.y - origin.y) / KageStage::currentScale) / _zoomValue) - anchor_center.y;
 									l_angleNew = atan2(l_rotateNew.y, l_rotateNew.x);
 								l_rotateOld.x = (((draw1.x - origin.x) / KageStage::currentScale) / _zoomValue) - anchor_center.x;
 								l_rotateOld.y = (((draw1.y - origin.y) / KageStage::currentScale) / _zoomValue) - anchor_center.y;
@@ -913,8 +913,8 @@ void KageStage::handleShapes() {
 	
 	vector<VectorData> v = win->getFrameData().getVectorData();
 	
-	anchor_upperLeft.x = 100000;
-	anchor_upperLeft.y = 100000;
+	anchor_upperLeft.x = DBL_MAX;
+	anchor_upperLeft.y = DBL_MAX;
 	
 	anchor_lowerRight.x = -100000;
 	anchor_lowerRight.y = -100000;

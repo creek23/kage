@@ -63,7 +63,7 @@ void KageStage::addSelectedNode(unsigned int p_index) {
 void KageStage::updateNodeX(double p_value, bool p_stackDo) {
 	Kage::timestamp_IN();
 	std::cout << " KageStage::updateNodeX " << selectedNodes.size() << " " << p_value << std::endl;
-	
+	p_value = p_value / KageStage::currentScale;
 	if (selectedNodes.size() == 0) {
 		Kage::timestamp_OUT();
 		return;
@@ -114,13 +114,13 @@ void KageStage::updateNodeX(double p_value, bool p_stackDo) {
 	if (p_stackDo) {
 		win->stackDo();
 	}
-	
+	invalidateToRender();
 	Kage::timestamp_OUT();
 }
 void KageStage::updateNodeY(double p_value, bool p_stackDo) {
 	Kage::timestamp_IN();
 	std::cout << " KageStage::updateNodeY " << selectedNodes.size() << " " << p_value << std::endl;
-	
+	p_value = p_value / KageStage::currentScale;
 	if (selectedNodes.size() == 0) {
 		Kage::timestamp_OUT();
 		return;
@@ -165,7 +165,7 @@ void KageStage::updateNodeY(double p_value, bool p_stackDo) {
 	if (p_stackDo) {
 		win->stackDo();
 	}
-	
+	invalidateToRender();
 	Kage::timestamp_OUT();
 }
 
@@ -389,16 +389,16 @@ void KageStage::handleNodes_relocation() {
 					break;
 				case VectorData::TYPE_LINE:
 					if (mouseDown == true && mouseOnNode == i) {
-						v[i].points[0].x = draw1.x - origin.x;
-						v[i].points[0].y = draw1.y - origin.y;
+						v[i].points[0].x = (draw2.x - origin.x) / _zoomValue;
+						v[i].points[0].y = (draw2.y - origin.y) / _zoomValue;
 					}
 					l_x = v[i].points[0].x + origin.x;
 					l_y = v[i].points[0].y + origin.y;
 					
 					if (isMouseOnNode(l_x, l_y) == true) {
 						if (mouseDown == true) {
-							v[i].points[0].x = draw1.x - origin.x;
-							v[i].points[0].y = draw1.y - origin.y;
+							v[i].points[0].x = (draw2.x - origin.x) / _zoomValue;
+							v[i].points[0].y = (draw2.y - origin.y) / _zoomValue;
 							
 							l_x = v[i].points[0].x + origin.x;
 							l_y = v[i].points[0].y + origin.y;
@@ -415,8 +415,8 @@ void KageStage::handleNodes_relocation() {
 					//relocate anchors
 					if (mouseDown == true && mouseOnNode == i && mouseOnNodeIndex == 3) {
 						l_editingNode = true;
-							l_x = ((draw1.x - origin.x - mouseOnNodeOffset.x) / KageStage::currentScale / _zoomValue) - v[i].points[2].x;
-							l_y = ((draw1.y - origin.y - mouseOnNodeOffset.y) / KageStage::currentScale / _zoomValue) - v[i].points[2].y;
+							l_x = ((draw2.x - origin.x - mouseOnNodeOffset.x) / KageStage::currentScale / _zoomValue) - v[i].points[2].x;
+							l_y = ((draw2.y - origin.y - mouseOnNodeOffset.y) / KageStage::currentScale / _zoomValue) - v[i].points[2].y;
 							if (keyControlDown == true) {
 								if (keyShiftDown == true) {
 									l_x = 0; //restraint on X axis
@@ -457,14 +457,14 @@ void KageStage::handleNodes_relocation() {
 					//relocate control points
 					if (mouseDown == true && mouseOnNode == i && mouseOnNodeIndex == 1) {
 						l_editingNode = true;
-						v[i].points[0].x = (draw1.x - origin.x) / KageStage::currentScale / _zoomValue;
-						v[i].points[0].y = (draw1.y - origin.y) / KageStage::currentScale / _zoomValue;
+						v[i].points[0].x = (draw2.x - origin.x) / KageStage::currentScale / _zoomValue;
+						v[i].points[0].y = (draw2.y - origin.y) / KageStage::currentScale / _zoomValue;
 					}
 					
 					if (mouseDown == true && mouseOnNode == i && mouseOnNodeIndex == 2) {
 						l_editingNode = true;
-						v[i].points[1].x = (draw1.x - origin.x) / KageStage::currentScale / _zoomValue;
-						v[i].points[1].y = (draw1.y - origin.y) / KageStage::currentScale / _zoomValue;
+						v[i].points[1].x = (draw2.x - origin.x) / KageStage::currentScale / _zoomValue;
+						v[i].points[1].y = (draw2.y - origin.y) / KageStage::currentScale / _zoomValue;
 					}
 					break;
 				case VectorData::TYPE_TEXT:
@@ -939,8 +939,8 @@ bool KageStage::isNodeOnSelectionBox(double p_nodeX, double p_nodeY) {
 	return false;
 }
 bool KageStage::isMouseOnNode(double p_x, double p_y, unsigned int p_buffer) {
-	if (p_x-p_buffer <= draw1.x && p_x+p_buffer >= draw1.x
-			&& p_y-p_buffer <= draw1.y && p_y+p_buffer >= draw1.y) {
+	if (p_x-p_buffer <= draw2.x && p_x+p_buffer >= draw2.x
+			&& p_y-p_buffer <= draw2.y && p_y+p_buffer >= draw2.y) {
 		return true;
 	}
 	return false;

@@ -1901,15 +1901,15 @@ string sanitizeToZero(double p_value) {
 	}
 }
 void Kage::updateShapeProperties() {
-	m_EntryX.set_text(     sanitizeToZero(m_KageStage.propX      * m_KageStage.stageWidth ));
-	m_EntryY.set_text(     sanitizeToZero(m_KageStage.propY      * m_KageStage.stageHeight));
-	m_EntryWidth.set_text( sanitizeToZero(m_KageStage.propWidth  * m_KageStage.stageWidth ));
-	m_EntryHeight.set_text(sanitizeToZero(m_KageStage.propHeight * m_KageStage.stageHeight));
+	m_EntryX.set_text(     sanitizeToZero(m_KageStage.propX      * m_KageStage.currentScale));
+	m_EntryY.set_text(     sanitizeToZero(m_KageStage.propY      * m_KageStage.currentScale));
+	m_EntryWidth.set_text( sanitizeToZero(m_KageStage.propWidth  * m_KageStage.currentScale));
+	m_EntryHeight.set_text(sanitizeToZero(m_KageStage.propHeight * m_KageStage.currentScale));
 }
 
 void Kage::updateNodeXY() {
-	m_EntryNodeX.set_text(sanitizeToZero(m_KageStage.nodeX * m_KageStage.stageWidth ));
-	m_EntryNodeY.set_text(sanitizeToZero(m_KageStage.nodeY * m_KageStage.stageHeight));
+	m_EntryNodeX.set_text(sanitizeToZero(m_KageStage.nodeX * m_KageStage.currentScale));
+	m_EntryNodeY.set_text(sanitizeToZero(m_KageStage.nodeY * m_KageStage.currentScale));
 }
 
 void Kage::stackDo() {
@@ -3260,7 +3260,6 @@ void Kage::EntryNodeX_onEnter() {
 	
 	m_EntryNodeX.set_text(StringHelper::doubleToString(l_dbl));
 	m_KageStage.updateNodeX(l_dbl);
-	renderFrames();
 }
 
 void Kage::EntryNodeY_onEnter() {
@@ -3268,7 +3267,6 @@ void Kage::EntryNodeY_onEnter() {
 	
 	m_EntryNodeY.set_text(StringHelper::doubleToString(l_dbl));
 	m_KageStage.updateNodeY(l_dbl);
-	renderFrames();
 }
 
 void Kage::ToggleLine_onClick() {

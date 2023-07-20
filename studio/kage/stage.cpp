@@ -322,7 +322,7 @@ bool KageStage::on_event(GdkEvent *e) {
 			invalidateToRender();
 		} else if (KageStage::toolMode == MODE_NODE) {
 			if (_isModifyingShape == false) {
-				if (draw1.x >= draw2.x-(5/KageStage::currentScale)
+				if (       draw1.x >= draw2.x-(5/KageStage::currentScale)
 						&& draw1.x <= draw2.x+(5/KageStage::currentScale)
 						&& draw1.y >= draw2.y-(5/KageStage::currentScale)
 						&& draw1.y <= draw2.y+(5/KageStage::currentScale)) {
@@ -453,18 +453,19 @@ bool KageStage::on_event(GdkEvent *e) {
 		_mouseLocation.y = e->button.y;
 		
 		if (KageStage::toolMode == MODE_NODE) {
-			draw1.x = e->button.x;
-			draw1.y = e->button.y;
+			draw2.x = e->button.x;
+			draw2.y = e->button.y;
+			
+			_zoomReference.x = e->button.x; //zoom++;
+			_zoomReference.y = e->button.y; //zoom++;
 			
 			invalidateToRender();
 		} else if (KageStage::toolMode == MODE_SELECT) {
-			draw2.x = (e->button.x - origin.x) / _zoomValue; //zoom++ : revert this line
-			draw2.y = (e->button.y - origin.y) / _zoomValue; //zoom++ : revert this line
-			//draw2.x = e->button.x;
-			//draw2.y = e->button.y;
+			draw2.x = e->button.x;
+			draw2.y = e->button.y;
 			
-			_zoomReference.x = e->button.x;
-			_zoomReference.y = e->button.y;
+			_zoomReference.x = e->button.x; //zoom++;
+			_zoomReference.y = e->button.y; //zoom++;
 			
 			if (mouseDown == true) {
 				invalidateToRender();
@@ -1339,11 +1340,11 @@ void KageStage::drawSelectionArea() {
 	
 	cr->set_dash(dashes, 0.0);
 	//draw bounding rectangle for the shape
-	cr->move_to(draw1.x , draw1.y );
-		cr->line_to(draw2.x*_zoomValue+origin.x, draw1.y            );
-		cr->line_to(draw2.x*_zoomValue+origin.x, draw2.y*_zoomValue+origin.y);
-		cr->line_to(draw1.x                    , draw2.y*_zoomValue+origin.y);
-		cr->line_to(draw1.x                    , draw1.y            );
+	cr->move_to(draw1.x , draw1.y);
+		cr->line_to(draw2.x, draw1.y);
+		cr->line_to(draw2.x, draw2.y);
+		cr->line_to(draw1.x, draw2.y);
+		cr->line_to(draw1.x, draw1.y);
 			cr->set_source_rgba(0.0,0.0,0.0,1.0);
 			cr->set_line_width(1.0);
 				cr->set_line_cap(Cairo::LINE_CAP_ROUND);

@@ -172,7 +172,7 @@ bool KageFrame::invalidateToRender() {
 	if (KageFramesetManager::LOADING_MODE == true) {
 		return true;
 	}
-	Kage::timestamp_IN(); cout << " KageFrame::invalidateToRender()" << endl;
+	cout << " KageFrame::invalidateToRender() @" << layerID << " " << frameID << endl;
 	if (!window) {
 		window = get_window();
 	}
@@ -183,8 +183,6 @@ bool KageFrame::invalidateToRender() {
 				get_allocation().get_height());
 		window->invalidate_rect(r, false);
 	}
-	
-	Kage::timestamp_OUT();
 	
 	return true;
 }
@@ -371,7 +369,7 @@ bool KageFrame::isNull() {
 void KageFrame::forceSetTween(unsigned int p_tween) {
 	_tweenX = p_tween/10;
 	_tweenY = p_tween - (_tweenX*10);
-	cout << " KageFrame::setTween() " << _tweenX << " " << _tweenY << endl;
+	//cout << " KageFrame::forceSetTween() " << _tweenX << " " << _tweenY << " @" << layerID << " " << frameID << endl;
 	
 	invalidateToRender();
 }
@@ -379,7 +377,7 @@ void KageFrame::setTween(unsigned int p_tween) {
 	if (_null == true) {
 		return;
 	}
-	cout << " KageFrame::setTween() " << frameID << " " << p_tween << endl;
+	cout << " KageFrame::setTween() @" << layerID << " " << frameID << " " << p_tween << endl;
 	if (       _extension == KageFrame::EXTENSION_NOT) {
 		forceSetTween(p_tween);
 	} else if (_extension == KageFrame::EXTENSION_START) {

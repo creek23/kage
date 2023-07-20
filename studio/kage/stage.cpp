@@ -31,6 +31,7 @@ KageStage::KageStage(Kage *p_win) {
 	add_events(Gdk::KEY_PRESS_MASK | Gdk::KEY_RELEASE_MASK);
 	add_events(Gdk::FOCUS_CHANGE_MASK);
 	add_events(Gdk::POINTER_MOTION_MASK);
+	add_events(Gdk::SCROLL_MASK);
 	
 	unpressKeys();
 }
@@ -560,6 +561,22 @@ bool KageStage::on_event(GdkEvent *e) {
 		 * 	gint16 height;
 		 * };
 		 */
+	} else if (e->type == GDK_SCROLL) {
+		GdkEventScroll* foobar = (GdkEventScroll*)(e);
+		cout << " " << foobar->x << " " << foobar->y << " " << foobar->direction << endl;
+		if (foobar->direction == GDK_SCROLL_UP) {
+			_zoomRatio = 1.1;
+			_zoomValue = _zoomValue * 1.1f;
+		} else {
+			_zoomRatio = 0.909090909f;
+			_zoomValue = _zoomValue / 1.1f;
+		}
+		//e->button.button = 0;
+		_zoomReference.x = e->button.x;
+		_zoomReference.y = e->button.y;
+		
+		origin = applyZoomRatio(origin); //zoom++
+		invalidateToRender();
 	} else {
 		//
 	}

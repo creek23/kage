@@ -38,12 +38,15 @@
 	//#include "kage/timeline/layer.h"
 	#include "kage/timeline/framesmanager.h"
 	//#include "kage/timeline/timeline.h"
-	#include "kage/stage.h"
+	#include "kage/stage/stage.h"
+	#include "kage/library/assetmanager.h"
+	#include "kage/library/library.h"
 	#include "kage/properties/fillstroke.h"
 	#include "kage/properties/frametween.h"
 	#include "kage/properties/locationsize.h"
 	#include "kage/properties/nodexy.h"
 	#include "kage/properties/stage.h"
+	#include "kage/document.h"
 	#include "about.h"
 //	#include "register.h" -- not implemented yet; this is to gather users for support group
 	
@@ -91,6 +94,7 @@
 			unsigned int hexToInt15(char p);
 			
 			KageLayerManager _layerManager;
+			KageAssetManager _assetManager;
 			KageFramesetManager _framesetManager;
 			
 		protected:
@@ -155,8 +159,9 @@
 			void ExportPNGTransparent_onClick();
 			void ExportPNGSpritesheet_onClick();
 			void ExportPNGSequence_onClick();
-			void ExportAVI_onClick();
+			void ExportVideo_onClick();
 			void ProjectSave_onClick(); //place holder
+			void ImportAsset_onClick();
 			
 			virtual bool on_delete_event(GdkEventAny* any_event);
 			virtual bool on_key_press_event(GdkEventKey *e) override;
@@ -215,10 +220,12 @@
 			Gtk::HSeparator m_Separator_Toolbar2;
 			Gtk::HSeparator m_Separator_Toolbar3;
 			Gtk::HSeparator m_Separator_Toolbar4;
+			Gtk::HSeparator m_Separator_Library1;
+			Gtk::HSeparator m_Separator_Library2;
 			Gtk::Label m_LabelProp;
 			Gtk::ScrolledWindow m_Property_Pane_ScrolledWindow;
 			Gtk::VScrollbar     m_Property_Pane_VScrollbar;
-			
+			Gtk::Label m_LabelLibrary;			
 			
 			Gtk::Label m_LblHolder_Toolbar;
 			Gtk::ScrolledWindow m_Stage_Pane_ScrolledWindow;
@@ -300,6 +307,8 @@
 			int _area_timeline_pane;
 			int _area_properties_pane1;
 			int _area_properties_pane2;
+			
+			bool m_LabelLibrary_onClick(GdkEventButton *event);//, gpointer user_data);
 		public:
 			KageStage m_KageStage;
 				bool _UPDATE_SHAPE_COLORS;
@@ -310,6 +319,7 @@
 			PropertyFillStroke m_propFillStroke;
 			PropertyNodeXY m_propNodeXY;
 			PropertyFrameTween m_propFrameTween;
+			KageLibrary  m_Library;
 			Gdk::Color m_Color; //fill or stroke?
 			void Undo_onClick();
 			void Redo_onClick();
@@ -358,8 +368,9 @@
 			void registerPropertiesPane();
 			
 			void refreshUI();
-		public:
 			void focusOnStage();
+
+			KageDocument _document;
 	};
 
 #endif //GTKMM_KAGE_H

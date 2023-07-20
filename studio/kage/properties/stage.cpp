@@ -47,13 +47,13 @@ PropertyStage::PropertyStage(Kage* p_kage) :
             m_EntryStageWid.set_size_request(20, 24);
             m_EntryStageWid.set_width_chars(4);
             m_EntryStageWid.set_max_length(4);
-            setWidthText(_kage->m_KageStage.stageWidth);
+            setWidthText(_kage->_document.Project._width);
                 m_EntryStageWid.signal_activate().connect(
                     sigc::mem_fun(*this, &PropertyStage::EntryStageArea_onEnter) );
             m_EntryStageHgt.set_size_request(20, 24);
             m_EntryStageHgt.set_width_chars(4);
             m_EntryStageHgt.set_max_length(4);
-            setHeightText(_kage->m_KageStage.stageHeight);
+            setHeightText(_kage->_document.Project._height);
                 m_EntryStageHgt.signal_activate().connect(
                     sigc::mem_fun(*this, &PropertyStage::EntryStageArea_onEnter) );
             m_ColorButtonStage.set_size_request(32, 32);
@@ -75,11 +75,11 @@ PropertyStage::~PropertyStage() {
 
 void PropertyStage::EntryStageArea_onEnter() {
 	string t = m_EntryStageWid.get_text();
-		_kage->m_KageStage.stageWidth = StringHelper::toDouble(t);
-		setWidthText(_kage->m_KageStage.stageWidth);
+		_kage->_document.Project._width = StringHelper::toDouble(t);
+        setWidthText(_kage->_document.Project._width);
 	t = m_EntryStageHgt.get_text();
-		_kage->m_KageStage.stageHeight = StringHelper::toDouble(t);
-		setHeightText(_kage->m_KageStage.stageHeight);
+		_kage->_document.Project._height = StringHelper::toDouble(t);
+        setHeightText(_kage->_document.Project._height);
 	_kage->m_KageStage.invalidateToRender();
 }
 void PropertyStage::EntryStageFPS_onEnter() {

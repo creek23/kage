@@ -21,29 +21,8 @@
 
 #include "kage.h"
 
-ColorData KageStage::stageBG(255, 255, 255);
-ColorData KageStage::fillColor(239, 41, 41, 255);
-StrokeColorData KageStage::stroke(164, 0, 0, 255);
-KageStage::ToolMode KageStage::toolMode = MODE_NONE;
-GdkPoint KageStage::moveStageXY;
 unsigned int PointData::debug_pts;
 
-bool KageLayer::mouseIsDown = false;
-Glib::RefPtr<Gdk::Pixbuf> KageLayer::imageVISIBLE_TRUE;
-Glib::RefPtr<Gdk::Pixbuf> KageLayer::imageVISIBLE_FALSE;
-Glib::RefPtr<Gdk::Pixbuf> KageLayer::imageLOCKED_TRUE;
-Glib::RefPtr<Gdk::Pixbuf> KageLayer::imageLOCKED_FALSE;
-
-Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_000;
-Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_045;
-Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_090;
-Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_135;
-Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_MOVE;
-Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_NE;
-Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_NW;
-Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_SW;
-Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_SE;
-Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_ROTATE;
 bool KageFrame::_gotFocus;
 
 unsigned int VectorDataManager::idmaker;
@@ -58,10 +37,14 @@ Kage::Kage(string p_filePath) :
 			   m_propFillStroke(this),
 			   m_propNodeXY(this),
 			   m_propFrameTween(this),
+			   _assetManager(this),
+			   m_Library(this),
 			   m_LabelProp("Properties"),
+			   m_LabelLibrary("Library"),
 			   m_LblHolder_Toolbar("Toolbar"),
 			   m_KageStage(this),
-			   _undoRedoManager() {
+			   _undoRedoManager(),
+			   _document() {
 	m_ContextId = m_Statusbar.get_context_id(KageAbout::app_title);
 	KageFrame::_gotFocus = false;
 	set_title(KageAbout::app_title);
@@ -76,7 +59,7 @@ Kage::Kage(string p_filePath) :
 	
 	m_refActionGroup->add( Gtk::Action::create("FileMenu", "_File") ); 
 	m_refActionGroup->add( Gtk::Action::create("ExportMenu", "_Export...") ); 
-	m_refActionGroup->add( Gtk::Action::create("ExportPNGMenu", "_PNG...") ); 
+	m_refActionGroup->add( Gtk::Action::create("ExportPNGMenu", "_PNG...") );
 	m_refActionGroup->add( Gtk::Action::create("EditMenu", "_Edit") );
 	m_refActionGroup->add( Gtk::Action::create("ViewMenu", "_View") );
 	m_refActionGroup->add( Gtk::Action::create("LayerMenu", "_Layer") );
@@ -135,9 +118,14 @@ Kage::Kage(string p_filePath) :
 		sigc::mem_fun(*this, &Kage::ExportPNGSequence_onClick)
 	);
 	m_refActionGroup->add(
-		Gtk::Action::create("ExportAVI", "Export AVI", "Export to AVI"),
+		Gtk::Action::create("ExportVideo", "Export Video", "Export to Video"),
 //		Gtk::AccelKey("<control>5"),
-		sigc::mem_fun(*this, &Kage::ExportAVI_onClick)
+		sigc::mem_fun(*this, &Kage::ExportVideo_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("ImportAsset", "Import Asset", "Import from Image/Video"),
+		Gtk::AccelKey("<control>R"),
+		sigc::mem_fun(*this, &Kage::ImportAsset_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("Close", Gtk::Stock::CLOSE, "_Close", "Close file"),
@@ -476,7 +464,7 @@ Kage::Kage(string p_filePath) :
 		"			<menuitem action='SaveAs'/>"
 		"			<separator/>"
 		"			<menu action='ExportMenu'>"
-		"				<menuitem action='ExportAVI'/>"
+		"				<menuitem action='ExportVideo'/>"
 		"				<menuitem action='ExportHTML5'/>"
 		"				<menuitem action='ExportSVG'/>"
 		"				<menuitem action='ExportKS'/>"
@@ -487,6 +475,7 @@ Kage::Kage(string p_filePath) :
 		"					<menuitem action='ExportPNGSequence'/>"
 		"				</menu>"
 		"			</menu>"
+		"			<menuitem action='ImportAsset'/>"
 		"			<separator/>"
 		"			<menuitem action='Close'/>"
 		"			<separator/>"
@@ -765,6 +754,21 @@ Kage::Kage(string p_filePath) :
 				m_PropertyBox.pack_start(m_propNodeXY, Gtk::PACK_SHRINK);
 				//Frame Tween
 				m_PropertyBox.pack_start(m_propFrameTween, Gtk::PACK_SHRINK);
+			
+			//Library Pane Label
+			m_PropertyBox.pack_start(m_Separator_Library1, Gtk::PACK_SHRINK);
+
+			m_PropertyBox.pack_start(m_LabelLibrary, Gtk::PACK_SHRINK);
+				m_LabelLibrary.set_size_request(200, 20);
+				m_LabelLibrary.set_alignment(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER);
+				m_PropertyBox.signal_button_press_event().connect(sigc::mem_fun(*this, &Kage::m_LabelLibrary_onClick));
+			m_PropertyBox.pack_start(m_Separator_Library2, Gtk::PACK_SHRINK);
+			
+				//asset preview widget
+				m_PropertyBox.pack_start(m_Library, Gtk::PACK_SHRINK);
+				//asset manager
+				m_PropertyBox.pack_start(_assetManager, Gtk::PACK_SHRINK);
+	
 	New_onClick();
 	
 	registerPropertiesPane();
@@ -782,6 +786,12 @@ Kage::Kage(string p_filePath) :
 	signal_key_press_event().connect( sigc::mem_fun(*this, &Kage::on_key_press_event) );
 	signal_key_release_event().connect( sigc::mem_fun(*this, &Kage::on_key_release_event) );
 }
+
+bool Kage::m_LabelLibrary_onClick(GdkEventButton *event) {//}, gpointer user_data) {
+	cout << "Kage::m_LabelLibrary_onClick " << event->button << " " << event->state << endl;
+	return false;
+}
+
 bool Kage::on_key_press_event(GdkEventKey *e) {
 	cout << "Kage::on_key_press_event " << e->keyval << " " << e->state << endl;
 	return Gtk::Window::on_key_press_event(e);
@@ -801,7 +811,7 @@ Kage::~Kage() {
 }
 
 void Kage::displayMouseXY(double p_x, double p_y) {
-	_labelStatusMouseXY.set_text("X: " + StringHelper::doubleToString(p_x) + " Y: " + StringHelper::doubleToString(p_y));
+	_labelStatusMouseXY.set_text("X: " + StringHelper::doubleToString(p_x) + " Y: " + StringHelper::doubleToString(p_y) + "\t" + StringHelper::doubleToString((int)(m_KageStage._zoomValue*100.0f)));
 }
 void Kage::updateStatus(Glib::ustring status_msg) {
 	m_Statusbar.push(status_msg, m_ContextId);
@@ -835,8 +845,12 @@ void Kage::Redo_onClick() {
 }
 void Kage::Cut_onClick() {
 	Kage::timestamp_IN(); std::cout << " Kage::Cut_onClick " << KageFrame::_gotFocus << std::endl;
-	if (m_KageStage.cutSelectedShapes() == true) {
-		forceRenderFrames();
+	if (KageFrame::_gotFocus == true) {
+		//handle Timeline Cut
+	} else {
+		if (m_KageStage.cutSelectedShapes() == true) {
+			forceRenderFrames();
+		}
 	}
 	Kage::timestamp_OUT();
 }
@@ -1832,6 +1846,8 @@ void Kage::New_onClick() {
 		return;
 	}
 	
+	_assetManager.removeAllAssets();
+	
 	_layerManager.removeAllLayers();
 	_framesetManager.removeAllFrames();
 	_framesetManager.addFrameset(_layerManager.addLayer());
@@ -1849,13 +1865,14 @@ void Kage::New_onClick() {
 	
 	m_KageStage.cleanSlate();
 	
-	m_PropStage.setWidthText(m_KageStage.stageWidth);
-	m_PropStage.setHeightText(m_KageStage.stageHeight);
-	m_PropStage.setFPSText(m_KageStage.fps);
-	
 	m_KageStage.invalidateToRender();
 	
 	ksfPath = "Untitled";
+	
+	m_PropStage.setWidthText(_document.Project._width);
+	m_PropStage.setHeightText(_document.Project._height);
+	m_PropStage.setFPSText(m_KageStage.fps);
+	
 	set_title(ksfPath + " - " + KageAbout::app_title);
 	updateStatus("Ready");
 }
@@ -1974,7 +1991,7 @@ void Kage::doSave(string p_filename) {
 			unsigned int l_currentFrame;
 	
 	saveKageStudio(ksfPath, "<KageStudio version=\"2020.03.10\">");
-	saveKageStudio(ksfPath, "<stage width=\"" + StringHelper::StringHelper::doubleToString(m_KageStage.stageWidth) + "\" height=\"" + StringHelper::StringHelper::doubleToString(m_KageStage.stageHeight) + "\" " +
+	saveKageStudio(ksfPath, "<stage width=\"" + StringHelper::StringHelper::doubleToString(_document.Project._width) + "\" height=\"" + StringHelper::StringHelper::doubleToString(_document.Project._height) + "\" " +
 							"background=\"rgb(" + StringHelper::integerToString(m_KageStage.stageBG.getR()) + ", " + StringHelper::integerToString(m_KageStage.stageBG.getG()) + ", " + StringHelper::integerToString(m_KageStage.stageBG.getB()) + ")\" " +
 							"fps=\"" + StringHelper::integerToString(m_KageStage.fps) + "\" " +
 							"layers=\"" + StringHelper::integerToString(l_lMax) + "\" " +
@@ -2043,7 +2060,7 @@ void Kage::ExportKS_onClick() {
 			
 			exportKonsolScript(ksPath, "Var:Number bgcolor;\n");
 			exportKonsolScript(ksPath, "function kagestudio_screencls() {");
-			exportKonsolScript(ksPath, "\tDraw:RectFill(0, 0, " + StringHelper::StringHelper::doubleToString(m_KageStage.stageWidth) + ", " + StringHelper::StringHelper::doubleToString(m_KageStage.stageHeight) + ", bgcolor, screen)");
+			exportKonsolScript(ksPath, "\tDraw:RectFill(0, 0, " + StringHelper::StringHelper::doubleToString(_document.Project._width) + ", " + StringHelper::StringHelper::doubleToString(_document.Project._height) + ", bgcolor, screen)");
 			exportKonsolScript(ksPath, "}");
 			exportKonsolScript(ksPath, "function render() {");
 			exportKonsolScript(ksPath, "\tkagestudio_screencls()");
@@ -2104,7 +2121,7 @@ void Kage::ExportHTML5_onClick() {
 				exportHtml5(expPath, "}");
 				exportHtml5(expPath, "function kagestudio_screencls() {");
 				exportHtml5(expPath, "\tscreen.fillStyle = \"rgb(" + StringHelper::integerToString(m_KageStage.stageBG.getR()) + ", " + StringHelper::integerToString(m_KageStage.stageBG.getG()) + "," + StringHelper::integerToString(m_KageStage.stageBG.getB()) + ")\";");
-				exportHtml5(expPath, "\tscreen.fillRect(0, 0, " + StringHelper::doubleToString(m_KageStage.stageWidth) + ", " + StringHelper::doubleToString(m_KageStage.stageHeight) + ");");
+				exportHtml5(expPath, "\tscreen.fillRect(0, 0, " + StringHelper::doubleToString(_document.Project._width) + ", " + StringHelper::doubleToString(_document.Project._height) + ");");
 				exportHtml5(expPath, "}");
 				exportHtml5(expPath, "function kagestudio_loop() {");
 				exportHtml5(expPath, "\tkagestudio_screencls()");
@@ -2114,7 +2131,7 @@ void Kage::ExportHTML5_onClick() {
 				exportHtml5(expPath, "}");
 			} else {
 				exportHtml5(expPath, "\tscreen.fillStyle = \"rgb(" + StringHelper::integerToString(m_KageStage.stageBG.getR()) + ", " + StringHelper::integerToString(m_KageStage.stageBG.getG()) + "," + StringHelper::integerToString(m_KageStage.stageBG.getB()) + ")\";");
-				exportHtml5(expPath, "\tscreen.fillRect(0, 0, " + StringHelper::doubleToString(m_KageStage.stageWidth) + ", " + StringHelper::doubleToString(m_KageStage.stageHeight) + ");");
+				exportHtml5(expPath, "\tscreen.fillRect(0, 0, " + StringHelper::doubleToString(_document.Project._width) + ", " + StringHelper::doubleToString(_document.Project._height) + ");");
 				exportHtml5(expPath, "\tks_f1();");
 				exportHtml5(expPath, "}");
 			}
@@ -2132,7 +2149,7 @@ void Kage::ExportHTML5_onClick() {
 				setCurrentFrame(f);
 				setCurrentLayer(t);
 			exportHtml5(expPath, "function main() {\n\t//add variable initialization...\n}");
-			if (exportHtml5(expPath, "</script>\n</head>\n<body align='center' onload='kagestudio();' bgcolor='#101010'>\n<canvas id='screen' width='" + StringHelper::doubleToString(m_KageStage.stageWidth) + "' height='" + StringHelper::doubleToString(m_KageStage.stageHeight) + "' style='display: block; margin: auto;'></canvas>\n</body>\n</html>") == true) {
+			if (exportHtml5(expPath, "</script>\n</head>\n<body align='center' onload='kagestudio();' bgcolor='#101010'>\n<canvas id='screen' width='" + StringHelper::doubleToString(_document.Project._width) + "' height='" + StringHelper::doubleToString(_document.Project._height) + "' style='display: block; margin: auto;'></canvas>\n</body>\n</html>") == true) {
 				updateStatus("Exported to " + expPath);
 			} else {
 				updateStatus("Unable to export!  Please try a different directory.");
@@ -2172,7 +2189,7 @@ void Kage::ExportSVG_onClick() {
 			
 			exportSvg(expPath, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>");
 			exportSvg(expPath, "<!-- Created with " + KageAbout::app_title + " v" + KageAbout::app_version + " (" + KageAbout::app_website + ") -->\n");
-			exportSvg(expPath, "<svg width=\"" + StringHelper::doubleToString(m_KageStage.stageWidth) + "\" height=\"" + StringHelper::doubleToString(m_KageStage.stageHeight) + "\" version=\"1.1\">");
+			exportSvg(expPath, "<svg width=\"" + StringHelper::doubleToString(_document.Project._width) + "\" height=\"" + StringHelper::doubleToString(_document.Project._height) + "\" version=\"1.1\">");
 
 				t = getCurrentLayer();
 				string l_layerToSVG = "";
@@ -2290,7 +2307,7 @@ void Kage::ExportPNGSpritesheet_onClick() {
 				t = getCurrentLayer();
 				f = getCurrentFrame();
 					
-					Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, m_KageStage.stageWidth * l_fMax, m_KageStage.stageHeight);
+					Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, _document.Project._width * l_fMax, _document.Project._height);
 					Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
 
 					for (j = 1; j <= l_fMax; ++j) {
@@ -2298,7 +2315,7 @@ void Kage::ExportPNGSpritesheet_onClick() {
 						
 						for (i = 1; i <= l_lMax; i++) {
 							_framesetManager.setCurrentLayer(i);
-							m_KageStage.renderFrameOffset(l_context, true, m_KageStage.stageWidth*(j-1));
+							m_KageStage.renderFrameOffset(l_context, true, _document.Project._width*(j-1));
 						}
 					}
 
@@ -2359,7 +2376,7 @@ void Kage::ExportPNGSequence_onClick() {
 					for (j = 1; j <= l_fMax; ++j) {
 						_framesetManager.setCurrentFrame(j);
 						
-						Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, m_KageStage.stageWidth, m_KageStage.stageHeight);
+						Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, _document.Project._width, _document.Project._height);
 						Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
 						
 							for (i = 1; i <= l_lMax; i++) {
@@ -2391,28 +2408,122 @@ void Kage::ExportPNGSequence_onClick() {
 	}
 }
 
-void Kage::ExportAVI_onClick() {
-	Gtk::FileChooserDialog dialog("Export to AVI", Gtk::FILE_CHOOSER_ACTION_SAVE);
+void Kage::ImportAsset_onClick() {
+	Gtk::FileChooserDialog dialog("Import Image/Video", Gtk::FILE_CHOOSER_ACTION_OPEN);
+	dialog.set_transient_for(*this);
+		//Add response buttons the the dialog:
+		dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
+		dialog.add_button("_Open", Gtk::RESPONSE_OK);
+
+	//Add filters, so that only certain file types can be selected ?!? -- filtering doesn't seem to working
+	auto filter_ksf = Gtk::FileFilter::create();
+		filter_ksf->set_name(KageAbout::app_title + " files");
+		filter_ksf->add_mime_type("application/kage");
+		filter_ksf->add_pattern("*.ksf");
+			dialog.add_filter(filter_ksf);
+	
+	auto filter_png = Gtk::FileFilter::create();
+		filter_png->set_name("Portable Network Graphics");
+		filter_png->add_mime_type("image/png");
+		filter_png->add_pattern("*.png");
+			dialog.add_filter(filter_png);
+	auto filter_avi = Gtk::FileFilter::create();
+		filter_avi->set_name("Audio Video Interleave files");
+		filter_avi->add_mime_type("video/x-msvideo");
+		filter_avi->add_pattern("*.avi");
+			dialog.add_filter(filter_avi);
+	auto filter_mkv = Gtk::FileFilter::create();
+		filter_mkv->set_name("Matroska files");
+		filter_mkv->add_mime_type("video/x-matroska");
+		filter_mkv->add_pattern("*.mkv");
+			dialog.add_filter(filter_mkv);
+	auto filter_mp4 = Gtk::FileFilter::create();
+		filter_mp4->set_name("MPEG Part 14 files");
+		filter_mp4->add_mime_type("video/mp4");
+		filter_mp4->add_pattern("*.mp4");
+			dialog.add_filter(filter_mp4);
+	
+	//Show the dialog and wait for a user response:
+	int result = dialog.run();
+
+	//Handle the response:
+	switch(result) {
+		case Gtk::RESPONSE_OK:
+			string l_importPath = dialog.get_filename();
+			cout << "File selected: " <<  l_importPath << endl;
+			cout << "uri:" << dialog.get_uri() << endl;
+			
+			if (_assetManager.exists(l_importPath) == false) {
+				int l_len = strlen(l_importPath.c_str()) - 4;
+				if (StringHelper::toLower(l_importPath).substr(l_len, 4) == ".ksf") {
+					updateStatus("Importing of KSF is still under consideration");
+				} else if (StringHelper::toLower(l_importPath).substr(l_len, 4) == ".png") {
+					unsigned int l_image = _assetManager.addAsset(l_importPath);
+					cout << "l_image " << l_image << endl;
+					if (l_image != UINT_MAX) {
+						_assetManager.setAssetType(KageAsset::AssetType::ASSET_IMAGE);
+						cout << " " << _assetManager.getImagePathByID(l_image);
+						unsigned int l_asdasd = m_KageStage.addImage(l_image);
+						_assetManager.render(l_asdasd);
+						//m_Library.render(l_asdasd);
+						updateStatus("Importing of PNG is under construction " + l_importPath);
+					} else {
+						updateStatus("Failed to import " + l_importPath);
+					}
+				} else if (StringHelper::toLower(l_importPath).substr(l_len, 4) == ".avi") {
+					unsigned int foofoo = _assetManager.addAsset(l_importPath);
+					_assetManager.setAssetType(KageAsset::AssetType::ASSET_VIDEO);
+					updateStatus("Importing of AVI is under consideration");
+				} else if (StringHelper::toLower(l_importPath).substr(l_len, 4) == ".mkv") {
+					unsigned int foofoo = _assetManager.addAsset(l_importPath);
+					_assetManager.setAssetType(KageAsset::AssetType::ASSET_VIDEO);
+					updateStatus("Importing of MKV is under consideration");
+				} else if (StringHelper::toLower(l_importPath).substr(l_len, 4) == ".mp4") {
+					unsigned int foofoo = _assetManager.addAsset(l_importPath);
+					_assetManager.setAssetType(KageAsset::AssetType::ASSET_VIDEO);
+					updateStatus("Importing of MP4 is under consideration");
+				} else if (StringHelper::toLower(l_importPath).substr(l_len, 4) != ".png") {
+					updateStatus("Importing of " + l_importPath + " is not supported");
+				}
+			} else {
+				//TODO: prompt if user wants to override existing Asset
+				updateStatus("Importing Failed! " + l_importPath + " is already imported");
+			}
+	}
+}
+void Kage::ExportVideo_onClick() {
+	Gtk::FileChooserDialog dialog("Export to Video", Gtk::FILE_CHOOSER_ACTION_SAVE);
 	dialog.set_transient_for( * this);
 		//Add response buttons the the dialog:
 		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 		dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
 		dialog.set_do_overwrite_confirmation(true);
 		
-		string l_exportAVI = "";
+		string l_exportVideo = "";
 		int l_len = strlen(ksfPath.c_str()) - 4;
-			l_exportAVI = StringHelper::toLower(ksfPath).substr(0, l_len) + ".avi";
-		cout << " setting to " << l_exportAVI << endl; 
-		dialog.set_filename(l_exportAVI);
-		
-		
+			l_exportVideo = StringHelper::toLower(ksfPath).substr(0, l_len) + ".mp4";
+		cout << " setting to " << l_exportVideo << endl; 
+		dialog.set_filename(l_exportVideo);
+	
 	auto filter_avi = Gtk::FileFilter::create();
 		filter_avi->set_name("Audio Video Interleave files");
 		filter_avi->add_mime_type("video/x-msvideo");
 		filter_avi->add_pattern("*.avi");
 			dialog.add_filter(filter_avi);
-	int result = dialog.run();
+	auto filter_mkv = Gtk::FileFilter::create();
+		filter_mkv->set_name("Matroska files");
+		filter_mkv->add_mime_type("video/x-matroska");
+		filter_mkv->add_pattern("*.mkv");
+			dialog.add_filter(filter_mkv);
+	auto filter_mp4 = Gtk::FileFilter::create();
+		filter_mp4->set_name("MPEG Part 14 files");
+		filter_mp4->add_mime_type("video/mp4");
+		filter_mp4->add_pattern("*.mp4");
+			dialog.add_filter(filter_mp4);
 	
+	int result = dialog.run();
+	string l_extension = "";
+	string l_format = "";
 	switch (result) {
 		case Gtk::RESPONSE_OK:
 			string l_pngPath = dialog.get_filename();
@@ -2421,6 +2532,16 @@ void Kage::ExportAVI_onClick() {
 			int l_len = strlen(l_pngPath.c_str()) - 4;
 			if (StringHelper::toLower(l_pngPath).substr(l_len, 4) == ".avi") {
 				l_pngPath = l_pngPath.substr(0, l_len);
+				l_extension = ".avi";
+				l_format = "-c:v ayuv";//ayuv produce too large; ffv1 isnt playing on Windows Media Player
+			} else if (StringHelper::toLower(l_pngPath).substr(l_len, 4) == ".mkv") {
+				l_pngPath = l_pngPath.substr(0, l_len);
+				l_extension = ".mkv";
+				l_format = "-vcodec libx264";
+			} else { //if (StringHelper::toLower(l_pngPath).substr(l_len, 4) == ".mp4") {
+				//l_pngPath = l_pngPath.substr(0, l_len);
+				l_extension = ".mp4";
+				l_format = "-vcodec libx264 -pix_fmt yuv420p";
 			}
 			
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
@@ -2439,10 +2560,9 @@ void Kage::ExportAVI_onClick() {
 				unsigned int j;
 					unsigned int t;
 					unsigned int f;
-				
+				unsigned int l_FPS = m_KageStage.fps;
 				if (l_fMax < m_KageStage.fps) {
-					updateStatus("Unable to export " + l_pngPath + ".avi; try adding more Frames to your animation.");
-					return;
+					l_FPS = l_fMax;
 				}
 				
 				GdkPoint l_tempOrigin;
@@ -2458,7 +2578,7 @@ void Kage::ExportAVI_onClick() {
 					for (j = 1; j <= l_fMax; ++j) {
 						_framesetManager.setCurrentFrame(j);
 						
-						Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, m_KageStage.stageWidth, m_KageStage.stageHeight);
+						Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, _document.Project._width, _document.Project._height);
 						Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
 						
 							m_KageStage.clearScreen(l_context);
@@ -2481,12 +2601,12 @@ void Kage::ExportAVI_onClick() {
 						CairoKage::writeToPNG(l_pngSequencePath, surface);
 					}
 					//workaround to FFMPEG-bug: see https://sourceforge.net/p/kage/tickets/25/
-					if ((l_fMax % m_KageStage.fps) != 0) {
-						unsigned int l_padding = m_KageStage.fps - ((l_fMax % m_KageStage.fps));
+					if ((l_fMax % l_FPS) != 0) {
+						unsigned int l_padding = l_FPS - ((l_fMax % l_FPS));
 						for (j = 1; j <= l_padding; ++j) {
 							_framesetManager.setCurrentFrame(l_fMax);
 							
-							Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, m_KageStage.stageWidth, m_KageStage.stageHeight);
+							Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, _document.Project._width, _document.Project._height);
 							Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
 							
 								m_KageStage.clearScreen(l_context);
@@ -2517,17 +2637,17 @@ void Kage::ExportAVI_onClick() {
 				m_KageStage.origin.y = l_tempOrigin.y;
 			
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-			if (runExternal(".\\ffmpeg", "-y -framerate " + StringHelper::unsignedIntegerToString(m_KageStage.fps) + " -i \"" + l_pngPath + "%05d.png\" -b:v 2048k \"" + l_pngPath + ".avi\"")) {
+			if (runExternal(".\\ffmpeg", "-y -framerate " + StringHelper::unsignedIntegerToString(l_FPS) + " -i \"" + l_pngPath + "%05d.png\" " + l_format + " -b:v 2048k \"" + l_pngPath + l_extension + "\"")) {
 				if (runExternal("del", "/f \"" + l_pngPath + "*.png\"")) {
 #else
-			if (runExternal("ffmpeg", "-y -framerate " + StringHelper::unsignedIntegerToString(m_KageStage.fps) + " -i '" + l_pngPath + "%05d.png' -b:v 2048k '" + l_pngPath + ".avi'")) {
+			if (runExternal("ffmpeg", "-y -framerate " + StringHelper::unsignedIntegerToString(l_FPS) + " -i '" + l_pngPath + "%05d.png' " + l_format + "  -b:v 2048k '" + l_pngPath + l_extension + "'")) {
 				if (runExternal("find", dialog.get_current_folder() + " -wholename '" + l_pngPath + "*.png' -delete")) {
 #endif
-					updateStatus("Exported to " + l_pngPath + ".avi");
+					updateStatus("Exported to " + l_pngPath + l_extension);
 					return;
 				}
 			}
-			updateStatus("Unable to export " + l_pngPath + ".avi");
+			updateStatus("Unable to export " + l_pngPath + l_extension);
 			break;
 	}
 }
@@ -2540,7 +2660,7 @@ void Kage::ProjectSave_onClick() {
 	dialog.add_button("Select", Gtk::RESPONSE_OK);
 	int result = dialog.run();
 	//Handle the response:
-	switch(result) {
+	switch (result) {
 		case(Gtk::RESPONSE_OK):
 			std::cout << "Select clicked." << std::endl;
 			std::cout << "Folder selected: " << dialog.get_filename() << std::endl;
@@ -2799,7 +2919,11 @@ string Kage::saveFrame() {
 				l_ostringstream << "\t<curve>" << v[i].points[0].x*m_KageStage.currentScale << " " << v[i].points[0].y*m_KageStage.currentScale << " " << v[i].points[1].x*m_KageStage.currentScale << " " << v[i].points[1].y*m_KageStage.currentScale << " " << v[i].points[2].x*m_KageStage.currentScale << " " << v[i].points[2].y*m_KageStage.currentScale << "</curve>\n";
 				break;
 			case VectorData::TYPE_IMAGE:
-				//2 '1st is for X/Y, 2nd is for width/height  -- ?!?
+				//p1 x/y == ID / imageBuff
+				//p2 x/y == x / y
+				//p3 x/y == scale / rotate
+				//TODO: save the filename too! -- maybe use ID?
+				l_ostringstream << "\t<image id=\"" << v[i].points[0].x << "\" buff=\"" << v[i].points[0].y << "\" x=\"" << v[i].points[1].x*m_KageStage.currentScale << "\" y=\"" << v[i].points[1].y*m_KageStage.currentScale << "\" scale=\"" << v[i].points[2].x << "\" rotate=\"" << v[i].points[2].y << "\" filename=\"\" />\n";
 				break;
 		}
 	}
@@ -3260,14 +3384,41 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 			VectorDataManager v;
 				v.addClosePath();
 			addDataToFrame(v, true);
+		} else if (l_tagname == "image") {
+			cout << "\n\n\tIMAGE " << endl;
+			for (unsigned int j = 0; j < l_properties.size(); ++j) {
+				if (l_properties[j].getName() == "id") {
+					//ID = StringHelper::toUnsignedInteger(l_properties[j].getValue());
+					cout << "\tid " << l_properties[j].getValue() << endl;
+				} else if (l_properties[j].getName() == "buff") { //placeholder -- not actually used
+					//buff = StringHelper::toUnsignedInteger(l_properties[j].getValue());
+					cout << "\tbuff " << l_properties[j].getValue() << endl;
+				} else if (l_properties[j].getName() == "x") {
+					//x = StringHelper::toUnsignedInteger(l_properties[j].getValue());
+					cout << "\tx " << l_properties[j].getValue() << endl;
+				} else if (l_properties[j].getName() == "y") {
+					//y = StringHelper::toUnsignedInteger(l_properties[j].getValue());
+					cout << "\ty " << l_properties[j].getValue() << endl;
+				} else if (l_properties[j].getName() == "scale") {
+					//scale = StringHelper::toUnsignedInteger(l_properties[j].getValue());
+					cout << "\tscale " << l_properties[j].getValue() << endl;
+				} else if (l_properties[j].getName() == "rotate") {
+					//rotate = StringHelper::toUnsignedInteger(l_properties[j].getValue());
+					cout << "\trotate " << l_properties[j].getValue() << endl;
+				} else if (l_properties[j].getName() == "filename") {
+					//filename = l_properties[j].getValue();
+					cout << "\tfilename " << l_properties[j].getValue() << endl;
+				}
+			}
+			cout << endl << endl << endl;
 		} else if (l_tagname == "stage") {
 			for (unsigned int j = 0; j < l_properties.size(); ++j) {
 				if (l_properties[j].getName() == "width") {
-					m_KageStage.stageWidth = StringHelper::toUnsignedInteger(l_properties[j].getValue());
-					m_PropStage.setWidthText(m_KageStage.stageWidth);
+					_document.Project._width = StringHelper::toUnsignedInteger(l_properties[j].getValue());
+					m_PropStage.setWidthText(_document.Project._width);
 				} else if (l_properties[j].getName() == "height") {
-					m_KageStage.stageHeight = StringHelper::toUnsignedInteger(l_properties[j].getValue());
-					m_PropStage.setHeightText(m_KageStage.stageHeight);
+					_document.Project._height = StringHelper::toUnsignedInteger(l_properties[j].getValue());
+					m_PropStage.setHeightText(_document.Project._height);
 				} else if (l_properties[j].getName() == "fps") {
 					m_KageStage.fps = StringHelper::toUnsignedInteger(l_properties[j].getValue());
 					m_PropStage.setFPSText(m_KageStage.fps);

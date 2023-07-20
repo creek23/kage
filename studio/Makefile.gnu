@@ -1,7 +1,7 @@
 # Makefile for KageStudio
 BIN = kagestudio
 CXX = g++
-CXXFLAGS = -c -I./ `pkg-config gtkmm-3.0 gdkmm-3.0 glibmm-2.4 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++11 -fmax-errors=5 -Wfatal-errors
+CXXFLAGS = -c -I./ `pkg-config gtkmm-3.0 gdkmm-3.0 glibmm-2.4 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++17 -fmax-errors=5 -Wfatal-errors
 CXXLINKS = `pkg-config gtkmm-3.0 gdkmm-3.0 glibmm-2.4 --libs | sed 's/ -I/ -isystem /g'`
 
 SOURCES = \
@@ -18,14 +18,23 @@ SOURCES = \
 	./kage/timeline/layermanager.cpp \
 	./kage/unre/kagedo.cpp \
 	./kage/unre/unre.cpp \
-	./kage/stage.cpp \
-	./kage/stage_node.cpp \
-	./kage/stage_oval.cpp \
-	./kage/stage_poly.cpp \
-	./kage/stage_rect.cpp \
-	./kage/stage_pencil.cpp \
-	./kage/stage_shape.cpp \
+	./kage/stage/stage.cpp \
+	./kage/stage/node.cpp \
+	./kage/stage/oval.cpp \
+	./kage/stage/poly.cpp \
+	./kage/stage/rect.cpp \
+	./kage/stage/pencil.cpp \
+	./kage/stage/shape.cpp \
+	./kage/library/asset.cpp \
+	./kage/library/assetmanager.cpp \
+	./kage/library/library.cpp \
+	./kage/properties/fillstroke.cpp \
+	./kage/properties/frametween.cpp \
+	./kage/properties/locationsize.cpp \
+	./kage/properties/nodexy.cpp \
+	./kage/properties/stage.cpp \
 	./kage/vectordatamanager.cpp \
+	./kage/document.cpp \
 	./util/xml/xmltoken.cpp \
 	./util/xml/xmltagproperty.cpp \
 	./util/xml/xmltag.cpp \
@@ -35,6 +44,7 @@ SOURCES = \
 	kage.cpp \
 	resources.cpp \
 	about.cpp \
+	asset_rename.cpp \
 	layer_rename.cpp \
 	main.cpp
 

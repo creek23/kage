@@ -21,7 +21,7 @@
 
 #include "vectordatamanager.h"
 #include "../kage.h"
-#include "stage.h"
+#include "stage/stage.h"
 
 VectorDataManager::VectorDataManager() {
 //	init(KageStage::fillColor, KageStage::stroke);
@@ -327,7 +327,23 @@ void VectorDataManager::addCurve(PointData p_point1, PointData p_point2, PointDa
 	vectorData[vectorData.size()-1].setPoints(ps);
 }
 
-
+void VectorDataManager::addImage(PointData p_IDandBuff, PointData p_xy, PointData p_scaleRotate) {
+	VectorData l_vectorData;
+	if (vectorData.size() > 0) {
+		l_vectorData = vectorData[vectorData.size()-1];
+	} else {
+		l_vectorData.setType(VectorData::TYPE_INIT);
+		l_vectorData.fillColor = KageStage::fillColor;
+		l_vectorData.stroke = KageStage::stroke;
+	}
+	add(VectorData::TYPE_IMAGE, l_vectorData.fillColor, l_vectorData.stroke);
+	
+	vector<PointData> ps;
+		ps.push_back(p_IDandBuff);
+		ps.push_back(p_xy);
+		ps.push_back(p_scaleRotate);
+	vectorData[vectorData.size()-1].setPoints(ps);
+}
 bool VectorDataManager::isEmpty() {
 	return (getVectorData().size() == 0);
 }

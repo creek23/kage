@@ -88,5 +88,8 @@
 		<file>share/icons/Text_tango.png</file>
 		<file>share/icons/Zoom.png</file>
 		<file>share/icons/Zoom_tango.png</file>
+		<file>share/library/asset_image.png</file>
+		<file>share/library/asset_kage.png</file>
+		<file>share/library/asset_video.png</file>
 	</gresource>
 </gresources>

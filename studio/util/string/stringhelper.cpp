@@ -149,3 +149,47 @@ string StringHelper::trim(string p_source) {
 	}
 	return l_source;
 }
+
+#include <iostream>
+string StringHelper::kHash(string par, int p_len) {
+	unsigned int i = par.length();
+	string hArr[i - 1];
+	int hNum[16] = { 75, 114, 105, 120, 119, 97, 114, 101, 32, 83, 116, 117, 100, 105, 111, 115 };
+	int hVal = 10;
+	string sHash;
+
+	//delimit hash length
+	if (p_len < 8) { p_len = 8; }
+	if (p_len > 24) { p_len = 24; }
+	
+	unsigned int ii;
+	int ii2, temp, prem = ((int)par.substr( 0, 1)[0]) % hVal;
+	
+	for (ii = 0; ii < par.length() - 1; ++ii) {
+		hArr[ii] = par[ii+1];
+		for (ii2 = 0; ii2 < 16; ++ii2) {
+			temp = (hNum[ii2] + atoi(hArr[ii].c_str()) + prem) % hVal;
+			if (temp < 25) {
+				temp = 97 + temp % 26;
+			} else {
+				temp = 65 + temp;
+			}
+			prem = temp % 52;
+			hNum[ii2] = temp;
+		}
+		prem = atoi(hArr[ii].c_str()) % hVal;
+	}
+	
+	std::stringstream ss;
+	ss  << char(hNum[ 0]) << char(hNum[ 1])
+		<< char(hNum[ 2]) << char(hNum[ 3])
+		<< char(hNum[ 4]) << char(hNum[ 5])
+		<< char(hNum[ 6]) << char(hNum[ 7])
+		<< char(hNum[ 8]) << char(hNum[ 9])
+		<< char(hNum[10]) << char(hNum[11])
+		<< char(hNum[12]) << char(hNum[13])
+		<< char(hNum[14]) << char(hNum[15]);
+	ss >> sHash;
+	
+	return sHash.substr(0, p_len);
+}

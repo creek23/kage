@@ -22,7 +22,7 @@
 //part of stage.cpp
 
 #include "stage.h"
-#include "../kage.h"
+#include "../../kage.h"
 #include <cairomm/context.h>
 
 void KageStage::handleDrawPolyMouseUp() {

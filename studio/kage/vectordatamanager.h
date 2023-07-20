@@ -59,6 +59,8 @@
 			void addMove(PointData p_point);
 			void addLineStyle(StrokeColorData p_stroke);
 			
+			void addImage(PointData p_IDandBuff, PointData p_xy, PointData p_scaleRotate);
+
 //			void init(ColorData p_fill, StrokeColorData p_stroke);
 			void push(VectorDataManager p_vectorsData);
 			

@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2022  Mj Mendoza IV
+ * Copyright (C) 2011~2023  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,12 @@
 #include "../../kage.h"
 
 #include <giomm/resource.h>
+
+bool KageLayer::mouseIsDown = false;
+Glib::RefPtr<Gdk::Pixbuf> KageLayer::imageVISIBLE_TRUE;
+Glib::RefPtr<Gdk::Pixbuf> KageLayer::imageVISIBLE_FALSE;
+Glib::RefPtr<Gdk::Pixbuf> KageLayer::imageLOCKED_TRUE;
+Glib::RefPtr<Gdk::Pixbuf> KageLayer::imageLOCKED_FALSE;
 
 KageLayer::KageLayer(KageLayerManager *p_layerManager, unsigned p_layerID) {
 	set_state_flags(Gtk::STATE_FLAG_NORMAL);

@@ -26,7 +26,7 @@
 #include <cairomm/context.h>
 
 void KageStage::handleDrawRectMouseUp() {
-	if (win->isLayerLocked() == true) {
+	if (_kage->isLayerLocked() == true) {
 		return;
 	}
 	if (draw1.x == draw2.x && draw1.y == draw2.y) { return; }
@@ -48,15 +48,15 @@ void KageStage::handleDrawRectMouseUp() {
 		v.addLine(p5);
 		v.addClosePath();
 		v.addEndFill();
-	win->addDataToFrame(v);
+	_kage->addDataToFrame(v);
 	
-	win->stackDo();
+	_kage->stackDo();
 	
 	invalidateToRender();
 }
 
 void KageStage::handleRect() {
-	if (win->isLayerLocked() == true) {
+	if (_kage->isLayerLocked() == true) {
 		return;
 	}
 	cr->move_to(draw1.x                      , draw1.y                      );

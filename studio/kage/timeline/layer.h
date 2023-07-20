@@ -19,8 +19,8 @@
  * 
  */
 
-#ifndef GTKMM_KAGE_LAYER_H
-	#define GTKMM_KAGE_LAYER_H
+#ifndef GTKMM_KAGE_LAYER_UI_H
+	#define GTKMM_KAGE_LAYER_UI_H
 	
 	#include <gtkmm/drawingarea.h>
 	#include <gtkmm/entry.h>
@@ -29,7 +29,7 @@
 	
 	class KageLayerManager; ///forward declaration
 	
-	class KageLayer : public Gtk::DrawingArea {
+	class KageLayerUI : public Gtk::DrawingArea {
 		public:
 			static bool mouseIsDown;
 			static Glib::RefPtr<Gdk::Pixbuf> imageVISIBLE_TRUE;
@@ -39,8 +39,8 @@
 			
 			Glib::RefPtr<Gdk::Window> window;
 			
-			KageLayer(KageLayerManager *p_layerManager, unsigned p_layerID);
-			virtual ~KageLayer();
+			KageLayerUI(KageLayerManager *p_layerManager, unsigned p_layerID);
+			virtual ~KageLayerUI();
 			
 			void setLabel(string p_label);
 			string getLabel();
@@ -78,4 +78,4 @@
 			
 			KageLayerManager *_layerManager;
 	};
-#endif // GTKMM_KAGE_LAYER_H
+#endif // GTKMM_KAGE_LAYER_UI_H

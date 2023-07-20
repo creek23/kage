@@ -60,36 +60,45 @@
 	
 	#include <vector>
 	#include "data/color.h"
-	/*#include <iostream>
+	#include "./data/scene.h"
 	
-	#include "data/point.h"
-	#include "data/strokecolor.h"
-	#include "data/vectordata.h"
-
-	#include "vectordatamanager.h"*/
-	#include "./timeline/frame.h"
+	#include "../util/string/stringhelper.h"
 	
 	#include <gdkmm/color.h>
-	//class Kage; //forward declaration
+	class Kage; //forward declaration
 	
 	using namespace std;
-	
-	class KageDocument {
+	class KageProject {
 		public:
-			struct KageProject {
-				string _name;
-				double _width; //made double for zoom
-				double _height; //ditto
-				ColorData _backgroundColor;
-				unsigned int _fps;
-			} Project;
+			string _name;
+			double _width; //made double for zoom
+			double _height; //ditto
+			ColorData _backgroundColor;
+			unsigned int _fps;
+			
+			KageProject();
+			virtual ~KageProject();
+			string toString();
+	};
 
-			KageDocument();
-			KageDocument(KageProject p_project);
+	class KageDocument {
+		protected:
+			bool _saved;
+			unsigned int _activeSceneID;
+		public:
+			KageProject Project;
+			Kage *_kage;
+
+			KageDocument(Kage *p_kage);
+			KageDocument(Kage *p_kage, KageProject p_project);
 			virtual ~KageDocument();
 			void setProjectInformation(KageProject p_project);
+			unsigned int openScene(string p_filepath);
+			bool saveScene(unsigned int p_sceneID);
+			bool openProject();
+			bool saveProject();
+			bool isSaved();
 			
-
 			enum AssetType {
 				ASSET_IMAGE,
 				ASSET_VIDEO,
@@ -102,37 +111,18 @@
 				string Path;
 				string Name;
 			};
+			//TODO: each instance of asset will reference to this
 			vector<Asset> Assets;
 			
-			struct Frame {
-				unsigned int ID;
-				bool _null;
-				bool _selected;
-				bool _current;
-				unsigned int _tweenX;
-				unsigned int _tweenY;
+			//TODO: each Scene will be saved as separate KSF file
+			vector<KageScene> Scenes;
+			static unsigned int ACTIVE_SCENE;
 
-				VectorDataManager vectorsData;
-				
-				KageFrame::extension _extension;
-				
-				Glib::ustring sCode;
-			};
+			unsigned int getActiveSceneID();
+			unsigned int getActiveLayerID();
+			unsigned int getActiveFrameID();
 
-			struct Layer {
-				unsigned int ID;
-				bool _visible;
-				bool _locked;
-				bool _selected;
-				vector<Frame> Frames;
-			};
-
-			struct Scene {
-				unsigned int ID;
-				bool _selected;
-				vector<Layer> Layers;
-			};
-			vector<Scene> Scenes;
-			
+			unsigned int frameCount();
+			void setCurrentFrame(unsigned int p_frame);
 	};
 #endif //GTKMM_KAGE_DOCUMENT_H

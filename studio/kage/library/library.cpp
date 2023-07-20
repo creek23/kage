@@ -111,14 +111,14 @@ bool KageLibrary::on_event(GdkEvent *e) {
 
 
 void KageLibrary::forceRender() {
-	if (KageFramesetManager::LOADING_MODE == true) {
+	if (KageScene::LOADING_MODE == true) {
 		return;
 	}
 		invalidateToRender();
 	Kage::timestamp_OUT();
 }
 bool KageLibrary::invalidateToRender() {
-	if (KageFramesetManager::LOADING_MODE == true) {
+	if (KageScene::LOADING_MODE == true) {
 		return true;
 	}
 	if (!window) {
@@ -136,7 +136,7 @@ bool KageLibrary::invalidateToRender() {
 }
 
 bool KageLibrary::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
-	if (KageFramesetManager::LOADING_MODE == true) {
+	if (KageScene::LOADING_MODE == true) {
 		return true;
 	}
 	if (!window) {
@@ -166,9 +166,9 @@ bool KageLibrary::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 		p_context->fill_preserve();
 
 		//TODO: check if _renderAssetID is IMAGE
-		if (_renderAssetID != UINT_MAX && _kage->m_KageStage.cairoPNG[_renderAssetID]) {
+		if (_renderAssetID != UINT_MAX && _kage->_stage.cairoPNG[_renderAssetID]) {
 			try {
-				KageStage::cairoImageSurface = _kage->m_KageStage.cairoPNG[_renderAssetID];
+				KageStage::cairoImageSurface = _kage->_stage.cairoPNG[_renderAssetID];
 				
 				double imageWidth = KageStage::cairoImageSurface->get_width();
 				double imageHeight = KageStage::cairoImageSurface->get_height();

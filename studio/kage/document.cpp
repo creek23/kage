@@ -20,20 +20,30 @@
  */
 
 #include "document.h"
-//#include "../kage.h"
-//#include "stage.h"
+#include "../kage.h"
 
-KageDocument::KageDocument() {
-	KageProject l_project;
-		l_project._name            = "Untitled";
-		l_project._width           = 800.0f;
-		l_project._height          = 600.0f;
-		l_project._backgroundColor = ColorData(255, 255, 255);
-		l_project._fps             = 12;
-	setProjectInformation(l_project);
+unsigned int KageDocument::ACTIVE_SCENE = 0;
+
+KageDocument::KageDocument(Kage *p_kage) {
+	Project = KageProject();
+
+	_kage = p_kage;
+	_activeSceneID = 0;
+	KageScene p_scene(this);
+	Scenes.push_back(p_scene);
 }
-KageDocument::KageDocument(KageProject p_project) {
+KageDocument::KageDocument(Kage *p_kage, KageProject p_project) {
 	setProjectInformation(p_project);
+	
+	_kage = p_kage;
+	_activeSceneID = 0;
+	KageScene p_scene(this);
+	Scenes.push_back(p_scene);
+}
+
+KageDocument::~KageDocument() {
+	Scenes.clear();
+	_kage = NULL;
 }
 
 void KageDocument::setProjectInformation(KageProject p_project) {
@@ -44,6 +54,84 @@ void KageDocument::setProjectInformation(KageProject p_project) {
 	Project._fps             = p_project._fps;
 }
 
-KageDocument::~KageDocument() {
-	//vectorData.clear();
+unsigned int KageDocument::openScene(string p_filepath) {
+	KageScene p_scene(this, p_filepath);
+	Scenes.push_back(p_scene);
+	return Scenes.size() - 1;
+}
+
+/**
+ * @brief Kage Document will contain several scenes.  This will allow saving one Scene to be saved each time
+ * 
+ * @param p_sceneID which Scene do we want to save?
+ * @return true 
+ * @return false 
+ */
+bool KageDocument::saveScene(unsigned int p_sceneID) {
+	if (p_sceneID > 0 && p_sceneID <= Scenes.size()) {
+		return Scenes[p_sceneID].save();
+	}
+	return false;
+}
+bool  KageDocument::openProject() {
+	//TODO: call openScene
+	return true;
+}
+bool  KageDocument::saveProject() {
+	//TODO:
+	// 1. save project info
+	cout << "<project " << Project.toString() << ">";
+	// 2. save AssetData
+	//		if image/video, filename, width, height
+	//		if ksf, save as Scene with name, data
+	// 3. save scene
+	for (KageScene l_scene : Scenes) {
+		if (l_scene.isSaved() == false && l_scene.save() == false) {
+			return false;
+		}
+	}
+	cout << "</project>";
+	_saved = true;
+	return true;
+}
+bool  KageDocument::isSaved() {
+	return _saved;
+}
+
+unsigned int KageDocument::getActiveSceneID() {
+	return _activeSceneID;
+}
+unsigned int KageDocument::getActiveLayerID() {
+	return Scenes[getActiveSceneID()].getActiveLayerID();
+}
+unsigned int KageDocument::getActiveFrameID() {
+	return Scenes[getActiveSceneID()].Layers[getActiveLayerID()]->getActiveFrameID();
+}
+//=======================================================================================
+KageProject::KageProject() {
+	_name            = "Untitled";
+	_width           = 800.0f;
+	_height          = 600.0f;
+	_backgroundColor = ColorData(255, 255, 255);
+	_fps             = 12;
+}
+
+KageProject::~KageProject() {
+	//
+}
+
+string KageProject::toString() {
+	return    "name=\"" + _name
+		+ "\" width=\"" + StringHelper::doubleToString(_width)
+		+ "\" height=\"" + StringHelper::doubleToString(_height)
+		+ "\" background=\"rgb(" + StringHelper::integerToString(_backgroundColor.getR()) + ", " + StringHelper::integerToString(_backgroundColor.getG()) + ", " + StringHelper::integerToString(_backgroundColor.getB()) + ")\" " +
+		+ "\" fps=\"" + StringHelper::unsignedIntegerToString(_fps) + "\"";
+}
+
+unsigned int KageDocument::frameCount() {
+	return Scenes[_activeSceneID].frameCount();
+}
+
+void KageDocument::setCurrentFrame(unsigned int p_frame) {
+	Scenes[_activeSceneID].setCurrentFrame(p_frame);
 }

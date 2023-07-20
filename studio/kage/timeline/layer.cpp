@@ -24,19 +24,17 @@
 #include <gdkmm/general.h> // set_source_pixbuf()
 #include <iostream>
 
-#include "frame.h"
-#include "framesmanager.h"
 #include "../../kage.h"
 
 #include <giomm/resource.h>
 
-bool KageLayer::mouseIsDown = false;
-Glib::RefPtr<Gdk::Pixbuf> KageLayer::imageVISIBLE_TRUE;
-Glib::RefPtr<Gdk::Pixbuf> KageLayer::imageVISIBLE_FALSE;
-Glib::RefPtr<Gdk::Pixbuf> KageLayer::imageLOCKED_TRUE;
-Glib::RefPtr<Gdk::Pixbuf> KageLayer::imageLOCKED_FALSE;
+bool KageLayerUI::mouseIsDown = false;
+Glib::RefPtr<Gdk::Pixbuf> KageLayerUI::imageVISIBLE_TRUE;
+Glib::RefPtr<Gdk::Pixbuf> KageLayerUI::imageVISIBLE_FALSE;
+Glib::RefPtr<Gdk::Pixbuf> KageLayerUI::imageLOCKED_TRUE;
+Glib::RefPtr<Gdk::Pixbuf> KageLayerUI::imageLOCKED_FALSE;
 
-KageLayer::KageLayer(KageLayerManager *p_layerManager, unsigned p_layerID) {
+KageLayerUI::KageLayerUI(KageLayerManager *p_layerManager, unsigned p_layerID) {
 	set_state_flags(Gtk::STATE_FLAG_NORMAL);
 	set_can_focus(true); //to accept key_press
 	_layerManager = p_layerManager;
@@ -55,15 +53,15 @@ KageLayer::KageLayer(KageLayerManager *p_layerManager, unsigned p_layerID) {
 	_txtLabel.set_max_length(50);
 	_txtLabel.set_text(_label);
 	_txtLabel.signal_activate().connect(
-							sigc::mem_fun(*this, &KageLayer::txtLabel_onEnter));
+							sigc::mem_fun(*this, &KageLayerUI::txtLabel_onEnter));
 	_txtLabel.show();
 }
 
-KageLayer::~KageLayer() {
+KageLayerUI::~KageLayerUI() {
 	//
 }
 
-void KageLayer::addEventsListener() {
+void KageLayerUI::addEventsListener() {
 //	add_events(Gdk::KEY_PRESS_MASK    | Gdk::KEY_RELEASE_MASK);
 	add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
 	add_events(Gdk::ENTER_NOTIFY_MASK | Gdk::LEAVE_NOTIFY_MASK);
@@ -72,12 +70,12 @@ void KageLayer::addEventsListener() {
 	//*window = NULL;
 }
 
-void KageLayer::txtLabel_onEnter() {
+void KageLayerUI::txtLabel_onEnter() {
 	_label = _txtLabel.get_text();
 	_txtLabel.hide();
 }
 
-bool KageLayer::on_key_press_event(GdkEventKey *e) {
+bool KageLayerUI::on_key_press_event(GdkEventKey *e) {
 	Kage::timestamp_IN();
 	std::cout << " KageFrame(L " << layerID << ") on_key_press_event" << std::endl;
 	if (e->keyval == GDK_KEY_period) {
@@ -86,7 +84,7 @@ bool KageLayer::on_key_press_event(GdkEventKey *e) {
 	Kage::timestamp_OUT();
 	return true;
 }
-bool KageLayer::on_expose_event(GdkEventExpose* e) {
+bool KageLayerUI::on_expose_event(GdkEventExpose* e) {
 	if (!window) {
 		window = get_window();
 	}
@@ -97,15 +95,15 @@ bool KageLayer::on_expose_event(GdkEventExpose* e) {
 	return true;
 }
 
-bool KageLayer::on_event(GdkEvent *e) {
+bool KageLayerUI::on_event(GdkEvent *e) {
 	if (e->type == GDK_ENTER_NOTIFY) {
 		Kage::timestamp_IN();
-		std::cout << " KageLayer(L " << layerID << ") on_event enter" << std::endl;
+		std::cout << " KageLayerUI(L " << layerID << ") on_event enter" << std::endl;
 		invalidateToRender();
 		Kage::timestamp_OUT();
 	} else if (e->type == GDK_LEAVE_NOTIFY) {
 		Kage::timestamp_IN();
-		std::cout << " KageLayer(L " << layerID << ") on_event leave" << std::endl;
+		std::cout << " KageLayerUI(L " << layerID << ") on_event leave" << std::endl;
 		invalidateToRender();
 		Kage::timestamp_OUT();
 	} else if (e->type == GDK_DOUBLE_BUTTON_PRESS) {
@@ -114,11 +112,11 @@ bool KageLayer::on_event(GdkEvent *e) {
 		}
 		//_txtLabel.show();
 	} else if (e->type == GDK_BUTTON_RELEASE) {
-		KageLayer::mouseIsDown = false;
+		KageLayerUI::mouseIsDown = false;
 		grab_focus();
 		invalidateToRender();
 	} else if (e->type == GDK_BUTTON_PRESS) {
-		KageLayer::mouseIsDown = true;
+		KageLayerUI::mouseIsDown = true;
 		if (e->button.x < 18) {
 			toggleVisibility();
 		} else if (e->button.x < 36) {
@@ -143,19 +141,19 @@ bool KageLayer::on_event(GdkEvent *e) {
 }
 
 
-void KageLayer::forceRender() {
-	if (KageFramesetManager::LOADING_MODE == true) {
+void KageLayerUI::forceRender() {
+	if (KageScene::LOADING_MODE == true) {
 		return;
 	}
-	Kage::timestamp_IN(); cout << " KageLayer::forceRender()" << endl;
+	Kage::timestamp_IN(); cout << " KageLayerUI::forceRender()" << endl;
 	invalidateToRender();
 	Kage::timestamp_OUT();
 }
-bool KageLayer::invalidateToRender() {
-	if (KageFramesetManager::LOADING_MODE == true) {
+bool KageLayerUI::invalidateToRender() {
+	if (KageScene::LOADING_MODE == true) {
 		return true;
 	}
-	Kage::timestamp_IN(); cout << " KageLayer::invalidateToRender()" << endl;
+	//Kage::timestamp_IN(); cout << " KageLayerUI::invalidateToRender()" << endl;
 	if (!window) {
 		window = get_window();
 	}
@@ -169,22 +167,22 @@ bool KageLayer::invalidateToRender() {
 		std::cerr << "Exception caught : " << e.what() << std::endl;
 	}
 	
-	Kage::timestamp_OUT();
+	//Kage::timestamp_OUT();
 	
 	return true;
 }
 
-bool KageLayer::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
+bool KageLayerUI::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 	if (!window) {
 		window = get_window();
 	}
 	if (window) {
-		if (!KageLayer::imageVISIBLE_TRUE) {
+		if (!KageLayerUI::imageVISIBLE_TRUE) {
 			try {
-				KageLayer::imageVISIBLE_TRUE  = Gdk::Pixbuf::create_from_resource("/kage/share/layer/visible_true.png");
-				KageLayer::imageVISIBLE_FALSE = Gdk::Pixbuf::create_from_resource("/kage/share/layer/visible_false.png");
-				KageLayer::imageLOCKED_TRUE     = Gdk::Pixbuf::create_from_resource("/kage/share/layer/locked_true.png");
-				KageLayer::imageLOCKED_FALSE    = Gdk::Pixbuf::create_from_resource("/kage/share/layer/locked_false.png");
+				KageLayerUI::imageVISIBLE_TRUE  = Gdk::Pixbuf::create_from_resource("/kage/share/layer/visible_true.png");
+				KageLayerUI::imageVISIBLE_FALSE = Gdk::Pixbuf::create_from_resource("/kage/share/layer/visible_false.png");
+				KageLayerUI::imageLOCKED_TRUE     = Gdk::Pixbuf::create_from_resource("/kage/share/layer/locked_true.png");
+				KageLayerUI::imageLOCKED_FALSE    = Gdk::Pixbuf::create_from_resource("/kage/share/layer/locked_false.png");
 			} catch(const Gio::ResourceError &ex) {
 				std::cerr << "ResourceError: " << ex.what() << std::endl;
 			} catch(const Gdk::PixbufError &ex) {
@@ -215,16 +213,16 @@ bool KageLayer::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 		cr->show_text(_label);
 		
 		if (_visible == true) {
-			Gdk::Cairo::set_source_pixbuf(cr, KageLayer::imageVISIBLE_TRUE, 2, 0);
+			Gdk::Cairo::set_source_pixbuf(cr, KageLayerUI::imageVISIBLE_TRUE, 2, 0);
 		} else {
-			Gdk::Cairo::set_source_pixbuf(cr, KageLayer::imageVISIBLE_FALSE, 2, 0);
+			Gdk::Cairo::set_source_pixbuf(cr, KageLayerUI::imageVISIBLE_FALSE, 2, 0);
 		}
 		cr->paint();
 		
 		if (_lock == true) {
-			Gdk::Cairo::set_source_pixbuf(cr, KageLayer::imageLOCKED_TRUE, 18, 0);
+			Gdk::Cairo::set_source_pixbuf(cr, KageLayerUI::imageLOCKED_TRUE, 18, 0);
 		} else {
-			Gdk::Cairo::set_source_pixbuf(cr, KageLayer::imageLOCKED_FALSE, 18, 0);
+			Gdk::Cairo::set_source_pixbuf(cr, KageLayerUI::imageLOCKED_FALSE, 18, 0);
 		}
 		cr->paint();
 		
@@ -233,34 +231,34 @@ bool KageLayer::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 	return false;
 }
 
-void KageLayer::setLabel(string p_label) {
+void KageLayerUI::setLabel(string p_label) {
 	_label = p_label;
 	invalidateToRender();
 }
-string KageLayer::getLabel() {
+string KageLayerUI::getLabel() {
 	return _label;
 }
-void KageLayer::setSelected(bool p_selected) {
+void KageLayerUI::setSelected(bool p_selected) {
 	_selected = p_selected;
 	invalidateToRender();
 }
-bool KageLayer::isSelected() {
+bool KageLayerUI::isSelected() {
 	return _selected;
 }
 
-bool KageLayer::isVisible() {
+bool KageLayerUI::isVisible() {
 	return _visible;
 }
 
-bool KageLayer::isLocked() {
+bool KageLayerUI::isLocked() {
 	return _lock;
 }
 
-void KageLayer::setFocus() {
+void KageLayerUI::setFocus() {
 	grab_focus();
 }
 
-void KageLayer::toggleVisibility() {
+void KageLayerUI::toggleVisibility() {
 	if (_visible == true) {
 		_visible = false;
 	} else {
@@ -269,7 +267,7 @@ void KageLayer::toggleVisibility() {
 	invalidateToRender();
 }
 
-void KageLayer::toggleLock() {
+void KageLayerUI::toggleLock() {
 	if (_lock == true) {
 		_lock = false;
 	} else {
@@ -278,12 +276,12 @@ void KageLayer::toggleLock() {
 	invalidateToRender();
 }
 
-void KageLayer::setVisible(bool p_visible) {
+void KageLayerUI::setVisible(bool p_visible) {
 	_visible = p_visible;
 	invalidateToRender();
 }
 
-void KageLayer::setLock(bool p_lock) {
+void KageLayerUI::setLock(bool p_lock) {
 	_lock = p_lock;
 	invalidateToRender();
 }

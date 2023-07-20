@@ -21,9 +21,7 @@
 
 #ifndef GTKMM_KAGE_H
 	#define GTKMM_KAGE_H
-	/*
-	#include <gtkmm/tooltip.h>
-	#include <gtkmm/scale.h>*/
+	
 	#include <gtkmm/togglebutton.h>
 	#include <gtkmm/paned.h>
 	#include <gtkmm/scrolledwindow.h>
@@ -35,9 +33,7 @@
 	#include <gtkmm/messagedialog.h>
 	#include <gtkmm/filechooserdialog.h>
 	#include "kage/timeline/layermanager.h"
-	//#include "kage/timeline/layer.h"
-	#include "kage/timeline/framesmanager.h"
-	//#include "kage/timeline/timeline.h"
+	#include "kage/timeline/timeline.h"
 	#include "kage/stage/stage.h"
 	#include "kage/library/assetmanager.h"
 	#include "kage/library/library.h"
@@ -46,6 +42,9 @@
 	#include "kage/properties/locationsize.h"
 	#include "kage/properties/nodexy.h"
 	#include "kage/properties/stage.h"
+	#include "kage/data/frame.h"
+	#include "kage/data/layer.h"
+	#include "kage/data/scene.h"
 	#include "kage/document.h"
 	#include "about.h"
 //	#include "register.h" -- not implemented yet; this is to gather users for support group
@@ -95,7 +94,7 @@
 			
 			KageLayerManager _layerManager;
 			KageAssetManager _assetManager;
-			KageFramesetManager _framesetManager;
+			KageTimeline _timeline;
 			
 		protected:
 			//Signal handlers:
@@ -199,10 +198,14 @@
 			Gtk::Button _btnLayerMoveBottom;
 				Gtk::Image                _btnLayerMoveBottom_img;
 				Glib::RefPtr<Gdk::Pixbuf> _btnLayerMoveBottom_pixbuf;
+			public:
 			Gtk::ToggleButton _toggleOnion;
+			protected:
 				Gtk::Image                _toggleOnion_img;
 				Glib::RefPtr<Gdk::Pixbuf> _toggleOnion_pixbuf;
+			public:
 			Gtk::ToggleButton _toggleOnionLayer;
+			protected:
 				Gtk::Image                _toggleOnionLayer_img;
 				Glib::RefPtr<Gdk::Pixbuf> _toggleOnionLayer_pixbuf;
 			Gtk::Label m_Timeline_CurrentFrame;
@@ -296,7 +299,8 @@
 			guint m_tick_id = 0;
 			gint64 m_start_time = 0;
 			const gint64 cycle_time = 3000000; // microseconds
-			guint tickCounter;
+			
+			unsigned int tickCounter;
 			guint frameCounter;
 			//bool _isPlaying;
 			
@@ -310,7 +314,7 @@
 			
 			bool m_LabelLibrary_onClick(GdkEventButton *event);//, gpointer user_data);
 		public:
-			KageStage m_KageStage;
+			KageStage _stage;
 				bool _UPDATE_SHAPE_COLORS;
 				bool _propFillVisible = false;
 				bool _propStrokeVisible = false;
@@ -319,7 +323,7 @@
 			PropertyFillStroke m_propFillStroke;
 			PropertyNodeXY m_propNodeXY;
 			PropertyFrameTween m_propFrameTween;
-			KageLibrary  m_Library;
+			KageLibrary  _library;
 			Gdk::Color m_Color; //fill or stroke?
 			void Undo_onClick();
 			void Redo_onClick();
@@ -371,6 +375,9 @@
 			void focusOnStage();
 
 			KageDocument _document;
+			
+			void setStageBG(Gdk::Color p_Color);
+			Gdk::Color getStageBG();
 	};
 
 #endif //GTKMM_KAGE_H

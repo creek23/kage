@@ -32,14 +32,14 @@
 	
 	class KageLayerManager : public Gtk::VBox {
 		public:
-			KageLayerManager(Kage *p_win);
+			KageLayerManager(Kage *p_kage);
 			virtual ~KageLayerManager();
 			unsigned int layerCount();
 			unsigned int addLayer(Glib::ustring p_name = "");
 			void deleteLayer();
 			bool removeAllLayers();
-			void setSelected(KageLayer *p_layer);
-			KageLayer *getLayer();
+			void setSelected(KageLayerUI *p_layer);
+			KageLayerUI *getLayer();
 			unsigned int getCurrentLayer();
 			void setCurrentLayer(unsigned int p_layer);
 			void setCurrentLayerByID(unsigned int p_layerID);
@@ -53,7 +53,7 @@
 			bool isLayerVisible();
 			void setVisible(bool p_visible);
 			
-			void renameLayer(KageLayer *p_layer);
+			void renameLayer(KageLayerUI *p_layer);
 			void renameLayer();
 			void setLabel(string p_label);
 			string getLabel();
@@ -64,10 +64,10 @@
 			bool moveToBottom();
 			
 		protected:
-			Kage *win;
+			Kage *_kage;
 			unsigned int layerCtr;
 			std::vector<Gtk::Button*> labels;
-			std::vector<KageLayer*> layers;
+			std::vector<KageLayerUI*> layers;
 			unsigned int _currentLayerID;
 			unsigned int _currentLayerIndex;
 	};

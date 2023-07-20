@@ -35,7 +35,7 @@
 
 	class LayerRenameDialog : public Gtk::Dialog {
 		public:
-			LayerRenameDialog(Gtk::Window& parent, KageLayer *p_layer);
+			LayerRenameDialog(Gtk::Window& parent, KageLayerUI *p_layer);
 			virtual ~LayerRenameDialog();
 			
 			void EntryLayerLabel_onEnter();
@@ -45,6 +45,6 @@
 			Gtk::Label _label;
 			Gtk::Entry _txtLabel;
 			
-			KageLayer *_layer;
+			KageLayerUI *_layer;
 	};	
 #endif //GTKMM_KAGE_LAYER_RENAME_H

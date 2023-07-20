@@ -21,7 +21,7 @@
 
 #include "layer_rename.h"
 
-LayerRenameDialog::LayerRenameDialog(Gtk::Window& parent, KageLayer *p_layer)
+LayerRenameDialog::LayerRenameDialog(Gtk::Window& parent, KageLayerUI *p_layer)
 		: Gtk::Dialog("Rename Layer", parent, true),
 		m_HBox(false, 8),
 		_label("Label:", true) {

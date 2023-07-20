@@ -43,28 +43,28 @@ PropertyLocationSize::PropertyLocationSize(Kage* p_kage) :
             m_EntryX.set_size_request(20, 24);
             m_EntryX.set_width_chars(9);
             m_EntryX.set_max_length(9);
-            setXText(_kage->m_KageStage.propX);
+            setXText(_kage->_stage.propX);
             m_EntryX.signal_activate().connect(
                 sigc::mem_fun(*this, &PropertyLocationSize::EntryX_onEnter));
         m_propLocationSizeV2.pack_start(m_EntryY, Gtk::PACK_SHRINK);
             m_EntryY.set_size_request(20, 24);
             m_EntryY.set_width_chars(9);
             m_EntryY.set_max_length(9);
-            setYText(_kage->m_KageStage.propY);
+            setYText(_kage->_stage.propY);
             m_EntryY.signal_activate().connect(
                 sigc::mem_fun(*this, &PropertyLocationSize::EntryY_onEnter));
         m_propLocationSizeV2.pack_start(m_EntryWidth, Gtk::PACK_SHRINK);
             m_EntryWidth.set_size_request(20, 24);
             m_EntryWidth.set_width_chars(9);
             m_EntryWidth.set_max_length(9);
-            setWidthText(_kage->m_KageStage.propWidth);
+            setWidthText(_kage->_stage.propWidth);
             m_EntryWidth.signal_activate().connect(
                 sigc::mem_fun(*this, &PropertyLocationSize::EntryWidth_onEnter));
         m_propLocationSizeV2.pack_start(m_EntryHeight, Gtk::PACK_SHRINK);
             m_EntryHeight.set_size_request(20, 24);
             m_EntryHeight.set_width_chars(9);
             m_EntryHeight.set_max_length(9);
-            setHeightText(_kage->m_KageStage.propHeight);
+            setHeightText(_kage->_stage.propHeight);
             m_EntryHeight.signal_activate().connect(
                 sigc::mem_fun(*this, &PropertyLocationSize::EntryHeight_onEnter));
 }
@@ -76,27 +76,27 @@ PropertyLocationSize::~PropertyLocationSize() {
 void PropertyLocationSize::EntryX_onEnter() {
 	double l_dbl = StringHelper::toDouble(m_EntryX.get_text());
 	    setXText(l_dbl);
-	_kage->m_KageStage.updateShapeX(l_dbl);
+	_kage->_stage.updateShapeX(l_dbl);
 }
 
 void PropertyLocationSize::EntryY_onEnter() {
 	double l_dbl = StringHelper::toDouble(m_EntryY.get_text());
 	    setYText(l_dbl);
-	_kage->m_KageStage.updateShapeY(l_dbl);
+	_kage->_stage.updateShapeY(l_dbl);
 }
 
 void PropertyLocationSize::EntryWidth_onEnter() {
 	double l_dbl = StringHelper::toDouble(m_EntryWidth.get_text());
 	
 	setWidthText(l_dbl);
-	_kage->m_KageStage.updateShapeWidth(l_dbl);
+	_kage->_stage.updateShapeWidth(l_dbl);
 }
 
 void PropertyLocationSize::EntryHeight_onEnter() {
 	double l_dbl = StringHelper::toDouble(m_EntryHeight.get_text());
 	
 	setHeightText(l_dbl);
-	_kage->m_KageStage.updateShapeHeight(l_dbl);
+	_kage->_stage.updateShapeHeight(l_dbl);
 }
 
 void PropertyLocationSize::setXText(double p_x) {

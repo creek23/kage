@@ -25,7 +25,6 @@
 #include <iostream>
 
 #include "asset.h"
-#include "../timeline/framesmanager.h"
 #include "../../kage.h"
 
 #include <giomm/resource.h>
@@ -123,7 +122,7 @@ bool KageAsset::on_event(GdkEvent *e) {
 	} else if (e->type == GDK_DOUBLE_BUTTON_PRESS) {
 		if (e->button.x > 36) {
 			if (_CTRL) {
-				_assetManager->_kage->m_KageStage.addImage(assetID);
+				_assetManager->_kage->_stage.addImage(assetID);
 			} else {
 				_assetManager->renameAsset(this);
 			}
@@ -159,7 +158,7 @@ bool KageAsset::on_event(GdkEvent *e) {
 
 
 void KageAsset::forceRender() {
-	if (KageFramesetManager::LOADING_MODE == true) {
+	if (KageScene::LOADING_MODE == true) {
 		return;
 	}
 	Kage::timestamp_IN(); cout << " KageAsset::forceRender()" << endl;
@@ -167,7 +166,7 @@ void KageAsset::forceRender() {
 	Kage::timestamp_OUT();
 }
 bool KageAsset::invalidateToRender() {
-	if (KageFramesetManager::LOADING_MODE == true) {
+	if (KageScene::LOADING_MODE == true) {
 		return true;
 	}
 	Kage::timestamp_IN(); cout << " KageAsset::invalidateToRender()" << endl;

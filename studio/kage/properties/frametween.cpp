@@ -73,7 +73,7 @@ void PropertyFrameTween::FrameTween_onChange() {
 		l_tweenY = 3;
 	}
 	
-	_kage->_framesetManager.setTween(l_tweenX + l_tweenY);
+	_kage->_document.Scenes[_kage->_document.getActiveSceneID()].setTween(l_tweenX + l_tweenY);
 	std::cout << "FrameTween_onChange X = " << nameX << " Y = " << nameY << " l_tweenX " << (l_tweenX+l_tweenY) << std::endl;
 }
 

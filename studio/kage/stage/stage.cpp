@@ -23,7 +23,6 @@
 #include "../../kage.h"
 #include <cairomm/context.h>
 
-ColorData KageStage::stageBG(255, 255, 255);
 ColorData KageStage::fillColor(239, 41, 41, 255);
 StrokeColorData KageStage::stroke(164, 0, 0, 255);
 
@@ -44,8 +43,8 @@ Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_SW;
 Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_SE;
 Glib::RefPtr<Gdk::Pixbuf> KageStage::imageSHAPE_ROTATE;
 
-KageStage::KageStage(Kage *p_win) {
-	win = p_win;
+KageStage::KageStage(Kage *p_kage) {
+	_kage = p_kage;
 	set_can_focus(true); //to accept key_press
 	add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
 	add_events(Gdk::ENTER_NOTIFY_MASK | Gdk::LEAVE_NOTIFY_MASK);
@@ -55,6 +54,8 @@ KageStage::KageStage(Kage *p_win) {
 	add_events(Gdk::SCROLL_MASK);
 	
 	unpressKeys();
+	
+	_invalidated = true;
 }
 
 KageStage::~KageStage() {
@@ -70,9 +71,9 @@ bool KageStage::on_key_press_event(GdkEventKey *e) {
 //			get_window()->set_cursor(handcur);
 		}
 	} else if (e->keyval == GDK_KEY_period) {
-		win->switchToNextFrame();
+		_kage->switchToNextFrame();
 	} else if (e->keyval == GDK_KEY_comma) {
-		win->switchToPreviousFrame();
+		_kage->switchToPreviousFrame();
 	} else {
 		if (KageStage::toolMode == MODE_SELECT
 				|| KageStage::toolMode == MODE_NODE
@@ -180,30 +181,30 @@ bool KageStage::on_key_release_event(GdkEventKey *e) {
 				operationSuccess = pasteSelectedShapes();
 			} else if (e->keyval == GDK_KEY_A || e->keyval == GDK_KEY_a) {
 				if (toolMode != KageStage::MODE_SELECT) {
-					win->ToolSelect_onClick();
+					_kage->ToolSelect_onClick();
 				}
 				operationSuccess = selectAllShapes();
 			/*} else if (e->keyval == GDK_KEY_Z || e->keyval == GDK_KEY_z) {
-				win->Undo_onClick();
+				_kage->Undo_onClick();
 				return true;
 			} else if (e->keyval == GDK_KEY_Y || e->keyval == GDK_KEY_y) {
-				win->Redo_onClick();
+				_kage->Redo_onClick();
 				return true;*/
 			}
 		if (operationSuccess == true) {
-			win->forceRenderFrames();
+			_kage->forceRenderFrames();
 			return true;
 		}
 	} else if (e->keyval == GDK_KEY_Delete) {
 		if (toolMode == KageStage::MODE_SELECT) {
 			if (deleteSelectedShapes() == true) {
-				win->stackDo();
-				win->forceRenderFrames();
+				_kage->stackDo();
+				_kage->forceRenderFrames();
 				return true;
 			}
 		} else if (KageStage::toolMode == KageStage::MODE_NODE) {
 			if (deleteSelectedNodes() == true) {
-				win->forceRenderFrames();
+				_kage->forceRenderFrames();
 				return true;
 			}
 		}
@@ -215,8 +216,8 @@ bool KageStage::on_key_release_event(GdkEventKey *e) {
 	
 	if (e->keyval == GDK_KEY_Escape) {
 		bool operationSuccess = false;
-			if (win->_isPlaying == true) {
-				win->Stop_onClick();
+			if (_kage->_isPlaying == true) {
+				_kage->Stop_onClick();
 			} else if (toolMode == KageStage::MODE_SELECT) {
 				operationSuccess = deselectSelectedShapes();
 			} else if (toolMode == KageStage::MODE_NODE) {
@@ -225,13 +226,13 @@ bool KageStage::on_key_release_event(GdkEventKey *e) {
 				operationSuccess = cancelDrawingPoly();
 			}
 		if (operationSuccess == true) {
-			win->forceRenderFrames();
+			_kage->forceRenderFrames();
 			return true;
 		}
 	}
 
 	if (_stackDo == true) {
-		win->stackDo();
+		_kage->stackDo();
 		_stackDo = false;
 	}
 	
@@ -275,7 +276,7 @@ bool KageStage::on_event(GdkEvent *e) {
 		if (selectedShapes.size() > 0) {
 			if (KageStage::toolMode == MODE_SELECT) {
 				KageStage::toolMode = MODE_NODE;
-				win->toolsButtonToggle("Node Tool");
+				_kage->toolsButtonToggle("Node Tool");
 			}
 		}
 	} else if (e->type == GDK_BUTTON_PRESS) { //mouse down
@@ -341,7 +342,7 @@ bool KageStage::on_event(GdkEvent *e) {
 					handleShapes_modifyingShapeRotate();
 				}
 				
-				win->stackDo();
+				_kage->stackDo();
 			}
 			updateShapeXY();
 			_isModifyingShape = false;
@@ -371,11 +372,11 @@ bool KageStage::on_event(GdkEvent *e) {
 						draw2.x = e->button.x * KageStage::currentScale * _zoomValue;
 						draw2.y = e->button.y * KageStage::currentScale * _zoomValue;
 				}
-				win->propFillStrokeSetVisible(false);
-				win->propShapePropertiesSetVisible(false);
-				win->propNodeXYSetVisible(true);
+				_kage->propFillStrokeSetVisible(false);
+				_kage->propShapePropertiesSetVisible(false);
+				_kage->propNodeXYSetVisible(true);
 			} else {
-				win->stackDo();
+				_kage->stackDo();
 				
 				//reset selected Node's control-point
 				mouseOnNodeIndex = _NO_SELECTION;
@@ -420,7 +421,7 @@ bool KageStage::on_event(GdkEvent *e) {
 			//applyZoom();
 			origin = applyZoomRatio(origin); //zoom++
 			invalidateToRender();
-			win->displayMouseXY(
+			_kage->displayMouseXY(
 					(int) ((e->button.x - origin.x) / _zoomValue),
 					(int) ((e->button.y - origin.y) / _zoomValue)
 				);
@@ -564,12 +565,12 @@ bool KageStage::on_event(GdkEvent *e) {
 			
 			invalidateToRender();
 		}
-		win->displayMouseXY(
+		_kage->displayMouseXY(
 				(int) ((e->button.x - origin.x) / _zoomValue),
 				(int) ((e->button.y - origin.y) / _zoomValue)
 			);
-		//win->forceRenderFrames(); //why there's a need to FORCE render?
-		win->renderFrames(); //trying to work around ^
+		//_kage->forceRenderFrames(); //why there's a need to FORCE render?
+		_kage->renderFrames(); //trying to work around ^
 		KageStage::moveStageXY.x = e->button.x;
 		KageStage::moveStageXY.y = e->button.y;
 	} else if (e->type == GDK_EXPOSE) {
@@ -610,7 +611,7 @@ bool KageStage::on_event(GdkEvent *e) {
 		
 		origin = applyZoomRatio(origin); //zoom++
 		invalidateToRender();
-		win->displayMouseXY(
+		_kage->displayMouseXY(
 				(int) ((e->button.x - origin.x) / _zoomValue),
 				(int) ((e->button.y - origin.y) / _zoomValue)
 			);
@@ -652,7 +653,7 @@ vector<VectorData> KageStage::applyZoom(vector<VectorData> v) {
  */
 void KageStage::applyZoom() {
 		
-	PointData __stageArea(win->_document.Project._width  + origin.x, win->_document.Project._height  + origin.y);
+	PointData __stageArea(_kage->_document.Project._width  + origin.x, _kage->_document.Project._height  + origin.y);
 	__stageArea = applyZoomRatio(__stageArea);
 	
 	__origin = applyZoomRatio(origin);
@@ -660,21 +661,21 @@ void KageStage::applyZoom() {
 		__stageArea.x -= __origin.x;
 		__stageArea.y -= __origin.y;
 	
-		win->stackDoZoom(origin, __origin, _zoomReference, _zoomRatio);
+		_kage->stackDoZoom(origin, __origin, _zoomReference, _zoomRatio);
 	
-	unsigned int l_layerCount = win->_layerManager.layerCount();
-	unsigned int l_frameCount = win->_framesetManager.frameCount();
-	unsigned int l_currentFrame = win->_framesetManager.getCurrentFrame();
-	unsigned int l_currentLayer = win->getCurrentLayer();
+	unsigned int l_layerCount = _kage->_layerManager.layerCount();
+	unsigned int l_frameCount = _kage->_document.frameCount();
+	unsigned int l_currentFrame = _kage->_document.Scenes[_kage->_document.getActiveSceneID()].getCurrentFrame();
+	unsigned int l_currentLayer = _kage->getCurrentLayer();
 	
 	for (unsigned int l_frame = 1; l_frame <= l_frameCount; ++l_frame) {
-		win->_framesetManager.setCurrentFrame(l_frame);
+		_kage->_document.setCurrentFrame(l_frame);
 		
 		for (unsigned int l_layer = 1; l_layer <= l_layerCount; ++l_layer) {
-			win->_framesetManager.setCurrentLayer(l_layer);
+			_kage->_document.Scenes[_kage->_document.getActiveSceneID()].setCurrentLayer(l_layer);
 			
-			if (win->getTween() == 0) {
-				vector<VectorData> v = win->getFrameData(true).getVectorData();
+			if (_kage->getTween() == 0) {
+				vector<VectorData> v = _kage->getFrameData(true).getVectorData();
 				
 				for (unsigned int i = 0; i < v.size(); ++i) {
 					if (v[i].vectorType == VectorData::TYPE_MOVE
@@ -696,33 +697,18 @@ void KageStage::applyZoom() {
 					}
 				}
 				
-				win->setFrameData(v, true);
+				_kage->setFrameData(v, true);
 			}
 		}
 	}
 	
-	//TODO: is it needed to access _framesetManager? why not just win->setCurrentLayer(l_currentLayer)?
-	win->_framesetManager.setCurrentLayer(l_currentLayer);
-	win->_framesetManager.setCurrentFrame(l_currentFrame);
+	//TODO: is it needed to access _framesetManager? why not just _kage->setCurrentLayer(l_currentLayer)?
+	_kage->_document.Scenes[_kage->_document.getActiveSceneID()].setCurrentLayer(l_currentLayer);
+	_kage->_document.setCurrentFrame(l_currentFrame);
 	
 	origin = __origin.clone();
-	win->_document.Project._width  = __stageArea.x;
-	win->_document.Project._height = __stageArea.y;
-}
-
-void KageStage::setStageBG(Gdk::Color p_c) {
-	KageStage::stageBG.setR(p_c.get_red() / 255);
-	KageStage::stageBG.setG(p_c.get_green() / 255);
-	KageStage::stageBG.setB(p_c.get_blue() / 255);
-	invalidateToRender();
-}
-Gdk::Color KageStage::getStageBG() {
-	Gdk::Color l_c;
-	l_c.set_red((gushort)KageStage::stageBG.getR() * 255);
-	l_c.set_green((gushort)KageStage::stageBG.getG() * 255);
-	l_c.set_blue((gushort)KageStage::stageBG.getB() * 255);
-	
-	return l_c;
+	_kage->_document.Project._width  = __stageArea.x;
+	_kage->_document.Project._height = __stageArea.y;
 }
 
 void KageStage::setFill(Gdk::Color p_Color) {
@@ -780,7 +766,7 @@ Gdk::Color KageStage::getStroke() {
 void KageStage::printVectors() {
 	Kage::timestamp_IN();
 	std::cout << " KageStage::printVectors <" << std::endl;
-	vector<VectorData> v = win->getFrameData().getVectorData();
+	vector<VectorData> v = _kage->getFrameData().getVectorData();
 	
 	unsigned int vsize = v.size();
 	Kage::timestamp();
@@ -889,12 +875,12 @@ void KageStage::printVectors() {
 void KageStage::cleanSlate() {
 	origin.x = 50;
 	origin.y = 50;
-	win->_document.Project._width = 800.0f;
-	win->_document.Project._height = 600.0f;
+	_kage->_document.Project._width = 800.0f;
+	_kage->_document.Project._height = 600.0f;
 	
-	currentScale = win->_document.Project._width;
+	currentScale = _kage->_document.Project._width;
 	
-	fps = 12;
+	_kage->_document.Project._fps = 12;
 	mouseDown = false;
 	stroke.setThickness(3.0);
 	drawCtr = 0;
@@ -917,8 +903,8 @@ void KageStage::cleanSlate() {
 	
 	_zoomValue = 1.0f;
 	_zoomRatio = 1.0f;
-	__stageArea.x = win->_document.Project._width;
-	__stageArea.y = win->_document.Project._height;
+	__stageArea.x = _kage->_document.Project._width;
+	__stageArea.y = _kage->_document.Project._height;
 	
 	initNodeTool();
 	
@@ -948,12 +934,12 @@ bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
 	if (window) {
 		cr = p_cr;
 		if (mouseDown) {
-			win->renderFramesBelowCurrentLayer();
+			_kage->renderFramesBelowCurrentLayer();
 			if (_rotateMode == false) {
 				renderFrame(cr);
 			}
 		} else {
-			win->renderFrames();
+			_kage->renderFrames();
 		}
 		
 		///why can't it be loaded when after `window = get_window()'?
@@ -973,13 +959,13 @@ bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
 		
 		if (_registerWidth != get_width()) {
 			_registerWidth = get_width();
-			origin.x = (_registerWidth - win->_document.Project._width) / 2;
+			origin.x = (_registerWidth - _kage->_document.Project._width) / 2;
 
-			win->registerPropertiesPane();
+			_kage->registerPropertiesPane();
 		}
 		if (_registerHeight != get_height()) {
 			_registerHeight = get_height();
-			origin.y = (_registerHeight - win->_document.Project._height) / 2;
+			origin.y = (_registerHeight - _kage->_document.Project._height) / 2;
 		}
 		
 		//draw user-drawn object
@@ -1005,7 +991,7 @@ bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
 			handleEyedrop();
 		}
 		if (mouseDown) {
-			win->renderFramesAboveCurrentLayer();
+			_kage->renderFramesAboveCurrentLayer();
 		}
 	}
 	
@@ -1027,17 +1013,17 @@ void KageStage::clearScreen(Cairo::RefPtr<Cairo::Context> p_context) {
 			p_context->line_to(width, height);
 			p_context->line_to(0, height);
 			p_context->close_path();
-		p_context->set_source_rgb(0.75, 0.75, 0.75);
+		p_context->set_source_rgb(0.38f, 0.38f, 0.38f);
 		p_context->fill();
 		
 		//draw viewable area
 		p_context->move_to(                                               origin.x, origin.y                                                );
-		p_context->line_to((win->_document.Project._width * _zoomValue) + origin.x, origin.y                                                );
-		p_context->line_to((win->_document.Project._width * _zoomValue) + origin.x, origin.y + (win->_document.Project._height * _zoomValue));
-		p_context->line_to(                                               origin.x, origin.y + (win->_document.Project._height * _zoomValue));
+		p_context->line_to((_kage->_document.Project._width * _zoomValue) + origin.x, origin.y                                                );
+		p_context->line_to((_kage->_document.Project._width * _zoomValue) + origin.x, origin.y + (_kage->_document.Project._height * _zoomValue));
+		p_context->line_to(                                                 origin.x, origin.y + (_kage->_document.Project._height * _zoomValue));
 		
 		p_context->close_path();
-			p_context->set_source_rgb((double)KageStage::stageBG.getR()/255, (double)KageStage::stageBG.getG()/255, (double)KageStage::stageBG.getB()/255);
+			p_context->set_source_rgb((double)_kage->_document.Project._backgroundColor.getR()/255, (double)_kage->_document.Project._backgroundColor.getG()/255, (double)_kage->_document.Project._backgroundColor.getB()/255);
 	//		p_context->fill_preserve();
 			p_context->fill();
 				p_context->set_line_width(0.2f);
@@ -1050,7 +1036,7 @@ void KageStage::clearScreen(Cairo::RefPtr<Cairo::Context> p_context) {
 
 bool KageStage::renderToPNG(string p_path, bool p_transparent) {
 	#ifdef CAIRO_HAS_PNG_FUNCTIONS
-		Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, win->_document.Project._width, win->_document.Project._height);
+		Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, _kage->_document.Project._width, _kage->_document.Project._height);
 		
 		Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
 		
@@ -1065,13 +1051,13 @@ bool KageStage::renderToPNG(string p_path, bool p_transparent) {
 			clearScreen(l_context);
 		}
 		
-		unsigned int l_layerCount = win->_layerManager.layerCount();
-		unsigned int l_currentLayer = win->getCurrentLayer();
+		unsigned int l_layerCount = _kage->_layerManager.layerCount();
+		unsigned int l_currentLayer = _kage->getCurrentLayer();
 			for (unsigned int i = 1; i <= l_layerCount; ++i) {
-				win->_framesetManager.setCurrentLayer(i);
+				_kage->_document.Scenes[_kage->_document.getActiveSceneID()].setCurrentLayer(i);
 				renderFrameToPNG(l_context);
 			}
-		win->setCurrentLayer(l_currentLayer);
+		_kage->setCurrentLayer(l_currentLayer);
 		
 		CairoKage::writeToPNG(p_path, surface);
 		
@@ -1090,7 +1076,7 @@ void KageStage::renderFrameToPNG(Cairo::RefPtr<Cairo::Context> p_context) {
 void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, bool p_force) {
 	Kage::timestamp_IN();
 	cout << " KageStage::renderFrame p_force " << p_force << endl;
-	vector<VectorData> v = win->getFrameData(p_force).getVectorData();
+	vector<VectorData> v = _kage->getFrameData(p_force).getVectorData();
 	renderFrame(p_context, v);
 	if (_polyVectors.isEmpty() == false) {
 		Kage::timestamp_IN();
@@ -1104,7 +1090,7 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, bool p_forc
 
 bool KageStage::renderToPNGOffset(string p_path, bool p_transparent, double p_offsetX, double p_offsetY) {
 	#ifdef CAIRO_HAS_PNG_FUNCTIONS
-		Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, win->_document.Project._width, win->_document.Project._height);
+		Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, _kage->_document.Project._width, _kage->_document.Project._height);
 		
 		Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
 		
@@ -1119,13 +1105,13 @@ bool KageStage::renderToPNGOffset(string p_path, bool p_transparent, double p_of
 			clearScreen(l_context);
 		}
 		
-		unsigned int l_layerCount = win->_layerManager.layerCount();
-		unsigned int l_currentLayer = win->getCurrentLayer();
+		unsigned int l_layerCount = _kage->_layerManager.layerCount();
+		unsigned int l_currentLayer = _kage->getCurrentLayer();
 			for (unsigned int i = 1; i <= l_layerCount; ++i) {
-				win->_framesetManager.setCurrentLayer(i);
+				_kage->_document.Scenes[_kage->_document.getActiveSceneID()].setCurrentLayer(i);
 				renderFrameToPNGOffset(l_context, p_offsetX, p_offsetY);
 			}
-		win->setCurrentLayer(l_currentLayer);
+		_kage->setCurrentLayer(l_currentLayer);
 		
 		CairoKage::writeToPNG(p_path, surface);
 		
@@ -1145,7 +1131,7 @@ void KageStage::renderFrameToPNGOffset(Cairo::RefPtr<Cairo::Context> p_context, 
 void KageStage::renderFrameOffset(Cairo::RefPtr<Cairo::Context> p_context, bool p_force, double p_offsetX, double p_offsetY) {
 	Kage::timestamp_IN();
 	cout << " KageStage::renderFrame p_force " << p_force << endl;
-	vector<VectorData> v = win->getFrameData(p_force).getVectorData();
+	vector<VectorData> v = _kage->getFrameData(p_force).getVectorData();
 	renderFrameOffset(p_context, v, 1.0, p_offsetX, p_offsetY);
 	if (_polyVectors.isEmpty() == false) {
 		Kage::timestamp_IN();
@@ -1284,7 +1270,7 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
 					try {
 						p_context->save();
 						if (!cairoPNG[p_vectorData[i].points[0].y]) {
-							cairoPNG[p_vectorData[i].points[0].y] = Cairo::ImageSurface::create_from_png(win->_assetManager.getImagePathByID(p_vectorData[i].points[0].x));
+							cairoPNG[p_vectorData[i].points[0].y] = Cairo::ImageSurface::create_from_png(_kage->_assetManager.getImagePathByID(p_vectorData[i].points[0].x));
 							cout << "image loaded" << endl;
 						}
 						cairoImageSurface = cairoPNG[p_vectorData[i].points[0].y];
@@ -1375,7 +1361,7 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
  * @return unsigned int
  */
 unsigned int KageStage::addImage(unsigned int p_ID) {
-	if (win->isLayerLocked() == true) {
+	if (_kage->isLayerLocked() == true) {
 		return UINT_MAX;
 	}
 	
@@ -1391,9 +1377,9 @@ unsigned int KageStage::addImage(unsigned int p_ID) {
 	VectorDataManager v;
 		v.addInit(p_anchor);
 		v.addImage(p1, p2, p3);
-	win->addDataToFrame(v);
+	_kage->addDataToFrame(v);
 	
-	win->stackDo();
+	_kage->stackDo();
 	
 	invalidateToRender();
 
@@ -1547,7 +1533,7 @@ void KageStage::handleStrokeMouseMove() {
 void KageStage::handleStrokeMouseUp() {
 	handleNodesMouseUp();
 	
-	win->updateSelectedShapeColor(false, true);
+	_kage->updateSelectedShapeColor(false, true);
 	initNodeTool();
 }
 
@@ -1558,7 +1544,7 @@ void KageStage::handleFill() {
 void KageStage::handleFillMouseUp() {
 	handleNodesMouseUp();
 	
-	win->updateSelectedShapeColor(true, false);
+	_kage->updateSelectedShapeColor(true, false);
 	initNodeTool();
 }
 
@@ -1569,7 +1555,7 @@ void KageStage::handleEyedrop() {
 	Kage::timestamp_IN();
 	std::cout << " KageStage::handleEyedrop " << selectedShape << std::endl;
 	
-	vector<VectorData> v = win->getFrameData().getVectorData();
+	vector<VectorData> v = _kage->getFrameData().getVectorData();
 	bool l_move = false;
 	
 	anchor_upperLeft.x = 100000;
@@ -1622,9 +1608,9 @@ void KageStage::handleEyedrop() {
 	cr->set_dash(dashes, 0.0);
 	
 	if (l_move == true) {
-		win->setFrameData(v);
+		_kage->setFrameData(v);
 		
-		win->stackDo();
+		_kage->stackDo();
 	}
 	
 	Kage::timestamp_OUT();
@@ -1634,11 +1620,11 @@ void KageStage::handleEyedropMouseMove() {
 //	Kage::timestamp_IN();
 //	std::cout << " KageStage::handleEyedropMouseMove ??? " << std::endl;
 //	handleNodesMouseUp();
-//	win->updateColors();
+//	_kage->updateColors();
 //	Kage::timestamp_OUT();
 }
 
 void KageStage::handleEyedropMouseUp() {
 	handleNodesMouseUp();
-	win->updateColors();
+	_kage->updateColors();
 }

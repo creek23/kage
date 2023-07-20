@@ -213,7 +213,7 @@ void KageAssetManager::render(unsigned int p_renderID) {
  * 
  */
 void KageAssetManager::renderLibrary(unsigned int p_ID) {
-	_kage->m_Library.render(p_ID);
+	_kage->_library.render(p_ID);
 }
 bool KageAssetManager::removeAllAssets() {
 	for (unsigned int i = 0; i < assetCount(); ++i) {
@@ -345,7 +345,7 @@ void KageAssetManager::setCurrentAssetByID(unsigned int p_assetID) {
  * this function will be called to reflect Asset's visibility on stage.
  */
 void KageAssetManager::renderStage() {
-	if (KageFramesetManager::LOADING_MODE == true) {
+	if (KageScene::LOADING_MODE == true) {
 		return;
 	}
 	Kage::timestamp_IN();

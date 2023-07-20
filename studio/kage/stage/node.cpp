@@ -70,7 +70,7 @@ void KageStage::updateNodeX(double p_value, bool p_stackDo) {
 	}
 	
 	double l_propXdiff = 0;
-	vector<VectorData> v = win->getFrameData().getVectorData();
+	vector<VectorData> v = _kage->getFrameData().getVectorData();
 	std::cout << " nodeIndexX " << nodeIndexX << " " << isSelectedNode(nodeIndexX) << endl;
 	//calculate xDIFF from selected base Node
 	for (unsigned int l_selectedNode = 0; l_selectedNode < selectedNodes.size(); ++l_selectedNode) {
@@ -109,10 +109,10 @@ void KageStage::updateNodeX(double p_value, bool p_stackDo) {
 		}
 	}
 	
-	win->setFrameData(v);
+	_kage->setFrameData(v);
 	
 	if (p_stackDo) {
-		win->stackDo();
+		_kage->stackDo();
 	}
 	
 	invalidateToRender();
@@ -128,7 +128,7 @@ void KageStage::updateNodeY(double p_value, bool p_stackDo) {
 	}
 	
 	double l_propYdiff = 0;
-	vector<VectorData> v = win->getFrameData().getVectorData();
+	vector<VectorData> v = _kage->getFrameData().getVectorData();
 	
 	//calculate yDIFF from selected base Node
 	for (unsigned int l_selectedNode = 0; l_selectedNode < selectedNodes.size(); ++l_selectedNode) {
@@ -161,10 +161,10 @@ void KageStage::updateNodeY(double p_value, bool p_stackDo) {
 		}
 	}
 	
-	win->setFrameData(v);
+	_kage->setFrameData(v);
 	
 	if (p_stackDo) {
-		win->stackDo();
+		_kage->stackDo();
 	}
 	
 	invalidateToRender();
@@ -184,7 +184,7 @@ void KageStage::handleNodes_selection() {
 		drawSelectionArea();
 	}
 	
-	vector<VectorData> v = win->getFrameData().getVectorData();
+	vector<VectorData> v = _kage->getFrameData().getVectorData();
 	unsigned int vsize = v.size();
 	mouseOnNodeHover = UINT_MAX;
 	unsigned int typeMovesIndex = _NO_SELECTION;
@@ -303,7 +303,7 @@ void KageStage::handleNodes_relocation() {
 		return;
 	}
 	
-	vector<VectorData> v = win->getFrameData().getVectorData();
+	vector<VectorData> v = _kage->getFrameData().getVectorData();
 	bool l_editingNode = false;
 	double l_x;
 	double l_y;
@@ -479,7 +479,7 @@ void KageStage::handleNodes_relocation() {
 	}
 	
 	if (l_editingNode == true) {
-		win->setFrameData(v);
+		_kage->setFrameData(v);
 	}
 //	cout << " \t l_editingNode " << l_editingNode << endl;
 	_isModifyingShape = l_editingNode;
@@ -489,7 +489,7 @@ void KageStage::handleNodes_rendering() {
 		return;
 	}
 	
-	vector<VectorData> v = win->getFrameData().getVectorData();
+	vector<VectorData> v = _kage->getFrameData().getVectorData();
 	double l_x;
 	double l_y;
 	bool l_shapeGotClose = false;
@@ -645,7 +645,7 @@ void KageStage::handleNodesMouseDown() {
 }
 void KageStage::handleNodesMouseUp() {
 	_nodeToMouseDistance = 1080;
-	vector<VectorData> v = win->getFrameData().getVectorData();
+	vector<VectorData> v = _kage->getFrameData().getVectorData();
 	if (v.size() == 0) {
 		return;
 	}
@@ -676,9 +676,9 @@ void KageStage::handleNodesMouseUp() {
 	if (selectedShape != UINT_MAX) {
 		addSelectedShape(selectedShape);
 		if (KageStage::toolMode == MODE_SELECT) {
-			win->propStageSetVisible(false);
-			win->propFillStrokeSetVisible(true);
-			win->propShapePropertiesSetVisible(true);
+			_kage->propStageSetVisible(false);
+			_kage->propFillStrokeSetVisible(true);
+			_kage->propShapePropertiesSetVisible(true);
 		}
 	}
 	if (selectedNodes.size() > 0) {
@@ -699,9 +699,9 @@ void KageStage::handleNodesMouseUp() {
 			nodeX = l_nodeX;
 			if (l_nodeY == DBL_MAX) { l_nodeY = 0; }
 			nodeY = l_nodeY;
-			win->updateNodeXY();
-			win->propStageSetVisible(false);
-			win->propNodeXYSetVisible(true);
+			_kage->updateNodeXY();
+			_kage->propStageSetVisible(false);
+			_kage->propNodeXYSetVisible(true);
 		}
 	}
 	
@@ -962,8 +962,8 @@ bool KageStage::deselectSelectedNodes() {
 	std::cout << " KageStage::deselectSelectedNodes " << selectedNodes.size() << std::endl;
 	
 	initNodeTool();
-	win->propStageSetVisible(true);
-	win->propNodeXYSetVisible(false);
+	_kage->propStageSetVisible(true);
+	_kage->propNodeXYSetVisible(false);
 	
 	Kage::timestamp_OUT();
 	
@@ -971,7 +971,7 @@ bool KageStage::deselectSelectedNodes() {
 }
 
 bool KageStage::deleteSelectedNodes() {
-	if (win->isLayerLocked() == true) {
+	if (_kage->isLayerLocked() == true) {
 		return false;
 	}
 	bool l_return = false;
@@ -995,7 +995,7 @@ bool KageStage::deleteSelectedNodes() {
 	selectedNodes.clear();
 	
 	if (l_return == true) {
-		win->stackDo();
+		_kage->stackDo();
 	}
 	
 	Kage::timestamp_OUT();
@@ -1003,10 +1003,10 @@ bool KageStage::deleteSelectedNodes() {
 	return l_return;
 }
 bool KageStage::deleteSelectedNode(unsigned int p_index) {
-	if (win->isLayerLocked() == true) {
+	if (_kage->isLayerLocked() == true) {
 		return false;
 	}
-	vector<VectorData> v = win->getFrameData().getVectorData();
+	vector<VectorData> v = _kage->getFrameData().getVectorData();
 	
 	selectedShape = getSelectedShapeViaNode(p_index, v);
 	
@@ -1075,13 +1075,13 @@ bool KageStage::deleteSelectedNode(unsigned int p_index) {
 		v.erase (v.begin() + p_index);
 	}
 	
-	win->setFrameData(v);
+	_kage->setFrameData(v);
 	
 	return true;
 }
 
 bool KageStage::toggleLineSelectedNodes() {
-	vector<VectorData> v = win->getFrameData().getVectorData();
+	vector<VectorData> v = _kage->getFrameData().getVectorData();
 	
 	unsigned int nsize = selectedNodes.size();
 	
@@ -1126,9 +1126,9 @@ bool KageStage::toggleLineSelectedNodes() {
 	}
 	
 	if (l_gotit == true) {
-		win->setFrameData(v);
+		_kage->setFrameData(v);
 		
-		win->stackDo();
+		_kage->stackDo();
 	}
 	
 	return l_gotit;
@@ -1144,7 +1144,7 @@ void KageStage::updateNodeXY() {
 	} else {
 		nodeX = DBL_MAX;
 		nodeY = DBL_MAX;
-		vector<VectorData> v = win->getFrameData().getVectorData();
+		vector<VectorData> v = _kage->getFrameData().getVectorData();
 		unsigned int vsize = v.size();
 		for (unsigned int i = 0; i < nsize; ++i) {
 			for (unsigned int j = i; j < vsize; ++j) {
@@ -1175,6 +1175,6 @@ void KageStage::updateNodeXY() {
 			nodeIndexY = UINT_MAX;
 		}
 	}
-	win->propNodeXYSetVisible(true);
+	_kage->propNodeXYSetVisible(true);
 }
 

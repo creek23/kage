@@ -76,7 +76,7 @@ void KageStage::handleDrawPencilMouseMove(PointData p_point) {
 	}
 }
 void KageStage::handleDrawPencilMouseUp() {
-	if (win->isLayerLocked() == true) {
+	if (_kage->isLayerLocked() == true) {
 		return;
 	}
 	
@@ -92,19 +92,19 @@ void KageStage::handleDrawPencilMouseUp() {
 				vector<unsigned int> l_shape;
 					l_shape.push_back(0);
 			_polyVectors.recenterRotationPoint(l_shape);
-			win->addDataToFrame(_polyVectors);
+			_kage->addDataToFrame(_polyVectors);
 			_polyVectors.clear();
 			drawCtr = 0;
-			win->stackDo();
+			_kage->stackDo();
 		} else{
 			_polyVectors.addEndFill();
 				vector<unsigned int> l_shape;
 					l_shape.push_back(0);
 			_polyVectors.recenterRotationPoint(l_shape);
-			win->addDataToFrame(_polyVectors);
+			_kage->addDataToFrame(_polyVectors);
 			_polyVectors.clear();
 			drawCtr = 0;
-			win->stackDo();
+			_kage->stackDo();
 		}
 	}
 	
@@ -113,7 +113,7 @@ void KageStage::handleDrawPencilMouseUp() {
 }
 
 void KageStage::handlePencil() {
-	if (win->isLayerLocked() == true) {
+	if (_kage->isLayerLocked() == true) {
 		return;
 	}
 	if (_polyVectors.getVectorData().size() < 5) return;

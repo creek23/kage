@@ -26,7 +26,7 @@
 #include <cairomm/context.h>
 
 void KageStage::handleDrawPolyMouseUp() {
-	if (win->isLayerLocked() == true) {
+	if (_kage->isLayerLocked() == true) {
 		return;
 	}
 	
@@ -42,22 +42,22 @@ void KageStage::handleDrawPolyMouseUp() {
 				vector<unsigned int> l_shape;
 					l_shape.push_back(0);
 			_polyVectors.recenterRotationPoint(l_shape);
-			win->addDataToFrame(_polyVectors);
+			_kage->addDataToFrame(_polyVectors);
 			drawCtr = 0;
 			_polyVectors.clear();
-			win->ToolSelect_onClick();
-			win->stackDo();
+			_kage->ToolSelect_onClick();
+			_kage->stackDo();
 		} else if (draw1.x-(5/KageStage::currentScale/_zoomValue) <= polyXtail && draw1.x+(5/KageStage::currentScale/_zoomValue) >= polyXtail
 				&& draw1.y-(5/KageStage::currentScale/_zoomValue) <= polyYtail && draw1.y+(5/KageStage::currentScale/_zoomValue) >= polyYtail) {
 			_polyVectors.addEndFill();
 				vector<unsigned int> l_shape;
 					l_shape.push_back(0);
 			_polyVectors.recenterRotationPoint(l_shape);
-			win->addDataToFrame(_polyVectors);
+			_kage->addDataToFrame(_polyVectors);
 			_polyVectors.clear();
 			drawCtr = 0;
-			win->ToolSelect_onClick();
-			win->stackDo();
+			_kage->ToolSelect_onClick();
+			_kage->stackDo();
 		} else {
 			PointData p2(draw1);
 				_polyVectors.addLinePoly(p2, polyXtail, polyYtail);
@@ -86,7 +86,7 @@ void KageStage::handleDrawPolyMouseUp() {
 }
 
 void KageStage::handlePoly() {
-	if (win->isLayerLocked() == true) {
+	if (_kage->isLayerLocked() == true) {
 		return;
 	}
 	if (drawCtr == 0) return;
@@ -130,7 +130,7 @@ void KageStage::handlePoly() {
 }
 
 bool KageStage::cancelDrawingPoly() {
-	if (win->isLayerLocked() == true) {
+	if (_kage->isLayerLocked() == true) {
 		return false;
 	}
 	_polyVectors.clear();

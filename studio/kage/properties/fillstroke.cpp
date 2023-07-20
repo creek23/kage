@@ -71,7 +71,7 @@ PropertyFillStroke::PropertyFillStroke(Kage* p_kage) :
                 m_ColorButtonFill.set_size_request(32, 32);
                 m_ColorButtonFill.set_use_alpha(true);
                 m_ColorButtonFill.set_title("Choose Fill Color");
-                    m_ColorButtonFill.set_color(_kage->m_KageStage.getStageBG());
+                    m_ColorButtonFill.set_color(_kage->getStageBG());
                 m_ColorButtonFill.signal_color_set().connect(sigc::mem_fun(* this, &PropertyFillStroke::ColorButtonFill_onClick) );
     //=======================================================	
     pack_start(m_PropFill, Gtk::PACK_SHRINK);
@@ -139,7 +139,7 @@ PropertyFillStroke::PropertyFillStroke(Kage* p_kage) :
                 m_ColorButtonStroke.set_size_request(32, 32);
                 m_ColorButtonStroke.set_use_alpha(true);
                 m_ColorButtonStroke.set_title("Choose Stroke Color");
-                    m_ColorButtonStroke.set_color(_kage->m_KageStage.getStageBG());
+                    m_ColorButtonStroke.set_color(_kage->getStageBG());
                 m_ColorButtonStroke.signal_color_set().connect(sigc::mem_fun(* this, &PropertyFillStroke::ColorButtonStroke_onClick) );
     //=======================================================
     pack_start(m_PropStroke, Gtk::PACK_SHRINK);
@@ -235,8 +235,8 @@ void PropertyFillStroke::ColorButtonFill_onClick() {
 		KageStage::fillColor.setB((int) (l_blue * 255.0f));
 		KageStage::fillColor.setA((int) (l_alpha * 255.0f));
 	}
-	_kage->m_KageStage.setFill(_kage->m_Color);
-	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
+	_kage->_stage.setFill(_kage->m_Color);
+	_kage->_stage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
 
 void PropertyFillStroke::ColorButtonStroke_onClick() {
@@ -250,8 +250,8 @@ void PropertyFillStroke::ColorButtonStroke_onClick() {
 	} else {
 		KageStage::stroke.setA((int) (l_alpha * 255.0f));
 	}
-	_kage->m_KageStage.setStroke(_kage->m_Color);
-	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
+	_kage->_stage.setStroke(_kage->m_Color);
+	_kage->_stage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
 
 
@@ -285,7 +285,7 @@ void PropertyFillStroke::FillR_onChange() {
 		KageStage::fillColor.setR(l_red);
 	}
 		updateEntryFillRGBA();
-	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
+	_kage->_stage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
 void PropertyFillStroke::FillG_onChange() {
 	double l_green = _scaleFillG.get_value();
@@ -299,7 +299,7 @@ void PropertyFillStroke::FillG_onChange() {
 		KageStage::fillColor.setG(l_green);
 	}
 		updateEntryFillRGBA();
-	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
+	_kage->_stage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
 void PropertyFillStroke::FillB_onChange() {
 	double l_blue = _scaleFillB.get_value();
@@ -313,7 +313,7 @@ void PropertyFillStroke::FillB_onChange() {
 		KageStage::fillColor.setB(l_blue);
 	}
 		updateEntryFillRGBA();
-	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
+	_kage->_stage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
 void PropertyFillStroke::FillAlpha_onChange() {
 	double l_alpha = _scaleFillAlpha.get_value();
@@ -327,7 +327,7 @@ void PropertyFillStroke::FillAlpha_onChange() {
 		KageStage::fillColor.setA((int) (l_alpha * 256.0f/ 100.0f));
 	}
 		updateEntryFillRGBA();
-	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
+	_kage->_stage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
 
 void PropertyFillStroke::EntryFillRGBA_onEnter() {
@@ -423,7 +423,7 @@ void PropertyFillStroke::EntryFillRGBA_onEnter() {
 		l_rgba.set_alpha( l_A / 255.f );
 			m_ColorButtonFill.set_rgba(l_rgba);
 	
-	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
+	_kage->_stage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
 
 
@@ -457,7 +457,7 @@ void PropertyFillStroke::StrokeR_onChange() {
 		KageStage::stroke.setR(l_red);
 	}
 		updateEntryStrokeRGBA();
-	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
+	_kage->_stage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
 void PropertyFillStroke::StrokeG_onChange() {
 	double l_green = _scaleStrokeG.get_value();
@@ -471,7 +471,7 @@ void PropertyFillStroke::StrokeG_onChange() {
 		KageStage::stroke.setG(l_green);
 	}
 		updateEntryStrokeRGBA();
-	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
+	_kage->_stage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
 void PropertyFillStroke::StrokeB_onChange() {
 	double l_blue = _scaleStrokeB.get_value();
@@ -485,7 +485,7 @@ void PropertyFillStroke::StrokeB_onChange() {
 		KageStage::stroke.setB(l_blue);
 	}
 		updateEntryStrokeRGBA();
-	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
+	_kage->_stage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
 void PropertyFillStroke::StrokeAlpha_onChange() {
 	double l_alpha = _scaleStrokeAlpha.get_value();
@@ -498,7 +498,7 @@ void PropertyFillStroke::StrokeAlpha_onChange() {
 		KageStage::stroke.setA((int) (l_alpha * 256.0f/ 100.0f));
 	}
 		updateEntryStrokeRGBA();
-	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
+	_kage->_stage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
 void PropertyFillStroke::EntryStrokeRGBA_onEnter() {
 	//see: https://sourceforge.net/p/kage/tickets/66/?limit=25#7488
@@ -593,7 +593,7 @@ void PropertyFillStroke::EntryStrokeRGBA_onEnter() {
 		l_rgba.set_alpha( l_A / 255.f );
 			m_ColorButtonStroke.set_rgba(l_rgba);
 	
-	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
+	_kage->_stage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
 void PropertyFillStroke::EntryStrokeThickness_onEnter() {
 	double l_dbl = StringHelper::toDouble(m_EntryStrokeThickness.get_text());
@@ -606,7 +606,7 @@ void PropertyFillStroke::EntryStrokeThickness_onEnter() {
 		KageStage::stroke.setThickness(l_dbl);
 		m_EntryStrokeThickness.set_text(StringHelper::doubleToString(KageStage::stroke.getThickness()));
 	}
-	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
+	_kage->_stage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
 
 void PropertyFillStroke::setFillColorData(ColorData p_colordata) {

@@ -41,14 +41,14 @@ PropertyNodeXY::PropertyNodeXY(Kage* p_kage) :
             m_EntryNodeX.set_size_request(20, 24);
             m_EntryNodeX.set_width_chars(9);
             m_EntryNodeX.set_max_length(9);
-            setNodeXText(_kage->m_KageStage.nodeX);
+            setNodeXText(_kage->_stage.nodeX);
             m_EntryNodeX.signal_activate().connect(
                 sigc::mem_fun(*this, &PropertyNodeXY::EntryNodeX_onEnter));
         m_propNodeXYV2.pack_start(m_EntryNodeY, Gtk::PACK_SHRINK);
             m_EntryNodeY.set_size_request(20, 24);
             m_EntryNodeY.set_width_chars(9);
             m_EntryNodeY.set_max_length(9);
-            setNodeYText(_kage->m_KageStage.nodeY);
+            setNodeYText(_kage->_stage.nodeY);
             m_EntryNodeY.signal_activate().connect(
                 sigc::mem_fun(*this, &PropertyNodeXY::EntryNodeY_onEnter));
         m_propNodeXYV2.pack_start(_btnToggleLine, Gtk::PACK_SHRINK);
@@ -70,19 +70,19 @@ void PropertyNodeXY::EntryNodeX_onEnter() {
 	double l_dbl = StringHelper::toDouble(m_EntryNodeX.get_text());
 	
 	m_EntryNodeX.set_text(StringHelper::doubleToString(l_dbl));
-	_kage->m_KageStage.updateNodeX(l_dbl);
+	_kage->_stage.updateNodeX(l_dbl);
 }
 
 void PropertyNodeXY::EntryNodeY_onEnter() {
 	double l_dbl = StringHelper::toDouble(m_EntryNodeY.get_text());
 	
 	m_EntryNodeY.set_text(StringHelper::doubleToString(l_dbl));
-	_kage->m_KageStage.updateNodeY(l_dbl);
+	_kage->_stage.updateNodeY(l_dbl);
 }
 
 void PropertyNodeXY::ToggleLine_onClick() {
 	Kage::timestamp_IN(); std::cout << " Kage::ToggleLine_onClick" << std::endl;
-	if (_kage->m_KageStage.toggleLineSelectedNodes() == true) {
+	if (_kage->_stage.toggleLineSelectedNodes() == true) {
 		_kage->forceRenderFrames();
 	}
 	Kage::timestamp_OUT();

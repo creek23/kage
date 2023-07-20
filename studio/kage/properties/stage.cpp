@@ -59,12 +59,12 @@ PropertyStage::PropertyStage(Kage* p_kage) :
             m_ColorButtonStage.set_size_request(32, 32);
             //m_ColorButtonStage.set_use_alpha(true);
             m_ColorButtonStage.set_title("Choose Stage Background Color");
-            setBackgroundColor(_kage->m_KageStage.getStageBG());
+            setBackgroundColor(_kage->getStageBG());
                 m_ColorButtonStage.signal_color_set().connect(sigc::mem_fun(* this, &PropertyStage::ColorButtonStage_onClick) );
             m_EntryStageFPS.set_size_request(20, 24);
             m_EntryStageFPS.set_width_chars(3);
             m_EntryStageFPS.set_max_length(3);
-            setFPSText(_kage->m_KageStage.fps);
+            setFPSText(_kage->_document.Project._fps);
                 m_EntryStageFPS.signal_activate().connect(
                     sigc::mem_fun(*this, &PropertyStage::EntryStageFPS_onEnter) );
 }
@@ -80,20 +80,20 @@ void PropertyStage::EntryStageArea_onEnter() {
 	t = m_EntryStageHgt.get_text();
 		_kage->_document.Project._height = StringHelper::toDouble(t);
         setHeightText(_kage->_document.Project._height);
-	_kage->m_KageStage.invalidateToRender();
+	_kage->_stage.invalidateToRender();
 }
 void PropertyStage::EntryStageFPS_onEnter() {
 	string t = m_EntryStageFPS.get_text();
-	cout << "m_KageStage.fps " << _kage->m_KageStage.fps << " t " << t << endl;
-	_kage->m_KageStage.fps = StringHelper::toUnsignedInteger(t);
-	cout << "m_KageStage.fps ..." << _kage->m_KageStage.fps << " t " << t << endl;
-	setFPSText(_kage->m_KageStage.fps);
+	cout << "_kage->_document.Project._fps " << _kage->_document.Project._fps << " t " << t << endl;
+	_kage->_document.Project._fps = StringHelper::toUnsignedInteger(t);
+	cout << "_kage->_document.Project._fps ..." << _kage->_document.Project._fps << " t " << t << endl;
+	setFPSText(_kage->_document.Project._fps);
 }
 
 void PropertyStage::ColorButtonStage_onClick() {
 	_kage->m_Color = m_ColorButtonStage.get_color();
-//	m_KageStage.modify_bg(Gtk::STATE_NORMAL, m_Color);
-	_kage->m_KageStage.setStageBG(_kage->m_Color);
+//	_stage.modify_bg(Gtk::STATE_NORMAL, m_Color);
+	_kage->setStageBG(_kage->m_Color);
 }
 
 void PropertyStage::setWidthText(double p_width) {

@@ -25,14 +25,14 @@
 	#include <gtkmm/drawingarea.h>
 	#include <iostream>
 	
-	#include "../data/anchor.h"
-	#include "../data/color.h"
-	#include "../data/strokecolor.h"
-	#include "../data/vectordata.h"
-	#include "../vectordatamanager.h"
+	#include "data/anchor.h"
+	#include "data/color.h"
+	#include "data/strokecolor.h"
+	#include "data/vectordata.h"
+	#include "vectordatamanager.h"
 	#include <cairomm/context.h>
 	#include <gdkmm/general.h> // set_source_pixbuf()
-	#include "../../util/cairo/cairo_kage.h"
+	#include "../util/cairo/cairo_kage.h"
 	
 	class Kage; //forward declaration
 	
@@ -49,7 +49,7 @@
 			static Glib::RefPtr<Gdk::Pixbuf> imageSHAPE_SE;
 			static Glib::RefPtr<Gdk::Pixbuf> imageSHAPE_ROTATE;
 			
-			KageStage(Kage *p_kage);
+			KageStage(Kage *p_win);
 			virtual ~KageStage();
 		
 			enum ToolMode {
@@ -69,13 +69,12 @@
 				MODE_DRAW_PENCIL
 			};
 			const unsigned int _NO_SELECTION = -1;
+			static ColorData stageBG; ///direct use for get only
 			static ColorData fillColor; ///direct use for get only
 			static StrokeColorData stroke; ///direct use for get only
-			//any changes on color/stroke during use of Pencil will be stored on Pencil only
-			static ColorData pencilFillColor; ///direct use for get only
-			static StrokeColorData pencilStroke; ///direct use for get only
 			static ToolMode toolMode;
 			static GdkPoint moveStageXY;
+			unsigned int fps;
 			double fpsElapse;
 			double propX = 0;
 			int propXindex1;
@@ -93,20 +92,22 @@
 			void printVectors();
 			void cleanSlate();
 			void invalidateToRender();
-			bool _invalidated;
 			
+			void setStageBG(Gdk::Color p_Color);
+			Gdk::Color getStageBG();
 			void setFill(Gdk::Color p_Color);
 			Gdk::Color getFill();
 			void setStroke(Gdk::Color p_Color);
 			Gdk::Color getStroke();
-			double currentScale; /// for use with zoom; default value is _kage->_document.Project._width; can be changed as preferred
+			double stageWidth; //direct use for get only
+			double stageHeight; //direct use for get only
+			double currentScale; /// for use with zoom; default value is stageWidth; can be changed as preferred
 			void clearScreen(Cairo::RefPtr<Cairo::Context> p_context);
 			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context, bool p_force = false);
 			void renderOnionFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> p_vectorData, double p_alpha);
 			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> p_vectorData, double p_alpha = 1.0);
 			void renderFrameOffset(Cairo::RefPtr<Cairo::Context> p_context, bool p_force = false, double p_offsetX = 0.0, double p_offsetY = 0.0);
 			void renderFrameOffset(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> p_vectorData, double p_alpha = 1.0, double p_offsetX = 0.0, double p_offsetY = 0.0);
-			unsigned int addImage(unsigned int p_ID);
 			void initNodeTool();
 			void handleShapes();
 			void handleShapes_modifyingShapeRotate();
@@ -211,12 +212,9 @@
 			vector<unsigned int> getSelectedShapes();
 
 			void unpressKeys();
-
-			vector<Cairo::RefPtr<Cairo::ImageSurface>> cairoPNG;
-			static Cairo::RefPtr<Cairo::ImageSurface> cairoImageSurface;
 		protected:
 			ToolMode prevTool; //used by Hand-tool shortcut [spacebar]
-			Kage *_kage;
+			Kage *win;
 			PointData draw1;
 			PointData draw2;
 			PointData drawFree1;

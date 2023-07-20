@@ -22,8 +22,8 @@
 #include "layermanager.h"
 #include "../../kage.h"
 
-KageLayerManager::KageLayerManager(Kage *p_win) {
-	win = p_win;
+KageLayerManager::KageLayerManager(Kage *p_kage) {
+	_kage = p_kage;
 	layerCtr = 0;
 }
 
@@ -37,7 +37,7 @@ unsigned int KageLayerManager::addLayer(Glib::ustring p_name) {
 		p_name = Glib::ustring::compose("Layer %1", layerCtr);
 	}
 	
-	layers.push_back(Gtk::manage(new KageLayer(this, layerCtr)));
+	layers.push_back(Gtk::manage(new KageLayerUI(this, layerCtr)));
 		pack_end(*layers.back(), Gtk::PACK_SHRINK);
 			(*layers.back()).setLabel(p_name);
 			(*layers.back()).set_size_request(100, 23);
@@ -98,11 +98,11 @@ bool KageLayerManager::removeAllLayers() {
 	return true;
 }
 
-/** For use of KageLayer.  When a KageLayer is clicked, previously clicked
- * KageLayer should be un-selected.
- * \param p_layer is pointer to KageLayer who called this function
+/** For use of KageLayerUI.  When a KageLayerUI is clicked, previously clicked
+ * KageLayerUI should be un-selected.
+ * \param p_layer is pointer to KageLayerUI who called this function
  */
-void KageLayerManager::setSelected(KageLayer *p_layer) {
+void KageLayerManager::setSelected(KageLayerUI *p_layer) {
 	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
 		layers[_currentLayerIndex]->setSelected(false);
 	} else {
@@ -117,14 +117,14 @@ void KageLayerManager::setSelected(KageLayer *p_layer) {
 	p_layer->setSelected(true);
 	_currentLayerID = p_layer->layerID;
 	
-	win->setCurrentFrame(win->getCurrentFrame());
+	_kage->setCurrentFrame(_kage->getCurrentFrame());
 }
 
 /** Not to be confused of getCurrentLayer().  This function returns the
- * pointer to active KageLayer Object to caller
+ * pointer to active KageLayerUI Object to caller
  * \return pointer to registered active layer
  */
-KageLayer *KageLayerManager::getLayer() {
+KageLayerUI *KageLayerManager::getLayer() {
 	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
 		return layers[_currentLayerIndex];
 	} else {
@@ -246,30 +246,30 @@ void KageLayerManager::setCurrentLayerByID(unsigned int p_layerID) {
  * this function will be called to reflect Layer's visibility on stage.
  */
 void KageLayerManager::renderStage() {
-	if (KageFramesetManager::LOADING_MODE == true) {
+	if (KageScene::LOADING_MODE == true) {
 		return;
 	}
 	Kage::timestamp_IN();
 	cout << " KageLayerManager::renderStage <" << endl;
-	win->forceRenderFrames();
-	win->refreshUI();
+	_kage->forceRenderFrames();
+	_kage->refreshUI();
 	Kage::timestamp_OUT();
 }
 
 /** For use of Kage when exporting/saving to file.
- * \return size of array of KageLayer
+ * \return size of array of KageLayerUI
  */
 unsigned int KageLayerManager::layerCount() {
 	return layers.size();
 }
 
-/** For use of KageLayer when User double-clicked Layer
+/** For use of KageLayerUI when User double-clicked Layer
  * \sa renameLayer()
  */
-void KageLayerManager::renameLayer(KageLayer *p_layer) {
+void KageLayerManager::renameLayer(KageLayerUI *p_layer) {
 	setSelected(p_layer);
 	
-	LayerRenameDialog* pDialog = new LayerRenameDialog(*win, p_layer);
+	LayerRenameDialog* pDialog = new LayerRenameDialog(*_kage, p_layer);
 		pDialog->run();
 	delete pDialog;
 }
@@ -278,7 +278,7 @@ void KageLayerManager::renameLayer(KageLayer *p_layer) {
  * \sa renameLayer(KageLayer)
  */
 void KageLayerManager::renameLayer() {
-	KageLayer *l_layer = NULL;
+	KageLayerUI *l_layer = NULL;
 	if (_currentLayerIndex < layerCount() && layers[_currentLayerIndex]->layerID == _currentLayerID) {
 		l_layer = layers[_currentLayerIndex];
 	} else {
@@ -292,7 +292,7 @@ void KageLayerManager::renameLayer() {
 	}
 	
 	if (l_layer) {
-		LayerRenameDialog* pDialog = new LayerRenameDialog(*win, l_layer);
+		LayerRenameDialog* pDialog = new LayerRenameDialog(*_kage, l_layer);
 			pDialog->run();
 		delete pDialog;
 	}

@@ -31,20 +31,20 @@ unsigned int Kage::TAB_COUNT = 0;
 
 Kage::Kage(string p_filePath) :
 			   _layerManager(this),
-			   _framesetManager(this),
+			   _timeline(this),
 			   m_PropStage(this),
 			   m_propLocationSize(this),
 			   m_propFillStroke(this),
 			   m_propNodeXY(this),
 			   m_propFrameTween(this),
 			   _assetManager(this),
-			   m_Library(this),
+			   _library(this),
 			   m_LabelProp("Properties"),
 			   m_LabelLibrary("Library"),
 			   m_LblHolder_Toolbar("Toolbar"),
-			   m_KageStage(this),
+			   _stage(this),
 			   _undoRedoManager(),
-			   _document() {
+			   _document(this) {
 	m_ContextId = m_Statusbar.get_context_id(KageAbout::app_title);
 	KageFrame::_gotFocus = false;
 	set_title(KageAbout::app_title);
@@ -703,7 +703,7 @@ Kage::Kage(string p_filePath) :
 						m_Timeline_Frame_VBox2.pack_start(m_Timeline_Frame_ScrolledWindow);//, Gtk::PACK_SHRINK);
 							m_Timeline_Frame_ScrolledWindow.set_policy(Gtk::POLICY_EXTERNAL , Gtk::POLICY_EXTERNAL);
 								m_Timeline_Frame_ScrolledWindow.set_border_width(0);
-								m_Timeline_Frame_ScrolledWindow.add(_framesetManager);
+								m_Timeline_Frame_ScrolledWindow.add(_timeline);
 								m_Timeline_Frame_ScrolledWindow.set_shadow_type(Gtk::SHADOW_NONE);
 								m_Timeline_Frame_ScrolledWindow.set_kinetic_scrolling(true);
 						m_Timeline_Frame_VBox2.pack_start(m_Timeline_HScrollbar, Gtk::PACK_SHRINK);
@@ -718,11 +718,11 @@ Kage::Kage(string p_filePath) :
 					
 		m_VPane_Timeline.add2(m_HPane_DrawingArea);
 			m_HPane_DrawingArea.add1(m_Stage_Pane_ScrolledWindow);
-				m_Stage_Pane_ScrolledWindow.add(m_KageStage);
+				m_Stage_Pane_ScrolledWindow.add(_stage);
 				m_Stage_Pane_ScrolledWindow.set_border_width(0);
 				m_Stage_Pane_ScrolledWindow.set_shadow_type(Gtk::SHADOW_NONE);
-					m_KageStage.set_size_request(1280, 700);
-					m_KageStage.show();
+					_stage.set_size_request(1280, 700);
+					_stage.show();
 					m_HPane_DrawingArea.add2(m_Box1);
 			
 			m_Box1.pack_start(m_Property_Pane_ScrolledWindow, Gtk::PACK_EXPAND_WIDGET);
@@ -765,7 +765,7 @@ Kage::Kage(string p_filePath) :
 			m_PropertyBox.pack_start(m_Separator_Library2, Gtk::PACK_SHRINK);
 			
 				//asset preview widget
-				m_PropertyBox.pack_start(m_Library, Gtk::PACK_SHRINK);
+				m_PropertyBox.pack_start(_library, Gtk::PACK_SHRINK);
 				//asset manager
 				m_PropertyBox.pack_start(_assetManager, Gtk::PACK_SHRINK);
 	
@@ -783,7 +783,7 @@ Kage::Kage(string p_filePath) :
 		m_propFillStroke.setStrokeColorData(KageStage::stroke);
 		KageStage::pencilStroke.setThickness(1.0);
 	_UPDATE_SHAPE_COLORS = true;
-
+	
 	signal_key_press_event().connect( sigc::mem_fun(*this, &Kage::on_key_press_event) );
 	signal_key_release_event().connect( sigc::mem_fun(*this, &Kage::on_key_release_event) );
 }
@@ -812,7 +812,7 @@ Kage::~Kage() {
 }
 
 void Kage::displayMouseXY(double p_x, double p_y) {
-	_labelStatusMouseXY.set_text("X: " + StringHelper::doubleToString(p_x) + " Y: " + StringHelper::doubleToString(p_y) + "\t" + StringHelper::doubleToString((int)(m_KageStage._zoomValue*100.0f)));
+	_labelStatusMouseXY.set_text("X: " + StringHelper::doubleToString(p_x) + " Y: " + StringHelper::doubleToString(p_y) + "\t" + StringHelper::doubleToString((int)(_stage._zoomValue*100.0f)));
 }
 void Kage::updateStatus(Glib::ustring status_msg) {
 	m_Statusbar.push(status_msg, m_ContextId);
@@ -825,23 +825,23 @@ void Kage::stackDoZoom(PointData p_originBefore, PointData p_originAfter, PointD
 void Kage::Undo_onClick() {
 	KageDo l_kageDo = _undoRedoManager.undo();
 	if (l_kageDo._layer != -1 && l_kageDo._frame != -1) {
-		_framesetManager.setCurrentLayer(l_kageDo._layer);
-		_framesetManager.setCurrentFrame(l_kageDo._frame); //<-- causes to lose focus on KageStage
+		_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(l_kageDo._layer);
+		_document.Scenes[_document.getActiveSceneID()].setCurrentFrame(l_kageDo._frame); //<-- causes to lose focus on KageStage
 		setFrameData(l_kageDo.getVectorData(), true);
 		
 		forceRenderFrames();
-		set_focus(m_KageStage); //return focus on KageStage; should be fixed better when Frame is rewritten
+		set_focus(_stage); //return focus on KageStage; should be fixed better when Frame is rewritten
 	}
 }
 void Kage::Redo_onClick() {
 	KageDo l_kageDo = _undoRedoManager.redo();
 	if (l_kageDo._layer != -1 && l_kageDo._frame != -1) {
-		_framesetManager.setCurrentLayer(l_kageDo._layer);
-		_framesetManager.setCurrentFrame(l_kageDo._frame); //<-- causes to lose focus on KageStage
+		_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(l_kageDo._layer);
+		_document.Scenes[_document.getActiveSceneID()].setCurrentFrame(l_kageDo._frame); //<-- causes to lose focus on KageStage
 		setFrameData(l_kageDo.getVectorData(), true);
 		
 		forceRenderFrames();
-		set_focus(m_KageStage); //return focus on KageStage; should be fixed better when Frame is rewritten
+		set_focus(_stage); //return focus on KageStage; should be fixed better when Frame is rewritten
 	}
 }
 void Kage::Cut_onClick() {
@@ -849,7 +849,7 @@ void Kage::Cut_onClick() {
 	if (KageFrame::_gotFocus == true) {
 		//handle Timeline Cut
 	} else {
-		if (m_KageStage.cutSelectedShapes() == true) {
+		if (_stage.cutSelectedShapes() == true) {
 			forceRenderFrames();
 		}
 	}
@@ -857,14 +857,14 @@ void Kage::Cut_onClick() {
 }
 void Kage::Copy_onClick() {
 	Kage::timestamp_IN(); std::cout << " Kage::Copy_onClick " << KageFrame::_gotFocus << std::endl;
-	if (m_KageStage.copySelectedShapes() == true) {
+	if (_stage.copySelectedShapes() == true) {
 		forceRenderFrames();
 	}
 	Kage::timestamp_OUT();
 }
 void Kage::Paste_onClick() {
 	Kage::timestamp_IN(); std::cout << " Kage::Paste_onClick " << KageFrame::_gotFocus << std::endl;
-	if (m_KageStage.pasteSelectedShapes() == true) {
+	if (_stage.pasteSelectedShapes() == true) {
 		forceRenderFrames();
 	}
 	Kage::timestamp_OUT();
@@ -873,9 +873,9 @@ void Kage::Duplicate_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp_IN(); std::cout << " Kage::Duplicate_onClick" << std::endl;
 		if (isLayerLocked() == false) {
-			vector<unsigned int> l_selectedShapes = _framesetManager.duplicateShapes(m_KageStage.getSelectedShapes());
+			vector<unsigned int> l_selectedShapes = _document.Scenes[_document.getActiveSceneID()].duplicateShapes(_stage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
-				m_KageStage.setSelectedShapes(l_selectedShapes);
+				_stage.setSelectedShapes(l_selectedShapes);
 				stackDo();
 				forceRenderFrames();
 			}
@@ -888,7 +888,7 @@ void Kage::SelectAll_onClick() {
 		ToolSelect_onClick();
 	}
 	Kage::timestamp_IN(); std::cout << " Kage::SelectAll_onClick" << std::endl;
-	if (m_KageStage.selectAllShapes() == true) {
+	if (_stage.selectAllShapes() == true) {
 		forceRenderFrames();
 	}
 	Kage::timestamp_OUT();
@@ -898,15 +898,15 @@ void Kage::Deselect_onClick() {
 	if (_isPlaying == true) {
 		Stop_onClick();
 	} else if (KageStage::toolMode == KageStage::MODE_SELECT) {
-		if (m_KageStage.deselectSelectedShapes() == true) {
+		if (_stage.deselectSelectedShapes() == true) {
 			forceRenderFrames();
 		}
 	} else if (KageStage::toolMode == KageStage::MODE_NODE) {
-		if (m_KageStage.deselectSelectedNodes() == true) {
+		if (_stage.deselectSelectedNodes() == true) {
 			forceRenderFrames();
 		}
 	} else if (KageStage::toolMode == KageStage::MODE_DRAW_POLY) {
-		if (m_KageStage.cancelDrawingPoly() == true) {
+		if (_stage.cancelDrawingPoly() == true) {
 			forceRenderFrames();
 		}
 	}
@@ -947,10 +947,10 @@ void Kage::TogglePropertiesStroke_onClick() {
 void Kage::ShapeGroup_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		if (isLayerLocked() == false) {
-			vector<unsigned int> l_selectedShapes = _framesetManager.groupSelectedShapes(m_KageStage.getSelectedShapes());
+			vector<unsigned int> l_selectedShapes = _document.Scenes[_document.getActiveSceneID()].groupSelectedShapes(_stage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
-				m_KageStage.setSelectedShapes(l_selectedShapes);
-				_framesetManager.recenterRotationPoint(l_selectedShapes);
+				_stage.setSelectedShapes(l_selectedShapes);
+				_document.Scenes[_document.getActiveSceneID()].recenterRotationPoint(l_selectedShapes);
 				stackDo();
 				forceRenderFrames();
 			}
@@ -962,10 +962,10 @@ void Kage::ShapeUngroup_onClick() {
 		Kage::timestamp_IN(); std::cout << " Kage::ShapeUngroup_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
-			vector<unsigned int> l_selectedShapes = _framesetManager.ungroupSelectedShapes(m_KageStage.getSelectedShapes());
+			vector<unsigned int> l_selectedShapes = _document.Scenes[_document.getActiveSceneID()].ungroupSelectedShapes(_stage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
-				m_KageStage.setSelectedShapes(l_selectedShapes);
-				_framesetManager.recenterRotationPoint(l_selectedShapes);
+				_stage.setSelectedShapes(l_selectedShapes);
+				_document.Scenes[_document.getActiveSceneID()].recenterRotationPoint(l_selectedShapes);
 				stackDo();
 				forceRenderFrames();
 			}
@@ -979,9 +979,9 @@ void Kage::Raise_onClick() {
 		Kage::timestamp_IN(); std::cout << " Kage::Raise_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
-			vector<unsigned int> l_selectedShapes = _framesetManager.raiseSelectedShape(m_KageStage.getSelectedShapes());
+			vector<unsigned int> l_selectedShapes = _document.Scenes[_document.getActiveSceneID()].raiseSelectedShape(_stage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
-				m_KageStage.setSelectedShapes(l_selectedShapes);
+				_stage.setSelectedShapes(l_selectedShapes);
 				stackDo();
 				forceRenderFrames();
 			}
@@ -994,9 +994,9 @@ void Kage::Lower_onClick() {
 		Kage::timestamp_IN(); std::cout << " Kage::Lower_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
-			vector<unsigned int> l_selectedShapes = _framesetManager.lowerSelectedShape(m_KageStage.getSelectedShapes());
+			vector<unsigned int> l_selectedShapes = _document.Scenes[_document.getActiveSceneID()].lowerSelectedShape(_stage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
-				m_KageStage.setSelectedShapes(l_selectedShapes);
+				_stage.setSelectedShapes(l_selectedShapes);
 				stackDo();
 				forceRenderFrames();
 			}
@@ -1009,9 +1009,9 @@ void Kage::RaiseToTop_onClick() {
 		Kage::timestamp_IN(); std::cout << " Kage::RaiseToTop_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
-			vector<unsigned int> l_selectedShapes = _framesetManager.raiseToTopSelectedShape(m_KageStage.getSelectedShapes());
+			vector<unsigned int> l_selectedShapes = _document.Scenes[_document.getActiveSceneID()].raiseToTopSelectedShape(_stage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
-				m_KageStage.setSelectedShapes(l_selectedShapes);
+				_stage.setSelectedShapes(l_selectedShapes);
 				stackDo();
 				forceRenderFrames();
 			}
@@ -1024,9 +1024,9 @@ void Kage::LowerToBottom_onClick() {
 		Kage::timestamp_IN(); std::cout << " Kage::LowerToBottom_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
-			vector<unsigned int> l_selectedShapes = _framesetManager.lowerToBottomSelectedShape(m_KageStage.getSelectedShapes());
+			vector<unsigned int> l_selectedShapes = _document.Scenes[_document.getActiveSceneID()].lowerToBottomSelectedShape(_stage.getSelectedShapes());
 			if (l_selectedShapes.size() > 0) {
-				m_KageStage.setSelectedShapes(l_selectedShapes);
+				_stage.setSelectedShapes(l_selectedShapes);
 				stackDo();
 				forceRenderFrames();
 			}
@@ -1040,7 +1040,7 @@ void Kage::FlipHorizontal_onClick() {
 		Kage::timestamp_IN(); std::cout << " Kage::FlipHorizontal_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
-			if (_framesetManager.flipHorizontalSelectedShape(m_KageStage.getSelectedShapes()) == true) {
+			if (_document.Scenes[_document.getActiveSceneID()].flipHorizontalSelectedShape(_stage.getSelectedShapes()) == true) {
 				stackDo();
 				forceRenderFrames();
 			}
@@ -1054,7 +1054,7 @@ void Kage::FlipVertical_onClick() {
 		Kage::timestamp_IN(); std::cout << " Kage::FlipVertical_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
-			if (_framesetManager.flipVerticalSelectedShape(m_KageStage.getSelectedShapes()) == true) {
+			if (_document.Scenes[_document.getActiveSceneID()].flipVerticalSelectedShape(_stage.getSelectedShapes()) == true) {
 				stackDo();
 				forceRenderFrames();
 			}
@@ -1069,7 +1069,7 @@ void Kage::RecenterRotationPoint_onClick() {
 		Kage::timestamp_IN(); std::cout << " Kage::RecenterRotationPoint_onClick" << std::endl;
 		
 		if (isLayerLocked() == false) {
-			if (_framesetManager.recenterRotationPoint(m_KageStage.getSelectedShapes()) == true) {
+			if (_document.Scenes[_document.getActiveSceneID()].recenterRotationPoint(_stage.getSelectedShapes()) == true) {
 				stackDo();
 				forceRenderFrames();
 			}
@@ -1082,14 +1082,14 @@ void Kage::RecenterRotationPoint_onClick() {
 void Kage::Delete_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp_IN(); std::cout << " Kage::Delete_onClick SHAPE" << std::endl;
-		if (m_KageStage.deleteSelectedShapes() == true) {
+		if (_stage.deleteSelectedShapes() == true) {
 			stackDo();
 			forceRenderFrames();
 		}
 		Kage::timestamp_OUT();
 	} else if (KageStage::toolMode == KageStage::MODE_NODE) {
 		Kage::timestamp_IN(); std::cout << " Kage::Delete_onClick NODE" << std::endl;
-		if (m_KageStage.deleteSelectedNodes() == true) {
+		if (_stage.deleteSelectedNodes() == true) {
 			forceRenderFrames();
 		}
 		Kage::timestamp_OUT();
@@ -1097,30 +1097,30 @@ void Kage::Delete_onClick() {
 }
 
 void Kage::AddFrame_onClick() {
-	_framesetManager.addFrame();
+	_document.Scenes[_document.getActiveSceneID()].addFrame();
 	
 	refreshUI();
 }
 void Kage::ExtendFrame_onClick() {
-	_framesetManager.extendFrame();
+	_document.Scenes[_document.getActiveSceneID()].extendFrame();
 	switchToNextFrame();
 	
 	refreshUI();
 }
 void Kage::DuplicateFrame_onClick() {
-	_framesetManager.duplicateFrame();
+	_document.Scenes[_document.getActiveSceneID()].duplicateFrame();
 	
 	refreshUI();
 }
 void Kage::RemoveFrame_onClick() {
-	_framesetManager.removeFrame();
+	_document.Scenes[_document.getActiveSceneID()].removeFrame();
 		forceRenderFrames();
 	
 	refreshUI();
 }
 
 void Kage::refreshUI() {
-	if (KageFramesetManager::LOADING_MODE == true) {
+	if (KageScene::LOADING_MODE == true) {
 		return;
 	}
 	show_all();
@@ -1167,14 +1167,16 @@ void Kage::refreshUI() {
 	} else {
 		propFrameTweenSetVisible(false);
 	}
+
+	_timeline.forceRender();
 }
 
 /**
  * Deletes a Frame via Selecting All then Deleting selected shapes
  */
 void Kage::CutFrame_onClick() {
-	if (m_KageStage.selectAllShapes() == true) {
-		if (m_KageStage.cutSelectedShapes() == true) {
+	if (_stage.selectAllShapes() == true) {
+		if (_stage.cutSelectedShapes() == true) {
 			stackDo();
 			forceRenderFrames();
 		}
@@ -1184,8 +1186,8 @@ void Kage::CutFrame_onClick() {
  * Copies Frame's full content
  */
 void Kage::CopyFrame_onClick() {
-	if (m_KageStage.selectAllShapes() == true) {
-		if (m_KageStage.copySelectedShapes() == true) {
+	if (_stage.selectAllShapes() == true) {
+		if (_stage.copySelectedShapes() == true) {
 			forceRenderFrames();
 		}
 	}
@@ -1195,10 +1197,10 @@ void Kage::CopyFrame_onClick() {
  * Deleting selected shapes then pasting buffer
  */
 void Kage::PasteFrame_onClick() {
-	if (m_KageStage.selectAllShapes() == true) {
-		m_KageStage.deleteSelectedShapes();
+	if (_stage.selectAllShapes() == true) {
+		_stage.deleteSelectedShapes();
 	}
-	if (m_KageStage.pasteSelectedShapes() == true) {
+	if (_stage.pasteSelectedShapes() == true) {
 		stackDo();
 		forceRenderFrames();
 	}
@@ -1213,26 +1215,26 @@ void Kage::DeleteFrame_onClick() {
 	}
 }
 	bool Kage::doDeleteFrame() {
-		if (m_KageStage.selectAllShapes() == true) {
-			return m_KageStage.deleteSelectedShapes();
+		if (_stage.selectAllShapes() == true) {
+			return _stage.deleteSelectedShapes();
 		}
 		return false;
 	}
 void Kage::Tween_onClick() {
 /*	Kage::timestamp_IN(); std::cout << " Kage::Tween_onClick" << std::endl;
 	if (isLayerLocked() == false) {
-		if (_framesetManager.getTween() != 0) {
+		if (_document.Scenes[_document.getActiveSceneID()].getTween() != 0) {
 			//set tween
 			unsigned int l_tweenType  = 11;
 			m_ComboX.set_active_text("Linear");
 			m_ComboY.set_active_text("Linear");
-			if (_framesetManager.setTween(l_tweenType) == true) {
+			if (_document.Scenes[_document.getActiveSceneID()].setTween(l_tweenType) == true) {
 //				stackDo();
 				propFrameTweenSetVisible(true);
 				
 				forceRenderFrames();
 			}
-		} else if (_framesetManager.setTween(0) == true) {
+		} else if (_document.Scenes[_document.getActiveSceneID()].setTween(0) == true) {
 //				stackDo();
 				propFrameTweenSetVisible(false);
 				forceRenderFrames();
@@ -1248,7 +1250,7 @@ void Kage::TweenFrame_onClick() {
 	m_propFrameTween.setTweenXText("Linear");
 	m_propFrameTween.setTweenYText("Linear");
 	if (isLayerLocked() == false) {
-		if (_framesetManager.setTween(l_tweenType) == true) {
+		if (_document.Scenes[_document.getActiveSceneID()].setTween(l_tweenType) == true) {
 //			stackDo();
 			propFrameTweenSetVisible(true);
 			forceRenderFrames();
@@ -1262,7 +1264,7 @@ void Kage::RemoveTweenFrame_onClick() {
 	Kage::timestamp_IN(); std::cout << " Kage::RemoveTweenFrame_onClick" << std::endl;
 	
 	if (isLayerLocked() == false) {
-		if (_framesetManager.setTween(0) == true) {
+		if (_document.Scenes[_document.getActiveSceneID()].setTween(0) == true) {
 //			stackDo();
 			propFrameTweenSetVisible(false);
 			forceRenderFrames();
@@ -1273,14 +1275,14 @@ void Kage::RemoveTweenFrame_onClick() {
 }
 
 void Kage::switchToPreviousFrame() {
-	_framesetManager.switchToPreviousFrame();
+	_document.Scenes[_document.getActiveSceneID()].switchToPreviousFrame();
 		forceRenderFrames();
 	
 	refreshUI();
 }
 
 void Kage::switchToNextFrame() {
-	_framesetManager.switchToNextFrame();
+	_document.Scenes[_document.getActiveSceneID()].switchToNextFrame();
 		forceRenderFrames();
 	
 	refreshUI();
@@ -1294,26 +1296,30 @@ void Kage::updateFrameLabel() {
 }
 
 void Kage::LayerAdd_onClick() {
-	_framesetManager.addFrameset(_layerManager.addLayer());
+	_document.Scenes[_document.getActiveSceneID()].addLayer(_layerManager.addLayer());
 	std::cout << "Layer Count: " << _layerManager.layerCount() << std::endl;
-	refreshUI();
 	setCurrentFrame(getCurrentFrame());
 	updateStatus("New Layer Added");
+	refreshUI();
 }
 void Kage::LayerRename_onClick() {
 	_layerManager.renameLayer();
 }
 void Kage::ShowHideLayer_onClick() {
 	_layerManager.toggleVisibility();
+	refreshUI();//TODO: update frames as shown/hidden
 }
 void Kage::LockUnlockLayer_onClick() {
 	_layerManager.toggleLock();
+	refreshUI();//TODO: update frames as locked/unlocked
 }
 void Kage::LayerDel_onClick() {
 	if (_layerManager.layerCount() > 1) {
-		_framesetManager.deleteFrameset(getCurrentLayer());
+		_document.Scenes[_document.getActiveSceneID()].deleteFrameset(getCurrentLayer());
 		_layerManager.deleteLayer();
 	}
+	
+	refreshUI();
 	std::cout << "Layer Delete Button clicked." << std::endl;
 }
 /**
@@ -1322,8 +1328,9 @@ void Kage::LayerDel_onClick() {
  * from LayerManager. 
  */
 void Kage::LayerMoveTop_onClick() {
-	if (_framesetManager.moveToTop() == true && _layerManager.moveToTop() == true) {
+	if (_document.Scenes[_document.getActiveSceneID()].moveToTop() == true && _layerManager.moveToTop() == true) {
 		forceRenderFrames();
+		refreshUI();
 	}
 }
 /**
@@ -1332,8 +1339,9 @@ void Kage::LayerMoveTop_onClick() {
  * from LayerManager. 
  */
 void Kage::LayerMoveUp_onClick() {
-	if (_framesetManager.moveUp() == true && _layerManager.moveUp() == true) {
+	if (_document.Scenes[_document.getActiveSceneID()].moveUp() == true && _layerManager.moveUp() == true) {
 		forceRenderFrames();
+		refreshUI();
 	}
 }
 /**
@@ -1342,8 +1350,9 @@ void Kage::LayerMoveUp_onClick() {
  * from LayerManager. 
  */
 void Kage::LayerMoveDown_onClick() {
-	if (_framesetManager.moveDown() == true && _layerManager.moveDown() == true) {
+	if (_document.Scenes[_document.getActiveSceneID()].moveDown() == true && _layerManager.moveDown() == true) {
 		forceRenderFrames();
+		refreshUI();
 	}
 }
 /**
@@ -1352,8 +1361,9 @@ void Kage::LayerMoveDown_onClick() {
  * from LayerManager. 
  */
 void Kage::LayerMoveBottom_onClick() {
-	if (_framesetManager.moveToBottom() == true && _layerManager.moveToBottom() == true) {
+	if (_document.Scenes[_document.getActiveSceneID()].moveToBottom() == true && _layerManager.moveToBottom() == true) {
 		forceRenderFrames();
+		refreshUI();
 	}
 }
 
@@ -1361,6 +1371,7 @@ void Kage::ToggleOnion_onClick() {
 	std::cout << "ToggleOnion_onClick " << std::endl;
 	//reflect onion in rendering
 	forceRenderFrames();
+	refreshUI();//TODO: update frames to indicate which frames are shown as onion
 }
 
 void Kage::toolsButtonToggle(string p_toolTip) {
@@ -1376,13 +1387,13 @@ void Kage::toolsButtonToggle(string p_toolTip) {
 			}
 		}
 	}
-	m_KageStage.unpressKeys();
+	_stage.unpressKeys();
 }
 
 void Kage::ToolButtons_onClick(Gtk::ToggleButton *p_sourceButton) {
 	if (p_sourceButton->get_active() == 1) {
 		if (currentTool->get_tooltip_text() == "Poly Tool") {
-			m_KageStage.cancelDrawingPoly();
+			_stage.cancelDrawingPoly();
 		}
 		
 		currentTool = p_sourceButton;
@@ -1420,7 +1431,7 @@ void Kage::ToolSelect_onClick() {
 	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	KageStage::toolMode = KageStage::MODE_SELECT;
-	m_KageStage.initNodeTool();
+	_stage.initNodeTool();
 	forceRenderFrames();
 }
 
@@ -1430,10 +1441,10 @@ void Kage::ToolNode_onClick() {
 	propFillStrokeSetVisible(false);
 	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(true);
-	m_propFillStroke.setFillButtonColor(m_KageStage.getFill());
-	m_propFillStroke.setStrokeButtonColor(m_KageStage.getStroke());
+	m_propFillStroke.setFillButtonColor(_stage.getFill());
+	m_propFillStroke.setStrokeButtonColor(_stage.getStroke());
 	KageStage::toolMode = KageStage::MODE_NODE;
-	m_KageStage.initNodeTool();
+	_stage.initNodeTool();
 	forceRenderFrames();
 }
 
@@ -1443,10 +1454,10 @@ void Kage::ToolPoly_onClick() {
 	propFillStrokeSetVisible(true);
 	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
-	m_propFillStroke.setFillButtonColor(m_KageStage.getFill());
-	m_propFillStroke.setStrokeButtonColor(m_KageStage.getStroke());
+	m_propFillStroke.setFillButtonColor(_stage.getFill());
+	m_propFillStroke.setStrokeButtonColor(_stage.getStroke());
 	KageStage::toolMode = KageStage::MODE_DRAW_POLY;
-	m_KageStage.initNodeTool();
+	_stage.initNodeTool();
 }
 
 void Kage::ToolPencil_onClick() {
@@ -1456,9 +1467,9 @@ void Kage::ToolPencil_onClick() {
 	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	KageStage::toolMode = KageStage::MODE_DRAW_PENCIL;
-	m_propFillStroke.setFillButtonColor(m_KageStage.getFill());
-	m_propFillStroke.setStrokeButtonColor(m_KageStage.getStroke());
-	m_KageStage.initNodeTool();
+	m_propFillStroke.setFillButtonColor(_stage.getFill());
+	m_propFillStroke.setStrokeButtonColor(_stage.getStroke());
+	_stage.initNodeTool();
 }
 
 void Kage::ToolOval_onClick() {
@@ -1467,10 +1478,10 @@ void Kage::ToolOval_onClick() {
 	propFillStrokeSetVisible(true);
 	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
-	m_propFillStroke.setFillButtonColor(m_KageStage.getFill());
-	m_propFillStroke.setStrokeButtonColor(m_KageStage.getStroke());
+	m_propFillStroke.setFillButtonColor(_stage.getFill());
+	m_propFillStroke.setStrokeButtonColor(_stage.getStroke());
 	KageStage::toolMode = KageStage::MODE_DRAW_OVAL;
-	m_KageStage.initNodeTool();
+	_stage.initNodeTool();
 }
 
 void Kage::ToolRectangle_onClick() {
@@ -1479,10 +1490,10 @@ void Kage::ToolRectangle_onClick() {
 	propFillStrokeSetVisible(true);
 	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
-	m_propFillStroke.setFillButtonColor(m_KageStage.getFill());
-	m_propFillStroke.setStrokeButtonColor(m_KageStage.getStroke());
+	m_propFillStroke.setFillButtonColor(_stage.getFill());
+	m_propFillStroke.setStrokeButtonColor(_stage.getStroke());
 	KageStage::toolMode = KageStage::MODE_DRAW_RECT;
-	m_KageStage.initNodeTool();
+	_stage.initNodeTool();
 }
 
 void Kage::ToolStroke_onClick() {
@@ -1491,10 +1502,10 @@ void Kage::ToolStroke_onClick() {
 	propFillStrokeSetVisible(true);
 	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
-	m_propFillStroke.setFillButtonColor(m_KageStage.getFill());
-	m_propFillStroke.setStrokeButtonColor(m_KageStage.getStroke());
+	m_propFillStroke.setFillButtonColor(_stage.getFill());
+	m_propFillStroke.setStrokeButtonColor(_stage.getStroke());
 	KageStage::toolMode = KageStage::MODE_STROKE;
-//	m_KageStage.initNodeTool();
+//	_stage.initNodeTool();
 //	forceRenderFrames();
 }
 
@@ -1504,10 +1515,10 @@ void Kage::ToolFill_onClick() {
 	propFillStrokeSetVisible(true);
 	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
-	m_propFillStroke.setFillButtonColor(m_KageStage.getFill());
-	m_propFillStroke.setStrokeButtonColor(m_KageStage.getStroke());
+	m_propFillStroke.setFillButtonColor(_stage.getFill());
+	m_propFillStroke.setStrokeButtonColor(_stage.getStroke());
 	KageStage::toolMode = KageStage::MODE_FILL;
-//	m_KageStage.initNodeTool();
+//	_stage.initNodeTool();
 //	forceRenderFrames();
 }
 
@@ -1517,10 +1528,10 @@ void Kage::ToolEyedrop_onClick() {
 	propFillStrokeSetVisible(true);
 	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
-	m_propFillStroke.setFillButtonColor(m_KageStage.getFill());
-	m_propFillStroke.setStrokeButtonColor(m_KageStage.getStroke());
+	m_propFillStroke.setFillButtonColor(_stage.getFill());
+	m_propFillStroke.setStrokeButtonColor(_stage.getStroke());
 	KageStage::toolMode = KageStage::MODE_EYEDROP;
-	m_KageStage.initNodeTool();
+	_stage.initNodeTool();
 	forceRenderFrames();
 }
 
@@ -1530,10 +1541,10 @@ void Kage::ToolZoom_onClick() {
 	propFillStrokeSetVisible(false);
 	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
-	m_propFillStroke.setFillButtonColor(m_KageStage.getFill());
-	m_propFillStroke.setStrokeButtonColor(m_KageStage.getStroke());
+	m_propFillStroke.setFillButtonColor(_stage.getFill());
+	m_propFillStroke.setStrokeButtonColor(_stage.getStroke());
 	KageStage::toolMode = KageStage::MODE_ZOOM;
-	m_KageStage.initNodeTool();
+	_stage.initNodeTool();
 	forceRenderFrames();
 }
 
@@ -1543,16 +1554,6 @@ void Kage::propStageSetVisible(bool p_visible) {
 
 void Kage::propFillStrokeSetVisible(bool p_visible) {
 	m_propFillStroke.set_visible(p_visible);
-	
-	//m_PropFillLabel.set_visible(p_visible);
-	//m_PropStrokeLabel.set_visible(p_visible);
-	if (p_visible == true) {
-	//	m_PropFill.set_visible(_propFillVisible);
-	//	m_PropStroke.set_visible(_propStrokeVisible);
-	} else {
-	//	m_PropFill.set_visible(p_visible);
-	//	m_PropStroke.set_visible(p_visible);
-	}
 }
 
 void Kage::propShapePropertiesSetVisible(bool p_visible) {
@@ -1569,11 +1570,14 @@ void Kage::propFrameTweenSetVisible(bool p_visible) {
 	m_propFrameTween.set_visible(p_visible);
 }
 
+/**
+ * @brief We're updating the GUI's colors based on KageStage's Fill and Stroke colors
+ */
 void Kage::updateColors() {
 	_UPDATE_SHAPE_COLORS = false;
-		m_propFillStroke.setFillButtonColor(m_KageStage.getFill());
+		m_propFillStroke.setFillButtonColor(_stage.getFill());
 		m_propFillStroke.setScaleFillRGBA(KageStage::fillColor);
-		m_propFillStroke.setStrokeButtonColor(m_KageStage.getStroke());
+		m_propFillStroke.setStrokeButtonColor(_stage.getStroke());
 		m_propFillStroke.setScaleStrokeRGBA(KageStage::stroke);
 		m_propFillStroke.setStrokeThicknessText(KageStage::stroke.getThickness());
 	_UPDATE_SHAPE_COLORS = true;
@@ -1594,15 +1598,15 @@ double sanitizeToZeroDouble(double p_value) {
 	}
 }
 void Kage::updateShapeProperties() {
-	m_propLocationSize.setXText(     sanitizeToZeroDouble(m_KageStage.propX      * m_KageStage.currentScale));
-	m_propLocationSize.setYText(     sanitizeToZeroDouble(m_KageStage.propY      * m_KageStage.currentScale));
-	m_propLocationSize.setWidthText( sanitizeToZeroDouble(m_KageStage.propWidth  * m_KageStage.currentScale));
-	m_propLocationSize.setHeightText(sanitizeToZeroDouble(m_KageStage.propHeight * m_KageStage.currentScale));
+	m_propLocationSize.setXText(     sanitizeToZeroDouble(_stage.propX      * _stage.currentScale));
+	m_propLocationSize.setYText(     sanitizeToZeroDouble(_stage.propY      * _stage.currentScale));
+	m_propLocationSize.setWidthText( sanitizeToZeroDouble(_stage.propWidth  * _stage.currentScale));
+	m_propLocationSize.setHeightText(sanitizeToZeroDouble(_stage.propHeight * _stage.currentScale));
 }
 
 void Kage::updateNodeXY() {
-	m_propNodeXY.setNodeXText(sanitizeToZeroDouble(m_KageStage.nodeX * m_KageStage.currentScale));
-	m_propNodeXY.setNodeYText(sanitizeToZeroDouble(m_KageStage.nodeY * m_KageStage.currentScale));
+	m_propNodeXY.setNodeXText(sanitizeToZeroDouble(_stage.nodeX * _stage.currentScale));
+	m_propNodeXY.setNodeYText(sanitizeToZeroDouble(_stage.nodeY * _stage.currentScale));
 }
 
 void Kage::stackDo() {
@@ -1648,7 +1652,7 @@ bool Kage::on_delete_event(GdkEventAny* any_event) {
 
 void Kage::addDataToFrame(VectorDataManager v, bool p_force) {
 	if (p_force || _layerManager.getLayer()->isLocked() == false) {
-		_framesetManager.addDataToFrame(v);
+		_document.Scenes[_document.getActiveSceneID()].addDataToFrame(v);
 	}
 }
 /**
@@ -1658,7 +1662,7 @@ void Kage::addDataToFrame(VectorDataManager v, bool p_force) {
  */
 VectorDataManager Kage::getFrameData(bool p_force) {
 	if (p_force || _layerManager.getLayer()->isVisible()) {
-		return _framesetManager.getFrameData();
+		return _document.Scenes[_document.getActiveSceneID()].getFrameData();
 	} else {
 		VectorDataManager l_nullReturn;
 		return l_nullReturn;
@@ -1673,7 +1677,7 @@ VectorDataManager Kage::getFrameData(bool p_force) {
  */
 VectorDataManager Kage::getFrameDataAt(unsigned int p_frame) {
 	if (_layerManager.getLayer()->isVisible()) {
-		return _framesetManager.getFrameDataAt(p_frame);
+		return _document.Scenes[_document.getActiveSceneID()].getFrameDataAt(p_frame);
 	} else {
 		VectorDataManager l_nullReturn;
 		return l_nullReturn;
@@ -1686,24 +1690,24 @@ void Kage::setFrameData(VectorDataManager p_vectorsData) {
 void Kage::setFrameData(VectorDataManager p_vectorsData, bool p_force) {
 	if (p_force == true
 			|| _layerManager.getLayer()->isLocked() == false) {
-		_framesetManager.setFrameData(p_vectorsData);
+		_document.Scenes[_document.getActiveSceneID()].setFrameData(p_vectorsData);
 	}
 }
 
 unsigned int Kage::getTween() {
-	return _framesetManager.getTween();
+	return _document.Scenes[_document.getActiveSceneID()].getTween();
 }
 
 bool Kage::isFrameEmpty() {
-	return (_framesetManager.getFrameData().getVectorData().size() > 0);
+	return (_document.Scenes[_document.getActiveSceneID()].getFrameData().getVectorData().size() > 0);
 }
 
 void Kage::forceRenderFrames() {
-	if (KageFramesetManager::LOADING_MODE == true) {
+	if (KageScene::LOADING_MODE == true) {
 		return;
 	}
 	Kage::timestamp_IN(); cout << " Kage::forceRenderFrames " << endl;
-	m_KageStage.invalidateToRender();
+	_stage.invalidateToRender();
 	renderFrames();
 
 	Kage::timestamp_OUT();
@@ -1713,7 +1717,7 @@ void Kage::forceRenderFrames() {
 void Kage::renderOnionFrames() {
 	Kage::timestamp_IN(); std::cout << " Kage::renderOnionFrames" << std::endl;
 	unsigned int l_layerCount = _layerManager.layerCount();
-	unsigned int l_frameCount = _framesetManager.frameCount();
+	unsigned int l_frameCount = _document.Scenes[_document.getActiveSceneID()].frameCount();
 	
 	unsigned int l_currentLayer = getCurrentLayer();
 	unsigned int l_currentFrame = getCurrentFrame();
@@ -1727,12 +1731,12 @@ void Kage::renderOnionFrames() {
 			
 			unsigned int l_frame = (unsigned int) f;
 			for (unsigned int i = 1; i <= l_layerCount; ++i) {
-				_framesetManager.setCurrentLayer(i);
+				_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(i);
 				if (l_frame == l_currentFrame) {
-					m_KageStage.renderFrame(m_KageStage.cr);
+					_stage.renderFrame(_stage.cr);
 				} else {
 					vector<VectorData> l_vectorData = getFrameDataAt(l_frame).getVectorData();
-					m_KageStage.renderOnionFrame(m_KageStage.cr, l_vectorData, l_alpha[f-(l_currentFrame-2)]);
+					_stage.renderOnionFrame(_stage.cr, l_vectorData, l_alpha[f-(l_currentFrame-2)]);
 				}
 			}
 		}
@@ -1744,12 +1748,12 @@ void Kage::renderOnionFrames() {
  * This renders all frameN in all layers, where frameN is the currentFrame
  */
 void Kage::renderFrames() {
-	if (KageFramesetManager::LOADING_MODE == true) {
+	if (KageScene::LOADING_MODE == true) {
 		return;
 	}
 	Kage::timestamp_IN(); cout << " Kage::renderFrames" << endl;
 	
-	m_KageStage.clearScreen(m_KageStage.cr);
+	_stage.clearScreen(_stage.cr);
 	
 	if (_toggleOnion.get_active() == true) {
 		renderOnionFrames();
@@ -1760,8 +1764,8 @@ void Kage::renderFrames() {
 	unsigned int l_layerCount = _layerManager.layerCount();
 	unsigned int l_currentLayer = getCurrentLayer();
 		for (unsigned int i = 1; i <= l_layerCount; ++i) {
-			_framesetManager.setCurrentLayer(i);
-			m_KageStage.renderFrame(m_KageStage.cr);
+			_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(i);
+			_stage.renderFrame(_stage.cr);
 		}
 	setCurrentLayer(l_currentLayer);
 	
@@ -1770,7 +1774,7 @@ void Kage::renderFrames() {
 
 void Kage::renderFramesBelowCurrentLayer() {
 	Kage::timestamp_IN(); cout << " Kage::renderFramesBelowCurrentLayer" << endl;
-	m_KageStage.clearScreen(m_KageStage.cr);
+	_stage.clearScreen(_stage.cr);
 	
 	if (_toggleOnion.get_active() == true) {
 		renderOnionFrames();
@@ -1780,12 +1784,12 @@ void Kage::renderFramesBelowCurrentLayer() {
 	
 	unsigned int l_currentLayer = getCurrentLayer();
 		for (unsigned int i = 1; i < l_currentLayer; ++i) {
-			_framesetManager.setCurrentLayer(i);
+			_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(i);
 			if (_toggleOnionLayer.get_active() == false) {
-				m_KageStage.renderFrame(m_KageStage.cr);
+				_stage.renderFrame(_stage.cr);
 			} else {
 				vector<VectorData> l_vectorData = getFrameData().getVectorData();
-				m_KageStage.renderOnionFrame(m_KageStage.cr, l_vectorData, 0.25);
+				_stage.renderOnionFrame(_stage.cr, l_vectorData, 0.25);
 			}
 		}
 	setCurrentLayer(l_currentLayer);
@@ -1797,12 +1801,12 @@ void Kage::renderFramesAboveCurrentLayer() {
 	unsigned int l_layerCount = _layerManager.layerCount();
 	unsigned int l_currentLayer = getCurrentLayer();
 		for (unsigned int i = (l_currentLayer + 1); i <= l_layerCount; ++i) {
-			_framesetManager.setCurrentLayer(i);
+			_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(i);
 			if (_toggleOnionLayer.get_active() == false) {
-				m_KageStage.renderFrame(m_KageStage.cr);
+				_stage.renderFrame(_stage.cr);
 			} else {
 				vector<VectorData> l_vectorData = getFrameData().getVectorData();
-				m_KageStage.renderOnionFrame(m_KageStage.cr, l_vectorData, 0.25);
+				_stage.renderOnionFrame(_stage.cr, l_vectorData, 0.25);
 			}
 		}
 	setCurrentLayer(l_currentLayer);
@@ -1818,17 +1822,13 @@ unsigned int Kage::getCurrentLayer() {
 
 void Kage::setCurrentLayer(unsigned int p_layer) {
 	if (_layerManager.getCurrentLayer() != p_layer) {
-		std::cout << "setting undoBase A setCurrentLayer " << p_layer << std::endl;
 		_undoBase = getFrameData(true).getVectorData(); //for use later by stackDo()
 		_layerManager.setCurrentLayer(p_layer);
-	} else {
-		Kage::timestamp_IN();
-		std::cout << "same layer!" << std::endl;
-		Kage::timestamp_OUT();
+		_document.Scenes[_document.getActiveSceneID()].setActiveLayerID(p_layer);
 	}
 }
 unsigned int Kage::getCurrentFrame() {
-	return _framesetManager.getCurrentFrame();
+	return _document.Scenes[_document.getActiveSceneID()].getCurrentFrame();
 }
 void Kage::setCurrentLayerByID(unsigned int p_layerID) {
 	cout << "setting undoBase B setCurrentLayerByID " << p_layerID << endl;
@@ -1839,7 +1839,7 @@ void Kage::setCurrentLayerByID(unsigned int p_layerID) {
 void Kage::setCurrentFrame(unsigned int p_layer) {
 	cout << "setting undoBase C setCurrentFrame " << endl;
 	_undoBase = getFrameData(true).getVectorData(); //for use later by stackDo()
-	_framesetManager.setCurrentFrame(p_layer);
+	_document.Scenes[_document.getActiveSceneID()].setCurrentFrame(p_layer);
 }
 
 void Kage::New_onClick() {
@@ -1847,33 +1847,34 @@ void Kage::New_onClick() {
 		return;
 	}
 	
-	m_Library.resetAssetID();
+	_library.resetAssetID();
 	_assetManager.removeAllAssets();
 	
 	_layerManager.removeAllLayers();
-	_framesetManager.removeAllFrames();
-	_framesetManager.addFrameset(_layerManager.addLayer());
+	_document.Scenes[_document.getActiveSceneID()].removeAllFrames();
+	_document.Scenes[_document.getActiveSceneID()].addLayer(_layerManager.addLayer());
 	
 	_undoRedoManager.clear();
 	stackDo();
 	
 	refreshUI();
 	
-	_framesetManager.setCurrentLayer(1);
-	_framesetManager.setCurrentFrame(1);
+	_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(1);
+	_document.Scenes[_document.getActiveSceneID()].setCurrentFrame(1);
 	
 	currentTool = toggleButtons[0];
 	currentTool->set_active(true);
 	
-	m_KageStage.cleanSlate();
+	_stage.cleanSlate();
 	
-	m_KageStage.invalidateToRender();
+	_stage.invalidateToRender();
 	
 	ksfPath = "Untitled";
 	
 	m_PropStage.setWidthText(_document.Project._width);
 	m_PropStage.setHeightText(_document.Project._height);
-	m_PropStage.setFPSText(m_KageStage.fps);
+	m_PropStage.setFPSText(_document.Project._fps);
+	m_PropStage.setBackgroundColor(getStageBG());
 	
 	set_title(ksfPath + " - " + KageAbout::app_title);
 	updateStatus("Ready");
@@ -1987,24 +1988,24 @@ void Kage::doSave(string p_filename) {
 	
 	unsigned int l_lMax = _layerManager.layerCount();
 	unsigned int i;
-		unsigned int l_fMax = _framesetManager.frameCount();
+		unsigned int l_fMax = _document.Scenes[_document.getActiveSceneID()].frameCount();
 		unsigned int j;
 			unsigned int l_currentLayer;
 			unsigned int l_currentFrame;
 	
 	saveKageStudio(ksfPath, "<KageStudio version=\"2020.03.10\">");
 	saveKageStudio(ksfPath, "<stage width=\"" + StringHelper::StringHelper::doubleToString(_document.Project._width) + "\" height=\"" + StringHelper::StringHelper::doubleToString(_document.Project._height) + "\" " +
-							"background=\"rgb(" + StringHelper::integerToString(m_KageStage.stageBG.getR()) + ", " + StringHelper::integerToString(m_KageStage.stageBG.getG()) + ", " + StringHelper::integerToString(m_KageStage.stageBG.getB()) + ")\" " +
-							"fps=\"" + StringHelper::integerToString(m_KageStage.fps) + "\" " +
+							"background=\"rgb(" + StringHelper::integerToString(_document.Project._backgroundColor.getR()) + ", " + StringHelper::integerToString(_document.Project._backgroundColor.getG()) + ", " + StringHelper::integerToString(_document.Project._backgroundColor.getB()) + ")\" " +
+							"fps=\"" + StringHelper::integerToString(_document.Project._fps) + "\" " +
 							"layers=\"" + StringHelper::integerToString(l_lMax) + "\" " +
 							"frames=\"" + StringHelper::integerToString(l_fMax) + "\" />");
 		l_currentLayer = getCurrentLayer();
 		l_currentFrame = getCurrentFrame();
 			for (i = 1; i <= l_lMax; i++) {
-				_framesetManager.setCurrentLayer(i);
+				_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(i);
 				saveKageStudio(ksfPath, "<layer" + StringHelper::unsignedIntegerToString(i) + " label=\"" + _layerManager.getLabel() + "\" visible=\"" + (_layerManager.isLayerVisible()?"true":"false") + "\" locked=\"" + (_layerManager.isLayerLocked()?"true":"false") + "\">");
 				for (j = 1; j <= l_fMax; ++j) {
-					KageFrame *l_frame = _framesetManager.getFrameAt(j);
+					KageFrame *l_frame = _document.Scenes[_document.getActiveSceneID()].getFrameAt(j);
 					KageFrame::extension l_extension = l_frame->getExtension();
 					string l_tween = "";
 					if (l_frame->getTween() > 0) {
@@ -2012,11 +2013,11 @@ void Kage::doSave(string p_filename) {
 					}
 					if (l_extension == KageFrame::EXTENSION_NOT) {
 						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + l_tween + ">");
-						_framesetManager.setCurrentFrame(j);
+						_document.Scenes[_document.getActiveSceneID()].setCurrentFrame(j);
 						saveKageStudio(ksfPath, saveFrame() + "</frame" + StringHelper::unsignedIntegerToString(j) + ">");
 					} else if (l_extension == KageFrame::EXTENSION_START) {
 						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + " extend=\"start\"" + l_tween + ">");
-						_framesetManager.setCurrentFrame(j);
+						_document.Scenes[_document.getActiveSceneID()].setCurrentFrame(j);
 						saveKageStudio(ksfPath, saveFrame() + "</frame" + StringHelper::unsignedIntegerToString(j) + ">");
 					} else if (l_extension == KageFrame::EXTENSION_MID) {
 						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + " extend=\"mid\"" + l_tween + " />");
@@ -2027,7 +2028,7 @@ void Kage::doSave(string p_filename) {
 				saveKageStudio(ksfPath, "</layer" + StringHelper::unsignedIntegerToString(i) + ">");
 			}
 		setCurrentLayer(l_currentLayer);
-		_framesetManager.setCurrentFrame(l_currentFrame);
+		_document.Scenes[_document.getActiveSceneID()].setCurrentFrame(l_currentFrame);
 	if (saveKageStudio(ksfPath, "</KageStudio>") == true) {
 		updateStatus("Saved to " + ksfPath);
 		
@@ -2073,7 +2074,7 @@ void Kage::ExportKS_onClick() {
 			exportKonsolScript(ksPath, "}");
 			exportKonsolScript(ksPath, "function main() {");
 			exportKonsolScript(ksPath, "\t//add variable initialization...");
-			exportKonsolScript(ksPath, "\tKonsol:RGB(" + StringHelper::integerToString(m_KageStage.stageBG.getR()) + ", " + StringHelper::integerToString(m_KageStage.stageBG.getG()) + "," + StringHelper::integerToString(m_KageStage.stageBG.getB()) + ", bgcolor)");
+			exportKonsolScript(ksPath, "\tKonsol:RGB(" + StringHelper::integerToString(_document.Project._backgroundColor.getR()) + ", " + StringHelper::integerToString(_document.Project._backgroundColor.getG()) + "," + StringHelper::integerToString(_document.Project._backgroundColor.getB()) + ", bgcolor)");
 			if (exportKonsolScript(ksPath, "}") == true) {
 				updateStatus("Exported to " + ksPath);
 			} else {
@@ -2107,7 +2108,7 @@ void Kage::ExportHTML5_onClick() {
 			
 			unsigned int l_lMax = _layerManager.layerCount();
 			unsigned int i;
-				unsigned int l_fMax = _framesetManager.frameCount();
+				unsigned int l_fMax = _document.Scenes[_document.getActiveSceneID()].frameCount();
 				unsigned int j;
 					unsigned int t;
 			
@@ -2119,10 +2120,10 @@ void Kage::ExportHTML5_onClick() {
 			exportHtml5(expPath, "\tmain();");
 			exportHtml5(expPath, "\tscreen = document.getElementById('screen').getContext('2d');");
 			if (l_fMax > 1) {
-				exportHtml5(expPath, "\tsetInterval(kagestudio_loop, " + StringHelper::integerToString(1000/m_KageStage.fps) + ");");
+				exportHtml5(expPath, "\tsetInterval(kagestudio_loop, " + StringHelper::integerToString(1000/_document.Project._fps) + ");");
 				exportHtml5(expPath, "}");
 				exportHtml5(expPath, "function kagestudio_screencls() {");
-				exportHtml5(expPath, "\tscreen.fillStyle = \"rgb(" + StringHelper::integerToString(m_KageStage.stageBG.getR()) + ", " + StringHelper::integerToString(m_KageStage.stageBG.getG()) + "," + StringHelper::integerToString(m_KageStage.stageBG.getB()) + ")\";");
+				exportHtml5(expPath, "\tscreen.fillStyle = \"rgb(" + StringHelper::integerToString(_document.Project._backgroundColor.getR()) + ", " + StringHelper::integerToString(_document.Project._backgroundColor.getG()) + "," + StringHelper::integerToString(_document.Project._backgroundColor.getB()) + ")\";");
 				exportHtml5(expPath, "\tscreen.fillRect(0, 0, " + StringHelper::doubleToString(_document.Project._width) + ", " + StringHelper::doubleToString(_document.Project._height) + ");");
 				exportHtml5(expPath, "}");
 				exportHtml5(expPath, "function kagestudio_loop() {");
@@ -2132,7 +2133,7 @@ void Kage::ExportHTML5_onClick() {
 				exportHtml5(expPath, "\tif (frame > frameMax) { frame = 1; }");
 				exportHtml5(expPath, "}");
 			} else {
-				exportHtml5(expPath, "\tscreen.fillStyle = \"rgb(" + StringHelper::integerToString(m_KageStage.stageBG.getR()) + ", " + StringHelper::integerToString(m_KageStage.stageBG.getG()) + "," + StringHelper::integerToString(m_KageStage.stageBG.getB()) + ")\";");
+				exportHtml5(expPath, "\tscreen.fillStyle = \"rgb(" + StringHelper::integerToString(_document.Project._backgroundColor.getR()) + ", " + StringHelper::integerToString(_document.Project._backgroundColor.getG()) + "," + StringHelper::integerToString(_document.Project._backgroundColor.getB()) + ")\";");
 				exportHtml5(expPath, "\tscreen.fillRect(0, 0, " + StringHelper::doubleToString(_document.Project._width) + ", " + StringHelper::doubleToString(_document.Project._height) + ");");
 				exportHtml5(expPath, "\tks_f1();");
 				exportHtml5(expPath, "}");
@@ -2140,10 +2141,10 @@ void Kage::ExportHTML5_onClick() {
 				t = getCurrentLayer();
 				unsigned int f = getCurrentFrame();
 					for (j = 1; j <= l_fMax; ++j) {
-						_framesetManager.setCurrentFrame(j);
+						_document.Scenes[_document.getActiveSceneID()].setCurrentFrame(j);
 						exportHtml5(expPath, "function ks_f" + StringHelper::unsignedIntegerToString(j) + "() {");
 						for (i = 1; i <= l_lMax; i++) {
-							_framesetManager.setCurrentLayer(i);
+							_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(i);
 							exportHtml5(expPath, dumpFrame(false));
 						}
 						exportHtml5(expPath, "}\n");
@@ -2185,7 +2186,7 @@ void Kage::ExportSVG_onClick() {
 			
 			unsigned int l_lMax = _layerManager.layerCount();
 			unsigned int i;
-				unsigned int l_fMax = _framesetManager.frameCount();
+				unsigned int l_fMax = _document.Scenes[_document.getActiveSceneID()].frameCount();
 				unsigned int j;
 					unsigned int t;
 			
@@ -2198,9 +2199,9 @@ void Kage::ExportSVG_onClick() {
 				string l_frameToSVG = "";
 				unsigned int f = getCurrentFrame();
 					//for (j = 1; j <= l_fMax; ++j) {
-					//	_framesetManager.setCurrentFrame(j);
+					//	_document.Scenes[_document.getActiveSceneID()].setCurrentFrame(j);
 						for (i = 1; i <= l_lMax; i++) {
-							_framesetManager.setCurrentLayer(i);
+							_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(i);
 							
 							l_layerToSVG =  "<g\n\tinkscape:label=\"" + _layerManager.getLabel() + "\"\n" +
 											"\tinkscape:groupmode=\"layer\"\n" +
@@ -2259,7 +2260,7 @@ void Kage::doExportPNGDialog(string p_title, bool p_transparent) {
 				l_pngPath = l_pngPath + ".png";
 			}
 			
-			if (m_KageStage.renderToPNG(l_pngPath, p_transparent) == true) {
+			if (_stage.renderToPNG(l_pngPath, p_transparent) == true) {
 				updateStatus("Exported to " + l_pngPath);
 			} else {
 				updateStatus("Unable to export!  Please try a different directory.");
@@ -2294,17 +2295,17 @@ void Kage::ExportPNGSpritesheet_onClick() {
 			
 			unsigned int l_lMax = _layerManager.layerCount();
 			unsigned int i;
-				unsigned int l_fMax = _framesetManager.frameCount();
+				unsigned int l_fMax = _document.Scenes[_document.getActiveSceneID()].frameCount();
 				unsigned int j;
 					unsigned int t;
 					unsigned int f;
 				
 				GdkPoint l_tempOrigin;
-				l_tempOrigin.x = m_KageStage.origin.x;
-				l_tempOrigin.y = m_KageStage.origin.y;
+				l_tempOrigin.x = _stage.origin.x;
+				l_tempOrigin.y = _stage.origin.y;
 				
-				m_KageStage.origin.x = 0;
-				m_KageStage.origin.y = 0;
+				_stage.origin.x = 0;
+				_stage.origin.y = 0;
 				
 				t = getCurrentLayer();
 				f = getCurrentFrame();
@@ -2313,11 +2314,11 @@ void Kage::ExportPNGSpritesheet_onClick() {
 					Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
 
 					for (j = 1; j <= l_fMax; ++j) {
-						_framesetManager.setCurrentFrame(j);
+						_document.Scenes[_document.getActiveSceneID()].setCurrentFrame(j);
 						
 						for (i = 1; i <= l_lMax; i++) {
-							_framesetManager.setCurrentLayer(i);
-							m_KageStage.renderFrameOffset(l_context, true, _document.Project._width*(j-1));
+							_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(i);
+							_stage.renderFrameOffset(l_context, true, _document.Project._width*(j-1));
 						}
 					}
 
@@ -2325,8 +2326,8 @@ void Kage::ExportPNGSpritesheet_onClick() {
 				setCurrentFrame(f);
 				setCurrentLayer(t);
 
-				m_KageStage.origin.x = l_tempOrigin.x;
-				m_KageStage.origin.y = l_tempOrigin.y;
+				_stage.origin.x = l_tempOrigin.x;
+				_stage.origin.y = l_tempOrigin.y;
 			
 			updateStatus("Exported to " + l_pngPath);
 			break;
@@ -2359,31 +2360,31 @@ void Kage::ExportPNGSequence_onClick() {
 			
 			unsigned int l_lMax = _layerManager.layerCount();
 			unsigned int i;
-				unsigned int l_fMax = _framesetManager.frameCount();
+				unsigned int l_fMax = _document.Scenes[_document.getActiveSceneID()].frameCount();
 				unsigned int j;
 					unsigned int t;
 					unsigned int f;
 				
 				
 				GdkPoint l_tempOrigin;
-				l_tempOrigin.x = m_KageStage.origin.x;
-				l_tempOrigin.y = m_KageStage.origin.y;
+				l_tempOrigin.x = _stage.origin.x;
+				l_tempOrigin.y = _stage.origin.y;
 				
-				m_KageStage.origin.x = 0;
-				m_KageStage.origin.y = 0;
+				_stage.origin.x = 0;
+				_stage.origin.y = 0;
 						
 				t = getCurrentLayer();
 				f = getCurrentFrame();
 					
 					for (j = 1; j <= l_fMax; ++j) {
-						_framesetManager.setCurrentFrame(j);
+						_document.Scenes[_document.getActiveSceneID()].setCurrentFrame(j);
 						
 						Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, _document.Project._width, _document.Project._height);
 						Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
 						
 							for (i = 1; i <= l_lMax; i++) {
-								_framesetManager.setCurrentLayer(i);
-								m_KageStage.renderFrame(l_context);
+								_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(i);
+								_stage.renderFrame(l_context);
 							}
 						
 						if (j < 10) {
@@ -2402,8 +2403,8 @@ void Kage::ExportPNGSequence_onClick() {
 				setCurrentFrame(f);
 				setCurrentLayer(t);
 			
-				m_KageStage.origin.x = l_tempOrigin.x;
-				m_KageStage.origin.y = l_tempOrigin.y;
+				_stage.origin.x = l_tempOrigin.x;
+				_stage.origin.y = l_tempOrigin.y;
 			
 			updateStatus("Exported to " + l_pngSequencePath);
 			break;
@@ -2465,9 +2466,9 @@ void Kage::ImportAsset_onClick() {
 					if (l_image != UINT_MAX) {
 						_assetManager.setAssetType(KageAsset::AssetType::ASSET_IMAGE);
 						cout << " " << _assetManager.getImagePathByID(l_image);
-						unsigned int l_asdasd = m_KageStage.addImage(l_image);
+						unsigned int l_asdasd = _stage.addImage(l_image);
 						_assetManager.render(l_asdasd);
-						//m_Library.render(l_asdasd);
+						//_library.render(l_asdasd);
 						updateStatus("Importing of PNG is under construction " + l_importPath);
 					} else {
 						updateStatus("Failed to import " + l_importPath);
@@ -2517,11 +2518,22 @@ void Kage::ExportVideo_onClick() {
 		filter_mkv->add_mime_type("video/x-matroska");
 		filter_mkv->add_pattern("*.mkv");
 			dialog.add_filter(filter_mkv);
+	auto filter_ogv = Gtk::FileFilter::create();
+		filter_ogv->set_name("Ogg files");
+		filter_ogv->add_mime_type("video/ogg");
+		filter_ogv->add_pattern("*.ogv");
+			dialog.add_filter(filter_ogv);
 	auto filter_mp4 = Gtk::FileFilter::create();
 		filter_mp4->set_name("MPEG Part 14 files");
 		filter_mp4->add_mime_type("video/mp4");
 		filter_mp4->add_pattern("*.mp4");
 			dialog.add_filter(filter_mp4);
+	auto filter_mov = Gtk::FileFilter::create();
+		filter_mov->set_name("QuickTime File Format files");
+		filter_mov->add_mime_type("video/quicktime");
+		filter_mov->add_pattern("*.mov");
+			dialog.add_filter(filter_mov);
+			
 	
 	int result = dialog.run();
 	string l_extension = "";
@@ -2540,6 +2552,12 @@ void Kage::ExportVideo_onClick() {
 				l_pngPath = l_pngPath.substr(0, l_len);
 				l_extension = ".mkv";
 				l_format = "-vcodec libx264";
+			} else if (StringHelper::toLower(l_pngPath).substr(l_len, 4) == ".mov") {
+				l_extension = ".mov";
+				l_format = "-vcodec libx264 -pix_fmt yuv420p -f mov";
+			} else if (StringHelper::toLower(l_pngPath).substr(l_len, 4) == ".ogv") {
+				l_extension = ".ogv";
+				l_format = "-vcodec libtheora -qscale:v 1 -f ogv";
 			} else { //if (StringHelper::toLower(l_pngPath).substr(l_len, 4) == ".mp4") {
 				//l_pngPath = l_pngPath.substr(0, l_len);
 				l_extension = ".mp4";
@@ -2558,35 +2576,35 @@ void Kage::ExportVideo_onClick() {
 			
 			unsigned int l_lMax = _layerManager.layerCount();
 			unsigned int i;
-				unsigned int l_fMax = _framesetManager.frameCount();
+				unsigned int l_fMax = _document.Scenes[_document.getActiveSceneID()].frameCount();
 				unsigned int j;
 					unsigned int t;
 					unsigned int f;
-				unsigned int l_FPS = m_KageStage.fps;
-				if (l_fMax < m_KageStage.fps) {
+				unsigned int l_FPS = _document.Project._fps;
+				if (l_fMax < _document.Project._fps) {
 					l_FPS = l_fMax;
 				}
 				
 				GdkPoint l_tempOrigin;
-				l_tempOrigin.x = m_KageStage.origin.x;
-				l_tempOrigin.y = m_KageStage.origin.y;
+				l_tempOrigin.x = _stage.origin.x;
+				l_tempOrigin.y = _stage.origin.y;
 				
-				m_KageStage.origin.x = 0;
-				m_KageStage.origin.y = 0;
+				_stage.origin.x = 0;
+				_stage.origin.y = 0;
 						
 				t = getCurrentLayer();
 				f = getCurrentFrame();
 					
 					for (j = 1; j <= l_fMax; ++j) {
-						_framesetManager.setCurrentFrame(j);
+						_document.Scenes[_document.getActiveSceneID()].setCurrentFrame(j);
 						
 						Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, _document.Project._width, _document.Project._height);
 						Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
 						
-							m_KageStage.clearScreen(l_context);
+							_stage.clearScreen(l_context);
 							for (i = 1; i <= l_lMax; i++) {
-								_framesetManager.setCurrentLayer(i);
-								m_KageStage.renderFrame(l_context, true);
+								_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(i);
+								_stage.renderFrame(l_context, true);
 							}
 						
 						if (j < 10) {
@@ -2606,15 +2624,15 @@ void Kage::ExportVideo_onClick() {
 					if ((l_fMax % l_FPS) != 0) {
 						unsigned int l_padding = l_FPS - ((l_fMax % l_FPS));
 						for (j = 1; j <= l_padding; ++j) {
-							_framesetManager.setCurrentFrame(l_fMax);
+							_document.Scenes[_document.getActiveSceneID()].setCurrentFrame(l_fMax);
 							
 							Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, _document.Project._width, _document.Project._height);
 							Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
 							
-								m_KageStage.clearScreen(l_context);
+								_stage.clearScreen(l_context);
 								for (i = 1; i <= l_lMax; i++) {
-									_framesetManager.setCurrentLayer(i);
-									m_KageStage.renderFrame(l_context, true);
+									_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(i);
+									_stage.renderFrame(l_context, true);
 								}
 							
 							if (l_fMax+j < 10) {
@@ -2635,8 +2653,8 @@ void Kage::ExportVideo_onClick() {
 				setCurrentFrame(f);
 				setCurrentLayer(t);
 			
-				m_KageStage.origin.x = l_tempOrigin.x;
-				m_KageStage.origin.y = l_tempOrigin.y;
+				_stage.origin.x = l_tempOrigin.x;
+				_stage.origin.y = l_tempOrigin.y;
 			
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 			if (runExternal(".\\ffmpeg", "-y -framerate " + StringHelper::unsignedIntegerToString(l_FPS) + " -i \"" + l_pngPath + "%05d.png\" " + l_format + " -b:v 2048k \"" + l_pngPath + l_extension + "\"")) {
@@ -2655,7 +2673,7 @@ void Kage::ExportVideo_onClick() {
 }
 
 void Kage::ProjectSave_onClick() {
-	Gtk::FileChooserDialog dialog("Please choose a folder", Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
+	Gtk::FileChooserDialog dialog("Save Project", Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
 //	dialog.set_transient_for( * this);
 	//Add response buttons the the dialog:
 	dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -2684,8 +2702,10 @@ void Kage::Play_onClick() {
 	Stop_onClick();
 	tickCounter = 0;
 	frameCounter = 0;
+	m_start_time = 0;
 	_isPlaying = true;
-	m_tick_id = m_KageStage.add_tick_callback( sigc::mem_fun(*this, &Kage::on_tick) );
+	_stage.fpsElapse = (double)(45/_document.Project._fps); //compensate for processing time -- aiming for 60Hz compatibility
+	m_tick_id = _stage.add_tick_callback( sigc::mem_fun(*this, &Kage::on_tick) );
 }
 
 void Kage::PlayFrame_onClick() {
@@ -2696,7 +2716,7 @@ void Kage::PlayFrame_onClick() {
 
 void Kage::Stop_onClick() {
 	if (_isPlaying == true) {
-		m_KageStage.remove_tick_callback(m_tick_id);
+		_stage.remove_tick_callback(m_tick_id);
 		_isPlaying = false;
 	}
 }
@@ -2704,28 +2724,29 @@ void Kage::Stop_onClick() {
 bool Kage::on_tick(const Glib::RefPtr<Gdk::FrameClock>& frame_clock) {
 	if (m_start_time == 0) {
 		m_start_time = frame_clock->get_frame_time();
+		return true;
 	}
 	
 	const gint64 current_time = frame_clock->get_frame_time();
 	const double f = ((current_time - m_start_time) % cycle_time) / (double)cycle_time;
 	
-	if (f >= m_KageStage.fpsElapse) {
+	if (f >= _stage.fpsElapse) {
 		//m_start_time = 0;
 	}
 	
 	++tickCounter;
-	if (tickCounter >= (60/m_KageStage.fps)) { //working for 60Hz
+	if (tickCounter >= _stage.fpsElapse) {
 		tickCounter = 0;
 		
 		++frameCounter;
-		if (frameCounter > _framesetManager.frameCount()) {
-			frameCounter = _framesetManager.frameCount();
+		if (frameCounter > _document.frameCount()) {
+			frameCounter = _document.frameCount();
 			
-			m_KageStage.remove_tick_callback(m_tick_id);
+			_stage.remove_tick_callback(m_tick_id);
 			_isPlaying = false;
 		}
 		
-		_framesetManager.setCurrentFrame(frameCounter);
+		_document.setCurrentFrame(frameCounter);
 		//renderFrames(); ^setCurrentFrame automatically calls renderFrames, somehow
 	}
 	
@@ -2754,7 +2775,7 @@ void Kage::addToolButton(const Glib::ustring &label) {
 
 void Kage::btnDebug_onClick() {
 	//print vectors in Stage
-	m_KageStage.printVectors();
+	_stage.printVectors();
 }
 
 void Kage::btnAbout_onClick() {
@@ -2853,22 +2874,22 @@ void Kage::updateSelectedShapeColor(bool p_doFill, bool p_doStroke) {
 	double l_alphaValue;
 	if (p_doFill == true) {
 		m_Color = m_propFillStroke.getFillColor();
-		m_KageStage.setFill  (m_Color);
+		_stage.setFill  (m_Color);
 		
 		l_alphaValue = m_propFillStroke.getFillScaleAlpha();
-		m_KageStage.fillColor.setA((int) (l_alphaValue * 255.0f/ 100.0f));
+		_stage.fillColor.setA((int) (l_alphaValue * 255.0f/ 100.0f));
 	}
 	if (p_doStroke == true) {
 		m_Color = m_propFillStroke.getStrokeColor();
-		m_KageStage.setStroke(m_Color);
+		_stage.setStroke(m_Color);
 		
 		l_alphaValue = m_propFillStroke.getStrokeScaleAlpha();
-		m_KageStage.stroke.setA((int) (l_alphaValue * 255.0f/ 100.0f));
+		_stage.stroke.setA((int) (l_alphaValue * 255.0f/ 100.0f));
 		
 		double l_dbl = StringHelper::toDouble(m_propFillStroke.getStrokeThicknessText());
 		KageStage::stroke.setThickness(l_dbl);
 	}
-	m_KageStage.updateShapeColor(p_doFill, p_doStroke);
+	_stage.updateShapeColor(p_doFill, p_doStroke);
 }
 
 string Kage::saveFrame() {
@@ -2889,7 +2910,7 @@ string Kage::saveFrame() {
 				break;
 			case VectorData::TYPE_INIT:
 				if (v[i].points.size() == 1) {
-					l_ostringstream << "<init>" << v[i].points[0].x*m_KageStage.currentScale << " " << v[i].points[0].y*m_KageStage.currentScale << "</init>\n";
+					l_ostringstream << "<init>" << v[i].points[0].x*_stage.currentScale << " " << v[i].points[0].y*_stage.currentScale << "</init>\n";
 				} else {
 					l_ostringstream << "<init/>\n";
 				}
@@ -2917,21 +2938,21 @@ string Kage::saveFrame() {
 					}
 				break;
 			case VectorData::TYPE_MOVE:
-				l_ostringstream << "\t<move>" << v[i].points[0].x*m_KageStage.currentScale << " " << v[i].points[0].y*m_KageStage.currentScale << "</move>\n";
+				l_ostringstream << "\t<move>" << v[i].points[0].x*_stage.currentScale << " " << v[i].points[0].y*_stage.currentScale << "</move>\n";
 				break;
 			case VectorData::TYPE_LINE: //currently not used
-				l_ostringstream << "\t<line>" << v[i].points[0].x*m_KageStage.currentScale << " " << v[i].points[0].y*m_KageStage.currentScale << "</line>\n";
+				l_ostringstream << "\t<line>" << v[i].points[0].x*_stage.currentScale << " " << v[i].points[0].y*_stage.currentScale << "</line>\n";
 				break;
 			case VectorData::TYPE_CURVE_QUADRATIC:
 			case VectorData::TYPE_CURVE_CUBIC:
-				l_ostringstream << "\t<curve>" << v[i].points[0].x*m_KageStage.currentScale << " " << v[i].points[0].y*m_KageStage.currentScale << " " << v[i].points[1].x*m_KageStage.currentScale << " " << v[i].points[1].y*m_KageStage.currentScale << " " << v[i].points[2].x*m_KageStage.currentScale << " " << v[i].points[2].y*m_KageStage.currentScale << "</curve>\n";
+				l_ostringstream << "\t<curve>" << v[i].points[0].x*_stage.currentScale << " " << v[i].points[0].y*_stage.currentScale << " " << v[i].points[1].x*_stage.currentScale << " " << v[i].points[1].y*_stage.currentScale << " " << v[i].points[2].x*_stage.currentScale << " " << v[i].points[2].y*_stage.currentScale << "</curve>\n";
 				break;
 			case VectorData::TYPE_IMAGE:
 				//p1 x/y == ID / imageBuff
 				//p2 x/y == x / y
 				//p3 x/y == scale / rotate
 				//TODO: save the filename too! -- maybe use ID?
-				l_ostringstream << "\t<image id=\"" << v[i].points[0].x << "\" buff=\"" << v[i].points[0].y << "\" x=\"" << v[i].points[1].x*m_KageStage.currentScale << "\" y=\"" << v[i].points[1].y*m_KageStage.currentScale << "\" scale=\"" << v[i].points[2].x << "\" rotate=\"" << v[i].points[2].y << "\" filename=\"\" />\n";
+				l_ostringstream << "\t<image id=\"" << v[i].points[0].x << "\" buff=\"" << v[i].points[0].y << "\" x=\"" << v[i].points[1].x*_stage.currentScale << "\" y=\"" << v[i].points[1].y*_stage.currentScale << "\" scale=\"" << v[i].points[2].x << "\" rotate=\"" << v[i].points[2].y << "\" filename=\"\" />\n";
 				break;
 		}
 	}
@@ -3029,9 +3050,9 @@ string Kage::dumpFrame(bool bKS) {
 				break;
 			case VectorData::TYPE_MOVE:
 				if (bKS == true) {
-					l_ostringstream << "Draw:MoveTo(" << v[i].points[0].x*m_KageStage.currentScale << ", " << v[i].points[0].y*m_KageStage.currentScale << ", screen)\n";
+					l_ostringstream << "Draw:MoveTo(" << v[i].points[0].x*_stage.currentScale << ", " << v[i].points[0].y*_stage.currentScale << ", screen)\n";
 				} else {
-					l_ostringstream << "screen.moveTo(" << v[i].points[0].x*m_KageStage.currentScale << ", " << v[i].points[0].y*m_KageStage.currentScale << ");\n";
+					l_ostringstream << "screen.moveTo(" << v[i].points[0].x*_stage.currentScale << ", " << v[i].points[0].y*_stage.currentScale << ");\n";
 				}
 				
 				p.x = v[i].points[0].x;
@@ -3039,9 +3060,9 @@ string Kage::dumpFrame(bool bKS) {
 				break;
 			case VectorData::TYPE_LINE:
 				if (bKS == true) {
-					l_ostringstream << "Draw:LineTo(" << v[i].points[0].x*m_KageStage.currentScale << ", " << v[i].points[0].y*m_KageStage.currentScale << ", screen)\n";
+					l_ostringstream << "Draw:LineTo(" << v[i].points[0].x*_stage.currentScale << ", " << v[i].points[0].y*_stage.currentScale << ", screen)\n";
 				} else {
-					l_ostringstream << "screen.lineTo(" << v[i].points[0].x*m_KageStage.currentScale << ", " << v[i].points[0].y*m_KageStage.currentScale << ");\n";
+					l_ostringstream << "screen.lineTo(" << v[i].points[0].x*_stage.currentScale << ", " << v[i].points[0].y*_stage.currentScale << ");\n";
 				}
 				
 				p.x = v[i].points[0].x;
@@ -3049,9 +3070,9 @@ string Kage::dumpFrame(bool bKS) {
 				break;
 			case VectorData::TYPE_CURVE_QUADRATIC:
 				if (bKS == true) {
-					l_ostringstream << "Draw:CurveTo(" << p.x*m_KageStage.currentScale << ", " << p.y*m_KageStage.currentScale << ", " << v[i].points[0].x*m_KageStage.currentScale << ", " << v[i].points[0].y*m_KageStage.currentScale << ", " << v[i].points[1].x*m_KageStage.currentScale << ", " << v[i].points[1].y*m_KageStage.currentScale << ", screen)\n";
+					l_ostringstream << "Draw:CurveTo(" << p.x*_stage.currentScale << ", " << p.y*_stage.currentScale << ", " << v[i].points[0].x*_stage.currentScale << ", " << v[i].points[0].y*_stage.currentScale << ", " << v[i].points[1].x*_stage.currentScale << ", " << v[i].points[1].y*_stage.currentScale << ", screen)\n";
 				} else {
-					l_ostringstream << "screen.quadraticCurveTo(" << p.x*m_KageStage.currentScale << ", " << p.y*m_KageStage.currentScale << ", " << v[i].points[0].x*m_KageStage.currentScale << ", " << v[i].points[0].y*m_KageStage.currentScale << ", " << v[i].points[1].x*m_KageStage.currentScale << ", " << v[i].points[1].y*m_KageStage.currentScale << ");\n";
+					l_ostringstream << "screen.quadraticCurveTo(" << p.x*_stage.currentScale << ", " << p.y*_stage.currentScale << ", " << v[i].points[0].x*_stage.currentScale << ", " << v[i].points[0].y*_stage.currentScale << ", " << v[i].points[1].x*_stage.currentScale << ", " << v[i].points[1].y*_stage.currentScale << ");\n";
 				}
 				
 				p.x = v[i].points[1].x;
@@ -3060,10 +3081,10 @@ string Kage::dumpFrame(bool bKS) {
 			case VectorData::TYPE_CURVE_CUBIC:
 				if (bKS == true) {
 //					l_ostringstream << "Draw:CubicCurveTo(" << p.x << ", " << p.y << ", " << v[i].points[0].x << ", " << v[i].points[0].y << ", " << v[i].points[1].x << ", " << v[i].points[1].y << ", screen)\n";
-					l_ostringstream << "Draw:CubicCurveTo(" << v[i].points[0].x*m_KageStage.currentScale << ", " << v[i].points[0].y*m_KageStage.currentScale << ", " << v[i].points[1].x*m_KageStage.currentScale << ", " << v[i].points[1].y*m_KageStage.currentScale << ", " << v[i].points[2].x*m_KageStage.currentScale << ", " << v[i].points[2].y*m_KageStage.currentScale << ", screen)\n";
+					l_ostringstream << "Draw:CubicCurveTo(" << v[i].points[0].x*_stage.currentScale << ", " << v[i].points[0].y*_stage.currentScale << ", " << v[i].points[1].x*_stage.currentScale << ", " << v[i].points[1].y*_stage.currentScale << ", " << v[i].points[2].x*_stage.currentScale << ", " << v[i].points[2].y*_stage.currentScale << ", screen)\n";
 				} else {
 //					l_ostringstream << "screen.bezierCurveTo(" << p.x << ", " << p.y << ", " << v[i].points[0].x << ", " << v[i].points[0].y << ", " << v[i].points[1].x << ", " << v[i].points[1].y << ");\n";
-					l_ostringstream << "screen.bezierCurveTo(" << v[i].points[0].x*m_KageStage.currentScale << ", " << v[i].points[0].y*m_KageStage.currentScale << ", " << v[i].points[1].x*m_KageStage.currentScale << ", " << v[i].points[1].y*m_KageStage.currentScale << ", " << v[i].points[2].x*m_KageStage.currentScale << ", " << v[i].points[2].y*m_KageStage.currentScale << ");\n";
+					l_ostringstream << "screen.bezierCurveTo(" << v[i].points[0].x*_stage.currentScale << ", " << v[i].points[0].y*_stage.currentScale << ", " << v[i].points[1].x*_stage.currentScale << ", " << v[i].points[1].y*_stage.currentScale << ", " << v[i].points[2].x*_stage.currentScale << ", " << v[i].points[2].y*_stage.currentScale << ");\n";
 				}
 				//p.x = v[i].points[1].x;
 				//p.y = v[i].points[1].y;
@@ -3123,8 +3144,8 @@ string Kage::dumpFrameToSvg() {
 				
 				l_initFlag = true;
 				if (v[i].points.size() == 1) {
-					l_ostringstream << "\t<g inkscape:transform-center-x=\"" << StringHelper::doubleToString(v[i].points[0].x*m_KageStage.currentScale) << "\" " <<
-						                     "inkscape:transform-center-y=\"" << StringHelper::doubleToString(v[i].points[0].y*m_KageStage.currentScale) << "\">\n";
+					l_ostringstream << "\t<g inkscape:transform-center-x=\"" << StringHelper::doubleToString(v[i].points[0].x*_stage.currentScale) << "\" " <<
+						                     "inkscape:transform-center-y=\"" << StringHelper::doubleToString(v[i].points[0].y*_stage.currentScale) << "\">\n";
 				} else {
 					l_ostringstream << "\t<g>\n";
 				}
@@ -3148,25 +3169,25 @@ string Kage::dumpFrameToSvg() {
 					}
 				break;
 			case VectorData::TYPE_MOVE:
-				l_ostringstream << " M " << v[i].points[0].x*m_KageStage.currentScale << " " << v[i].points[0].y*m_KageStage.currentScale;
+				l_ostringstream << " M " << v[i].points[0].x*_stage.currentScale << " " << v[i].points[0].y*_stage.currentScale;
 				
 				p.x = v[i].points[0].x;
 				p.y = v[i].points[0].y;
 				break;
 			case VectorData::TYPE_LINE:
-				l_ostringstream << " L " << v[i].points[0].x*m_KageStage.currentScale << " " << v[i].points[0].y*m_KageStage.currentScale;
+				l_ostringstream << " L " << v[i].points[0].x*_stage.currentScale << " " << v[i].points[0].y*_stage.currentScale;
 				
 				p.x = v[i].points[0].x;
 				p.y = v[i].points[0].y;
 				break;
 			case VectorData::TYPE_CURVE_QUADRATIC:
-				l_ostringstream << " Q " << p.x*m_KageStage.currentScale << " " << p.y*m_KageStage.currentScale << " " << v[i].points[0].x*m_KageStage.currentScale << " " << v[i].points[0].y*m_KageStage.currentScale << " " << v[i].points[1].x*m_KageStage.currentScale << " " << v[i].points[1].y*m_KageStage.currentScale;
+				l_ostringstream << " Q " << p.x*_stage.currentScale << " " << p.y*_stage.currentScale << " " << v[i].points[0].x*_stage.currentScale << " " << v[i].points[0].y*_stage.currentScale << " " << v[i].points[1].x*_stage.currentScale << " " << v[i].points[1].y*_stage.currentScale;
 				
 				p.x = v[i].points[1].x;
 				p.y = v[i].points[1].y;
 				break;
 			case VectorData::TYPE_CURVE_CUBIC:
-				l_ostringstream << "C " << v[i].points[0].x*m_KageStage.currentScale << " " << v[i].points[0].y*m_KageStage.currentScale << " " << v[i].points[1].x*m_KageStage.currentScale << " " << v[i].points[1].y*m_KageStage.currentScale << " " << v[i].points[2].x*m_KageStage.currentScale << " " << v[i].points[2].y*m_KageStage.currentScale;
+				l_ostringstream << "C " << v[i].points[0].x*_stage.currentScale << " " << v[i].points[0].y*_stage.currentScale << " " << v[i].points[1].x*_stage.currentScale << " " << v[i].points[1].y*_stage.currentScale << " " << v[i].points[2].x*_stage.currentScale << " " << v[i].points[2].y*_stage.currentScale;
 				
 				break;
 			case VectorData::TYPE_IMAGE:
@@ -3304,9 +3325,9 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 		if (l_tagname.substr(0, 5) == "layer") {
 			unsigned int l_layer = StringHelper::toUnsignedInteger(l_tagname.substr(5));
 			cout << "\t\t\t\t\tl_tagname LAYER\t" << l_layer << "\t" << l_properties.size() << endl;
-			while (l_layer > _framesetManager.layerCount()) {
-				_framesetManager.addFrameset(_layerManager.addLayer());
-				_framesetManager.setCurrentLayer(_layerManager.layerCount());
+			while (l_layer > _document.Scenes[_document.getActiveSceneID()].layerCount()) {
+				_document.Scenes[_document.getActiveSceneID()].addLayer(_layerManager.addLayer());
+				_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(_layerManager.layerCount());
 			}
 			
 			for (unsigned int l_propertyIndex = 0; l_propertyIndex < l_properties.size(); ++l_propertyIndex) {
@@ -3319,30 +3340,30 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 					_layerManager.setLock(StringHelper::toBoolean(l_properties[l_propertyIndex].getValue()));
 				}
 			}
-			_framesetManager.setCurrentLayer(l_layer);
+			_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(l_layer);
 		} else if (l_tagname.substr(0, 5) == "frame") {
 			unsigned int l_frame = StringHelper::toUnsignedInteger(l_tagname.substr(5));
-			while (l_frame > _framesetManager.frameCount()) {
-				_framesetManager.addFrame();
+			while (l_frame > _document.Scenes[_document.getActiveSceneID()].frameCount()) {
+				_document.Scenes[_document.getActiveSceneID()].addFrame();
 			}
-			_framesetManager.setCurrentFrame(l_frame);
+			_document.Scenes[_document.getActiveSceneID()].setCurrentFrame(l_frame);
 			for (unsigned int l_propertyIndex = 0; l_propertyIndex < l_properties.size(); ++l_propertyIndex) {
 				if (l_properties[l_propertyIndex].getName() == "extend") {
 					if (l_properties[l_propertyIndex].getValue() == "start") {
-						_framesetManager.setFrameExtension(KageFrame::EXTENSION_START);
+						_document.Scenes[_document.getActiveSceneID()].setFrameExtension(KageFrame::EXTENSION_START);
 					} else if (l_properties[l_propertyIndex].getValue() == "mid") {
-						_framesetManager.setFrameExtension(KageFrame::EXTENSION_MID);
+						_document.Scenes[_document.getActiveSceneID()].setFrameExtension(KageFrame::EXTENSION_MID);
 					} else if (l_properties[l_propertyIndex].getValue() == "end") {
-						_framesetManager.setFrameExtension(KageFrame::EXTENSION_END);
+						_document.Scenes[_document.getActiveSceneID()].setFrameExtension(KageFrame::EXTENSION_END);
 					}
 				} else if (l_properties[l_propertyIndex].getName() == "tween") {
 					string l_tweenValue = l_properties[l_propertyIndex].getValue();
 					if (l_tweenValue == "true") {
-						_framesetManager.forceSetTween(11);
+						_document.Scenes[_document.getActiveSceneID()].forceSetTween(11);
 					} else if (l_tweenValue == "false") {
-						_framesetManager.forceSetTween(0);
+						_document.Scenes[_document.getActiveSceneID()].forceSetTween(0);
 					} else {
-						_framesetManager.forceSetTween(StringHelper::toUnsignedInteger(l_tweenValue));
+						_document.Scenes[_document.getActiveSceneID()].forceSetTween(StringHelper::toUnsignedInteger(l_tweenValue));
 					}
 				}
 			}
@@ -3351,7 +3372,7 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 			
 			vector<double> l_numbers = parseNumbers(p_children[i]._value); //XY for rotation anchor
 			if (l_numbers.size() == 2) {
-				v.addInit(PointData(l_numbers[0]/m_KageStage.currentScale, l_numbers[1]/m_KageStage.currentScale));
+				v.addInit(PointData(l_numbers[0]/_stage.currentScale, l_numbers[1]/_stage.currentScale));
 			} else {
 				v.addInit();
 			}
@@ -3378,15 +3399,15 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 		} else if (l_tagname == "move") {
 			VectorDataManager v;
 			vector<double> l_numbers = parseNumbers(p_children[i]._value); //XY
-				v.addMove(PointData(l_numbers[0]/m_KageStage.currentScale, l_numbers[1]/m_KageStage.currentScale));
+				v.addMove(PointData(l_numbers[0]/_stage.currentScale, l_numbers[1]/_stage.currentScale));
 			addDataToFrame(v, true);
 		} else if (l_tagname == "cubiccurve" || l_tagname == "curve") {
 			VectorDataManager v;
 			vector<double> l_numbers = parseNumbers(p_children[i]._value); //XYs
 				v.addCubic(
-					PointData(l_numbers[0]/m_KageStage.currentScale, l_numbers[1]/m_KageStage.currentScale),
-					PointData(l_numbers[2]/m_KageStage.currentScale, l_numbers[3]/m_KageStage.currentScale),
-					PointData(l_numbers[4]/m_KageStage.currentScale, l_numbers[5]/m_KageStage.currentScale));
+					PointData(l_numbers[0]/_stage.currentScale, l_numbers[1]/_stage.currentScale),
+					PointData(l_numbers[2]/_stage.currentScale, l_numbers[3]/_stage.currentScale),
+					PointData(l_numbers[4]/_stage.currentScale, l_numbers[5]/_stage.currentScale));
 			addDataToFrame(v, true);
 		} else if (l_tagname == "closepath") {
 			VectorDataManager v;
@@ -3428,12 +3449,12 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 					_document.Project._height = StringHelper::toUnsignedInteger(l_properties[j].getValue());
 					m_PropStage.setHeightText(_document.Project._height);
 				} else if (l_properties[j].getName() == "fps") {
-					m_KageStage.fps = StringHelper::toUnsignedInteger(l_properties[j].getValue());
-					m_PropStage.setFPSText(m_KageStage.fps);
+					_document.Project._fps = StringHelper::toUnsignedInteger(l_properties[j].getValue());
+					m_PropStage.setFPSText(_document.Project._fps);
 				} else if (l_properties[j].getName() == "background") {
 					vector<int> l_colors = parseColorString(l_properties[j].getValue());
-					m_KageStage.stageBG = ColorData(l_colors[0], l_colors[1], l_colors[2]);
-					m_PropStage.setBackgroundColor(m_KageStage.getStageBG());
+					_document.Project._backgroundColor = ColorData(l_colors[0], l_colors[1], l_colors[2]);
+					m_PropStage.setBackgroundColor(getStageBG());
 				}
 			}
 		}
@@ -3444,7 +3465,7 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 			addDataToFrame(v, true);
 		}
 	}
-	m_KageStage.invalidateToRender();
+	_stage.invalidateToRender();
 	refreshUI();
 }
 void Kage::parseKSF(string p_content) {
@@ -3462,10 +3483,10 @@ void Kage::parseKSF(string p_content) {
 							|| l_xmlTagProperties[0].getValue() == "2020.03.10"
 						)
 					) {
-					KageFramesetManager::LOADING_MODE = true;
+					KageScene::LOADING_MODE = true;
 						parseKSF_Children(l_root._children);
 						updateStatus("Loaded " + ksfPath);
-					KageFramesetManager::LOADING_MODE = false;
+					KageScene::LOADING_MODE = false;
 				}
 			}
 		} else {
@@ -3558,5 +3579,22 @@ void Kage::timestamp_OUT() {
 }
 
 void Kage::focusOnStage() {
-	set_focus(m_KageStage);
+	set_focus(_stage);
+}
+
+
+void Kage::setStageBG(Gdk::Color p_c) {
+	_document.Project._backgroundColor.setR(p_c.get_red() / 255);
+	_document.Project._backgroundColor.setG(p_c.get_green() / 255);
+	_document.Project._backgroundColor.setB(p_c.get_blue() / 255);
+	_stage.invalidateToRender();
+}
+
+Gdk::Color Kage::getStageBG() {
+	Gdk::Color l_c;
+	l_c.set_red((gushort)_document.Project._backgroundColor.getR() * 255);
+	l_c.set_green((gushort)_document.Project._backgroundColor.getG() * 255);
+	l_c.set_blue((gushort)_document.Project._backgroundColor.getB() * 255);
+	
+	return l_c;
 }

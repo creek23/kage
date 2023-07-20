@@ -228,7 +228,6 @@ void KageScene::setCurrentFrame(unsigned int p_frame) {
 			}
 		}
 		
-		_document->_kage->updateFrameLabel();
 		_document->_kage->forceRenderFrames();
 		_document->_kage->refreshUI();
 	}
@@ -252,7 +251,6 @@ void KageScene::setCurrentFrameByID(unsigned int p_frameID) {
 			}
 		}
 		
-		_document->_kage->updateFrameLabel();
 		_document->_kage->forceRenderFrames();
 		_document->_kage->refreshUI();
 	}
@@ -301,6 +299,22 @@ KageFrame *KageScene::getFrameAt(unsigned int p_frame) {
 	}
 }
 
+KageLayer *KageScene::getLayer() {
+	unsigned int l_currentLayer = _document->_kage->getCurrentLayer();
+	if (l_currentLayer < 1 || l_currentLayer > Layers.size()) {
+		return NULL;
+	} else {
+		return Layers[l_currentLayer-1];
+	}
+}
+KageLayer *KageScene::getLayerAt(unsigned int p_layer) {
+	if (p_layer < 1 || p_layer > Layers.size()) {
+		return NULL;
+	} else {
+		return Layers[p_layer-1];
+	}
+}
+			
 /**
  * NOTE: KageFrameset are organized as index 0 as BOTTOM and last index is TOP
  * \sa moveDown() moveToBottom() moveUp()
@@ -578,16 +592,24 @@ unsigned int KageScene::getTween() {
 	return 0;
 }
 
-void KageScene::switchToPreviousFrame() {
+bool KageScene::switchToPreviousFrame() {
 	unsigned int l_count = 1;
 	if (Layers.size() > 0) {
 		l_count = Layers.size();
 	}
+	bool l_return = false;
 	for (unsigned int i = 0; i < l_count; ++i) {
-		Layers[i]->switchToPreviousFrame();
+		l_return = Layers[i]->switchToPreviousFrame();
+		if (KageScene::LOADING_MODE == false) {
+			Layers[i]->getFrame()->setSelected(false);
+		}
 	}
+	if (KageScene::LOADING_MODE == false) {
+		Layers[getActiveLayerID()-1]->getFrame()->setSelected(true);
+	}
+	return l_return;
 }
-void KageScene::switchToPreviousFrame(unsigned int p_frameID) {
+bool KageScene::switchToPreviousFrame(unsigned int p_frameID) {
 	unsigned int l_count = 1;
 	if (Layers.size() > 0) {
 		l_count = Layers.size();
@@ -596,6 +618,7 @@ void KageScene::switchToPreviousFrame(unsigned int p_frameID) {
 	
 	if (l_currentLayer < 1 || l_currentLayer > Layers.size()) {
 		//do nothing
+		return false;
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
 		unsigned int l_frameByID = Layers[l_currentLayer]->getFrameNumberByID(p_frameID);
@@ -610,21 +633,32 @@ void KageScene::switchToPreviousFrame(unsigned int p_frameID) {
 		}
 	}
 	
-	_document->_kage->updateFrameLabel();
 	_document->_kage->forceRenderFrames();
 	_document->_kage->refreshUI();
+	
+	return true;
 }
 
-void KageScene::switchToNextFrame() {
+bool KageScene::switchToNextFrame() {
 	unsigned int l_count = 1;
 	if (Layers.size() > 0) {
 		l_count = Layers.size();
 	}
+	bool l_return = false;
+	
 	for (unsigned int i = 0; i < l_count; ++i) {
-		Layers[i]->switchToNextFrame();
+		l_return = Layers[i]->switchToNextFrame();
+		if (KageScene::LOADING_MODE == false) {
+			Layers[i]->getFrame()->setSelected(false);
+			Layers[i]->getFrame()->setSelected(false);
+		}
 	}
+	if (KageScene::LOADING_MODE == false) {
+		Layers[getActiveLayerID()-1]->getFrame()->setSelected(true);
+	}
+	return l_return;
 }
-void KageScene::switchToNextFrame(unsigned int p_frameID) {
+bool KageScene::switchToNextFrame(unsigned int p_frameID) {
 	unsigned int l_count = 1;
 	if (Layers.size() > 0) {
 		l_count = Layers.size();
@@ -634,6 +668,7 @@ void KageScene::switchToNextFrame(unsigned int p_frameID) {
 	
 	if (l_currentLayer < 1 || l_currentLayer > Layers.size()) {
 		//do nothing
+		return false;
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
 		unsigned int l_frameByID = Layers[l_currentLayer]->getFrameNumberByID(p_frameID);
@@ -648,9 +683,10 @@ void KageScene::switchToNextFrame(unsigned int p_frameID) {
 		}
 	}
 	
-	_document->_kage->updateFrameLabel();
 	_document->_kage->forceRenderFrames();
 	_document->_kage->refreshUI();
+	
+	return true;
 }
 
 void KageScene::setFrameExtension(KageFrame::extension p_extension) {

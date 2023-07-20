@@ -91,5 +91,12 @@
 		<file>share/library/asset_image.png</file>
 		<file>share/library/asset_kage.png</file>
 		<file>share/library/asset_video.png</file>
+		<file>share/timeline/loop.png</file>
+		<file>share/timeline/next.png</file>
+		<file>share/timeline/pause.png</file>
+		<file>share/timeline/play.png</file>
+		<file>share/timeline/previous.png</file>
+		<file>share/timeline/rewind.png</file>
+		<file>share/timeline/stop.png</file>
 	</gresource>
 </gresources>

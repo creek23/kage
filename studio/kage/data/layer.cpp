@@ -468,6 +468,18 @@ unsigned int KageLayer::getCurrentFrame() {
 	return 1;
 }
 
+KageFrame *KageLayer::getFrame() {
+	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+		return Frames[_currentFrameIndex];
+	} else {
+		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+			if (Frames[i]->frameID == _currentFrameID) {
+				return Frames[i];
+			}
+		}
+	}
+	return NULL;
+}
 KageFrame *KageLayer::getFrameAt(unsigned int p_frame) {
 	if (p_frame < 1 || p_frame > getFrameCount()) {
 		return NULL;

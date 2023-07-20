@@ -78,9 +78,11 @@
 			unsigned int getCurrentLayer(); //currently used by getFrame()
 			unsigned int layerCount();
 			unsigned int frameCount();
-			void selectAll(bool p_selectAll); //used by KageFrame
+			void selectAll(bool p_selectAll);
 			KageFrame *getFrame();
 			KageFrame *getFrameAt(unsigned int p_frame);
+			KageLayer *getLayer();
+			KageLayer *getLayerAt(unsigned int p_layer);
 			
 			void renderStage(); //used by KageFrame
 			
@@ -112,10 +114,10 @@
 			bool setTween(unsigned int p_tween);
 			unsigned int getTween();
 			
-			void switchToPreviousFrame(); ///Called by Kage for navigating to Previous Frame
-			void switchToPreviousFrame(unsigned int p_frameID); ///Called by KageFrame for navigating to Previous Frame
-			void switchToNextFrame(); ///Called by Kage for navigating to Next Frame
-			void switchToNextFrame(unsigned int p_frameID); ///Called by KageFrame for navigating to Next Frame
+			bool switchToPreviousFrame(); ///Called by Kage for navigating to Previous Frame
+			bool switchToPreviousFrame(unsigned int p_frameID); ///Called by KageFrame for navigating to Previous Frame
+			bool switchToNextFrame(); ///Called by Kage for navigating to Next Frame
+			bool switchToNextFrame(unsigned int p_frameID); ///Called by KageFrame for navigating to Next Frame
 			
 			void setFrameExtension(KageFrame::extension p_extension);
 			//Kage *_kage;

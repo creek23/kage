@@ -312,12 +312,17 @@ Kage::Kage(string p_filePath) :
 	m_refActionGroup->add(
 		Gtk::Action::create("PreviousFrame", "_Previous", "Previous Frame"),
 		Gtk::AccelKey(","),
-		sigc::mem_fun(*this, &Kage::switchToPreviousFrame)
+		sigc::mem_fun(*this, &Kage::PreviousFrame_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("NextFrame", "_Next", "Next Frame"),
 		Gtk::AccelKey("."),
-		sigc::mem_fun(*this, &Kage::switchToNextFrame)
+		sigc::mem_fun(*this, &Kage::NextFrame_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("ToggleLoop", "Toggle _Loop", "Toggle Loop on Playback"),
+//		Gtk::AccelKey("F2"),
+		sigc::mem_fun(*this, &Kage::ToggleLoop_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("AddFrame", "_Add Frame", "Add Blank Frame"),
@@ -510,6 +515,9 @@ Kage::Kage(string p_filePath) :
 		"			<menuitem action='ShowHideLayer'/>"
 		"			<menuitem action='LockUnlockLayer'/>"
 		"			<separator/>"
+		"			<menuitem action='ToggleOnionSkin'/>"
+		"			<menuitem action='ToggleOnionLayer'/>"
+		"			<separator/>"
 		"			<menuitem action='RaiseLayer'/>"
 		"			<menuitem action='LowerLayer'/>"
 		"			<menuitem action='RaiseToTopLayer'/>"
@@ -535,6 +543,7 @@ Kage::Kage(string p_filePath) :
 		"			<menuitem action='Stop'/>"
 		"			<menuitem action='NextFrame'/>"
 		"			<menuitem action='PreviousFrame'/>"
+		"			<menuitem action='ToggleLoop'/>"
 		"			<separator/>"
 		"			<menuitem action='AddFrame'/>"
 		"			<menuitem action='ExtendFrame'/>"
@@ -603,7 +612,7 @@ Kage::Kage(string p_filePath) :
 		addToolButton("Stroke");
 		addToolButton("Fill");
 		addToolButton("Eyedrop"); //TODO: use gtk-color-picker
-//		addToolButton("Eraser"); //TODO: implement tool
+//		addToolButton("Eraser"); //TODO: implement tool; inkscape got this feature as I see how it should be
 //		m_VBoxToolbar_Holder.pack_start(m_Separator_Toolbar4, Gtk::PACK_SHRINK);
 		addToolButton("Zoom"); //TODO: use gtk-zoom-in
 		
@@ -611,43 +620,67 @@ Kage::Kage(string p_filePath) :
 		m_VPane_Timeline.add1(m_Timeline_HBox);
 			m_Timeline_HBox.pack_start(m_Timeline_HPaned);
 				m_Timeline_HPaned.set_size_request(100, 100);
-				m_Timeline_HPaned.add1(m_Timeline_Layer_VBox);
-					m_Timeline_Layer_VBox.pack_start(m_Timeline_Layer_ScrolledWindow);//, Gtk::PACK_SHRINK);
-						m_Timeline_Layer_ScrolledWindow.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_EXTERNAL);
-							m_Timeline_Layer_ScrolledWindow.add(_layerManager);
-							m_Timeline_Layer_ScrolledWindow.set_border_width(0);
-							m_Timeline_Layer_ScrolledWindow.set_shadow_type(Gtk::SHADOW_NONE);
-							cout << "layer count " << _layerManager.layerCount() << endl;
-					m_Timeline_Layer_VBox.pack_start(m_Timeline_Layer_Add_HBox, Gtk::PACK_SHRINK);
-						m_Timeline_Layer_Add_HBox.pack_start(m_Timeline_Label, Gtk::PACK_EXPAND_WIDGET);
-							m_Timeline_Label.set_label("  Timeline  ");
-						m_Timeline_Layer_Add_HBox.pack_start(m_Timeline_Add_Button, Gtk::PACK_SHRINK);
-							m_Timeline_Add_Button_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/layer/layer_add.png");
-								m_Timeline_Add_Button_img = Gtk::Image(m_Timeline_Add_Button_pixbuf);
-									m_Timeline_Add_Button.set_image(m_Timeline_Add_Button_img);
-										m_Timeline_Add_Button.property_always_show_image();
-										m_Timeline_Add_Button.show();
-										m_Timeline_Add_Button.set_size_request(20, 20);
-										m_Timeline_Add_Button.signal_clicked().connect(sigc::mem_fun(*this, &Kage::LayerAdd_onClick));
-						m_Timeline_Layer_Add_HBox.pack_start(m_Timeline_Del_Button, Gtk::PACK_SHRINK);
-							m_Timeline_Del_Button_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/layer/layer_delete.png");
-								m_Timeline_Del_Button_img = Gtk::Image(m_Timeline_Del_Button_pixbuf);
-									m_Timeline_Del_Button.set_image(m_Timeline_Del_Button_img);
-										m_Timeline_Del_Button.property_always_show_image();
-										m_Timeline_Del_Button.show();
-										m_Timeline_Del_Button.set_size_request(20, 20);
-										m_Timeline_Del_Button.signal_clicked().connect(sigc::mem_fun(*this, &Kage::LayerDel_onClick));
+				m_Timeline_HPaned.add1(m_Timeline_Layer_VBox1);
+					m_Timeline_Layer_VBox1.pack_start(m_Timeline_Layer_VBox2, Gtk::PACK_EXPAND_WIDGET);
+						m_Timeline_Layer_VBox2.pack_start(m_Timeline_Layer_ScrolledWindow);//, Gtk::PACK_SHRINK);
+							m_Timeline_Layer_ScrolledWindow.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_EXTERNAL);
+								m_Timeline_Layer_ScrolledWindow.add(_layerManager);
+								m_Timeline_Layer_ScrolledWindow.set_border_width(0);
+								m_Timeline_Layer_ScrolledWindow.set_shadow_type(Gtk::SHADOW_NONE);
+								cout << "layer count " << _layerManager.layerCount() << endl;
+						m_Timeline_Layer_VBox2.pack_start(m_Timeline_Layer_HScrollbar, Gtk::PACK_SHRINK);
+							m_Timeline_Layer_HScrollbar.set_adjustment(m_Timeline_Layer_ScrolledWindow.get_hadjustment());
+					m_Timeline_Layer_VBox1.pack_start(m_Timeline_Layer_Controls_HBox, Gtk::PACK_SHRINK);
+						m_Timeline_Layer_Controls_HBox.pack_start(m_Timeline_Label, Gtk::PACK_EXPAND_WIDGET);
+							m_Timeline_Label.set_label("     Layer     ");
+						m_Timeline_Layer_Controls_HBox.pack_start(_btnLayerAdd, Gtk::PACK_SHRINK);
+							_btnLayerAdd_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/layer/layer_add.png");
+								_btnLayerAdd_img = Gtk::Image(_btnLayerAdd_pixbuf);
+									_btnLayerAdd.set_image(_btnLayerAdd_img);
+										_btnLayerAdd.property_always_show_image();
+										_btnLayerAdd.show();
+										
+										Glib::ustring data = "#gtkbutton {padding: 0;}";
+										auto css = Gtk::CssProvider::create();
+										if(!css->load_from_data(data)) {
+											cerr << "Failed to load css\n";
+										}
+										auto screen = Gdk::Screen::get_default();
+										auto ctx = _btnLayerAdd.get_style_context();
+										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										_btnLayerAdd.set_name("gtkbutton");
+
+										_btnLayerAdd.set_size_request(16, 16);
+										_btnLayerAdd.signal_clicked().connect(sigc::mem_fun(*this, &Kage::LayerAdd_onClick));
+						m_Timeline_Layer_Controls_HBox.pack_start(_btnLayerDelete, Gtk::PACK_SHRINK);
+							_btnLayerDelete_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/layer/layer_delete.png");
+								_btnLayerDelete_img = Gtk::Image(_btnLayerDelete_pixbuf);
+									_btnLayerDelete.set_image(_btnLayerDelete_img);
+										_btnLayerDelete.property_always_show_image();
+										_btnLayerDelete.show();
+										
+										ctx = _btnLayerDelete.get_style_context();
+										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										_btnLayerDelete.set_name("gtkbutton");
+										
+										_btnLayerDelete.set_size_request(16, 16);
+										_btnLayerDelete.signal_clicked().connect(sigc::mem_fun(*this, &Kage::LayerDel_onClick));
 												
-						m_Timeline_Layer_Add_HBox.pack_start(_btnLayerMoveTop, Gtk::PACK_SHRINK);
+						m_Timeline_Layer_Controls_HBox.pack_start(_btnLayerMoveTop, Gtk::PACK_SHRINK);
 							_btnLayerMoveTop_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/layer/move_top.png");
 								_btnLayerMoveTop_img = Gtk::Image(_btnLayerMoveTop_pixbuf);
 									_btnLayerMoveTop.set_image(_btnLayerMoveTop_img);
 										_btnLayerMoveTop.property_always_show_image();
 										_btnLayerMoveTop.set_tooltip_text("Move Layer to Top");
 										_btnLayerMoveTop.show();
-										_btnLayerMoveTop.set_size_request(20, 20);
+										
+										ctx = _btnLayerMoveTop.get_style_context();
+										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										_btnLayerMoveTop.set_name("gtkbutton");
+										
+										_btnLayerMoveTop.set_size_request(16, 16);
 										_btnLayerMoveTop.signal_clicked().connect(sigc::mem_fun(*this, &Kage::LayerMoveTop_onClick));
-						m_Timeline_Layer_Add_HBox.pack_start(_btnLayerMoveUp, Gtk::PACK_SHRINK);
+						m_Timeline_Layer_Controls_HBox.pack_start(_btnLayerMoveUp, Gtk::PACK_SHRINK);
 							_btnLayerMoveUp_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/layer/move_up.png");
 								_btnLayerMoveUp_img = Gtk::Image(_btnLayerMoveUp_pixbuf);
 									_btnLayerMoveUp.set_image(_btnLayerMoveUp_img);
@@ -655,9 +688,14 @@ Kage::Kage(string p_filePath) :
 										_btnLayerMoveUp.set_tooltip_text("Move Layer Up");
 										_btnLayerMoveUp.set_focus_on_click(false);
 										_btnLayerMoveUp.show();
-										_btnLayerMoveUp.set_size_request(20, 20);
+										
+										ctx = _btnLayerMoveUp.get_style_context();
+										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										_btnLayerMoveUp.set_name("gtkbutton");
+										
+										_btnLayerMoveUp.set_size_request(16, 16);
 										_btnLayerMoveUp.signal_clicked().connect(sigc::mem_fun(*this, &Kage::LayerMoveUp_onClick));
-						m_Timeline_Layer_Add_HBox.pack_start(_btnLayerMoveDown, Gtk::PACK_SHRINK);
+						m_Timeline_Layer_Controls_HBox.pack_start(_btnLayerMoveDown, Gtk::PACK_SHRINK);
 							_btnLayerMoveDown_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/layer/move_down.png");
 								_btnLayerMoveDown_img = Gtk::Image(_btnLayerMoveDown_pixbuf);
 									_btnLayerMoveDown.set_image(_btnLayerMoveDown_img);
@@ -665,9 +703,14 @@ Kage::Kage(string p_filePath) :
 										_btnLayerMoveDown.set_tooltip_text("Move Layer Down");
 										_btnLayerMoveDown.set_focus_on_click(false);
 										_btnLayerMoveDown.show();
-										_btnLayerMoveDown.set_size_request(20, 20);
+										
+										ctx = _btnLayerMoveDown.get_style_context();
+										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										_btnLayerMoveDown.set_name("gtkbutton");
+										
+										_btnLayerMoveDown.set_size_request(16, 16);
 										_btnLayerMoveDown.signal_clicked().connect(sigc::mem_fun(*this, &Kage::LayerMoveDown_onClick));
-						m_Timeline_Layer_Add_HBox.pack_start(_btnLayerMoveBottom, Gtk::PACK_SHRINK);
+						m_Timeline_Layer_Controls_HBox.pack_start(_btnLayerMoveBottom, Gtk::PACK_SHRINK);
 							_btnLayerMoveBottom_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/layer/move_bottom.png");
 								_btnLayerMoveBottom_img = Gtk::Image(_btnLayerMoveBottom_pixbuf);
 									_btnLayerMoveBottom.set_image(_btnLayerMoveBottom_img);
@@ -675,9 +718,14 @@ Kage::Kage(string p_filePath) :
 										_btnLayerMoveBottom.set_tooltip_text("Move Layer to Bottom");
 										_btnLayerMoveBottom.set_focus_on_click(false);
 										_btnLayerMoveBottom.show();
-										_btnLayerMoveBottom.set_size_request(20, 20);
+										
+										ctx = _btnLayerMoveBottom.get_style_context();
+										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										_btnLayerMoveBottom.set_name("gtkbutton");
+										
+										_btnLayerMoveBottom.set_size_request(16, 16);
 										_btnLayerMoveBottom.signal_clicked().connect(sigc::mem_fun(*this, &Kage::LayerMoveBottom_onClick));
-						m_Timeline_Layer_Add_HBox.pack_start(_toggleOnion, Gtk::PACK_SHRINK);
+						m_Timeline_Layer_Controls_HBox.pack_start(_toggleOnion, Gtk::PACK_SHRINK);
 							_toggleOnion_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/layer/onion.png");
 								_toggleOnion_img = Gtk::Image(_toggleOnion_pixbuf);
 									_toggleOnion.set_image(_toggleOnion_img);
@@ -685,9 +733,14 @@ Kage::Kage(string p_filePath) :
 										_toggleOnion.set_tooltip_text("Toggle Onion Skin");
 										_toggleOnion.set_focus_on_click(false);
 										_toggleOnion.show();
-										_toggleOnion.set_size_request(20, 20);
+										
+										ctx = _toggleOnion.get_style_context();
+										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										_toggleOnion.set_name("gtkbutton");
+										
+										_toggleOnion.set_size_request(16, 16);
 										_toggleOnion.signal_clicked().connect(sigc::mem_fun(*this, &Kage::ToggleOnion_onClick));
-						m_Timeline_Layer_Add_HBox.pack_start(_toggleOnionLayer, Gtk::PACK_SHRINK);
+						m_Timeline_Layer_Controls_HBox.pack_start(_toggleOnionLayer, Gtk::PACK_SHRINK);
 							_toggleOnionLayer_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/layer/onion_layer.png");
 								_toggleOnionLayer_img = Gtk::Image(_toggleOnionLayer_pixbuf);
 									_toggleOnionLayer.set_image(_toggleOnionLayer_img);
@@ -695,7 +748,12 @@ Kage::Kage(string p_filePath) :
 										_toggleOnionLayer.set_tooltip_text("Toggle Onion Layer");
 										_toggleOnionLayer.set_focus_on_click(false);
 										_toggleOnionLayer.show();
-										_toggleOnionLayer.set_size_request(20, 20);
+										
+										ctx = _toggleOnionLayer.get_style_context();
+										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										_toggleOnionLayer.set_name("gtkbutton");
+										
+										_toggleOnionLayer.set_size_request(16, 16);
 										_toggleOnionLayer.signal_clicked().connect(sigc::mem_fun(*this, &Kage::ToggleOnion_onClick));
 										
 				m_Timeline_HPaned.add2(m_Timeline_Frame_VBox1);
@@ -708,9 +766,100 @@ Kage::Kage(string p_filePath) :
 								m_Timeline_Frame_ScrolledWindow.set_kinetic_scrolling(true);
 						m_Timeline_Frame_VBox2.pack_start(m_Timeline_HScrollbar, Gtk::PACK_SHRINK);
 							m_Timeline_HScrollbar.set_adjustment(m_Timeline_Frame_ScrolledWindow.get_hadjustment());
-					m_Timeline_Frame_VBox1.pack_start(m_Timeline_CurrentFrame, Gtk::PACK_SHRINK);
-							m_Timeline_CurrentFrame.set_label("L 1 F 1");
+					m_Timeline_Frame_VBox1.pack_start(m_Timeline_Controls_HBox, Gtk::PACK_SHRINK);
+						m_Timeline_Controls_HBox.pack_start(m_Timeline_CurrentFrame, Gtk::PACK_EXPAND_PADDING);
+							m_Timeline_CurrentFrame.set_label("Timeline");
 							m_Timeline_CurrentFrame.set_size_request(22, 22);
+						m_Timeline_Controls_HBox.pack_start(_btnTimelineRewind, Gtk::PACK_SHRINK);
+							_btnTimelineRewind_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/timeline/rewind.png");
+								_btnTimelineRewind_img = Gtk::Image(_btnTimelineRewind_pixbuf);
+									_btnTimelineRewind.set_image(_btnTimelineRewind_img);
+										_btnTimelineRewind.property_always_show_image();
+										_btnTimelineRewind.set_tooltip_text("Play from Start (F9)");
+										_btnTimelineRewind.set_focus_on_click(false);
+										_btnTimelineRewind.show();
+										
+										ctx = _btnTimelineRewind.get_style_context();
+										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										_btnTimelineRewind.set_name("gtkbutton");
+										
+										_btnTimelineRewind.set_size_request(16, 16);
+										_btnTimelineRewind.signal_clicked().connect(sigc::mem_fun(*this, &Kage::Play_onClick));
+						m_Timeline_Controls_HBox.pack_start(_btnTimelinePrevious, Gtk::PACK_SHRINK);
+							_btnTimelinePrevious_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/timeline/previous.png");
+								_btnTimelinePrevious_img = Gtk::Image(_btnTimelinePrevious_pixbuf);
+									_btnTimelinePrevious.set_image(_btnTimelinePrevious_img);
+										_btnTimelinePrevious.property_always_show_image();
+										_btnTimelinePrevious.set_tooltip_text("Previous Frame");
+										_btnTimelinePrevious.set_focus_on_click(false);
+										_btnTimelinePrevious.show();
+										
+										ctx = _btnTimelinePrevious.get_style_context();
+										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										_btnTimelinePrevious.set_name("gtkbutton");
+										
+										_btnTimelinePrevious.set_size_request(16, 16);
+										_btnTimelinePrevious.signal_clicked().connect(sigc::mem_fun(*this, &Kage::PreviousFrame_onClick));
+						m_Timeline_Controls_HBox.pack_start(_btnTimelinePlay, Gtk::PACK_SHRINK);
+							_btnTimelinePlay_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/timeline/play.png");
+								_btnTimelinePlay_img = Gtk::Image(_btnTimelinePlay_pixbuf);
+									_btnTimelinePlay.set_image(_btnTimelinePlay_img);
+										_btnTimelinePlay.property_always_show_image();
+										_btnTimelinePlay.set_tooltip_text("Play on Current Frame (Ctrl+F9)");
+										_btnTimelinePlay.set_focus_on_click(false);
+										_btnTimelinePlay.show();
+										
+										ctx = _btnTimelinePlay.get_style_context();
+										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										_btnTimelinePlay.set_name("gtkbutton");
+										
+										_btnTimelinePlay.set_size_request(16, 16);
+										_btnTimelinePlay.signal_clicked().connect(sigc::mem_fun(*this, &Kage::PlayFrame_onClick));
+						m_Timeline_Controls_HBox.pack_start(_btnTimelineNext, Gtk::PACK_SHRINK);
+							_btnTimelineNext_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/timeline/next.png");
+								_btnTimelineNext_img = Gtk::Image(_btnTimelineNext_pixbuf);
+									_btnTimelineNext.set_image(_btnTimelineNext_img);
+										_btnTimelineNext.property_always_show_image();
+										_btnTimelineNext.set_tooltip_text("Next Frame");
+										_btnTimelineNext.set_focus_on_click(false);
+										_btnTimelineNext.show();
+										
+										ctx = _btnTimelineNext.get_style_context();
+										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										_btnTimelineNext.set_name("gtkbutton");
+										
+										_btnTimelineNext.set_size_request(16, 16);
+										_btnTimelineNext.signal_clicked().connect(sigc::mem_fun(*this, &Kage::NextFrame_onClick));
+						m_Timeline_Controls_HBox.pack_start(_btnTimelineStop, Gtk::PACK_SHRINK);
+							_btnTimelineStop_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/timeline/stop.png");
+								_btnTimelineStop_img = Gtk::Image(_btnTimelineStop_pixbuf);
+									_btnTimelineStop.set_image(_btnTimelineStop_img);
+										_btnTimelineStop.property_always_show_image();
+										_btnTimelineStop.set_tooltip_text("Stop Playback (Escape)");
+										_btnTimelineStop.set_focus_on_click(false);
+										_btnTimelineStop.show();
+										
+										ctx = _btnTimelineStop.get_style_context();
+										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										_btnTimelineStop.set_name("gtkbutton");
+										
+										_btnTimelineStop.set_size_request(16, 16);
+										_btnTimelineStop.signal_clicked().connect(sigc::mem_fun(*this, &Kage::Stop_onClick));
+						m_Timeline_Controls_HBox.pack_start(_btnTimelineLoop, Gtk::PACK_SHRINK);
+							_btnTimelineLoop_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/timeline/loop.png");
+								_btnTimelineLoop_img = Gtk::Image(_btnTimelineLoop_pixbuf);
+									_btnTimelineLoop.set_image(_btnTimelineLoop_img);
+										_btnTimelineLoop.property_always_show_image();
+										_btnTimelineLoop.set_tooltip_text("Toggle Loop");
+										_btnTimelineLoop.set_focus_on_click(false);
+										_btnTimelineLoop.show();
+										
+										ctx = _btnTimelineLoop.get_style_context();
+										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										_btnTimelineLoop.set_name("gtkbutton");
+										
+										_btnTimelineLoop.set_size_request(16, 16);
+										//_btnTimelineLoop.signal_clicked().connect(sigc::mem_fun(*this, &Kage::ToggleLoop_onClick));
 
 			m_Timeline_HBox.pack_start(m_Timeline_VScrollbar, Gtk::PACK_SHRINK);
 				m_Timeline_VScrollbar.set_adjustment(m_Timeline_Frame_ScrolledWindow.get_vadjustment());
@@ -1095,7 +1244,17 @@ void Kage::Delete_onClick() {
 		Kage::timestamp_OUT();
 	}
 }
-
+void Kage::PreviousFrame_onClick() {
+	Stop_onClick();
+	switchToPreviousFrame();
+}
+void Kage::NextFrame_onClick() {
+	Stop_onClick();
+	switchToNextFrame();
+}
+void Kage::ToggleLoop_onClick() {
+	_btnTimelineLoop.clicked();
+}
 void Kage::AddFrame_onClick() {
 	_document.Scenes[_document.getActiveSceneID()].addFrame();
 	
@@ -1105,7 +1264,7 @@ void Kage::ExtendFrame_onClick() {
 	_document.Scenes[_document.getActiveSceneID()].extendFrame();
 	switchToNextFrame();
 	
-	refreshUI();
+	//refreshUI();
 }
 void Kage::DuplicateFrame_onClick() {
 	_document.Scenes[_document.getActiveSceneID()].duplicateFrame();
@@ -1274,25 +1433,22 @@ void Kage::RemoveTweenFrame_onClick() {
 	Kage::timestamp_OUT();
 }
 
-void Kage::switchToPreviousFrame() {
-	_document.Scenes[_document.getActiveSceneID()].switchToPreviousFrame();
+bool Kage::switchToPreviousFrame() {
+	bool l_return = _document.Scenes[_document.getActiveSceneID()].switchToPreviousFrame();
+		_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(getCurrentLayer());
 		forceRenderFrames();
 	
 	refreshUI();
+	return l_return;
 }
 
-void Kage::switchToNextFrame() {
-	_document.Scenes[_document.getActiveSceneID()].switchToNextFrame();
+bool Kage::switchToNextFrame() {
+	bool l_return = _document.Scenes[_document.getActiveSceneID()].switchToNextFrame();
+		_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(getCurrentLayer());
 		forceRenderFrames();
 	
 	refreshUI();
-}
-
-/**
- * Called by KageFramesetManager::setCurrentFrame
- */
-void Kage::updateFrameLabel() {
-	m_Timeline_CurrentFrame.set_label("L " + StringHelper::unsignedIntegerToString(getCurrentLayer()) + " F " + StringHelper::unsignedIntegerToString(getCurrentFrame()));
+	return l_return;
 }
 
 void Kage::LayerAdd_onClick() {
@@ -1367,8 +1523,17 @@ void Kage::LayerMoveBottom_onClick() {
 	}
 }
 
+void Kage::ToggleOnionSkin_onClick() {
+	_toggleOnion.clicked();
+
+	ToggleOnion_onClick();
+}
+void Kage::ToggleOnionLayer_onClick() {
+	_toggleOnionLayer.clicked();
+
+	ToggleOnion_onClick();
+}
 void Kage::ToggleOnion_onClick() {
-	std::cout << "ToggleOnion_onClick " << std::endl;
 	//reflect onion in rendering
 	forceRenderFrames();
 	refreshUI();//TODO: update frames to indicate which frames are shown as onion
@@ -2742,8 +2907,12 @@ bool Kage::on_tick(const Glib::RefPtr<Gdk::FrameClock>& frame_clock) {
 		if (frameCounter > _document.frameCount()) {
 			frameCounter = _document.frameCount();
 			
-			_stage.remove_tick_callback(m_tick_id);
-			_isPlaying = false;
+			if (_btnTimelineLoop.get_active()) {
+				frameCounter = 1;
+			} else {
+				_stage.remove_tick_callback(m_tick_id);
+				_isPlaying = false;
+			}
 		}
 		
 		_document.setCurrentFrame(frameCounter);

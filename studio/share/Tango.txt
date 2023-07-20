@@ -1,0 +1,27 @@
+Icons from Tango Icons
+https://commons.wikimedia.org/wiki/Tango_icons
+
+The icons below have been released into the public domain by its author, The Tango Desktop Project (http://tango.freedesktop.org/Tango_Desktop_Project). This applies worldwide.
+In some countries this may not be legally possible; if so:
+The Tango Desktop Project grants anyone the right to use this work for any purpose, without any conditions, unless such conditions are required by law.
+
+icons/Eyedrop_tango.png
+icons/Fill_tango.png
+icons/Node_tango.png
+icons/Oval_tango.png
+icons/Rectangle_tango.png
+icons/Select_tango.png
+icons/Text_tango.png
+icons/Zoom_tango.png
+layer/layer_delete.png
+layer/move_bottom.png
+layer/move_down.png
+layer/move_top.png
+layer/move_up.png
+timeline/loop.svg
+timeline/next.svg
+timeline/play.svg
+timeline/previous.svg
+timeline/stop.svg
+timeline/rewind.svg
+layer/layer_add.png

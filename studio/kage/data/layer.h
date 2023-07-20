@@ -63,6 +63,7 @@
 			void removeAllFrames();
 			
 			KageScene *getScene();
+			KageFrame *getFrame();
 			KageFrame *getFrameAt(unsigned int p_frame);
 			unsigned int getFrameNumberByID(unsigned int p_frameID);
 			

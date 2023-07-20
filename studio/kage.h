@@ -32,6 +32,7 @@
 	#include <gtkmm/radioaction.h>
 	#include <gtkmm/messagedialog.h>
 	#include <gtkmm/filechooserdialog.h>
+	#include <gtkmm/cssprovider.h>
 	#include "kage/timeline/layermanager.h"
 	#include "kage/timeline/timeline.h"
 	#include "kage/stage/stage.h"
@@ -109,6 +110,8 @@
 			void LayerMoveUp_onClick();
 			void LayerMoveDown_onClick();
 			void LayerMoveBottom_onClick();
+			void ToggleOnionSkin_onClick();
+			void ToggleOnionLayer_onClick();
 			void ToggleOnion_onClick();
 			void ToolButtons_onClick(Gtk::ToggleButton *p_sourceButton);
 			void onActionActivate();
@@ -137,6 +140,10 @@
 			void RecenterRotationPoint_onClick();
 			void Tween_onClick();
 			
+			void PreviousFrame_onClick();
+			void NextFrame_onClick();
+			void ToggleLoop_onClick();
+
 			void AddFrame_onClick();
 			void ExtendFrame_onClick();
 			void DuplicateFrame_onClick();
@@ -178,14 +185,18 @@
 			Gtk::VBox m_VBoxTimelineLayer;
 			Gtk::HPaned m_Timeline_HPaned;
 			Gtk::VBox m_Timeline_Layer_VBox;
-			Gtk::HBox m_Timeline_Layer_Add_HBox;
+			Gtk::VBox m_Timeline_Layer_VBox1;
+			Gtk::VBox m_Timeline_Layer_VBox2;
+			
+			Gtk::HBox m_Timeline_Layer_Controls_HBox;
+			Gtk::HBox m_Timeline_Controls_HBox;
 			Gtk::Label m_Timeline_Label;
-			Gtk::Button m_Timeline_Add_Button;
-				Gtk::Image                m_Timeline_Add_Button_img;
-				Glib::RefPtr<Gdk::Pixbuf> m_Timeline_Add_Button_pixbuf;
-			Gtk::Button m_Timeline_Del_Button;
-				Gtk::Image                m_Timeline_Del_Button_img;
-				Glib::RefPtr<Gdk::Pixbuf> m_Timeline_Del_Button_pixbuf;
+			Gtk::Button _btnLayerAdd;
+				Gtk::Image                _btnLayerAdd_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnLayerAdd_pixbuf;
+			Gtk::Button _btnLayerDelete;
+				Gtk::Image                _btnLayerDelete_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnLayerDelete_pixbuf;
 			Gtk::Button _btnLayerMoveTop;
 				Gtk::Image                _btnLayerMoveTop_img;
 				Glib::RefPtr<Gdk::Pixbuf> _btnLayerMoveTop_pixbuf;
@@ -198,6 +209,25 @@
 			Gtk::Button _btnLayerMoveBottom;
 				Gtk::Image                _btnLayerMoveBottom_img;
 				Glib::RefPtr<Gdk::Pixbuf> _btnLayerMoveBottom_pixbuf;
+			
+			Gtk::Button _btnTimelineRewind;
+				Gtk::Image                _btnTimelineRewind_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnTimelineRewind_pixbuf;
+			Gtk::Button _btnTimelinePrevious;
+				Gtk::Image                _btnTimelinePrevious_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnTimelinePrevious_pixbuf;
+			Gtk::Button _btnTimelinePlay;
+				Gtk::Image                _btnTimelinePlay_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnTimelinePlay_pixbuf;
+			Gtk::Button _btnTimelineNext;
+				Gtk::Image                _btnTimelineNext_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnTimelineNext_pixbuf;
+			Gtk::Button _btnTimelineStop;
+				Gtk::Image                _btnTimelineStop_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnTimelineStop_pixbuf;
+			Gtk::ToggleButton _btnTimelineLoop;
+				Gtk::Image                _btnTimelineLoop_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnTimelineLoop_pixbuf;
 			public:
 			Gtk::ToggleButton _toggleOnion;
 			protected:
@@ -248,6 +278,7 @@
 			std::vector<Gtk::Tooltip*> tooltips;
 			Gtk::ToggleButton* currentTool;
 			
+			Gtk::HScrollbar m_Timeline_Layer_HScrollbar;
 			Gtk::HScrollbar m_Timeline_HScrollbar;
 			Gtk::VScrollbar m_Timeline_VScrollbar;
 			Gtk::HBox m_Timeline_HBox;
@@ -339,9 +370,8 @@
 			static void timestamp_OUT();
 			static unsigned int TAB_COUNT;
 			
-			void switchToPreviousFrame();
-			void switchToNextFrame();
-			void updateFrameLabel();
+			bool switchToPreviousFrame();
+			bool switchToNextFrame();
 			
 			void propStageSetVisible(bool p_visible);
 			void propFillStrokeSetVisible(bool p_visible);

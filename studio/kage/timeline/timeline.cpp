@@ -89,11 +89,16 @@ KageTimeline::~KageTimeline() {
 	//
 }
 
+unsigned int g_frameSelectIndex;
 bool KageTimeline::on_key_press_event(GdkEventKey *e) {
 	if (e->keyval == GDK_KEY_period) {
-		_kage->switchToNextFrame();
+		if (_kage->switchToNextFrame()) {
+			++g_frameSelectIndex;
+		}
 	} else if (e->keyval == GDK_KEY_comma) {
-		_kage->switchToPreviousFrame();
+		if (_kage->switchToPreviousFrame()) {
+			--g_frameSelectIndex;
+		}
 	}
 
 	return true;
@@ -129,14 +134,14 @@ bool KageTimeline::on_event(GdkEvent *e) {
 			unsigned int p_frameIndex = ((draw1.x-FRAME_WIDTH_OFFSET) - ((unsigned int)(draw1.x-FRAME_WIDTH_OFFSET) % 8)) / 8;
 			unsigned int p_layerCount = _kage->_document.Scenes[_kage->_document.getActiveSceneID()].Layers.size();
 			unsigned int p_layerHeight = p_layerCount * FRAME_HEIGHT;
-			unsigned int p_layerIndex = UINT_MAX;
 			if (get_height() >= p_layerHeight) {
 				draw1.y -= (get_height() - p_layerHeight); //remove excess
 			} else {
 				draw1.y += (p_layerHeight-get_height()); //pad hidden layers
 			}
-			p_layerIndex = (draw1.y - ((unsigned int)draw1.y % FRAME_HEIGHT)) / FRAME_HEIGHT;
-			_kage->setCurrentLayer(p_layerCount-p_layerIndex);
+			unsigned int l_layerSelectIndex = (draw1.y - ((unsigned int)draw1.y % FRAME_HEIGHT)) / FRAME_HEIGHT;
+			g_frameSelectIndex = p_frameIndex;
+			_kage->setCurrentLayer(p_layerCount-l_layerSelectIndex);
 			_kage->setCurrentFrame(p_frameIndex+1);
 		} else {
 			//TODO: multi-SELECT frames
@@ -258,22 +263,53 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 		p_context->line_to(       get_width(), get_height());
 		p_context->line_to(FRAME_WIDTH_OFFSET, get_height());
 		p_context->line_to(FRAME_WIDTH_OFFSET,            0);
-		p_context->set_source_rgb(0.38f, 0.38f, 0.38f);
-		p_context->fill_preserve();
-		p_context->set_source_rgb(0.38f, 0.38f, 0.38f);
+		p_context->set_source_rgb(0.75f, 0.75f, 0.75f);
+		p_context->fill();
+		p_context->set_source_rgb(0.75f, 0.75f, 0.75f);
 		p_context->stroke();
 
 		unsigned int l_layers = _kage->_document.Scenes[_kage->_document.getActiveSceneID()].Layers.size();
-		double l_y = get_height() - FRAME_HEIGHT_OFFSET;
+		double l_y = get_height();
+		//draw timeline grid
+		while (l_y + (FRAME_HEIGHT_OFFSET*2) > 0) {
+			p_context->rectangle(FRAME_WIDTH_OFFSET, l_y, get_width(), FRAME_HEIGHT_OFFSET);
+			p_context->set_source_rgb(0.9f, 0.9f, 0.9f);
+			p_context->fill();
+			
+			l_y -= (FRAME_HEIGHT_OFFSET*2);
+		}
+		double l_x = FRAME_WIDTH_OFFSET;
+		while (l_x < get_width()) {
+			p_context->move_to( l_x,            0);
+			p_context->line_to( l_x, get_height());
+			p_context->set_source_rgb(0.80f, 0.80f, 0.80f);
+			p_context->set_line_width(1.0f);
+			p_context->stroke();
+			l_x += (FRAME_WIDTH_OFFSET * _kage->_document.Project._fps);
+		}
+		
+		//draw selected frame index
+		p_context->move_to(g_frameSelectIndex * FRAME_WIDTH_OFFSET + (FRAME_WIDTH_OFFSET/2) + FRAME_WIDTH_OFFSET,            0);
+		p_context->line_to(g_frameSelectIndex * FRAME_WIDTH_OFFSET + (FRAME_WIDTH_OFFSET/2) + FRAME_WIDTH_OFFSET, get_height());
+		p_context->set_source_rgb(0.75f, 0.0f, 0.0f);
+		p_context->stroke();
+
+
+		l_y = get_height() - FRAME_HEIGHT_OFFSET;
+		unsigned int l_frames = 0;
 		for (unsigned int i = 0; i < l_layers; ++i) {
+			double l_layerSelectIndex = UINT_MAX;
 			KageLayer *l_layer = _kage->_document.Scenes[_kage->_document.getActiveSceneID()].Layers[i];
-			unsigned int l_frames = l_layer->Frames.size();
+			l_frames = l_layer->Frames.size();
 			double l_x = FRAME_WIDTH_OFFSET;//offset due to VBox divider mouse-handling
 			for (unsigned int j = 0; j < l_frames; ++j) {
 				KageFrame *l_frame = l_layer->Frames[j];
 				bool l_current = l_layer->isCurrentFrame(l_frame->frameID);
 				bool l_selected = l_frame->isSelected();
 				bool l_tween = (l_frame->getTween() > 0);
+				if (l_current && l_selected) {
+					l_layerSelectIndex = i;
+				}
 				switch (l_frame->getExtension()) {
 					case KageFrame::EXTENSION_NOT:
 					case KageFrame::EXTENSION_END:
@@ -371,17 +407,61 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 				p_context->paint();
 				l_x += FRAME_WIDTH_OFFSET;
 			}
+			
+			//dont highlight non-selected layer
+			if (l_layerSelectIndex != i) {
+				p_context->rectangle(FRAME_WIDTH_OFFSET, l_y, get_width(), FRAME_HEIGHT_OFFSET);
+				p_context->set_source_rgba(0.85f, 0.85f, 0.85f, 0.25f);
+				p_context->fill();
+			}
+			
 			l_y -= FRAME_HEIGHT_OFFSET;
 		}
-		/*
-			p_context->select_font_face ("Verdana", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_BOLD);
-			p_context->set_font_size(12);
-			p_context->set_source_rgb(0.75f, 0.75f, 0.75f);
-			p_context->move_to(10, 40);
-			p_context->show_text("Under Construction");
-			p_context->move_to(10, 80);
-			p_context->show_text("Frames");
-		*/
+
+		//resize widget as per current frame/layer count
+		int l_width, l_height;
+		get_size_request(l_width, l_height);
+		if (l_width/FRAME_WIDTH_OFFSET != l_frames+1 /* +1 is for offset due to VBox divider mouse-handling*/
+				|| l_height/FRAME_HEIGHT_OFFSET != l_layers) {
+			l_width = (l_frames+1) * FRAME_WIDTH_OFFSET;
+			l_height = l_layers * FRAME_HEIGHT_OFFSET;
+			set_size_request(l_width, l_height);
+		}
+
+		Cairo::TextExtents extents;
+		string l_text;
+		//draw currently selected Layer/Frame
+		p_context->select_font_face ("Arial", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_BOLD);
+		p_context->set_font_size(16);
+		p_context->set_source_rgb(0.25f, 0.5f, 0.25f);
+		l_text = "Layer " + StringHelper::unsignedIntegerToString(_kage->getCurrentLayer()) + " Frame " + StringHelper::unsignedIntegerToString(_kage->getCurrentFrame());// + " ? " + StringHelper::unsignedIntegerToString(g_frameSelectIndex);
+		p_context->get_text_extents(l_text, extents);
+			p_context->move_to( get_width() - (extents.width + 24), get_height() - 24);
+
+		p_context->show_text(l_text);
+		
+		//draw frame Number
+		l_x = FRAME_WIDTH_OFFSET;
+		unsigned int l_ctr = 0;
+		
+		p_context->select_font_face ("Arial", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_BOLD);
+		p_context->set_font_size(16);
+		//p_context->set_source_rgb(0.34f, 0.34f, 0.34f);
+		p_context->set_source_rgb(0.5f, 0.5f, 0.5f);
+		while (l_x < get_width()) {
+			l_text = StringHelper::unsignedIntegerToString(_kage->_document.Project._fps * l_ctr);
+			p_context->get_text_extents(l_text, extents);
+				p_context->move_to( l_x-(extents.width/2), 16);
+				p_context->show_text(l_text);
+
+			l_text = StringHelper::unsignedIntegerToString(l_ctr) + "s";
+			p_context->get_text_extents(l_text, extents);
+				p_context->move_to( l_x-(extents.width/2), get_height()-2);
+				p_context->show_text(l_text);
+			l_x += (FRAME_WIDTH_OFFSET * _kage->_document.Project._fps);
+			++l_ctr;
+		}
+		
 		//render mouse-multiselect
 		if (mouseIsDown == true) {
 			vector<double> dashes;
@@ -394,7 +474,7 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 			p_context->line_to(draw2.x, draw2.y);
 			p_context->line_to(draw1.x, draw2.y);
 			p_context->line_to(draw1.x, draw1.y);
-			p_context->set_source_rgb(0.75f, 0.0f, 0.0f);
+			p_context->set_source_rgb(0.85f, 0.0f, 0.0f);
 			p_context->stroke();
 		}
 		return true;

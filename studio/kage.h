@@ -21,36 +21,29 @@
 
 #ifndef GTKMM_KAGE_H
 	#define GTKMM_KAGE_H
-	
-	#include <gtkmm/window.h>
-	#include <gtkmm/button.h>
-	#include <gtkmm/box.h>
-	#include <gtkmm/uimanager.h>
-	#include <gtkmm/stock.h>
-	#include <gtkmm/label.h>
-	//#include <gtkmm/action.h>
-	#include <gtkmm/radioaction.h>
-	//#include <gtkmm/menubar.h>
-	#include <gtkmm/separator.h>
-	#include <gtkmm/paned.h>
-	#include <gtkmm/statusbar.h>
-	#include <gtkmm/togglebutton.h>
-	#include <gtkmm/messagedialog.h>
+	/*
 	#include <gtkmm/tooltip.h>
-	#include <gtkmm/scrollbar.h>
+	#include <gtkmm/scale.h>*/
+	#include <gtkmm/togglebutton.h>
+	#include <gtkmm/paned.h>
 	#include <gtkmm/scrolledwindow.h>
+	#include <gtkmm/separator.h>
+	#include <gtkmm/scrollbar.h>
+	#include <gtkmm/uimanager.h>
+	#include <gtkmm/statusbar.h>
+	#include <gtkmm/radioaction.h>
+	#include <gtkmm/messagedialog.h>
 	#include <gtkmm/filechooserdialog.h>
-	#include <gtkmm/colorbutton.h>
-	#include <gtkmm/colorselection.h>
-	#include <gtkmm/colorchooser.h>
-	#include <gtkmm/comboboxtext.h>
-	#include <gtkmm/liststore.h>
-	#include <gtkmm/scale.h>
 	#include "kage/timeline/layermanager.h"
 	//#include "kage/timeline/layer.h"
 	#include "kage/timeline/framesmanager.h"
 	//#include "kage/timeline/timeline.h"
 	#include "kage/stage.h"
+	#include "kage/properties/fillstroke.h"
+	#include "kage/properties/frametween.h"
+	#include "kage/properties/locationsize.h"
+	#include "kage/properties/nodexy.h"
+	#include "kage/properties/stage.h"
 	#include "about.h"
 //	#include "register.h" -- not implemented yet; this is to gather users for support group
 	
@@ -223,144 +216,12 @@
 			Gtk::HSeparator m_Separator_Toolbar3;
 			Gtk::HSeparator m_Separator_Toolbar4;
 			Gtk::Label m_LabelProp;
-			//Stage Property items
-				Gtk::HBox m_PropStage;
-				Gtk::VBox m_PropStageV1;
-				Gtk::VBox m_PropStageV2;
-				Gtk::Label m_LabelStageWid;
-				Gtk::Label m_LabelStageHgt;
-				Gtk::Label m_LabelStageBG;
-				Gtk::Label m_LabelStageFPS;
-				
-				Gtk::Entry m_EntryStageWid;
-				Gtk::Entry m_EntryStageHgt;
-					void EntryStageArea_onEnter();
-				Gtk::ColorButton m_ColorButtonStage;
-//				Gtk::ColorChooser m_ColorChooser;
-				Gtk::ColorSelection m_ColorSelectionStage;
-					void ColorButtonStage_onClick();
-				Gtk::Entry m_EntryStageFPS;
-					void EntryStageFPS_onEnter();
 			Gtk::ScrolledWindow m_Property_Pane_ScrolledWindow;
 			Gtk::VScrollbar     m_Property_Pane_VScrollbar;
-			//Fill Property items
-				Gtk::HBox m_PropFill;
-					bool _propFillVisible = false;
-				Gtk::VBox m_PropFillV1;
-				Gtk::VBox m_PropFillV2;
-				
-				Gtk::Button m_ButtonFill;
-				Gtk::ColorButton m_ColorButtonFill;
-					void ColorButtonFill_onClick();
-				Gtk::Label m_LabelFillR;
-				Gtk::Label m_LabelFillG;
-				Gtk::Label m_LabelFillB;
-				Gtk::Label m_LabelFillAlpha;
-				Glib::RefPtr<Gtk::Adjustment> _adjustFillR;
-				Glib::RefPtr<Gtk::Adjustment> _adjustFillG;
-				Glib::RefPtr<Gtk::Adjustment> _adjustFillB;
-				Glib::RefPtr<Gtk::Adjustment> _adjustFillA;
-				
-				Gtk::Scale _scaleFillR;
-					void FillR_onChange();
-				Gtk::Scale _scaleFillG;
-					void FillG_onChange();
-				Gtk::Scale _scaleFillB;
-					void FillB_onChange();
-				Gtk::Scale _scaleFillAplha;
-					void FillAlpha_onChange();
-				Gtk::Label m_LabelFillRGBA;	
-				Gtk::Entry m_EntryFillRGBA;
-					void EntryFillRGBA_onEnter();
-				void updateEntryFillRGBA();
-			//Stroke Property items
-				Gtk::HBox m_PropStroke;
-					bool _propStrokeVisible = false;
-				Gtk::VBox m_PropStrokeV1;
-				Gtk::VBox m_PropStrokeV2;
-				
-				Glib::RefPtr<Gtk::Adjustment> _adjustStrokeR;
-				Glib::RefPtr<Gtk::Adjustment> _adjustStrokeG;
-				Glib::RefPtr<Gtk::Adjustment> _adjustStrokeB;
-				Glib::RefPtr<Gtk::Adjustment> _adjustStrokeA;
-				
-				Gtk::Button m_ButtonStroke;
-				Gtk::Label m_LabelStrokeThickness;
-				Gtk::Entry m_EntryStrokeThickness;
-					void EntryStrokeThickness_onEnter();
-				Gtk::Label m_LabelStrokeR;
-				Gtk::Label m_LabelStrokeG;
-				Gtk::Label m_LabelStrokeB;
-				Gtk::Label m_LabelStrokeAlpha;
-				Gtk::Scale _scaleStrokeR;
-					void StrokeR_onChange();
-				Gtk::Scale _scaleStrokeG;
-					void StrokeG_onChange();
-				Gtk::Scale _scaleStrokeB;
-					void StrokeB_onChange();
-				Gtk::Scale _scaleStrokeAlpha;
-					void StrokeAlpha_onChange();
-				Gtk::Label m_LabelStrokeRGBA;	
-				Gtk::Entry m_EntryStrokeRGBA;
-					void EntryStrokeRGBA_onEnter();
-				void updateEntryStrokeRGBA();
-				Gtk::ColorButton m_ColorButtonStroke;
-					void ColorButtonStroke_onClick();
-			//Toggle for Fill/Stroke Property items
-				Gtk::HBox m_PropFillLabel;
-				Gtk::VBox m_PropFillLabelV1;
-				Gtk::VBox m_PropFillLabelV2;
-
-				Gtk::HBox m_PropStrokeLabel;
-				Gtk::VBox m_PropStrokeLabelV1;
-				Gtk::VBox m_PropStrokeLabelV2;
 			
-			//X/Y Width/Height Shape's properties
-				Gtk::HBox m_propLocationSize;
-				Gtk::VBox m_propLocationSizeV1;
-				Gtk::VBox m_propLocationSizeV2;
-				Gtk::Label m_LabelX;
-				Gtk::Entry m_EntryX;
-					void EntryX_onEnter();
-				Gtk::Label m_LabelY;
-				Gtk::Entry m_EntryY;
-					void EntryY_onEnter();
-				Gtk::Label m_LabelWidth;
-				Gtk::Entry m_EntryWidth;
-					void EntryWidth_onEnter();
-				Gtk::Label m_LabelHeight;
-				Gtk::Entry m_EntryHeight;
-					void EntryHeight_onEnter();
-					
-			//X/Y Node's properties
-				Gtk::HBox m_propNodeXY;
-				Gtk::VBox m_propNodeXYV1;
-				Gtk::VBox m_propNodeXYV2;
-				Gtk::Label m_LabelNodeX;
-				Gtk::Entry m_EntryNodeX;
-					void EntryNodeX_onEnter();
-				Gtk::Label m_LabelNodeY;
-				Gtk::Entry m_EntryNodeY;
-					void EntryNodeY_onEnter();
-				Gtk::Label m_LabelToggleLine;
-				Gtk::Button _btnToggleLine;
-					Gtk::Image                _btnToggleLine_img;
-					Glib::RefPtr<Gdk::Pixbuf> _btnToggleLine_pixbuf;
-					void ToggleLine_onClick();
-			
-			//Frame's properties
-				Gtk::HBox m_propFrameTween;
-				Gtk::VBox m_propFrameTweenV1;
-				Gtk::VBox m_propFrameTweenV2;
-				Gtk::Label m_LabelTweenX;
-				Gtk::ComboBoxText m_ComboX;
-				Gtk::Label m_LabelTweenY;
-				Gtk::ComboBoxText m_ComboY;
-					void FrameTween_onChange();
 			
 			Gtk::Label m_LblHolder_Toolbar;
 			Gtk::ScrolledWindow m_Stage_Pane_ScrolledWindow;
-			KageStage m_KageStage;
 			Glib::RefPtr<Gtk::UIManager> m_refUIManager;
 			Glib::RefPtr<Gtk::ActionGroup> m_refActionGroup;
 			
@@ -403,8 +264,6 @@
 			bool dump(string p_path, string p_msg);
 			bool fileWrite(string p_path, string p_msg, std::ofstream &p_file, bool &p_flag);
 			
-			Gdk::Color m_Color;
-			
 			string openTextFile(string p_path);
 			vector<double> parseNumbers(string p_numbers);
 			vector<int> parseColorString(string p_color);
@@ -441,9 +300,17 @@
 			int _area_timeline_pane;
 			int _area_properties_pane1;
 			int _area_properties_pane2;
-			
-			bool _UPDATE_SHAPE_COLORS;
 		public:
+			KageStage m_KageStage;
+				bool _UPDATE_SHAPE_COLORS;
+				bool _propFillVisible = false;
+				bool _propStrokeVisible = false;
+			PropertyStage m_PropStage;
+			PropertyLocationSize m_propLocationSize;
+			PropertyFillStroke m_propFillStroke;
+			PropertyNodeXY m_propNodeXY;
+			PropertyFrameTween m_propFrameTween;
+			Gdk::Color m_Color; //fill or stroke?
 			void Undo_onClick();
 			void Redo_onClick();
 			void Stop_onClick();

@@ -1,5 +1,5 @@
 <KageStudio version="2020.03.10">
-<stage width="600.01" height="600" background="rgb(255, 255, 255)" fps="12" layers="1" frames="1" />
+<stage width="600" height="600" background="rgb(255, 255, 255)" fps="12" layers="1" frames="1" />
 <layer1 label="Layer 1" visible="true" locked="false">
 <frame1>
 <init>300 300</init>

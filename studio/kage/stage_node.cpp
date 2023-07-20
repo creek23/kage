@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2022  Mj Mendoza IV
+ * Copyright (C) 2011~2023  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -114,6 +114,7 @@ void KageStage::updateNodeX(double p_value, bool p_stackDo) {
 	if (p_stackDo) {
 		win->stackDo();
 	}
+	
 	invalidateToRender();
 	Kage::timestamp_OUT();
 }
@@ -165,6 +166,7 @@ void KageStage::updateNodeY(double p_value, bool p_stackDo) {
 	if (p_stackDo) {
 		win->stackDo();
 	}
+	
 	invalidateToRender();
 	Kage::timestamp_OUT();
 }
@@ -660,13 +662,13 @@ void KageStage::handleNodesMouseUp() {
 	}
 	for (unsigned int i = l_vStartIndex; i < vsize; ++i) {
 		if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC) {
-			if (handleNodes_getNearestShape(v[i].points[0].x + origin.x, v[i].points[0].y + origin.y, i, v)) {
+			if (handleNodes_getNearestShape(v[i].points[0].x, v[i].points[0].y, i, v)) {
 				selectedNodes.push_back(i-1); //visualization-wise, the control-point is for the previous Node -- it is its right control-point
 			}
-			if (handleNodes_getNearestShape(v[i].points[1].x + origin.x, v[i].points[1].y + origin.y, i, v)) {
+			if (handleNodes_getNearestShape(v[i].points[1].x, v[i].points[1].y, i, v)) {
 				selectedNodes.push_back(i);
 			}
-			if (handleNodes_getNearestShape(v[i].points[2].x + origin.x, v[i].points[2].y + origin.y, i, v)) {
+			if (handleNodes_getNearestShape(v[i].points[2].x, v[i].points[2].y, i, v)) {
 				selectedNodes.push_back(i);
 			}
 		}
@@ -709,21 +711,27 @@ bool KageStage::handleNodes_getNearestShape(double p_x, double p_y, unsigned int
 	double l_vXdiff, l_vYdiff;
 	double l_distance;
 	
-	if (p_x >= draw1.x) {
-		l_vXdiff = p_x - draw1.x;
+	double l_draw1_x = (draw1.x-origin.x) / KageStage::currentScale / _zoomValue;
+	double l_draw1_y = (draw1.y-origin.y) / KageStage::currentScale / _zoomValue;
+	if (p_x >= l_draw1_x) {
+		l_vXdiff = p_x - l_draw1_x;
 	} else {
-		l_vXdiff = draw1.x - p_x;
+		l_vXdiff = l_draw1_x - p_x;
 	}
-	if (p_y >= draw1.y) {
-		l_vYdiff = p_y - draw1.y;
+	if (p_y >= l_draw1_y) {
+		l_vYdiff = p_y - l_draw1_y;
 	} else {
-		l_vYdiff = draw1.y - p_y;
+		l_vYdiff = l_draw1_y - p_y;
 	}
 	
 	l_distance = sqrt((l_vXdiff * l_vXdiff) + (l_vYdiff * l_vYdiff));
-	if (l_distance <= _nodeToMouseDistance
-			&& isMouseOnNode(p_x, p_y, 100) == true) {
-		_nodeToMouseDistance = l_distance;
+	
+	if (l_distance <= (_nodeToMouseDistance/ KageStage::currentScale / _zoomValue)
+			&& isMouseOnNode(
+				p_x * _zoomValue * KageStage::currentScale,
+				p_y * _zoomValue * KageStage::currentScale, 100) == true) {
+	
+		_nodeToMouseDistance = l_distance * _zoomValue * KageStage::currentScale;
 		selectedShape = getSelectedShapeViaNode(p_index, p_v);
 //		addSelectedShape(selectedShape);
 		return true;

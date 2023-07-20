@@ -26,6 +26,10 @@
 ColorData KageStage::stageBG(255, 255, 255);
 ColorData KageStage::fillColor(239, 41, 41, 255);
 StrokeColorData KageStage::stroke(164, 0, 0, 255);
+
+ColorData KageStage::pencilFillColor(239, 41, 41, 0);
+StrokeColorData KageStage::pencilStroke(64, 64, 64, 64);
+
 KageStage::ToolMode KageStage::toolMode = MODE_NONE;
 GdkPoint KageStage::moveStageXY;
 
@@ -722,32 +726,54 @@ Gdk::Color KageStage::getStageBG() {
 }
 
 void KageStage::setFill(Gdk::Color p_Color) {
-	KageStage::fillColor.setR(p_Color.get_red() / 255);
-	KageStage::fillColor.setG(p_Color.get_green() / 255);
-	KageStage::fillColor.setB(p_Color.get_blue() / 255);
+	if (KageStage::toolMode == ToolMode::MODE_DRAW_PENCIL) {
+		KageStage::pencilFillColor.setR(p_Color.get_red() / 255);
+		KageStage::pencilFillColor.setG(p_Color.get_green() / 255);
+		KageStage::pencilFillColor.setB(p_Color.get_blue() / 255);
+	} else {
+		KageStage::fillColor.setR(p_Color.get_red() / 255);
+		KageStage::fillColor.setG(p_Color.get_green() / 255);
+		KageStage::fillColor.setB(p_Color.get_blue() / 255);
+	}
 	invalidateToRender();
 }
 Gdk::Color KageStage::getFill() {
 	Gdk::Color tColor;
-	tColor.set_red((gushort)KageStage::fillColor.getR() * 255);
-	tColor.set_green((gushort)KageStage::fillColor.getG() * 255);
-	tColor.set_blue((gushort)KageStage::fillColor.getB() * 255);
-	
+	if (KageStage::toolMode == ToolMode::MODE_DRAW_PENCIL) {
+		tColor.set_red((gushort)KageStage::pencilFillColor.getR() * 255);
+		tColor.set_green((gushort)KageStage::pencilFillColor.getG() * 255);
+		tColor.set_blue((gushort)KageStage::pencilFillColor.getB() * 255);
+	} else {
+		tColor.set_red((gushort)KageStage::fillColor.getR() * 255);
+		tColor.set_green((gushort)KageStage::fillColor.getG() * 255);
+		tColor.set_blue((gushort)KageStage::fillColor.getB() * 255);
+	}
 	return tColor;
 }
 
 void KageStage::setStroke(Gdk::Color p_c) {
-	KageStage::stroke.setR(p_c.get_red() / 255);
-	KageStage::stroke.setG(p_c.get_green() / 255);
-	KageStage::stroke.setB(p_c.get_blue() / 255);
+	if (KageStage::toolMode == ToolMode::MODE_DRAW_PENCIL) {
+		KageStage::pencilStroke.setR(p_c.get_red() / 255);
+		KageStage::pencilStroke.setG(p_c.get_green() / 255);
+		KageStage::pencilStroke.setB(p_c.get_blue() / 255);
+	} else {
+		KageStage::stroke.setR(p_c.get_red() / 255);
+		KageStage::stroke.setG(p_c.get_green() / 255);
+		KageStage::stroke.setB(p_c.get_blue() / 255);
+	}
 	invalidateToRender();
 }
 Gdk::Color KageStage::getStroke() {
 	Gdk::Color l_c;
-	l_c.set_red((gushort)KageStage::stroke.getR() * 255);
-	l_c.set_green((gushort)KageStage::stroke.getG() * 255);
-	l_c.set_blue((gushort)KageStage::stroke.getB() * 255);
-	
+	if (KageStage::toolMode == ToolMode::MODE_DRAW_PENCIL) {
+		l_c.set_red((gushort)KageStage::pencilStroke.getR() * 255);
+		l_c.set_green((gushort)KageStage::pencilStroke.getG() * 255);
+		l_c.set_blue((gushort)KageStage::pencilStroke.getB() * 255);
+	} else {
+		l_c.set_red((gushort)KageStage::stroke.getR() * 255);
+		l_c.set_green((gushort)KageStage::stroke.getG() * 255);
+		l_c.set_blue((gushort)KageStage::stroke.getB() * 255);
+	}
 	return l_c;
 }
 

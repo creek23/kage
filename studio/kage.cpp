@@ -781,6 +781,7 @@ Kage::Kage(string p_filePath) :
 	_UPDATE_SHAPE_COLORS = false;
 		m_propFillStroke.setFillColorData(KageStage::fillColor);
 		m_propFillStroke.setStrokeColorData(KageStage::stroke);
+		KageStage::pencilStroke.setThickness(1.0);
 	_UPDATE_SHAPE_COLORS = true;
 
 	signal_key_press_event().connect( sigc::mem_fun(*this, &Kage::on_key_press_event) );
@@ -1454,9 +1455,9 @@ void Kage::ToolPencil_onClick() {
 	propFillStrokeSetVisible(true);
 	propShapePropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
+	KageStage::toolMode = KageStage::MODE_DRAW_PENCIL;
 	m_propFillStroke.setFillButtonColor(m_KageStage.getFill());
 	m_propFillStroke.setStrokeButtonColor(m_KageStage.getStroke());
-	KageStage::toolMode = KageStage::MODE_DRAW_PENCIL;
 	m_KageStage.initNodeTool();
 }
 
@@ -1846,6 +1847,7 @@ void Kage::New_onClick() {
 		return;
 	}
 	
+	m_Library.resetAssetID();
 	_assetManager.removeAllAssets();
 	
 	_layerManager.removeAllLayers();
@@ -2841,6 +2843,12 @@ bool Kage::dtrace(string p_msg) {
 	return dump(ksfPath, p_msg);
 }
 
+/**
+ * @brief Used by Fill and Stroke tools
+ * 
+ * @param p_doFill 
+ * @param p_doStroke 
+ */
 void Kage::updateSelectedShapeColor(bool p_doFill, bool p_doStroke) {
 	double l_alphaValue;
 	if (p_doFill == true) {

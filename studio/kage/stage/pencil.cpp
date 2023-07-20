@@ -38,8 +38,8 @@ void KageStage::handleDrawPencilMouseDown(PointData p_point) {
 	
 	PointData p1(drawFree1);
 		_polyVectors.addInit();
-		_polyVectors.addFill(KageStage::fillColor.clone());
-		_polyVectors.addLineStyle(KageStage::stroke);
+		_polyVectors.addFill(KageStage::pencilFillColor.clone());
+		_polyVectors.addLineStyle(KageStage::pencilStroke);
 		_polyVectors.addMove(p1);
 
 }
@@ -121,10 +121,12 @@ void KageStage::handlePencil() {
 	cr->move_to((drawFree4.x*KageStage::currentScale*_zoomValue)+origin.x,
 				(drawFree4.y*KageStage::currentScale*_zoomValue)+origin.y);
 	cr->line_to(draw2.x, draw2.y);
-		cr->set_line_width(stroke.getThickness() / 2 * _zoomValue);
+		cr->set_line_width(KageStage::pencilStroke.getThickness() / 2 * _zoomValue);
 		cr->set_source_rgba(0.533, 0.541, 0.522, 1.0);
 		cr->stroke();
-	
+	if (KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_PENCIL) {
+		return;
+	}
 	//draw point-of-origin box
 	if (       draw2.x-5 <= (polyXhead*KageStage::currentScale*_zoomValue)+origin.x && draw2.x+5 >= (polyXhead*KageStage::currentScale*_zoomValue)+origin.x
 			&& draw2.y-5 <= (polyYhead*KageStage::currentScale*_zoomValue)+origin.y && draw2.y+5 >= (polyYhead*KageStage::currentScale*_zoomValue)+origin.y) {

@@ -72,6 +72,8 @@
 			void addDataToFrame(VectorDataManager v);
 
 			void render(unsigned int p_assetID);
+
+			void resetAssetID();
 		protected:
 			//Override default signal handler:
 			virtual bool on_expose_event(GdkEventExpose *e);

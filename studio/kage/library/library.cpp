@@ -48,7 +48,7 @@ KageLibrary::KageLibrary(Kage* p_kage) :
 	add_events(Gdk::FOCUS_CHANGE_MASK);
 //	add_events(Gdk::POINTER_MOTION_MASK);
 
-	_renderAssetID = UINT_MAX;
+	resetAssetID();
 }
 
 KageLibrary::~KageLibrary() {
@@ -259,4 +259,7 @@ vector<unsigned int> KageLibrary::raiseSelectedShape(vector<unsigned int> p_sele
 }
 void KageLibrary::addDataToFrame(VectorDataManager v) {
 	//
+}
+void KageLibrary::resetAssetID() {
+	_renderAssetID = UINT_MAX;
 }

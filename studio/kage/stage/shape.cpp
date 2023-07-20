@@ -348,11 +348,19 @@ void KageStage::updateShapeColor(bool p_doFill, bool p_doStroke) {
 		for (unsigned int i = selectedShapes[l_shapeIndex]; i < vsize; ++i) {
 			if (v[i].vectorType == VectorData::TYPE_FILL) {
 				if (p_doFill == true) {
-					v[i].fillColor = fillColor.clone();
+					if (KageStage::toolMode == ToolMode::MODE_DRAW_PENCIL) {
+						v[i].fillColor = pencilFillColor.clone();
+					} else {
+						v[i].fillColor = fillColor.clone();
+					}
 				}
 			} else if (v[i].vectorType == VectorData::TYPE_STROKE) {
 				if (p_doStroke == true) {
-					v[i].stroke = stroke.clone();
+					if (KageStage::toolMode == ToolMode::MODE_DRAW_PENCIL) {
+						v[i].stroke = pencilStroke.clone();
+					} else {
+						v[i].stroke = stroke.clone();
+					}
 				}
 				
 				break;

@@ -72,6 +72,9 @@
 			static ColorData stageBG; ///direct use for get only
 			static ColorData fillColor; ///direct use for get only
 			static StrokeColorData stroke; ///direct use for get only
+			//any changes on color/stroke during use of Pencil will be stored on Pencil only
+			static ColorData pencilFillColor; ///direct use for get only
+			static StrokeColorData pencilStroke; ///direct use for get only
 			static ToolMode toolMode;
 			static GdkPoint moveStageXY;
 			unsigned int fps;

@@ -224,11 +224,17 @@ void PropertyFillStroke::ColorButtonFill_onClick() {
 	_scaleFillG.set_value(l_green * 255.0f);
 	_scaleFillB.set_value(l_blue * 255.0f);
 	_scaleFillAlpha.set_value(l_alpha * 255.0f);
-	KageStage::fillColor.setR((int) (l_red * 255.0f));
-	KageStage::fillColor.setG((int) (l_green * 255.0f));
-	KageStage::fillColor.setB((int) (l_blue * 255.0f));
-	KageStage::fillColor.setA((int) (l_alpha * 255.0f));
-	
+	if (KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_PENCIL) {
+		KageStage::pencilFillColor.setR((int) (l_red * 255.0f));
+		KageStage::pencilFillColor.setG((int) (l_green * 255.0f));
+		KageStage::pencilFillColor.setB((int) (l_blue * 255.0f));
+		KageStage::pencilFillColor.setA((int) (l_alpha * 255.0f));
+	} else {
+		KageStage::fillColor.setR((int) (l_red * 255.0f));
+		KageStage::fillColor.setG((int) (l_green * 255.0f));
+		KageStage::fillColor.setB((int) (l_blue * 255.0f));
+		KageStage::fillColor.setA((int) (l_alpha * 255.0f));
+	}
 	_kage->m_KageStage.setFill(_kage->m_Color);
 	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
@@ -239,18 +245,32 @@ void PropertyFillStroke::ColorButtonStroke_onClick() {
 	double l_alpha = l_rgba.get_alpha();
 	
 	_scaleStrokeAlpha.set_value(l_alpha * 100.0f);
-	KageStage::stroke.setA((int) (l_alpha * 255.0f));
-	
+	if (KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_PENCIL) {
+		KageStage::pencilStroke.setA((int) (l_alpha * 255.0f));
+	} else {
+		KageStage::stroke.setA((int) (l_alpha * 255.0f));
+	}
 	_kage->m_KageStage.setStroke(_kage->m_Color);
 	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
 
 
 void PropertyFillStroke::updateEntryFillRGBA() {
-	unsigned int l_R = KageStage::fillColor.getR();
-	unsigned int l_G = KageStage::fillColor.getG();
-	unsigned int l_B = KageStage::fillColor.getB();
-	unsigned int l_A = KageStage::fillColor.getA();
+	unsigned int l_R = 0;
+	unsigned int l_G = 0;
+	unsigned int l_B = 0;
+	unsigned int l_A = 0;
+	if (KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_PENCIL) {
+		l_R = KageStage::pencilFillColor.getR();
+		l_G = KageStage::pencilFillColor.getG();
+		l_B = KageStage::pencilFillColor.getB();
+		l_A = KageStage::pencilFillColor.getA();
+	} else {
+		l_R = KageStage::fillColor.getR();
+		l_G = KageStage::fillColor.getG();
+		l_B = KageStage::fillColor.getB();
+		l_A = KageStage::fillColor.getA();
+	}
 	m_EntryFillRGBA.set_text(_kage->int255ToHex(l_R) + _kage->int255ToHex(l_G) + _kage->int255ToHex(l_B) + _kage->int255ToHex(l_A));
 }
 void PropertyFillStroke::FillR_onChange() {
@@ -259,7 +279,11 @@ void PropertyFillStroke::FillR_onChange() {
 		l_rgba.set_red( l_red / 255.0f );
 	m_ColorButtonFill.set_rgba(l_rgba);
 	
-	KageStage::fillColor.setR(l_red);
+	if (KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_PENCIL) {
+		KageStage::pencilFillColor.setR(l_red);
+	} else {
+		KageStage::fillColor.setR(l_red);
+	}
 		updateEntryFillRGBA();
 	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
@@ -269,7 +293,11 @@ void PropertyFillStroke::FillG_onChange() {
 		l_rgba.set_green( l_green / 255.0f );
 	m_ColorButtonFill.set_rgba(l_rgba);
 	
-	KageStage::fillColor.setG(l_green);
+	if (KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_PENCIL) {
+		KageStage::pencilFillColor.setG(l_green);
+	} else {
+		KageStage::fillColor.setG(l_green);
+	}
 		updateEntryFillRGBA();
 	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
@@ -279,7 +307,11 @@ void PropertyFillStroke::FillB_onChange() {
 		l_rgba.set_blue( l_blue / 255.0f );
 	m_ColorButtonFill.set_rgba(l_rgba);
 	
-	KageStage::fillColor.setB(l_blue);
+	if (KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_PENCIL) {
+		KageStage::pencilFillColor.setB(l_blue);
+	} else {
+		KageStage::fillColor.setB(l_blue);
+	}
 		updateEntryFillRGBA();
 	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
@@ -289,7 +321,11 @@ void PropertyFillStroke::FillAlpha_onChange() {
 		l_rgba.set_alpha( l_alpha / 100.f );
 	m_ColorButtonFill.set_rgba(l_rgba);
 	
-	KageStage::fillColor.setA((int) (l_alpha * 256.0f/ 100.0f));
+	if (KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_PENCIL) {
+		KageStage::pencilFillColor.setA((int) (l_alpha * 256.0f/ 100.0f));
+	} else {
+		KageStage::fillColor.setA((int) (l_alpha * 256.0f/ 100.0f));
+	}
 		updateEntryFillRGBA();
 	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
@@ -301,8 +337,12 @@ void PropertyFillStroke::EntryFillRGBA_onEnter() {
 	unsigned int l_R = 0;
 	unsigned int l_G = 0;
 	unsigned int l_B = 0;
-	unsigned int l_A = KageStage::fillColor.getA();
-	
+	unsigned int l_A = 0;
+	if (KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_PENCIL) {
+		l_A = KageStage::pencilFillColor.getA();
+	} else {
+		l_A = KageStage::fillColor.getA();
+	}
 	string l_sR = "";
 	string l_sG = "";
 	string l_sB = "";
@@ -363,11 +403,19 @@ void PropertyFillStroke::EntryFillRGBA_onEnter() {
 	_scaleFillG.set_value(l_G);
 	_scaleFillB.set_value(l_B);
 	_scaleFillAlpha.set_value((double) l_A / 255.0f * 100.0f);
-	KageStage::fillColor.setR(l_R);
-	KageStage::fillColor.setG(l_G);
-	KageStage::fillColor.setB(l_B);
-	KageStage::fillColor.setA(l_A);
 	
+	if (KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_PENCIL) {
+		KageStage::pencilFillColor.setR(l_R);
+		KageStage::pencilFillColor.setG(l_G);
+		KageStage::pencilFillColor.setB(l_B);
+		KageStage::pencilFillColor.setA(l_A);
+	} else {
+		KageStage::fillColor.setR(l_R);
+		KageStage::fillColor.setG(l_G);
+		KageStage::fillColor.setB(l_B);
+		KageStage::fillColor.setA(l_A);
+	}
+
 	Gdk::RGBA l_rgba = m_ColorButtonFill.get_rgba();
 		l_rgba.set_red  ( l_R / 255.f );
 		l_rgba.set_blue ( l_G / 255.f );
@@ -380,10 +428,21 @@ void PropertyFillStroke::EntryFillRGBA_onEnter() {
 
 
 void PropertyFillStroke::updateEntryStrokeRGBA() {
-	unsigned int l_R = KageStage::stroke.getR();
-	unsigned int l_G = KageStage::stroke.getG();
-	unsigned int l_B = KageStage::stroke.getB();
-	unsigned int l_A = KageStage::stroke.getA();
+	unsigned int l_R = 0;
+	unsigned int l_G = 0;
+	unsigned int l_B = 0;
+	unsigned int l_A = 0;
+	if (KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_PENCIL) {
+		l_R = KageStage::pencilStroke.getR();
+		l_G = KageStage::pencilStroke.getG();
+		l_B = KageStage::pencilStroke.getB();
+		l_A = KageStage::pencilStroke.getA();
+	} else {
+		l_R = KageStage::stroke.getR();
+		l_G = KageStage::stroke.getG();
+		l_B = KageStage::stroke.getB();
+		l_A = KageStage::stroke.getA();
+	}
 	m_EntryStrokeRGBA.set_text(_kage->int255ToHex(l_R) + _kage->int255ToHex(l_G) + _kage->int255ToHex(l_B) + _kage->int255ToHex(l_A));
 }
 void PropertyFillStroke::StrokeR_onChange() {
@@ -392,7 +451,11 @@ void PropertyFillStroke::StrokeR_onChange() {
 		l_rgba.set_red( l_red / 255.0f );
 	m_ColorButtonStroke.set_rgba(l_rgba);
 	
-	KageStage::stroke.setR(l_red);
+	if (KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_PENCIL) {
+		KageStage::pencilStroke.setR(l_red);
+	} else {
+		KageStage::stroke.setR(l_red);
+	}
 		updateEntryStrokeRGBA();
 	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
@@ -402,7 +465,11 @@ void PropertyFillStroke::StrokeG_onChange() {
 		l_rgba.set_green( l_green / 255.0f );
 	m_ColorButtonStroke.set_rgba(l_rgba);
 	
-	KageStage::stroke.setG(l_green);
+	if (KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_PENCIL) {
+		KageStage::pencilStroke.setG(l_green);
+	} else {
+		KageStage::stroke.setG(l_green);
+	}
 		updateEntryStrokeRGBA();
 	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
@@ -412,7 +479,11 @@ void PropertyFillStroke::StrokeB_onChange() {
 		l_rgba.set_blue( l_blue / 255.0f );
 	m_ColorButtonStroke.set_rgba(l_rgba);
 	
-	KageStage::stroke.setB(l_blue);
+	if (KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_PENCIL) {
+		KageStage::pencilStroke.setB(l_blue);
+	} else {
+		KageStage::stroke.setB(l_blue);
+	}
 		updateEntryStrokeRGBA();
 	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
@@ -421,8 +492,11 @@ void PropertyFillStroke::StrokeAlpha_onChange() {
 	Gdk::RGBA l_rgba = m_ColorButtonStroke.get_rgba();
 		l_rgba.set_alpha( l_alpha / 100.f );
 	m_ColorButtonStroke.set_rgba(l_rgba);
-	
-	KageStage::stroke.setA((int) (l_alpha * 256.0f/ 100.0f));
+	if (KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_PENCIL) {
+		KageStage::pencilStroke.setA((int) (l_alpha * 256.0f/ 100.0f));
+	} else {
+		KageStage::stroke.setA((int) (l_alpha * 256.0f/ 100.0f));
+	}
 		updateEntryStrokeRGBA();
 	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
@@ -433,8 +507,12 @@ void PropertyFillStroke::EntryStrokeRGBA_onEnter() {
 	unsigned int l_R = 0;
 	unsigned int l_G = 0;
 	unsigned int l_B = 0;
-	unsigned int l_A = KageStage::stroke.getA();
-	
+	unsigned int l_A = 0;
+	if (KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_PENCIL) {
+		l_A = KageStage::pencilStroke.getA();
+	} else {
+		l_A = KageStage::stroke.getA();
+	}
 	string l_sR = "";
 	string l_sG = "";
 	string l_sB = "";
@@ -495,11 +573,19 @@ void PropertyFillStroke::EntryStrokeRGBA_onEnter() {
 	_scaleStrokeG.set_value(l_G);
 	_scaleStrokeB.set_value(l_B);
 	_scaleStrokeAlpha.set_value((double) l_A / 255.0f * 100.0f);
-	KageStage::stroke.setR(l_R);
-	KageStage::stroke.setG(l_G);
-	KageStage::stroke.setB(l_B);
-	KageStage::stroke.setA(l_A);
 	
+	if (KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_PENCIL) {
+		KageStage::pencilStroke.setR(l_R);
+		KageStage::pencilStroke.setG(l_G);
+		KageStage::pencilStroke.setB(l_B);
+		KageStage::pencilStroke.setA(l_A);
+	} else {
+		KageStage::stroke.setR(l_R);
+		KageStage::stroke.setG(l_G);
+		KageStage::stroke.setB(l_B);
+		KageStage::stroke.setA(l_A);
+	}
+
 	Gdk::RGBA l_rgba = m_ColorButtonStroke.get_rgba();
 		l_rgba.set_red  ( l_R / 255.f );
 		l_rgba.set_blue ( l_G / 255.f );
@@ -513,8 +599,13 @@ void PropertyFillStroke::EntryStrokeThickness_onEnter() {
 	double l_dbl = StringHelper::toDouble(m_EntryStrokeThickness.get_text());
     if (l_dbl < 0) { l_dbl = 0; }
     if (l_dbl > 999) { l_dbl = 999; }
-	KageStage::stroke.setThickness(l_dbl);
-	m_EntryStrokeThickness.set_text(StringHelper::doubleToString(KageStage::stroke.getThickness()));
+	if (KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_PENCIL) {
+		KageStage::pencilStroke.setThickness(l_dbl);
+		m_EntryStrokeThickness.set_text(StringHelper::doubleToString(KageStage::pencilStroke.getThickness()));
+	} else {
+		KageStage::stroke.setThickness(l_dbl);
+		m_EntryStrokeThickness.set_text(StringHelper::doubleToString(KageStage::stroke.getThickness()));
+	}
 	_kage->m_KageStage.updateShapeColor(_kage->_UPDATE_SHAPE_COLORS, _kage->_UPDATE_SHAPE_COLORS);
 }
 

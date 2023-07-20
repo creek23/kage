@@ -823,6 +823,32 @@ VectorDataManager KageLayer::getFrameTweenData(unsigned int p_frameIndex) {
 							l_vHead[j].points[k].y += (l_yDistance - l_yMult);
 						}
 					}
+				} else if (l_vHead[j].vectorType == VectorData::TYPE_IMAGE && l_vTail[j].vectorType == VectorData::TYPE_IMAGE) {
+					for (unsigned int k = 1; k < 5; ++k) {
+						if (k == 2) {
+							continue;
+						}
+						double l_xDistance = l_vTail[j].points[k].x - l_vHead[j].points[k].x;
+						if (l_tweenX == 1) l_vHead[j].points[k].x += l_xDistance * l_progress;
+						if (l_tweenX == 2) l_vHead[j].points[k].x += l_xDistance * pow(0.66667, l_tweenDistance-l_tweenInterpolate);
+						if (l_tweenX == 3) {
+							double l_xMult = l_xDistance * 0.3334;
+							for (unsigned int l_tweenCtr = 1; l_tweenCtr < l_tweenInterpolate; ++l_tweenCtr) {
+								l_xMult = l_xMult * 0.6667;
+							}
+							l_vHead[j].points[k].x += (l_xDistance - l_xMult);
+						}
+						double l_yDistance = l_vTail[j].points[k].y - l_vHead[j].points[k].y;
+						if (l_tweenY == 1) l_vHead[j].points[k].y += l_yDistance * l_progress;
+						if (l_tweenY == 2) l_vHead[j].points[k].y += l_yDistance * pow(0.66667, l_tweenDistance-l_tweenInterpolate);
+						if (l_tweenY == 3) {
+							double l_yMult = l_yDistance * 0.3334;
+							for (unsigned int l_tweenCtr = 1; l_tweenCtr < l_tweenInterpolate; ++l_tweenCtr) {
+								l_yMult = l_yMult * 0.6667;
+							}
+							l_vHead[j].points[k].y += (l_yDistance - l_yMult);
+						}
+					}
 				} else if ((l_vHead[j].vectorType == VectorData::TYPE_FILL   && l_vTail[j].vectorType == VectorData::TYPE_FILL)
 						|| (l_vHead[j].vectorType == VectorData::TYPE_STROKE && l_vTail[j].vectorType == VectorData::TYPE_STROKE)) {
 					ColorData l_fillColor;

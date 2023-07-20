@@ -32,10 +32,7 @@ void KageScene::init(KageDocument *p_document) {
 
 	ID = 0;
 	_selected = false;
-
-	//_activeLayer = 1;
-	
-	//Layers.push_back(new KageLayer (this, _activeLayer, 1));
+	_activeLayerID = UINT_MAX;
 }
 
 bool KageScene::open(string p_filepath) {
@@ -82,19 +79,22 @@ unsigned int KageScene::frameCount() {
 	return l_count;
 }
 
-void KageScene::addLayer(unsigned int p_layer) {
+void KageScene::addLayer(unsigned int p_layerID) {
 	unsigned int l_count = 1;
 	if (Layers.size() > 0) {
 		l_count = (*Layers.back()).getFrameCount();
 	}
 	
-	Layers.push_back(new KageLayer(this, p_layer, l_count));
+	Layers.push_back(new KageLayer(this, p_layerID, l_count));
+	if (_activeLayerID == UINT_MAX) {
+		setActiveLayerID(p_layerID);
+	}
 }
 
-//void KageScene::deleteLayer(unsigned int p_layer) {
-void KageScene::deleteFrameset(unsigned int p_layer) {
-	Layers[p_layer-1]->removeAllFrames();
-	Layers.erase (Layers.begin() + (p_layer-1));
+void KageScene::deleteLayer(unsigned int p_layerID) {
+	//TODO: should determine if Layer on Index is same layerID as p_layerID
+	Layers[p_layerID-1]->removeAllFrames();
+	Layers.erase (Layers.begin() + (p_layerID-1));
 }
 
 bool KageScene::addFrame() {
@@ -170,7 +170,7 @@ bool KageScene::removeAllFrames() {
 }
 
 void KageScene::setActiveLayerID(unsigned int p_layerID) {
-	_activeLayer = p_layerID;
+	_activeLayerID = p_layerID;
 }
 
 unsigned int KageScene::getCurrentLayer() {
@@ -700,5 +700,5 @@ void KageScene::setFrameExtension(KageFrame::extension p_extension) {
 }
 
 unsigned int KageScene::getActiveLayerID() {
-	return _activeLayer;
+	return _activeLayerID;
 }

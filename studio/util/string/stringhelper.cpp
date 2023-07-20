@@ -153,7 +153,7 @@ string StringHelper::trim(string p_source) {
 #include <iostream>
 string StringHelper::kHash(string par, int p_len) {
 	unsigned int i = par.length();
-	string hArr[i - 1];
+	char hArr[i - 1];
 	int hNum[16] = { 75, 114, 105, 120, 119, 97, 114, 101, 32, 83, 116, 117, 100, 105, 111, 115 };
 	int hVal = 10;
 	string sHash;
@@ -168,7 +168,7 @@ string StringHelper::kHash(string par, int p_len) {
 	for (ii = 0; ii < par.length() - 1; ++ii) {
 		hArr[ii] = par[ii+1];
 		for (ii2 = 0; ii2 < 16; ++ii2) {
-			temp = (hNum[ii2] + atoi(hArr[ii].c_str()) + prem) % hVal;
+			temp = (hNum[ii2] + int(hArr[ii]) + prem) % hVal;
 			if (temp < 25) {
 				temp = 97 + temp % 26;
 			} else {
@@ -177,7 +177,7 @@ string StringHelper::kHash(string par, int p_len) {
 			prem = temp % 52;
 			hNum[ii2] = temp;
 		}
-		prem = atoi(hArr[ii].c_str()) % hVal;
+		prem = int(hArr[ii]) % hVal;
 	}
 	
 	std::stringstream ss;

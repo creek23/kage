@@ -32,6 +32,7 @@
 	class KageAsset : public Gtk::DrawingArea {
 		public:
 			enum AssetType {
+				ASSET_NULL,
 				ASSET_IMAGE,
 				ASSET_KAGE,
 				ASSET_VIDEO

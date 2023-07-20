@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2022  Mj Mendoza IV
+ * Copyright (C) 2011~2023  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@
 	#include "kage/stage/stage.h"
 	#include "kage/library/assetmanager.h"
 	#include "kage/library/library.h"
+	#include "kage/properties/asset.h"
 	#include "kage/properties/fillstroke.h"
 	#include "kage/properties/frametween.h"
 	#include "kage/properties/locationsize.h"
@@ -62,6 +63,7 @@
 	
 	#include <fstream> //ofstream
 	#include <iostream> //cerr
+	#include <filesystem>
 	
 	#include <gdkmm/cursor.h>
 	#include <gdkmm/frameclock.h>
@@ -156,8 +158,6 @@
 			void RemoveTweenFrame_onClick();
 //			void New_onClick();
 			void OpenKSF_onClick();
-			void Save_onClick();
-			void SaveAs_onClick();
 			void ExportKS_onClick();
 			void ExportHTML5_onClick();
 			void ExportSVG_onClick();
@@ -166,16 +166,20 @@
 			void ExportPNGSpritesheet_onClick();
 			void ExportPNGSequence_onClick();
 			void ExportVideo_onClick();
-			void ProjectSave_onClick(); //place holder
+			void ProjectSave_onClick();
+			void ProjectSaveAs_onClick();
 			void ImportAsset_onClick();
 			
 			virtual bool on_delete_event(GdkEventAny* any_event);
 			virtual bool on_key_press_event(GdkEventKey *e) override;
 			virtual bool on_key_release_event(GdkEventKey *e) override;
 			
-			void doOpen();
+			void doOpenKAGE();
+			void doOpenKSF();
+			void doSaveProjectDialog(string p_title);
+			void doSaveProject(string p_filename);
 			void doSaveDialog(string p_title);
-			void doSave(string p_filename);
+			bool doSaveKSF(string p_filename);
 			
 			void doExportPNGDialog(string p_title, bool p_transparent);
 			
@@ -290,6 +294,10 @@
 			
 			unsigned m_ContextId;
 			
+			bool kageInited;
+			string kagePath;
+			std::ofstream kageFile;
+			
 			bool ksfInited;
 			string ksfPath;
 			std::ofstream ksfFile;
@@ -299,6 +307,7 @@
 			std::ofstream expFile;
 			bool dtrace(string p_msg);
 			bool saveKageStudio(string p_path, string p_msg);
+			bool saveKageStudioFile(string p_path, string p_msg);
 			bool exportHtml5(string p_path, string p_msg);
 			bool exportSvg(string p_path, string p_msg);
 			bool exportKonsolScript(string p_path, string p_msg);
@@ -308,6 +317,8 @@
 			string openTextFile(string p_path);
 			vector<double> parseNumbers(string p_numbers);
 			vector<int> parseColorString(string p_color);
+			void parseKAGE_Children(vector<XmlTag> p_children);
+			void parseKAGE(string p_content);
 			void parseKSF_Children(vector<XmlTag> p_children);
 			void parseKSF(string p_content);
 			bool runExternal(string p_cmd, string p_param);
@@ -351,6 +362,7 @@
 				bool _propStrokeVisible = false;
 			PropertyStage m_PropStage;
 			PropertyLocationSize m_propLocationSize;
+			PropertyAsset m_propAsset;
 			PropertyFillStroke m_propFillStroke;
 			PropertyNodeXY m_propNodeXY;
 			PropertyFrameTween m_propFrameTween;
@@ -375,11 +387,15 @@
 			
 			void propStageSetVisible(bool p_visible);
 			void propFillStrokeSetVisible(bool p_visible);
+			void propDisplayObjectPropertiesSetVisible(bool p_visible);
+			bool _displayObjectIsShape = false;
 			void propShapePropertiesSetVisible(bool p_visible);
+			void propAssetPropertiesSetVisible(bool p_visible);
 			void propNodeXYSetVisible(bool p_visible);
 			void propFrameTweenSetVisible(bool p_visible);
 			void updateColors();
 			void updateShapeProperties();
+			void updateAssetProperties();
 			void updateNodeXY();
 			void updateSelectedShapeColor(bool p_doFill = true, bool p_doStroke = true);
 			

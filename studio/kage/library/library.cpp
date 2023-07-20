@@ -88,6 +88,8 @@ bool KageLibrary::on_event(GdkEvent *e) {
 	} else if (e->type == GDK_BUTTON_PRESS) {
 		KageLibrary::mouseIsDown = true;
 		//
+	} else if (e->type == GDK_DOUBLE_BUTTON_PRESS) {
+		_kage->_stage.addImage(_renderAssetID);
 	} else if (e->type == GDK_EXPOSE) {
 		on_expose_event((GdkEventExpose*) e);
 	} else if (e->type == GDK_FOCUS_CHANGE) {

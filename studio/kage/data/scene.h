@@ -47,7 +47,7 @@
 			unsigned int ID;
 			bool _selected;
 			bool _saved;
-			unsigned int _activeLayer;
+			unsigned int _activeLayerID;
 		public:
 			static bool LOADING_MODE;
 			KageScene(KageDocument *p_document, string p_filepath);
@@ -64,8 +64,8 @@
 			KageScene(KageDocument *p_document);
 			KageScene(KageDocument *p_document, KageScene *p_scene);
 			virtual ~KageScene();
-			void addLayer(unsigned int p_layer);
-			void deleteFrameset(unsigned int p_layer);
+			void addLayer(unsigned int p_layerID);
+			void deleteLayer(unsigned int p_layerID);
 			bool addFrame();
 			bool extendFrame();
 			bool duplicateFrame();

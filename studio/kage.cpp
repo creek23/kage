@@ -34,6 +34,7 @@ Kage::Kage(string p_filePath) :
 			   _timeline(this),
 			   m_PropStage(this),
 			   m_propLocationSize(this),
+			   m_propAsset(this),
 			   m_propFillStroke(this),
 			   m_propNodeXY(this),
 			   m_propFrameTween(this),
@@ -76,12 +77,12 @@ Kage::Kage(string p_filePath) :
 		sigc::mem_fun(*this, &Kage::OpenKSF_onClick)
 	);
 	m_refActionGroup->add(
-		Gtk::Action::create("Save", Gtk::Stock::SAVE, "_Save", "Save current file"),
-		sigc::mem_fun(*this, &Kage::Save_onClick)
+		Gtk::Action::create("SaveProject", Gtk::Stock::SAVE, "_Save", "Save Project"),
+		sigc::mem_fun(*this, &Kage::ProjectSave_onClick)
 	);
 	m_refActionGroup->add(
-		Gtk::Action::create("SaveAs", "Save _As", "Save current file As"),
-		sigc::mem_fun(*this, &Kage::SaveAs_onClick)
+		Gtk::Action::create("SaveProjectAs", "Save _As", "Save Project As"),
+		sigc::mem_fun(*this, &Kage::ProjectSaveAs_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("ExportKS", "Export KonsolScript", "Export to KS"),
@@ -473,8 +474,8 @@ Kage::Kage(string p_filePath) :
 		"			<menuitem action='New'/>"
 		"			<menuitem action='OpenKSF'/>"
 		"			<separator/>"
-		"			<menuitem action='Save'/>"
-		"			<menuitem action='SaveAs'/>"
+		"			<menuitem action='SaveProject'/>"
+		"			<menuitem action='SaveProjectAs'/>"
 		"			<separator/>"
 		"			<menu action='ExportMenu'>"
 		"				<menuitem action='ExportVideo'/>"
@@ -655,7 +656,7 @@ Kage::Kage(string p_filePath) :
 										}
 										auto screen = Gdk::Screen::get_default();
 										auto ctx = _btnLayerAdd.get_style_context();
-										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										//ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 										_btnLayerAdd.set_name("gtkbutton");
 
 										_btnLayerAdd.set_size_request(16, 16);
@@ -668,7 +669,7 @@ Kage::Kage(string p_filePath) :
 										_btnLayerDelete.show();
 										
 										ctx = _btnLayerDelete.get_style_context();
-										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										//ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 										_btnLayerDelete.set_name("gtkbutton");
 										
 										_btnLayerDelete.set_size_request(16, 16);
@@ -683,7 +684,7 @@ Kage::Kage(string p_filePath) :
 										_btnLayerMoveTop.show();
 										
 										ctx = _btnLayerMoveTop.get_style_context();
-										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										//ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 										_btnLayerMoveTop.set_name("gtkbutton");
 										
 										_btnLayerMoveTop.set_size_request(16, 16);
@@ -698,7 +699,7 @@ Kage::Kage(string p_filePath) :
 										_btnLayerMoveUp.show();
 										
 										ctx = _btnLayerMoveUp.get_style_context();
-										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										//ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 										_btnLayerMoveUp.set_name("gtkbutton");
 										
 										_btnLayerMoveUp.set_size_request(16, 16);
@@ -713,7 +714,7 @@ Kage::Kage(string p_filePath) :
 										_btnLayerMoveDown.show();
 										
 										ctx = _btnLayerMoveDown.get_style_context();
-										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										//ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 										_btnLayerMoveDown.set_name("gtkbutton");
 										
 										_btnLayerMoveDown.set_size_request(16, 16);
@@ -728,7 +729,7 @@ Kage::Kage(string p_filePath) :
 										_btnLayerMoveBottom.show();
 										
 										ctx = _btnLayerMoveBottom.get_style_context();
-										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										//ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 										_btnLayerMoveBottom.set_name("gtkbutton");
 										
 										_btnLayerMoveBottom.set_size_request(16, 16);
@@ -743,7 +744,7 @@ Kage::Kage(string p_filePath) :
 										_toggleOnion.show();
 										
 										ctx = _toggleOnion.get_style_context();
-										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										//ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 										_toggleOnion.set_name("gtkbutton");
 										
 										_toggleOnion.set_size_request(16, 16);
@@ -758,7 +759,7 @@ Kage::Kage(string p_filePath) :
 										_toggleOnionLayer.show();
 										
 										ctx = _toggleOnionLayer.get_style_context();
-										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										//ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 										_toggleOnionLayer.set_name("gtkbutton");
 										
 										_toggleOnionLayer.set_size_request(16, 16);
@@ -788,7 +789,7 @@ Kage::Kage(string p_filePath) :
 										_btnTimelineRewind.show();
 										
 										ctx = _btnTimelineRewind.get_style_context();
-										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										//ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 										_btnTimelineRewind.set_name("gtkbutton");
 										
 										_btnTimelineRewind.set_size_request(16, 16);
@@ -803,7 +804,7 @@ Kage::Kage(string p_filePath) :
 										_btnTimelinePrevious.show();
 										
 										ctx = _btnTimelinePrevious.get_style_context();
-										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										//ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 										_btnTimelinePrevious.set_name("gtkbutton");
 										
 										_btnTimelinePrevious.set_size_request(16, 16);
@@ -818,7 +819,7 @@ Kage::Kage(string p_filePath) :
 										_btnTimelinePlay.show();
 										
 										ctx = _btnTimelinePlay.get_style_context();
-										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										//ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 										_btnTimelinePlay.set_name("gtkbutton");
 										
 										_btnTimelinePlay.set_size_request(16, 16);
@@ -833,7 +834,7 @@ Kage::Kage(string p_filePath) :
 										_btnTimelineNext.show();
 										
 										ctx = _btnTimelineNext.get_style_context();
-										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										//ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 										_btnTimelineNext.set_name("gtkbutton");
 										
 										_btnTimelineNext.set_size_request(16, 16);
@@ -848,7 +849,7 @@ Kage::Kage(string p_filePath) :
 										_btnTimelineStop.show();
 										
 										ctx = _btnTimelineStop.get_style_context();
-										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										//ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 										_btnTimelineStop.set_name("gtkbutton");
 										
 										_btnTimelineStop.set_size_request(16, 16);
@@ -863,7 +864,7 @@ Kage::Kage(string p_filePath) :
 										_btnTimelineLoop.show();
 										
 										ctx = _btnTimelineLoop.get_style_context();
-										ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										//ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 										_btnTimelineLoop.set_name("gtkbutton");
 										
 										_btnTimelineLoop.set_size_request(16, 16);
@@ -907,6 +908,8 @@ Kage::Kage(string p_filePath) :
 				m_PropertyBox.pack_start(m_propFillStroke, Gtk::PACK_SHRINK);
 				//X/Y Width/Height
 				m_PropertyBox.pack_start(m_propLocationSize, Gtk::PACK_SHRINK);
+				//X/Y Width/Height for Asset
+				m_PropertyBox.pack_start(m_propAsset, Gtk::PACK_SHRINK);
 				//X/Y of Node
 				m_PropertyBox.pack_start(m_propNodeXY, Gtk::PACK_SHRINK);
 				//Frame Tween
@@ -933,12 +936,15 @@ Kage::Kage(string p_filePath) :
 	
 	if (p_filePath != "") {
 		ksfPath = p_filePath;
-		doOpen();
+		doOpenKAGE();
 	}
 	_UPDATE_SHAPE_COLORS = false;
 		m_propFillStroke.setFillColorData(KageStage::fillColor);
 		m_propFillStroke.setStrokeColorData(KageStage::stroke);
 		KageStage::pencilStroke.setThickness(1.0);
+		//collapse fill/stroke
+		m_propFillStroke.TogglePropertiesFill_onClick();
+		m_propFillStroke.TogglePropertiesStroke_onClick();
 	_UPDATE_SHAPE_COLORS = true;
 	
 	signal_key_press_event().connect( sigc::mem_fun(*this, &Kage::on_key_press_event) );
@@ -1301,11 +1307,11 @@ void Kage::refreshUI() {
 	} else if (KageStage::toolMode == KageStage::MODE_NODE) {
 		propFillStrokeSetVisible(false);
 		propStageSetVisible(false);
-		propShapePropertiesSetVisible(false);
+		propDisplayObjectPropertiesSetVisible(false);
 	} else if (KageStage::toolMode == KageStage::MODE_NONE) {
 		propNodeXYSetVisible(false);
 		propFillStrokeSetVisible(false);
-		propShapePropertiesSetVisible(false);
+		propDisplayObjectPropertiesSetVisible(false);
 	}
 	
 
@@ -1421,6 +1427,7 @@ void Kage::TweenFrame_onClick() {
 //			stackDo();
 			propFrameTweenSetVisible(true);
 			forceRenderFrames();
+			_timeline.forceRender();
 		}
 	}
 	
@@ -1435,6 +1442,7 @@ void Kage::RemoveTweenFrame_onClick() {
 //			stackDo();
 			propFrameTweenSetVisible(false);
 			forceRenderFrames();
+			_timeline.forceRender();
 		}
 	}
 	
@@ -1479,7 +1487,7 @@ void Kage::LockUnlockLayer_onClick() {
 }
 void Kage::LayerDel_onClick() {
 	if (_layerManager.layerCount() > 1) {
-		_document.Scenes[_document.getActiveSceneID()].deleteFrameset(getCurrentLayer());
+		_document.Scenes[_document.getActiveSceneID()].deleteLayer(getCurrentLayer());
 		_layerManager.deleteLayer();
 	}
 	
@@ -1601,7 +1609,7 @@ void Kage::ToolSelect_onClick() {
 	toolsButtonToggle("Select Tool");
 	propStageSetVisible(true);
 	propFillStrokeSetVisible(false);
-	propShapePropertiesSetVisible(false);
+	propDisplayObjectPropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	KageStage::toolMode = KageStage::MODE_SELECT;
 	_stage.initNodeTool();
@@ -1612,7 +1620,7 @@ void Kage::ToolNode_onClick() {
 	toolsButtonToggle("Node Tool");
 	propStageSetVisible(false);
 	propFillStrokeSetVisible(false);
-	propShapePropertiesSetVisible(false);
+	propDisplayObjectPropertiesSetVisible(false);
 	propNodeXYSetVisible(true);
 	m_propFillStroke.setFillButtonColor(_stage.getFill());
 	m_propFillStroke.setStrokeButtonColor(_stage.getStroke());
@@ -1625,7 +1633,7 @@ void Kage::ToolPoly_onClick() {
 	toolsButtonToggle("Poly Tool");
 	propStageSetVisible(false);
 	propFillStrokeSetVisible(true);
-	propShapePropertiesSetVisible(false);
+	propDisplayObjectPropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	m_propFillStroke.setFillButtonColor(_stage.getFill());
 	m_propFillStroke.setStrokeButtonColor(_stage.getStroke());
@@ -1637,7 +1645,7 @@ void Kage::ToolPencil_onClick() {
 	toolsButtonToggle("Pencil Tool");
 	propStageSetVisible(false);
 	propFillStrokeSetVisible(true);
-	propShapePropertiesSetVisible(false);
+	propDisplayObjectPropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	KageStage::toolMode = KageStage::MODE_DRAW_PENCIL;
 	m_propFillStroke.setFillButtonColor(_stage.getFill());
@@ -1649,7 +1657,7 @@ void Kage::ToolOval_onClick() {
 	toolsButtonToggle("Oval Tool");
 	propStageSetVisible(false);
 	propFillStrokeSetVisible(true);
-	propShapePropertiesSetVisible(false);
+	propDisplayObjectPropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	m_propFillStroke.setFillButtonColor(_stage.getFill());
 	m_propFillStroke.setStrokeButtonColor(_stage.getStroke());
@@ -1661,7 +1669,7 @@ void Kage::ToolRectangle_onClick() {
 	toolsButtonToggle("Rectangle Tool");
 	propStageSetVisible(false);
 	propFillStrokeSetVisible(true);
-	propShapePropertiesSetVisible(false);
+	propDisplayObjectPropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	m_propFillStroke.setFillButtonColor(_stage.getFill());
 	m_propFillStroke.setStrokeButtonColor(_stage.getStroke());
@@ -1673,7 +1681,7 @@ void Kage::ToolStroke_onClick() {
 	toolsButtonToggle("Stroke Tool");
 	propStageSetVisible(false);
 	propFillStrokeSetVisible(true);
-	propShapePropertiesSetVisible(false);
+	propDisplayObjectPropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	m_propFillStroke.setFillButtonColor(_stage.getFill());
 	m_propFillStroke.setStrokeButtonColor(_stage.getStroke());
@@ -1686,7 +1694,7 @@ void Kage::ToolFill_onClick() {
 	toolsButtonToggle("Fill Tool");
 	propStageSetVisible(false);
 	propFillStrokeSetVisible(true);
-	propShapePropertiesSetVisible(false);
+	propDisplayObjectPropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	m_propFillStroke.setFillButtonColor(_stage.getFill());
 	m_propFillStroke.setStrokeButtonColor(_stage.getStroke());
@@ -1699,7 +1707,7 @@ void Kage::ToolEyedrop_onClick() {
 	toolsButtonToggle("Eyedrop Tool");
 	propStageSetVisible(false);
 	propFillStrokeSetVisible(true);
-	propShapePropertiesSetVisible(false);
+	propDisplayObjectPropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	m_propFillStroke.setFillButtonColor(_stage.getFill());
 	m_propFillStroke.setStrokeButtonColor(_stage.getStroke());
@@ -1712,7 +1720,7 @@ void Kage::ToolZoom_onClick() {
 	toolsButtonToggle("Zoom Tool");
 	propStageSetVisible(true);
 	propFillStrokeSetVisible(false);
-	propShapePropertiesSetVisible(false);
+	propDisplayObjectPropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	m_propFillStroke.setFillButtonColor(_stage.getFill());
 	m_propFillStroke.setStrokeButtonColor(_stage.getStroke());
@@ -1729,9 +1737,27 @@ void Kage::propFillStrokeSetVisible(bool p_visible) {
 	m_propFillStroke.set_visible(p_visible);
 }
 
+void Kage::propDisplayObjectPropertiesSetVisible(bool p_visible) {
+	cout << "_displayObjectIsShape " << _displayObjectIsShape << " p_visible " << p_visible << endl;
+	propShapePropertiesSetVisible(false);
+	propAssetPropertiesSetVisible(false);
+	if (p_visible == true) {
+		if (_displayObjectIsShape == true) {
+			propShapePropertiesSetVisible(true);
+		} else {
+			propAssetPropertiesSetVisible(true);
+		}
+	}
+}
+
 void Kage::propShapePropertiesSetVisible(bool p_visible) {
 	m_propLocationSize.set_visible(p_visible);
 	updateShapeProperties();
+}
+
+void Kage::propAssetPropertiesSetVisible(bool p_visible) {
+	m_propAsset.set_visible(p_visible);
+	updateAssetProperties();
 }
 
 void Kage::propNodeXYSetVisible(bool p_visible) {
@@ -1777,6 +1803,14 @@ void Kage::updateShapeProperties() {
 	m_propLocationSize.setHeightText(sanitizeToZeroDouble(_stage.propHeight * _stage.currentScale));
 }
 
+void Kage::updateAssetProperties() {
+	m_propAsset.setXText(       sanitizeToZeroDouble(_stage.propX        * _stage.currentScale));
+	m_propAsset.setYText(       sanitizeToZeroDouble(_stage.propY        * _stage.currentScale));
+	m_propAsset.setWidthText(   sanitizeToZeroDouble(_stage.propWidth    * _stage.currentScale));
+	m_propAsset.setHeightText(  sanitizeToZeroDouble(_stage.propHeight   * _stage.currentScale));
+	m_propAsset.setRotationText(sanitizeToZeroDouble(_stage.propRotation                      ));
+}
+
 void Kage::updateNodeXY() {
 	m_propNodeXY.setNodeXText(sanitizeToZeroDouble(_stage.nodeX * _stage.currentScale));
 	m_propNodeXY.setNodeYText(sanitizeToZeroDouble(_stage.nodeY * _stage.currentScale));
@@ -1797,7 +1831,7 @@ void Kage::stackDo() {
 	}
 	
 	_undoRedoManager.stackDo(getCurrentLayer(), getCurrentFrame(), getFrameData().getVectorData());
-	set_title("*" + ksfPath + " - " + KageAbout::app_title);
+	set_title("*" + kagePath + " - " + KageAbout::app_title);
 }
 
 void Kage::Quit_onClick() {
@@ -1826,6 +1860,7 @@ bool Kage::on_delete_event(GdkEventAny* any_event) {
 void Kage::addDataToFrame(VectorDataManager v, bool p_force) {
 	if (p_force || _layerManager.getLayer()->isLocked() == false) {
 		_document.Scenes[_document.getActiveSceneID()].addDataToFrame(v);
+		_timeline.forceRender();
 	}
 }
 /**
@@ -2042,6 +2077,7 @@ void Kage::New_onClick() {
 	
 	_stage.invalidateToRender();
 	
+	kagePath = "Untitled";
 	ksfPath = "Untitled";
 	
 	m_PropStage.setWidthText(_document.Project._width);
@@ -2049,7 +2085,7 @@ void Kage::New_onClick() {
 	m_PropStage.setFPSText(_document.Project._fps);
 	m_PropStage.setBackgroundColor(getStageBG());
 	
-	set_title(ksfPath + " - " + KageAbout::app_title);
+	set_title(kagePath + " - " + KageAbout::app_title);
 	updateStatus("Ready");
 }
 
@@ -2078,8 +2114,8 @@ void Kage::OpenKSF_onClick() {
 	
 	auto filter_kage = Gtk::FileFilter::create();
 		filter_kage->set_name(KageAbout::app_title + " Files");
-		filter_kage->add_mime_type("text/x-kage");
-		filter_kage->add_pattern("*.ksf");
+		filter_kage->add_mime_type("application/kage+xml");
+		filter_kage->add_pattern("*.kage");
 			dialog.add_filter(filter_kage);
 	//Show the dialog and wait for a user response:
 	int result = dialog.run();
@@ -2088,16 +2124,40 @@ void Kage::OpenKSF_onClick() {
 	switch (result) {
 		case Gtk::RESPONSE_OK:
 			New_onClick();
-			ksfPath = dialog.get_filename();
+			kagePath = dialog.get_filename();
 			cout << "uri:" << dialog.get_uri() << endl;
 			
-			doOpen();
+			int l_len = strlen(kagePath.c_str()) - 5;
+			if (StringHelper::toLower(kagePath).substr(l_len, 5) == ".kage") {
+				doOpenKAGE();
+			} else {
+				l_len = strlen(kagePath.c_str()) - 4;
+				if (StringHelper::toLower(kagePath).substr(l_len, 4) == ".ksf") {
+					ksfPath = kagePath;
+					kagePath = StringHelper::toLower(kagePath).substr(0, l_len) + ".kage";
+					doOpenKSF();
+				}
+			}
 			break;
-//		default:
-//			std::cout << "clicked " << result << endl;
 	}
 }
-void Kage::doOpen() {
+void Kage::doOpenKAGE() {
+	int l_len = strlen(kagePath.c_str()) - 5;
+	if (StringHelper::toLower(kagePath).substr(l_len, 5) != ".kage") {
+		kagePath = kagePath + ".kage";
+	}
+	
+	string l_kageContent = BasicXml::openXMLFile(kagePath);
+	
+	parseKAGE(l_kageContent);
+	_undoRedoManager.clear();
+	stackDo();
+	propFillStrokeSetVisible(false);
+	propDisplayObjectPropertiesSetVisible(false);
+	propNodeXYSetVisible(false);
+	set_title(kagePath + " - " + KageAbout::app_title);
+}
+void Kage::doOpenKSF() {
 	int l_len = strlen(ksfPath.c_str()) - 4;
 	if (StringHelper::toLower(ksfPath).substr(l_len, 4) != ".ksf") {
 		ksfPath = ksfPath + ".ksf";
@@ -2105,25 +2165,13 @@ void Kage::doOpen() {
 	
 	string l_ksfContent = BasicXml::openXMLFile(ksfPath);
 	
-	//cout << "Loaded... \n" << l_ksfContent << endl;
 	parseKSF(l_ksfContent);
 	_undoRedoManager.clear();
 	stackDo();
 	propFillStrokeSetVisible(false);
-	propShapePropertiesSetVisible(false);
+	propDisplayObjectPropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
-	set_title(ksfPath + " - " + KageAbout::app_title);
-}
-
-void Kage::Save_onClick() {
-	if (ksfPath != "Untitled") {
-		doSave(ksfPath);
-		return;
-	}
-	doSaveDialog("Save File");
-}
-void Kage::SaveAs_onClick() {
-	doSaveDialog("Save File As");
+	set_title(kagePath + " - " + KageAbout::app_title);
 }
 
 void Kage::doSaveDialog(string p_title) {
@@ -2144,13 +2192,11 @@ void Kage::doSaveDialog(string p_title) {
 	switch (result) {
 		case Gtk::RESPONSE_OK:
 			cout << "uri:" << dialog.get_uri() << endl;
-			doSave(dialog.get_filename());
+			doSaveKSF(dialog.get_filename());
 			break;
-//		default:
-//			std::cout << "clicked " << result << endl;
 	}
 }
-void Kage::doSave(string p_filename) {
+bool Kage::doSaveKSF(string p_filename) {
 	int l_len = strlen(p_filename.c_str()) - 4;
 	if (StringHelper::toLower(p_filename).substr(l_len, 4) != ".ksf") {
 		p_filename = p_filename + ".ksf";
@@ -2166,17 +2212,13 @@ void Kage::doSave(string p_filename) {
 			unsigned int l_currentLayer;
 			unsigned int l_currentFrame;
 	
-	saveKageStudio(ksfPath, "<KageStudio version=\"2020.03.10\">");
-	saveKageStudio(ksfPath, "<stage width=\"" + StringHelper::StringHelper::doubleToString(_document.Project._width) + "\" height=\"" + StringHelper::StringHelper::doubleToString(_document.Project._height) + "\" " +
-							"background=\"rgb(" + StringHelper::integerToString(_document.Project._backgroundColor.getR()) + ", " + StringHelper::integerToString(_document.Project._backgroundColor.getG()) + ", " + StringHelper::integerToString(_document.Project._backgroundColor.getB()) + ")\" " +
-							"fps=\"" + StringHelper::integerToString(_document.Project._fps) + "\" " +
-							"layers=\"" + StringHelper::integerToString(l_lMax) + "\" " +
-							"frames=\"" + StringHelper::integerToString(l_fMax) + "\" />");
+	saveKageStudioFile(ksfPath, "<KageStudio version=\"2023.06.26\">");
+	saveKageStudioFile(ksfPath, "<stage layers=\"" + StringHelper::integerToString(l_lMax) + "\" frames=\"" + StringHelper::integerToString(l_fMax) + "\" />");
 		l_currentLayer = getCurrentLayer();
 		l_currentFrame = getCurrentFrame();
 			for (i = 1; i <= l_lMax; i++) {
 				_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(i);
-				saveKageStudio(ksfPath, "<layer" + StringHelper::unsignedIntegerToString(i) + " label=\"" + _layerManager.getLabel() + "\" visible=\"" + (_layerManager.isLayerVisible()?"true":"false") + "\" locked=\"" + (_layerManager.isLayerLocked()?"true":"false") + "\">");
+				saveKageStudioFile(ksfPath, "<layer" + StringHelper::unsignedIntegerToString(i) + " label=\"" + _layerManager.getLabel() + "\" visible=\"" + (_layerManager.isLayerVisible()?"true":"false") + "\" locked=\"" + (_layerManager.isLayerLocked()?"true":"false") + "\">");
 				for (j = 1; j <= l_fMax; ++j) {
 					KageFrame *l_frame = _document.Scenes[_document.getActiveSceneID()].getFrameAt(j);
 					KageFrame::extension l_extension = l_frame->getExtension();
@@ -2185,30 +2227,28 @@ void Kage::doSave(string p_filename) {
 						l_tween = " tween=\"" + StringHelper::unsignedIntegerToString(l_frame->getTween()) + "\"";
 					}
 					if (l_extension == KageFrame::EXTENSION_NOT) {
-						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + l_tween + ">");
+						saveKageStudioFile(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + l_tween + ">");
 						_document.Scenes[_document.getActiveSceneID()].setCurrentFrame(j);
-						saveKageStudio(ksfPath, saveFrame() + "</frame" + StringHelper::unsignedIntegerToString(j) + ">");
+						saveKageStudioFile(ksfPath, saveFrame() + "</frame" + StringHelper::unsignedIntegerToString(j) + ">");
 					} else if (l_extension == KageFrame::EXTENSION_START) {
-						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + " extend=\"start\"" + l_tween + ">");
+						saveKageStudioFile(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + " extend=\"start\"" + l_tween + ">");
 						_document.Scenes[_document.getActiveSceneID()].setCurrentFrame(j);
-						saveKageStudio(ksfPath, saveFrame() + "</frame" + StringHelper::unsignedIntegerToString(j) + ">");
+						saveKageStudioFile(ksfPath, saveFrame() + "</frame" + StringHelper::unsignedIntegerToString(j) + ">");
 					} else if (l_extension == KageFrame::EXTENSION_MID) {
-						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + " extend=\"mid\"" + l_tween + " />");
+						saveKageStudioFile(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + " extend=\"mid\"" + l_tween + " />");
 					} else if (l_extension == KageFrame::EXTENSION_END) {
-						saveKageStudio(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + " extend=\"end\"" + l_tween + " />");
+						saveKageStudioFile(ksfPath, "<frame" + StringHelper::unsignedIntegerToString(j) + " extend=\"end\"" + l_tween + " />");
 					}
 				}
-				saveKageStudio(ksfPath, "</layer" + StringHelper::unsignedIntegerToString(i) + ">");
+				saveKageStudioFile(ksfPath, "</layer" + StringHelper::unsignedIntegerToString(i) + ">");
 			}
 		setCurrentLayer(l_currentLayer);
 		_document.Scenes[_document.getActiveSceneID()].setCurrentFrame(l_currentFrame);
-	if (saveKageStudio(ksfPath, "</KageStudio>") == true) {
-		updateStatus("Saved to " + ksfPath);
-		
-		set_title(ksfPath + " - " + KageAbout::app_title);
-		//TODO: zip saved file -- should it be zipped?
+	if (saveKageStudioFile(ksfPath, "</KageStudio>") == true) {
+		return true;
 	} else {
 		updateStatus("Unable to save file!  Try saving to a different location");
+		return false;
 	}
 }
 void Kage::ExportKS_onClick() {
@@ -2479,6 +2519,8 @@ void Kage::ExportPNGSpritesheet_onClick() {
 				
 				_stage.origin.x = 0;
 				_stage.origin.y = 0;
+				double l_zoomValue = _stage._zoomValue;
+				_stage._zoomValue = 1.0f;
 				
 				t = getCurrentLayer();
 				f = getCurrentFrame();
@@ -2501,6 +2543,7 @@ void Kage::ExportPNGSpritesheet_onClick() {
 
 				_stage.origin.x = l_tempOrigin.x;
 				_stage.origin.y = l_tempOrigin.y;
+				_stage._zoomValue = l_zoomValue;
 			
 			updateStatus("Exported to " + l_pngPath);
 			break;
@@ -2538,14 +2581,15 @@ void Kage::ExportPNGSequence_onClick() {
 					unsigned int t;
 					unsigned int f;
 				
-				
 				GdkPoint l_tempOrigin;
 				l_tempOrigin.x = _stage.origin.x;
 				l_tempOrigin.y = _stage.origin.y;
 				
 				_stage.origin.x = 0;
 				_stage.origin.y = 0;
-						
+				double l_zoomValue = _stage._zoomValue;
+				_stage._zoomValue = 1.0f;
+				
 				t = getCurrentLayer();
 				f = getCurrentFrame();
 					
@@ -2578,6 +2622,7 @@ void Kage::ExportPNGSequence_onClick() {
 			
 				_stage.origin.x = l_tempOrigin.x;
 				_stage.origin.y = l_tempOrigin.y;
+				_stage._zoomValue = l_zoomValue;
 			
 			updateStatus("Exported to " + l_pngSequencePath);
 			break;
@@ -2587,22 +2632,20 @@ void Kage::ExportPNGSequence_onClick() {
 void Kage::ImportAsset_onClick() {
 	Gtk::FileChooserDialog dialog("Import Image/Video", Gtk::FILE_CHOOSER_ACTION_OPEN);
 	dialog.set_transient_for(*this);
-		//Add response buttons the the dialog:
 		dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
 		dialog.add_button("_Open", Gtk::RESPONSE_OK);
 
-	//Add filters, so that only certain file types can be selected ?!? -- filtering doesn't seem to working
-	auto filter_ksf = Gtk::FileFilter::create();
-		filter_ksf->set_name(KageAbout::app_title + " files");
-		filter_ksf->add_mime_type("application/kage");
-		filter_ksf->add_pattern("*.ksf");
-			dialog.add_filter(filter_ksf);
-	
+	//Add filters, so that only certain file types can be selected ?!? -- filtering doesn't seem to be working
 	auto filter_png = Gtk::FileFilter::create();
 		filter_png->set_name("Portable Network Graphics");
 		filter_png->add_mime_type("image/png");
 		filter_png->add_pattern("*.png");
 			dialog.add_filter(filter_png);
+	auto filter_ksf = Gtk::FileFilter::create();
+		filter_ksf->set_name(KageAbout::app_title + " files");
+		filter_ksf->add_mime_type("application/kage");
+		filter_ksf->add_pattern("*.ksf");
+			dialog.add_filter(filter_ksf);
 	auto filter_avi = Gtk::FileFilter::create();
 		filter_avi->set_name("Audio Video Interleave files");
 		filter_avi->add_mime_type("video/x-msvideo");
@@ -2639,10 +2682,9 @@ void Kage::ImportAsset_onClick() {
 					if (l_image != UINT_MAX) {
 						_assetManager.setAssetType(KageAsset::AssetType::ASSET_IMAGE);
 						cout << " " << _assetManager.getImagePathByID(l_image);
-						unsigned int l_asdasd = _stage.addImage(l_image);
-						_assetManager.render(l_asdasd);
-						//_library.render(l_asdasd);
-						updateStatus("Importing of PNG is under construction " + l_importPath);
+						unsigned int l_cairoIndex = _stage.addImage(l_image);
+						_assetManager.render(l_cairoIndex);
+						updateStatus("Imported " + l_importPath);
 					} else {
 						updateStatus("Failed to import " + l_importPath);
 					}
@@ -2768,6 +2810,8 @@ void Kage::ExportVideo_onClick() {
 				t = getCurrentLayer();
 				f = getCurrentFrame();
 					
+					double l_zoomValue = _stage._zoomValue;
+					_stage._zoomValue = 1.0f;
 					for (j = 1; j <= l_fMax; ++j) {
 						_document.Scenes[_document.getActiveSceneID()].setCurrentFrame(j);
 						
@@ -2801,13 +2845,11 @@ void Kage::ExportVideo_onClick() {
 							
 							Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, _document.Project._width, _document.Project._height);
 							Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
-							
 								_stage.clearScreen(l_context);
 								for (i = 1; i <= l_lMax; i++) {
 									_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(i);
 									_stage.renderFrame(l_context, true);
 								}
-							
 							if (l_fMax+j < 10) {
 								l_pngSequencePath = l_pngPath + "0000" + StringHelper::unsignedIntegerToString(l_fMax+j) + ".png";
 							} else if (l_fMax+j < 100) {
@@ -2822,6 +2864,7 @@ void Kage::ExportVideo_onClick() {
 							CairoKage::writeToPNG(l_pngSequencePath, surface);
 						}
 					}
+					_stage._zoomValue = l_zoomValue;
 					//end of workaround
 				setCurrentFrame(f);
 				setCurrentLayer(t);
@@ -2846,24 +2889,113 @@ void Kage::ExportVideo_onClick() {
 }
 
 void Kage::ProjectSave_onClick() {
-	Gtk::FileChooserDialog dialog("Save Project", Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
-//	dialog.set_transient_for( * this);
-	//Add response buttons the the dialog:
-	dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-	dialog.add_button("Select", Gtk::RESPONSE_OK);
+	if (kagePath != "Untitled") {
+		doSaveProject(kagePath);
+		return;
+	}
+	doSaveProjectDialog("Save Project");
+}
+void Kage::ProjectSaveAs_onClick() {
+	doSaveProjectDialog("Save File As");
+}
+
+void Kage::doSaveProject(string p_filename) {
+	#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+		const string l_directory = "\\";
+	#else
+		const string l_directory = "/";
+	#endif
+	int l_len = strlen(p_filename.c_str()) - 5;
+	/*if (StringHelper::toLower(p_filename).substr(l_len, 5) == ".kage") {
+		p_filename = filesystem::path(p_filename).remove_filename().u8string();
+		p_filename = p_filename.substr(0, l_len);
+	}*/
+	filesystem::path l_projectName = filesystem::path(p_filename).filename();
+	filesystem::path l_projectFileName { p_filename };
+	
+	cout << "l_projectName     " << l_projectName << endl;
+	cout << "l_projectFileName " << l_projectFileName << endl;
+	
+	filesystem::file_status l_fileStatus = filesystem::file_status{};
+	if(filesystem::status_known(l_fileStatus) ? filesystem::exists(l_fileStatus) : filesystem::exists(l_projectFileName)) {
+		cout << "//TODO: prompt if user want to overwrite" << endl;
+		//filesystem::remove_all(l_projectFileName);
+	} else {
+		filesystem::create_directory(l_projectFileName);
+		//system(("mkdir " + l_projectFileName.u8string()).c_str()); //above causes locked-access on directory; study filesystem::permissions/perms
+	}
+	
+	string l_filename = l_projectFileName.u8string();
+	//ofstream{l_projectFileName/l_projectName+".kage"};
+	
+	l_len = strlen(p_filename.c_str()) - 5;
+	if (StringHelper::toLower(p_filename).substr(l_len, 5) != ".kage") {
+		p_filename += (l_directory + l_projectName.u8string() + ".kage");
+	}
+	cout << "l_filename " << l_filename << endl;
+	cout << "p_filename " << p_filename << endl;
+	kagePath = l_filename;//p_filename;
+	kageInited = false;
+	kageFile.close();
+	
+	unsigned int l_sceneMax = _document.Scenes.size();
+	unsigned int l_assetMax = _assetManager.assetCount();
+	unsigned int i;
+			unsigned int l_currentScene;
+	
+	saveKageStudio(p_filename, "<KageStudio version=\"2023.06.24\">");
+	saveKageStudio(p_filename, "<stage width=\"" + StringHelper::StringHelper::doubleToString(_document.Project._width) + "\" height=\"" + StringHelper::StringHelper::doubleToString(_document.Project._height) + "\" " +
+							"background=\"rgb(" + StringHelper::integerToString(_document.Project._backgroundColor.getR()) + ", " + StringHelper::integerToString(_document.Project._backgroundColor.getG()) + ", " + StringHelper::integerToString(_document.Project._backgroundColor.getB()) + ")\" " +
+							"fps=\"" + StringHelper::integerToString(_document.Project._fps) + "\" " +
+							"assets=\"" + StringHelper::unsignedIntegerToString(l_assetMax) + "\" " +
+							"scenes=\"" + StringHelper::unsignedIntegerToString(l_sceneMax) + "\" />");
+		
+		saveKageStudio(p_filename, _assetManager.saveAssetsTo(l_filename + l_directory));
+		
+		l_currentScene = _document.getActiveSceneID();
+			string l_sceneName;
+			bool l_saved = false;
+			for (i = 0; i < l_sceneMax; ++i) {
+				//TODO: get name of scene from AssetManager
+				l_sceneName = "scene" + StringHelper::unsignedIntegerToString(i);
+				saveKageStudio(p_filename, "<scene label=\"" + l_sceneName + "\" />");
+					_document.setActiveSceneID(i);
+					l_saved = doSaveKSF(l_filename + l_directory + l_sceneName);
+			}
+
+		_document.setActiveSceneID(l_currentScene);
+	if (saveKageStudio(p_filename, "</KageStudio>") == true) {
+		updateStatus("Saved to " + p_filename);
+		
+		set_title(p_filename + " - " + KageAbout::app_title);
+		//TODO: zip saved file -- should it be zipped?
+	} else {
+		updateStatus("Unable to save project!  Try saving to a different location");
+	}
+}
+void Kage::doSaveProjectDialog(string p_title) {
+//	Gtk::FileChooserDialog dialog(p_title, Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
+	Gtk::FileChooserDialog dialog(p_title, Gtk::FILE_CHOOSER_ACTION_SAVE);
+	dialog.set_transient_for( * this);
+		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+		dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
+		dialog.set_do_overwrite_confirmation(true);
+	
+	auto filter_kage = Gtk::FileFilter::create();
+		filter_kage->set_name(KageAbout::app_title + " Files");
+		filter_kage->add_mime_type("application/kage+xml");
+		filter_kage->add_pattern("*.kage");
+			dialog.add_filter(filter_kage);
+	
 	int result = dialog.run();
-	//Handle the response:
+	
 	switch (result) {
 		case(Gtk::RESPONSE_OK):
-			std::cout << "Select clicked." << std::endl;
-			std::cout << "Folder selected: " << dialog.get_filename() << std::endl;
+			cout << "uri:" << dialog.get_uri() << endl;
+			doSaveProject(dialog.get_filename());
 			break;
 		case(Gtk::RESPONSE_CANCEL):
-			std::cout << "Cancel clicked." << std::endl;
-			break;
-		default:
-			std::cout << "Unexpected button clicked." << std::endl;
-			break;
+			return;
 	}
 }
 
@@ -3003,6 +3135,14 @@ bool Kage::dump(string p_path, string p_msg) {
 	return fileWrite(p_path, p_msg, ksfFile, ksfInited);
 }
 bool Kage::saveKageStudio(string p_path, string p_msg) {
+	int l_len = strlen(p_path.c_str()) - 5;
+	if (StringHelper::toLower(p_path).substr(l_len, 5) != ".kage") {
+		p_path = p_path + ".kage";
+	}
+	
+	return fileWrite(p_path, p_msg, kageFile, kageInited);
+}
+bool Kage::saveKageStudioFile(string p_path, string p_msg) {
 	int l_len = strlen(p_path.c_str()) - 4;
 	if (StringHelper::toLower(p_path).substr(l_len, 4) != ".ksf") {
 		p_path = p_path + ".ksf";
@@ -3127,9 +3267,16 @@ string Kage::saveFrame() {
 			case VectorData::TYPE_IMAGE:
 				//p1 x/y == ID / imageBuff
 				//p2 x/y == x / y
-				//p3 x/y == scale / rotate
-				//TODO: save the filename too! -- maybe use ID?
-				l_ostringstream << "\t<image id=\"" << v[i].points[0].x << "\" buff=\"" << v[i].points[0].y << "\" x=\"" << v[i].points[1].x*_stage.currentScale << "\" y=\"" << v[i].points[1].y*_stage.currentScale << "\" scale=\"" << v[i].points[2].x << "\" rotate=\"" << v[i].points[2].y << "\" filename=\"\" />\n";
+				//p3 x/y == width / height
+				//p4 x/y == scaleX / scaleY
+				//p5 x/y == rotate / alpha
+				l_ostringstream << "\t<image"
+						<<       " id=\"" << v[i].points[0].x                     <<   "\" buff=\"" << v[i].points[0].y
+						<<      "\" x=\"" << v[i].points[1].x*_stage.currentScale <<      "\" y=\"" << v[i].points[1].y*_stage.currentScale
+						<<  "\" width=\"" << v[i].points[2].x*_stage.currentScale << "\" height=\"" << v[i].points[2].y*_stage.currentScale
+						<< "\" scaleX=\"" << v[i].points[3].x                     << "\" scaleY=\"" << v[i].points[3].y
+						<< "\" rotate=\"" << v[i].points[4].x                     <<  "\" alpha=\"" << v[i].points[4].y
+						<< "\" hash=\"\" />\n";
 				break;
 		}
 	}
@@ -3267,7 +3414,11 @@ string Kage::dumpFrame(bool bKS) {
 				//p.y = v[i].points[1].y;
 				break;
 			case VectorData::TYPE_IMAGE:
-				//2 '1st is for X/Y, 2nd is for width/height  -- ?!?
+				//p1 x/y == ID / imageBuff
+				//p2 x/y == x / y
+				//p3 x/y == width / height
+				//p4 x/y == scaleX / scaleY
+				//p5 x/y == rotate / alpha
 				break;
 		}
 	}
@@ -3368,7 +3519,11 @@ string Kage::dumpFrameToSvg() {
 				
 				break;
 			case VectorData::TYPE_IMAGE:
-				//2 '1st is for X/Y, 2nd is for width/height  -- ?!?
+				//p1 x/y == ID / imageBuff
+				//p2 x/y == x / y
+				//p3 x/y == width / height
+				//p4 x/y == scaleX / scaleY
+				//p5 x/y == rotate / alpha
 				break;
 		}
 	}
@@ -3495,7 +3650,146 @@ vector<int> Kage::parseColorString(string p_color) {
 	return l_colors;
 }
 
+void Kage::parseKAGE_Children(vector<XmlTag> p_children) {
+	unsigned int l_sceneCount = UINT_MAX;
+	unsigned int l_assetCount = UINT_MAX;
+	for (unsigned int i = 0; i < p_children.size(); ++i) {
+		string l_tagname = p_children[i].getName();
+		vector<XmlTagProperty> l_properties = p_children[i].getProperties();
+		cout << "\tl_tagname " << l_tagname << " l_properties " << l_properties.size() << " ? " << p_children[i]._value << endl;
+		if (l_tagname.substr(0, 5) == "scene") {
+			bool l_active = false;
+			unsigned int l_sceneID = UINT_MAX;
+			for (unsigned int l_propertyIndex = 0; l_propertyIndex < l_properties.size(); ++l_propertyIndex) {
+				cout << "\t\tA [" << l_propertyIndex << "] " << l_properties[l_propertyIndex].getName() << " = " << l_properties[l_propertyIndex].getValue() << " ? " << StringHelper::toBoolean(l_properties[l_propertyIndex].getValue()) << endl;
+				if (l_properties[l_propertyIndex].getName() == "label") {
+					#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+						ksfPath = filesystem::path(kagePath).remove_filename().u8string() + "\\" + l_properties[l_propertyIndex].getValue();
+					#else
+						ksfPath = filesystem::path(kagePath).remove_filename().u8string() + "/" + l_properties[l_propertyIndex].getValue();
+					#endif
+					doOpenKSF();
+					//l_sceneID = _document.Scenes[_document.Scenes.size()-1].ID; //get newly added Scene's ID
+				} else if (l_properties[l_propertyIndex].getName() == "active") {
+					if (l_properties[l_propertyIndex].getValue() == "true") {
+						l_active = true;
+					}
+				}
+			}
+			if (l_active == true) {
+				//TODO: set active scene
+				//_document.setActiveSceneID(l_sceneID);
+			}
+			//TODO: add to AssetManager
+			--l_sceneCount;
+		} else if (l_tagname.substr(0, 5) == "asset") {
+			string l_assetLabel = "Asset";
+			string l_hash;
+			string l_originalFileName;
+			string l_assetFilePath;
+			for (unsigned int l_propertyIndex = 0; l_propertyIndex < l_properties.size(); ++l_propertyIndex) {
+				cout << "\t\tB [" << l_propertyIndex << "] " << l_properties[l_propertyIndex].getName() << " = " << l_properties[l_propertyIndex].getValue() << endl;
+				if (l_properties[l_propertyIndex].getName() == "label") {
+					l_assetLabel = l_properties[l_propertyIndex].getValue();
+				} else if (l_properties[l_propertyIndex].getName() == "hash") {
+					l_hash = l_properties[l_propertyIndex].getValue();
+					l_originalFileName = p_children[i]._value; //filename
+				}
+			}
+			//TODO: consider how to handle cross-platform file
+			if (l_hash == StringHelper::kHash(l_originalFileName, 24)) {
+				int l_len = strlen(l_originalFileName.c_str()) - 4;
+				if (StringHelper::toLower(l_originalFileName).substr(l_len, 4) == ".png") {
+					//add PNG Asset
+					l_assetFilePath = filesystem::path(kagePath).remove_filename().u8string() + l_hash;
+					unsigned int l_image = _assetManager.addAsset(l_assetFilePath);
+					cout << "l_image " << l_image << endl;
+					if (l_image != UINT_MAX) {
+						_assetManager.setAssetType(KageAsset::AssetType::ASSET_IMAGE);
+						cout << " " << _assetManager.getImagePathByID(l_image);
+						//unsigned int l_cairoIndex = _stage.addImage(l_image); //DO NOT ADD to Stage, just add to AssetManager
+						Cairo::RefPtr<Cairo::ImageSurface> l_tmp;
+							_stage.cairoPNG.push_back(l_tmp);
+						//cout << "l_cairoIndex " << l_cairoIndex << endl;
+						_assetManager.setLabel(l_assetLabel);
+						//TODO: should we add previous info of asset; is it cross-platform proof?
+						_assetManager.setFilePathAt(_assetManager.assetCount()-1, filesystem::path(l_originalFileName).remove_filename().u8string()); //TODO: remove last slash
+						_assetManager.setFileNameAt(_assetManager.assetCount()-1, filesystem::path(l_originalFileName).filename().u8string());
+						_assetManager.setHashAt(_assetManager.assetCount()-1, l_hash);
+						_assetManager.render(_stage.cairoPNG.size()-1);
+						cout << "Importing of PNG is under construction " << l_assetFilePath << endl;
+					} else {
+						cout << "Failed to import " << l_assetFilePath << endl;
+					}
+				}
+			} else {
+				cout << "hash " << l_hash << "\t" << StringHelper::kHash(l_originalFileName) << endl;
+			}
+			--l_assetCount;
+		} else if (l_tagname == "stage") {
+			for (unsigned int j = 0; j < l_properties.size(); ++j) {
+				if (l_properties[j].getName() == "width") {
+					_document.Project._width = StringHelper::toUnsignedInteger(l_properties[j].getValue());
+					m_PropStage.setWidthText(_document.Project._width);
+				} else if (l_properties[j].getName() == "height") {
+					_document.Project._height = StringHelper::toUnsignedInteger(l_properties[j].getValue());
+					m_PropStage.setHeightText(_document.Project._height);
+				} else if (l_properties[j].getName() == "fps") {
+					_document.Project._fps = StringHelper::toUnsignedInteger(l_properties[j].getValue());
+					m_PropStage.setFPSText(_document.Project._fps);
+				} else if (l_properties[j].getName() == "background") {
+					vector<int> l_colors = parseColorString(l_properties[j].getValue());
+					_document.Project._backgroundColor = ColorData(l_colors[0], l_colors[1], l_colors[2]);
+					m_PropStage.setBackgroundColor(getStageBG());
+				} else if (l_properties[j].getName() == "scenes") {
+					l_sceneCount = StringHelper::toUnsignedInteger(l_properties[j].getValue());
+				} else if (l_properties[j].getName() == "assets") {
+					l_assetCount = StringHelper::toUnsignedInteger(l_properties[j].getValue());
+				}
+			}
+		}
+		parseKSF_Children(p_children[i]._children);
+	}
+	if (l_sceneCount != UINT_MAX && l_sceneCount != 0) {
+		cout << "missing " << l_sceneCount << " scene/s" << endl;
+	}
+	if (l_assetCount != UINT_MAX && l_assetCount != 0) {
+		cout << "missing " << l_assetCount << " asset/s" << endl;
+	}
+	_stage.invalidateToRender();
+	refreshUI();
+}
+void Kage::parseKAGE(string p_content) {
+	BasicXml _xml;
+	std::cout << "parsing... " << p_content.length() << std::endl;
+	if (_xml.parse(p_content)) {
+		if (_xml.tokenize()) {
+			XmlTag l_root = _xml.getRoot();
+			if (l_root.getName() == "KageStudio") {
+				vector<XmlTagProperty> l_xmlTagProperties = l_root.getProperties();
+				if (l_xmlTagProperties.size() > 0
+						&& l_xmlTagProperties[0].getName() == "version"
+						&& l_xmlTagProperties[0].getValue() == "2023.06.24"
+					) {
+					KageScene::LOADING_MODE = true;
+						parseKAGE_Children(l_root._children);
+						updateStatus("Loaded " + kagePath);
+					KageScene::LOADING_MODE = false;
+				}
+			}
+		} else {
+			//unable to tokenize KSF
+			updateStatus("Loading Error 1: Unabe to load " + kagePath);
+		}
+	} else {
+		//unable to parse KSF
+		updateStatus("Loading Error 2: Unabe to load " + kagePath);
+	}
+}
 void Kage::parseKSF_Children(vector<XmlTag> p_children) {
+	unsigned int l_layerCount = UINT_MAX;
+	unsigned int l_frameCount = UINT_MAX;
+	unsigned int l_frameCounter = UINT_MAX;
 	for (unsigned int i = 0; i < p_children.size(); ++i) {
 		string l_tagname = p_children[i].getName();
 		vector<XmlTagProperty> l_properties = p_children[i].getProperties();
@@ -3518,6 +3812,8 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 				}
 			}
 			_document.Scenes[_document.getActiveSceneID()].setCurrentLayer(l_layer);
+			--l_layerCount;
+			l_frameCounter = l_frameCount;
 		} else if (l_tagname.substr(0, 5) == "frame") {
 			unsigned int l_frame = StringHelper::toUnsignedInteger(l_tagname.substr(5));
 			while (l_frame > _document.Scenes[_document.getActiveSceneID()].frameCount()) {
@@ -3544,6 +3840,7 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 					}
 				}
 			}
+			--l_frameCounter;
 		} else if (l_tagname == "init") {
 			VectorDataManager v;
 			
@@ -3592,55 +3889,83 @@ void Kage::parseKSF_Children(vector<XmlTag> p_children) {
 			addDataToFrame(v, true);
 		} else if (l_tagname == "image") {
 			cout << "\n\n\tIMAGE " << endl;
+			double l_ID, l_buff;
+			double l_x = 0.0f;
+			double l_y = 0.0f;
+			double l_width = 0.0f, l_height = 0.0f;
+			double l_scaleX = 1.0f, l_scaleY = 1.0f;
+			double l_rotate = 0.0f, l_alpha = 1.0f;
 			for (unsigned int j = 0; j < l_properties.size(); ++j) {
 				if (l_properties[j].getName() == "id") {
-					//ID = StringHelper::toUnsignedInteger(l_properties[j].getValue());
-					cout << "\tid " << l_properties[j].getValue() << endl;
+					l_ID = StringHelper::toDouble(l_properties[j].getValue());
+					cout << "\tid " << l_ID << endl;
 				} else if (l_properties[j].getName() == "buff") { //placeholder -- not actually used
-					//buff = StringHelper::toUnsignedInteger(l_properties[j].getValue());
+					l_buff = StringHelper::toDouble(l_properties[j].getValue());
 					cout << "\tbuff " << l_properties[j].getValue() << endl;
 				} else if (l_properties[j].getName() == "x") {
-					//x = StringHelper::toUnsignedInteger(l_properties[j].getValue());
-					cout << "\tx " << l_properties[j].getValue() << endl;
+					l_x = StringHelper::toDouble(l_properties[j].getValue())/_stage.currentScale;
+					cout << "\tx " << l_x << endl;
 				} else if (l_properties[j].getName() == "y") {
-					//y = StringHelper::toUnsignedInteger(l_properties[j].getValue());
-					cout << "\ty " << l_properties[j].getValue() << endl;
+					l_y = StringHelper::toDouble(l_properties[j].getValue())/_stage.currentScale;
+					cout << "\ty " << l_y << "\t" << l_y << endl;
+				} else if (l_properties[j].getName() == "width") {
+					l_width = StringHelper::toDouble(l_properties[j].getValue())/_stage.currentScale;
+					cout << "\twidth " << l_width << endl;
+				} else if (l_properties[j].getName() == "height") {
+					l_height = StringHelper::toDouble(l_properties[j].getValue())/_stage.currentScale;
+					cout << "\theight " << l_height << endl;
+				} else if (l_properties[j].getName() == "scaleX") {
+					l_scaleX = StringHelper::toDouble(l_properties[j].getValue());
+					cout << "\tscaleX " << l_scaleX << endl;
+				} else if (l_properties[j].getName() == "scaleY") {
+					l_scaleY = StringHelper::toDouble(l_properties[j].getValue());
+					cout << "\tscaleY " << l_scaleY << endl;
 				} else if (l_properties[j].getName() == "scale") {
-					//scale = StringHelper::toUnsignedInteger(l_properties[j].getValue());
-					cout << "\tscale " << l_properties[j].getValue() << endl;
+					l_scaleX = StringHelper::toDouble(l_properties[j].getValue());
+					l_scaleY = StringHelper::toDouble(l_properties[j].getValue());
+					cout << "\tscale " << l_scaleX << "\t" << l_scaleY << endl;
 				} else if (l_properties[j].getName() == "rotate") {
-					//rotate = StringHelper::toUnsignedInteger(l_properties[j].getValue());
-					cout << "\trotate " << l_properties[j].getValue() << endl;
-				} else if (l_properties[j].getName() == "filename") {
-					//filename = l_properties[j].getValue();
-					cout << "\tfilename " << l_properties[j].getValue() << endl;
+					l_rotate = StringHelper::toDouble(l_properties[j].getValue());
+					cout << "\trotate " << l_rotate << endl;
+				} else if (l_properties[j].getName() == "alpha") {
+					l_alpha = StringHelper::toDouble(l_properties[j].getValue());
+					cout << "\talpha " << l_alpha << endl;
+				} else if (l_properties[j].getName() == "hash") {
+					//hash = l_properties[j].getValue();
+					cout << "\thash " << l_properties[j].getValue() << endl;
 				}
 			}
 			cout << endl << endl << endl;
+			//TODO: if width/height is 0/0, get actual width height from loaded image resource
+			PointData  p1(     l_ID,   l_buff);
+			PointData  p2(      l_x,      l_y);
+			PointData  p3(  l_width, l_height);
+			PointData  p4( l_scaleX, l_scaleY);
+			PointData  p5( l_rotate,  l_alpha);
+			VectorDataManager v;
+				v.addImage(p1, p2, p3, p4, p5);
+			addDataToFrame(v, true);
 		} else if (l_tagname == "stage") {
 			for (unsigned int j = 0; j < l_properties.size(); ++j) {
-				if (l_properties[j].getName() == "width") {
-					_document.Project._width = StringHelper::toUnsignedInteger(l_properties[j].getValue());
-					m_PropStage.setWidthText(_document.Project._width);
-				} else if (l_properties[j].getName() == "height") {
-					_document.Project._height = StringHelper::toUnsignedInteger(l_properties[j].getValue());
-					m_PropStage.setHeightText(_document.Project._height);
-				} else if (l_properties[j].getName() == "fps") {
-					_document.Project._fps = StringHelper::toUnsignedInteger(l_properties[j].getValue());
-					m_PropStage.setFPSText(_document.Project._fps);
-				} else if (l_properties[j].getName() == "background") {
-					vector<int> l_colors = parseColorString(l_properties[j].getValue());
-					_document.Project._backgroundColor = ColorData(l_colors[0], l_colors[1], l_colors[2]);
-					m_PropStage.setBackgroundColor(getStageBG());
+				if (l_properties[j].getName() == "layers") {
+					l_layerCount = StringHelper::toUnsignedInteger(l_properties[j].getValue());
+				} else if (l_properties[j].getName() == "frames") {
+					l_frameCount = StringHelper::toUnsignedInteger(l_properties[j].getValue());
 				}
 			}
 		}
 		parseKSF_Children(p_children[i]._children);
-		if (l_tagname == "fill") {
+		if (l_tagname == "fill") { //what's this for?
 			VectorDataManager v;
 				v.addEndFill();
 			addDataToFrame(v, true);
 		}
+	}
+	if (l_layerCount != UINT_MAX && l_layerCount != 0) {
+		cout << "missing " << l_layerCount << " layer/s" << endl;
+	}
+	if (l_frameCount != UINT_MAX && l_frameCounter != 0) {
+		cout << "missing " << l_frameCounter << " frame/s" << endl;
 	}
 	_stage.invalidateToRender();
 	refreshUI();
@@ -3658,6 +3983,7 @@ void Kage::parseKSF(string p_content) {
 						&&
 						(	   l_xmlTagProperties[0].getValue() == "2019.10.14"
 							|| l_xmlTagProperties[0].getValue() == "2020.03.10"
+							|| l_xmlTagProperties[0].getValue() == "2023.06.26"
 						)
 					) {
 					KageScene::LOADING_MODE = true;
@@ -3674,7 +4000,6 @@ void Kage::parseKSF(string p_content) {
 		//unable to parse KSF
 		updateStatus("Loading Error 2: Unabe to load " + ksfPath);
 	}
-	refreshUI();
 }
 
 bool Kage::runExternal(string p_cmd, string p_param) {

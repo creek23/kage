@@ -150,6 +150,36 @@ bool VectorDataManager::recenterRotationPoint(vector<unsigned int> p_selectedSha
 						l_bottomMost = v[i].points[j].y;
 					}
 				}
+			} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
+				//TODO: factor-in rotation
+				//for (unsigned int j = 0; j < 3; ++j) {
+				unsigned int j = 1;
+					if (v[i].points[j].x < l_leftMost) {
+						l_leftMost   = v[i].points[j].x;
+					}
+					if (v[i].points[j].x > l_rightMost) {
+						l_rightMost  = v[i].points[j].x;
+					}
+					if (v[i].points[j].y < l_topMost) {
+						l_topMost    = v[i].points[j].y;
+					}
+					if (v[i].points[j].y > l_bottomMost) {
+						l_bottomMost = v[i].points[j].y;
+					}
+				j = 2;
+					if (v[i].points[1].x + v[i].points[j].x < l_leftMost) {
+						l_leftMost   = v[i].points[1].x + v[i].points[j].x;
+					}
+					if (v[i].points[1].x + v[i].points[j].x > l_rightMost) {
+						l_rightMost  = v[i].points[1].x + v[i].points[j].x;
+					}
+					if (v[i].points[1].y + v[i].points[j].y < l_topMost) {
+						l_topMost    = v[i].points[1].y + v[i].points[j].y;
+					}
+					if (v[i].points[1].x + v[i].points[j].y > l_bottomMost) {
+						l_bottomMost = v[i].points[1].y + v[i].points[j].y;
+					}
+				//}
 			}
 		}
 		
@@ -327,7 +357,7 @@ void VectorDataManager::addCurve(PointData p_point1, PointData p_point2, PointDa
 	vectorData[vectorData.size()-1].setPoints(ps);
 }
 
-void VectorDataManager::addImage(PointData p_IDandBuff, PointData p_xy, PointData p_scaleRotate) {
+void VectorDataManager::addImage(PointData p_IDandBuff, PointData p_xy, PointData p_size, PointData p_scale, PointData p_rotateAlpha) {
 	VectorData l_vectorData;
 	if (vectorData.size() > 0) {
 		l_vectorData = vectorData[vectorData.size()-1];
@@ -341,7 +371,9 @@ void VectorDataManager::addImage(PointData p_IDandBuff, PointData p_xy, PointDat
 	vector<PointData> ps;
 		ps.push_back(p_IDandBuff);
 		ps.push_back(p_xy);
-		ps.push_back(p_scaleRotate);
+		ps.push_back(p_size);
+		ps.push_back(p_scale);
+		ps.push_back(p_rotateAlpha);
 	vectorData[vectorData.size()-1].setPoints(ps);
 }
 bool VectorDataManager::isEmpty() {

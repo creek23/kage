@@ -27,16 +27,17 @@ unsigned int KageDocument::ACTIVE_SCENE = 0;
 KageDocument::KageDocument(Kage *p_kage) {
 	Project = KageProject();
 
-	_kage = p_kage;
-	_activeSceneID = 0;
-	KageScene p_scene(this);
-	Scenes.push_back(p_scene);
+	init(p_kage);
 }
 KageDocument::KageDocument(Kage *p_kage, KageProject p_project) {
 	setProjectInformation(p_project);
 	
+	init(p_kage);
+}
+
+void KageDocument::init(Kage *p_kage) {
 	_kage = p_kage;
-	_activeSceneID = 0;
+	setActiveSceneID(0);
 	KageScene p_scene(this);
 	Scenes.push_back(p_scene);
 }
@@ -101,6 +102,9 @@ bool  KageDocument::isSaved() {
 unsigned int KageDocument::getActiveSceneID() {
 	return _activeSceneID;
 }
+void KageDocument::setActiveSceneID(unsigned int p_activeSceneID) {
+	_activeSceneID = p_activeSceneID;
+}
 unsigned int KageDocument::getActiveLayerID() {
 	return Scenes[getActiveSceneID()].getActiveLayerID();
 }
@@ -129,9 +133,9 @@ string KageProject::toString() {
 }
 
 unsigned int KageDocument::frameCount() {
-	return Scenes[_activeSceneID].frameCount();
+	return Scenes[getActiveSceneID()].frameCount();
 }
 
 void KageDocument::setCurrentFrame(unsigned int p_frame) {
-	Scenes[_activeSceneID].setCurrentFrame(p_frame);
+	Scenes[getActiveSceneID()].setCurrentFrame(p_frame);
 }

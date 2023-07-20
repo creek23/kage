@@ -30,6 +30,7 @@ SOURCES = \
 	./kage/library/asset.cpp \
 	./kage/library/assetmanager.cpp \
 	./kage/library/library.cpp \
+	./kage/properties/asset.cpp \
 	./kage/properties/fillstroke.cpp \
 	./kage/properties/frametween.cpp \
 	./kage/properties/locationsize.cpp \

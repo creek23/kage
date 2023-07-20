@@ -91,6 +91,7 @@
 
 			KageDocument(Kage *p_kage);
 			KageDocument(Kage *p_kage, KageProject p_project);
+			void init(Kage *p_kage);
 			virtual ~KageDocument();
 			void setProjectInformation(KageProject p_project);
 			unsigned int openScene(string p_filepath);
@@ -119,6 +120,7 @@
 			static unsigned int ACTIVE_SCENE;
 
 			unsigned int getActiveSceneID();
+			void setActiveSceneID(unsigned int p_activeSceneID);
 			unsigned int getActiveLayerID();
 			unsigned int getActiveFrameID();
 

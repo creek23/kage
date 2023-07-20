@@ -29,6 +29,8 @@
 	#include "../../asset_rename.h"
 	#include "../../util/string/stringhelper.h"
 	
+	#include <filesystem>
+	
 	class Kage;
 	
 	class KageAssetManager : public Gtk::VBox {
@@ -36,7 +38,7 @@
 			KageAssetManager(Kage *p_kage);
 			virtual ~KageAssetManager();
 			unsigned int assetCount();
-			unsigned int addAsset(Glib::ustring p_name = "");
+			unsigned int addAsset(string p_name = "");
 			void deleteAsset();
 			bool removeAllAssets();
 			void setSelected(KageAsset *p_asset);
@@ -67,6 +69,17 @@
 			string _KageStudioAsset;
 			string getImagePathByID(unsigned int p_index);
 			string getImageByID(unsigned int p_id);
+			string getFilePathAt(unsigned int p_index);
+			string getFileNameAt(unsigned int p_index);
+			string getLabelAt(unsigned int p_index);
+			string getHashAt(unsigned int p_index);
+			string getIDAt(unsigned int p_index);
+			bool setFilePathAt(unsigned int p_index, string p_filePath);
+			bool setFileNameAt(unsigned int p_index, string p_fileName);
+			bool setHashAt(unsigned int p_index, string p_hash);
+
+			string saveAssetsTo(string p_path);
+			
 
 			void renderLibrary(unsigned int p_ID);
 			

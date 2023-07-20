@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2022  Mj Mendoza IV
+ * Copyright (C) 2011~2023  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -95,6 +95,13 @@ void KageStage::handleShapes_scaleNorth() {
 				diffOld = anchor_lowerRight.y - v[typeMovesIndex].points[0].y;
 				diffNew = diffRatio * diffOld;
 					v[typeMovesIndex].points[0].y = anchor_lowerRight.y - diffNew;
+			} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
+				//if rotation is factored-in then Scale North could be Scale XXX because rotation would change orientation 
+				///NOTE: current implementation thinks image origin is top-left (or X/Y) or image
+				diffOld = anchor_lowerRight.y - v[i].points[1].y;
+				diffNew = diffRatio * diffOld;
+					v[i].points[1].y = anchor_lowerRight.y - diffNew;
+				v[i].points[3].y *= diffRatio;
 			} else if (v[i].vectorType == VectorData::TYPE_INIT
 					&& i != selectedShapes[l_shapeIndex]) {
 				break;
@@ -151,13 +158,17 @@ void KageStage::handleShapes_scaleEast() {
 				diffOld = anchor_upperLeft.x - v[typeMovesIndex].points[0].x;
 				diffNew = diffRatio * diffOld;
 					v[typeMovesIndex].points[0].x = anchor_upperLeft.x - diffNew;
+			} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
+				//if rotation is factored-in then Scale East could be Scale XXX because rotation would change orientation 
+				///NOTE: current implementation thinks image origin is top-left (or X/Y) or image
+				v[i].points[3].x *= diffRatio;
 			} else if (v[i].vectorType == VectorData::TYPE_INIT
 					&& i != selectedShapes[l_shapeIndex]) {
 				break;
 			} else if (v[i].vectorType == VectorData::TYPE_INIT) {
-				diffOld = anchor_upperLeft.x - v[i].points[0].x;
+				diffOld = v[i].points[0].x - anchor_upperLeft.x;
 				diffNew = diffRatio * diffOld;
-					v[i].points[0].x = anchor_upperLeft.x - diffNew;
+					v[i].points[0].x = anchor_upperLeft.x + diffNew;
 			}
 		}
 	}
@@ -207,6 +218,13 @@ void KageStage::handleShapes_scaleWest() {
 				diffOld = anchor_lowerRight.x - v[typeMovesIndex].points[0].x;
 				diffNew = diffRatio * diffOld;
 					v[typeMovesIndex].points[0].x = anchor_lowerRight.x - diffNew;
+			} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
+				//if rotation is factored-in then Scale West could be Scale XXX because rotation would change orientation 
+				///NOTE: current implementation thinks image origin is top-left (or X/Y) or image
+				diffOld = anchor_lowerRight.x - v[i].points[1].x;
+				diffNew = diffRatio * diffOld;
+					v[i].points[1].x = anchor_lowerRight.x - diffNew;
+				v[i].points[3].x *= diffRatio;
 			} else if (v[i].vectorType == VectorData::TYPE_INIT
 					&& i != selectedShapes[l_shapeIndex]) {
 				break;
@@ -263,13 +281,17 @@ void KageStage::handleShapes_scaleSouth() {
 				diffOld = anchor_upperLeft.y - v[typeMovesIndex].points[0].y;
 				diffNew = diffRatio * diffOld;
 					v[typeMovesIndex].points[0].y = anchor_upperLeft.y - diffNew;
+			} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
+				//if rotation is factored-in then Scale South could be Scale XXX because rotation would change orientation 
+				///NOTE: current implementation thinks image origin is top-left (or X/Y) or image
+				v[i].points[3].y *= diffRatio;
 			} else if (v[i].vectorType == VectorData::TYPE_INIT
 					&& i != selectedShapes[l_shapeIndex]) {
 				break;
 			} else if (v[i].vectorType == VectorData::TYPE_INIT) {
-				diffOld = anchor_upperLeft.y - v[i].points[0].y;
+				diffOld = v[i].points[0].y - anchor_upperLeft.y;
 				diffNew = diffRatio * diffOld;
-					v[i].points[0].y = anchor_upperLeft.y - diffNew;
+					v[i].points[0].y = anchor_upperLeft.y + diffNew;
 			}
 		}
 	}
@@ -307,8 +329,8 @@ void KageStage::handleShapes_moveShape(double p_diffX, double p_diffY) {
 					v[typeMovesIndex].points[0].y += p_diffY;
 				}
 			} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
-				v[i].points[1].x += (p_diffX*1000); //not sure why 1000 is the magic number
-				v[i].points[1].y += (p_diffY*1000); //TODO: revisit later to know why
+				v[i].points[1].x += p_diffX;
+				v[i].points[1].y += p_diffY;
 			} else if (v[i].vectorType == VectorData::TYPE_INIT
 					&& i != selectedShapes[l_shapeIndex]) {
 				break;
@@ -400,7 +422,11 @@ void KageStage::updateShapeX(double p_value, bool p_stackDo) {
 	unsigned int l_selectedShapes_size = selectedShapes.size();
 	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
 		//calling getSelectedShapeViaNode will update propXindex1/propXindex2 based on left-most VectorData.x
-		getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+3, v);
+		if (_kage->_displayObjectIsShape == true) {
+			getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+3, v);
+		} else {
+			getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+1, v);
+		}
 	}
 	
 	double l_propXprev = 0;
@@ -421,7 +447,9 @@ void KageStage::updateShapeX(double p_value, bool p_stackDo) {
 			} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
 				//p1 x/y == ID / imageBuff
 				//p2 x/y == x / y
-				//p3 x/y == scale / rotate
+				//p3 x/y == width/height
+				//p4 x/y == scaleX/Y
+				//p5 x/y == rotate / alpha
 				v[i].points[1].x += l_propXdiff;
 			} else if (v[i].vectorType == VectorData::TYPE_INIT
 					&& i != selectedShapes[l_shapeIndex]) {
@@ -463,8 +491,12 @@ void KageStage::updateShapeY(double p_value, bool p_stackDo) {
 	unsigned int vsize = v.size();
 	unsigned int l_selectedShapes_size = selectedShapes.size();
 	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
-		//calling getSelectedShapeViaNode will update propYindex1/propYindex2 based on top-most VectorData.y
-		getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+3, v);
+		if (_kage->_displayObjectIsShape == true) {
+			//calling getSelectedShapeViaNode will update propYindex1/propYindex2 based on top-most VectorData.y
+			getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+3, v);
+		} else {
+			getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+1, v);
+		}
 	}
 	
 	double l_propYprev = 0;
@@ -485,7 +517,9 @@ void KageStage::updateShapeY(double p_value, bool p_stackDo) {
 			} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
 				//p1 x/y == ID / imageBuff
 				//p2 x/y == x / y
-				//p3 x/y == scale / rotate
+				//p3 x/y == width/height
+				//p4 x/y == scaleX/Y
+				//p5 x/y == rotate / alpha
 				v[i].points[1].y += l_propYdiff;
 			} else if (v[i].vectorType == VectorData::TYPE_INIT
 					&& i != selectedShapes[l_shapeIndex]) {
@@ -528,8 +562,12 @@ void KageStage::updateShapeWidth(double p_value) {
 	unsigned int vsize = v.size();
 	unsigned int l_selectedShapes_size = selectedShapes.size();
 	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
-		//calling getSelectedShapeViaNode will update propXindex1/propXindex2 based on left-most VectorData.x
-		getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+3, v);
+		if (_kage->_displayObjectIsShape == true) {
+			//calling getSelectedShapeViaNode will update propXindex1/propXindex2 based on left-most VectorData.x
+			getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+3, v);
+		} else {
+			getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+1, v);
+		}
 	}
 	
 	double l_propXprev = 0;
@@ -548,8 +586,11 @@ void KageStage::updateShapeWidth(double p_value) {
 			} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
 				//p1 x/y == ID / imageBuff
 				//p2 x/y == x / y
-				//p3 x/y == scale / rotate
-				v[i].points[1].x = propX + ((v[i].points[1].x-l_propXprev) / propWidth * (p_value / KageStage::currentScale));
+				//p3 x/y == width/height
+				//p4 x/y == scaleX/Y
+				//p5 x/y == rotate / alpha
+				//TODO: factor-in rotation
+				v[i].points[3].x = (v[i].points[1].x + (v[i].points[2].x * v[i].points[3].x)) / (p_value / KageStage::currentScale);
 			} else if (v[i].vectorType == VectorData::TYPE_INIT
 					&& i != selectedShapes[l_shapeIndex]) {
 				break;
@@ -588,8 +629,12 @@ void KageStage::updateShapeHeight(double p_value) {
 	unsigned int vsize = v.size();
 	unsigned int l_selectedShapes_size = selectedShapes.size();
 	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
-		//calling getSelectedShapeViaNode will update propYindex1/propYindex2 based on top-most VectorData.y
-		getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+3, v);
+		if (_kage->_displayObjectIsShape == true) {
+			//calling getSelectedShapeViaNode will update propYindex1/propYindex2 based on top-most VectorData.y
+			getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+3, v);
+		} else {
+			getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+1, v);
+		}
 	}
 	
 	double l_propYprev = 0;
@@ -610,8 +655,11 @@ void KageStage::updateShapeHeight(double p_value) {
 			} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
 				//p1 x/y == ID / imageBuff
 				//p2 x/y == x / y
-				//p3 x/y == scale / rotate
-				v[i].points[1].y = propY + ((v[i].points[1].y-l_propYprev) / propHeight * (p_value / KageStage::currentScale));
+				//p3 x/y == width/height
+				//p4 x/y == scaleX/Y
+				//p5 x/y == rotate / alpha
+				//TODO: factor-in rotation
+				v[i].points[3].y = (v[i].points[1].y + (v[i].points[2].y * v[i].points[3].y)) / (p_value / KageStage::currentScale);
 			} else if (v[i].vectorType == VectorData::TYPE_INIT
 					&& i != selectedShapes[l_shapeIndex]) {
 				break;
@@ -694,6 +742,9 @@ void KageStage::handleShapes_modifyingShapeRotate() {
 						v[i].points[j].x = (cos(l_pointAngle) * l_hyp)/KageStage::currentScale + anchor_center.x;
 						v[i].points[j].y = (sin(l_pointAngle) * l_hyp)/KageStage::currentScale + anchor_center.y;
 					}
+				} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
+					l_angleDiff = l_angleNew - l_angleOld;
+						v[i].points[4].x += l_angleDiff;
 				}
 			}
 		}
@@ -809,8 +860,8 @@ void KageStage::handleShapes_modifyingShape() {
 							anchor_rotate.x = (draw2.x - origin.x) / KageStage::currentScale / _zoomValue;
 							anchor_rotate.y = (draw2.y - origin.y) / KageStage::currentScale / _zoomValue;
 						} else {
-							v[i].points[0].x = (draw2.x - origin.x) / KageStage::currentScale / _zoomValue;// - origin.x;
-							v[i].points[0].y = (draw2.y - origin.y) / KageStage::currentScale / _zoomValue;// - origin.y;
+							v[i].points[0].x = (draw2.x - origin.x) / KageStage::currentScale / _zoomValue;
+							v[i].points[0].y = (draw2.y - origin.y) / KageStage::currentScale / _zoomValue;
 						}
 						
 						l_anchor.x = (draw2.x - origin.x) / KageStage::currentScale / _zoomValue;
@@ -897,6 +948,9 @@ void KageStage::handleShapes_modifyingShape() {
 							v[i].points[j].x = (cos(l_pointAngle) * l_hyp)/KageStage::currentScale + anchor_center.x;
 							v[i].points[j].y = (sin(l_pointAngle) * l_hyp)/KageStage::currentScale + anchor_center.y;
 						}
+					} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
+						l_angleDiff = l_angleNew - l_angleOld;
+							v[i].points[4].x += l_angleDiff;
 					}
 				}
 			}
@@ -917,7 +971,7 @@ void KageStage::handleShapes_modifyingShape() {
 	
 	cr->set_dash(dashes, 0.0);
 	//draw bounding rectangle for the shape
-	cr->move_to(anchor_upperLeft.x*KageStage::currentScale*_zoomValue+origin.x, anchor_upperLeft.y*KageStage::currentScale*_zoomValue+origin.y);
+	cr->move_to(      anchor_upperLeft.x*KageStage::currentScale*_zoomValue+origin.x,  anchor_upperLeft.y*KageStage::currentScale*_zoomValue+origin.y);
 		cr->line_to( anchor_lowerRight.x*KageStage::currentScale*_zoomValue+origin.x,  anchor_upperLeft.y*KageStage::currentScale*_zoomValue+origin.y);
 		cr->line_to( anchor_lowerRight.x*KageStage::currentScale*_zoomValue+origin.x, anchor_lowerRight.y*KageStage::currentScale*_zoomValue+origin.y);
 		cr->line_to(  anchor_upperLeft.x*KageStage::currentScale*_zoomValue+origin.x, anchor_lowerRight.y*KageStage::currentScale*_zoomValue+origin.y);
@@ -954,6 +1008,21 @@ void KageStage::handleShapes() {
 				handleShapes_updateAnchors(v[i].points[0].x, v[i].points[0].y);
 				handleShapes_updateAnchors(v[i].points[1].x, v[i].points[1].y);
 				handleShapes_updateAnchors(v[i].points[2].x, v[i].points[2].y);
+			} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
+				double xImagePos   = v[i].points[1].x;
+				double yImagePos   = v[i].points[1].y;
+				double imageWidth  = v[i].points[2].x * v[i].points[3].x;
+				double imageHeight = v[i].points[2].y * v[i].points[3].y;
+				//TODO: factor-in rotation
+				cout << "xImagePos\t" << xImagePos << "\tyImagePos\t" << yImagePos << endl;
+				cout << "imageWidth\t" << imageWidth << "\timageHeight\t" << imageHeight << endl;
+				propX = xImagePos;
+				propY = yImagePos;
+				propWidth    = imageWidth;
+				propHeight   = imageHeight;
+				propRotation = v[i].points[4].x;
+				handleShapes_updateAnchors(xImagePos             , yImagePos              );
+				handleShapes_updateAnchors(xImagePos + imageWidth, yImagePos + imageHeight);
 			} else if (v[i].vectorType == VectorData::TYPE_INIT
 					&& i != selectedShapes[l_shapeIndex]) {
 				break;
@@ -1109,16 +1178,20 @@ void KageStage::trySingleSelectShape() {
 			_rotateMode = false;
 		}
 		
-		//this should be able to update Property pane's X/Y Width Height
-		getSelectedShapeViaNode(_mouseLocationShapeIndex+3, _kage->getFrameData().getVectorData());
+		if (_kage->_displayObjectIsShape == true) {
+			//this should be able to update Property pane's X/Y Width Height
+			getSelectedShapeViaNode(_mouseLocationShapeIndex+3, _kage->getFrameData().getVectorData());
+		} else {
+			getSelectedShapeViaNode(_mouseLocationShapeIndex+1, _kage->getFrameData().getVectorData());
+		}
 		
 		_kage->propStageSetVisible(false);
 		_kage->propFillStrokeSetVisible(true);
-		_kage->propShapePropertiesSetVisible(true);
+		_kage->propDisplayObjectPropertiesSetVisible(true);
 		_kage->propNodeXYSetVisible(false);
 		
 		_kage->updateColors();
-		_kage->updateShapeProperties();
+//		_kage->updateShapeProperties(); already called inside propShapePropertiesSetVisible()
 	} else if (keyShiftDown == false) {
 		selectedShapes.clear();
 	}
@@ -1161,6 +1234,28 @@ void KageStage::tryMultiSelectShapes() {
 				selectedNode = i;
 				addSelectedNode(selectedNode);
 			}
+		} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
+			double xImagePos   = v[i].points[1].x / KageStage::currentScale;
+			double yImagePos   = v[i].points[1].y / KageStage::currentScale;
+			double imageWidth  = v[i].points[2].x / KageStage::currentScale * v[i].points[3].x;//(double)cairoImageSurface->get_width() /KageStage::currentScale; //should be dynamic as per user's resize need
+			double imageHeight = v[i].points[2].y / KageStage::currentScale * v[i].points[3].y;//(double)cairoImageSurface->get_height()/KageStage::currentScale; //should be dynamic as per user's resize need
+			//TODO: factor-in rotation
+			if (isNodeOnSelectionBox(xImagePos             , yImagePos              )) {
+				selectedNode = i;
+				addSelectedNode(selectedNode);
+			}
+			if (isNodeOnSelectionBox(xImagePos + imageWidth, yImagePos              )) {
+				selectedNode = i;
+				addSelectedNode(selectedNode);
+			}
+			if (isNodeOnSelectionBox(xImagePos + imageWidth, yImagePos + imageHeight)) {
+				selectedNode = i;
+				addSelectedNode(selectedNode);
+			}
+			if (isNodeOnSelectionBox(xImagePos             , yImagePos + imageHeight)) {
+				selectedNode = i;
+				addSelectedNode(selectedNode);
+			}
 		}
 	}
 	
@@ -1170,7 +1265,7 @@ void KageStage::tryMultiSelectShapes() {
 		if (KageStage::toolMode == MODE_SELECT) {
 			_kage->propStageSetVisible(false);
 			_kage->propFillStrokeSetVisible(true);
-			_kage->propShapePropertiesSetVisible(true);
+			_kage->propDisplayObjectPropertiesSetVisible(true);
 			_kage->propNodeXYSetVisible(false);
 		}
 	}
@@ -1295,7 +1390,7 @@ bool KageStage::deselectSelectedShapes() {
 	initNodeTool();
 	_kage->propStageSetVisible(true);
 	_kage->propFillStrokeSetVisible(false);
-	_kage->propShapePropertiesSetVisible(false);
+	_kage->propDisplayObjectPropertiesSetVisible(false);
 	
 	Kage::timestamp_OUT();
 	
@@ -1379,6 +1474,7 @@ bool KageStage::deleteSelectedShapes() {
 	selectedShapes.clear();
 	
 	_kage->setFrameData(v);
+	_kage->_timeline.forceRender();
 	Kage::timestamp_OUT();
 	return true;
 }
@@ -1396,8 +1492,12 @@ void KageStage::updateShapeXY() {
 	unsigned int vsize = v.size();
 	unsigned int l_selectedShapes_size = selectedShapes.size();
 	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
-		//calling getSelectedShapeViaNode will update propXindex1/propXindex2 based on left-most VectorData.x
-		getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+3, v);
+		if (_kage->_displayObjectIsShape == true) {
+			//calling getSelectedShapeViaNode will update propXindex1/propXindex2 based on left-most VectorData.x
+			getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+3, v);
+		} else {
+			getSelectedShapeViaNode(selectedShapes[l_shapeIndex]+1, v);
+		}
 	}
 	
 	unsigned int nsize = selectedNodes.size();
@@ -1427,6 +1527,15 @@ void KageStage::updateShapeXY() {
 					} else if (v[j].vectorType == VectorData::TYPE_INIT
 							&& j != selectedShapes[i]) {
 						break;
+					} else if (v[j].vectorType == VectorData::TYPE_IMAGE) {
+						if (v[j].points[1].x < nodeX) {
+							nodeX = v[j].points[1].x;
+							nodeIndexX = j;
+						}
+						if (v[j].points[1].y < nodeY) {
+							nodeY = v[j].points[1].y;
+							nodeIndexY = j;
+						}
 					}
 				}
 			}
@@ -1441,8 +1550,8 @@ void KageStage::updateShapeXY() {
 		}
 	}
 	if (propX == DBL_MAX && propY == DBL_MAX) {
-		_kage->propShapePropertiesSetVisible(false);
+		_kage->propDisplayObjectPropertiesSetVisible(false);
 	} else {
-		_kage->propShapePropertiesSetVisible(true);
+		_kage->propDisplayObjectPropertiesSetVisible(true);
 	}
 }

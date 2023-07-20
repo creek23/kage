@@ -26,7 +26,7 @@ KageAssetManager::KageAssetManager(Kage *p_kage) {
 	_kage = p_kage;
 	assetCtr = 0;
 
-	_KageStudioAsset = StringHelper::kHash("Kage Studio Asset");
+	_KageStudioAsset = StringHelper::kHash("Kage Studio Asset", 24);
 
 	assets.clear();
 }
@@ -35,74 +35,77 @@ KageAssetManager::~KageAssetManager() {
 	assets.clear();
 }
 
-#include <filesystem>
-
-unsigned int KageAssetManager::addAsset(Glib::ustring p_name) {
+unsigned int KageAssetManager::addAsset(string p_name) {
 	string l_filePath;
 	string l_fileName;
 	
 	/**
 	 * TODO: 
 	 * 1. [DONE] check p_name exists -- done in Kage with AssetManager
-	 * 2. if project is saved, copy file to project path
+	 * 2. [DONE]if project is saved, copy file to project path
 	 *    [DONE] else, copy file to temporary
 	 * 3. [DONE] create hash for path and filesize for future check by assetManager if already existing in Library
 	 *    use kHash from Quixie
 	 */
 	
-	string l_hash = StringHelper::kHash(p_name);
-	
+	string l_hash = StringHelper::kHash(p_name, 24);
+	int l_len = strlen(p_name.c_str()) - 4;
 	if (p_name == "") {
 		//p_name = Glib::ustring::compose("Asset %1", assetCtr);
 		cout << "NOTE: creating Kage Asset will have no existing file unless User save the Project";
 		//TODO: make this create Asset for KSF
 		return UINT_MAX;
-	} else {
+	} else if (StringHelper::toLower(p_name).substr(l_len, 4) == ".ksf") {
+		//TODO: use Kage to read KSF then add to _document.Scenes 
+	} else if (StringHelper::toLower(p_name).substr(l_len, 4) == ".png") {
 		/**
 		 * TODO:
 		 * 1. [DONE] check if file p_name exists
 		 * 2. [DONE] if existing, copy to temp path
 		 * 3. [DONE] load copied file -- use original path as hash
-		 * 4. select image on stage
-		 * 5. resize image on stage
-		 * 6. delete image on stage
-		 * 7. add image on stage FROM LIBRARY (double click)
-		 * 8. add image on stage FROM ASSET (double click)
-		 * 9. add image on stage FROM LIBRARY (drag-n-drop)
-		 * 10. add image on stage FROM ASSET (drag-n-dropl)
+		 * 4. [DONE] select image on stage
+		 * 5. draw rectangle on selected image on stage
+		 * 6. resize image on stage
+		 * 7. [DONE] delete image on stage
+		 * 8. [DONE] add image on stage FROM LIBRARY (double click)
+		 * 9. [DONE] add image on stage FROM ASSET (double click)
+		 * 10. add image on stage FROM LIBRARY (drag-n-drop)
+		 * 11. add image on stage FROM ASSET (drag-n-drop)
 		 */
 		
-		string l_name = p_name;
-		std::filesystem::path l_sourceFile = l_name;
-		if (std::filesystem::exists(l_sourceFile) == true) {
-			std::size_t found = p_name.find_last_of("/\\");
-			l_filePath = p_name.substr(0,found);
-			l_fileName = p_name.substr(found+1);
+		filesystem::path l_sourceFile = p_name;
+		if (filesystem::exists(l_sourceFile) == true) {
+			l_fileName = l_sourceFile.filename().u8string();
+			l_filePath = filesystem::path(p_name).remove_filename().u8string();
 
-			std::filesystem::path l_currentPath = std::filesystem::current_path();
-			cout << "Current path is " << l_currentPath << endl;
-			std::filesystem::current_path(std::filesystem::temp_directory_path());
-			cout << "    New path is " << std::filesystem::current_path() << endl;
+			filesystem::path l_currentPath = filesystem::current_path();
+			filesystem::current_path(filesystem::temp_directory_path());
 			
-			std::filesystem::create_directories(_KageStudioAsset);
-			
-			//std::ofstream("sandbox/file1.txt").put('a');
-			//std::filesystem::copy("sandbox/file1.txt", "sandbox/file2.txt"); // copy file
-			//const auto copyOptions = std::filesystem::copy_options::update_existing;
-								//| std::filesystem::copy_options::recursive; <-- use in future when importing project file which will import assets
-			std::filesystem::path l_assetFile = std::filesystem::temp_directory_path() / _KageStudioAsset / l_hash;
-			if (std::filesystem::exists(l_assetFile) == true) {
-				//delete l_assetFile
-				if (std::filesystem::remove_all(l_assetFile) == false) {
-					return UINT_MAX;
+				filesystem::create_directories(_KageStudioAsset);
+				//const auto copyOptions = filesystem::copy_options::update_existing;
+									//| filesystem::copy_options::recursive; <-- use in future when importing project file which will import ALL assets
+				filesystem::path l_assetFile = filesystem::temp_directory_path() / _KageStudioAsset / l_hash;
+				if (filesystem::exists(l_assetFile) == true) {
+					//delete l_assetFile
+					const char* filename = l_assetFile.u8string().c_str();
+
+					//if (filesystem::remove_all(l_assetFile) == false) { //it's not deleting somehow
+					if (std::remove(filename) != 0) {
+						std::perror("Error deleting file");
+						return UINT_MAX;
+					} else {
+						std::puts("File successfully deleted");
+					}
 				}
-			}
+				
+				//filesystem::copy(l_sourceFile, l_assetFile, filesystem::copy_options::update_existing);
+				//as above code is not working with GCC 13
+				std::ifstream src(l_sourceFile.u8string(), std::ios::binary);
+				std::ofstream dst( l_assetFile.u8string(), std::ios::binary);
+					dst << src.rdbuf();
 			
-			std::filesystem::copy(l_sourceFile, l_assetFile, std::filesystem::copy_options::update_existing);
+			filesystem::current_path(l_currentPath);
 			
-			static_cast<void>(std::system("tree"));
-			std::filesystem::current_path(l_currentPath);
-
 			p_name = l_fileName;
 		} else {
 			return UINT_MAX;
@@ -175,7 +178,7 @@ KageAsset::AssetType KageAssetManager::getAssetType() {
 			}
 		}
 	}
-	return KageAsset::AssetType::ASSET_IMAGE; //prone to bug; return ASSET_NULL instead
+	return KageAsset::AssetType::ASSET_NULL;
 }
 /** Set the AssetType of the selected Asset
  * \param p_assetType which AssetType to set
@@ -545,8 +548,9 @@ bool KageAssetManager::moveToBottom() {
  */
 bool KageAssetManager::exists(string p_filePath) {
 	bool l_return = false;
-	string l_assetHash = StringHelper::kHash(p_filePath);
-	for (unsigned int i = 0; i < assetCount(); ++i) {
+	unsigned int l_assetCount = assetCount();
+	string l_assetHash = StringHelper::kHash(p_filePath, 24);
+	for (unsigned int i = 0; i < l_assetCount; ++i) {
 		cout << " " << assets[i]->getAssetHash() << " == " << l_assetHash << endl;
 		if (assets[i]->getAssetHash() == l_assetHash) {
 			return true;
@@ -574,7 +578,7 @@ void KageAssetManager::setAssetHash(string p_assetHash) {
 
 string KageAssetManager::getImagePathByID(unsigned int p_index) {
 	cout << "p_index " << p_index << endl;
-	std::filesystem::path path_tempPath = std::filesystem::temp_directory_path();
+	filesystem::path path_tempPath = filesystem::temp_directory_path();
 //	stringstream stream_tempPath;
 //	stream_tempPath << path_tempPath;
 //	string l_tempPath;
@@ -613,6 +617,116 @@ string KageAssetManager::getImageByID(unsigned int p_id) {
 			}
 		}
 	}
-		return "";
+	return "";
 }
 
+/**
+ * @brief For use by Kage when Opening
+ * 
+ * @param p_index 
+ * @param p_filepath 
+ * @return true if asset index exists
+ * @return false 
+ */
+bool KageAssetManager::setFilePathAt(unsigned int p_index, string p_filePath) {
+	if (p_index < assetCount() && assets[p_index]->getAssetHash() != "") {
+		assets[p_index]->setFilePath(p_filePath);
+		return true;
+	}
+	return false;
+}
+/**
+ * For use by saveAssetsTo when Exporting; returns path like /home/creek23/assets/
+ * @param p_index
+ */
+string KageAssetManager::getFilePathAt(unsigned int p_index) {
+	if (p_index < assetCount() && assets[p_index]->getAssetHash() != "") {
+		return assets[p_index]->getFilePath();
+	}
+	return "";
+}
+/**
+ * @brief For use by Kage when Opening
+ * 
+ * @param p_index 
+ * @param p_fileName 
+ * @return true if asset index exists
+ * @return false 
+ */
+bool KageAssetManager::setFileNameAt(unsigned int p_index, string p_fileName) {
+	if (p_index < assetCount() && assets[p_index]->getAssetHash() != "") {
+		assets[p_index]->setFileName(p_fileName);
+		return true;
+	}
+	return false;
+}
+/**
+ * For use by saveAssetsTo when Exporting; returns path like image.png
+ * @param p_index
+ */
+string KageAssetManager::getFileNameAt(unsigned int p_index) {
+	if (p_index < assetCount() && assets[p_index]->getAssetHash() != "") {
+		return assets[p_index]->getFileName();
+	}
+	return "";
+}
+/**
+ * For use by saveAssetsTo when Exporting; returns label as scene on AssetManager
+ * @param p_index
+ */
+string KageAssetManager::getLabelAt(unsigned int p_index) {
+	if (p_index < assetCount() && assets[p_index]->getAssetHash() != "") {
+		return assets[p_index]->getLabel();
+	}
+	return "";
+}
+
+bool KageAssetManager::setHashAt(unsigned int p_index, string p_hash) {
+	if (p_index < assetCount() && assets[p_index]->getAssetHash() != "") {
+		assets[p_index]->setAssetHash(p_hash);
+		return true;
+	}
+	return false;
+}
+/**
+ * For use by saveAssetsTo when Exporting; returns hash of '/home/creek23/assets/image.png'
+ * @param p_index
+ */
+string KageAssetManager::getHashAt(unsigned int p_index) {
+	if (p_index < assetCount() && assets[p_index]->getAssetHash() != "") {
+		return assets[p_index]->getAssetHash();
+	}
+	return "";
+}
+
+/**
+ * For use by Kage when Exporting; returns XML string as part of .kage file
+ * @param p_path
+ */
+string KageAssetManager::saveAssetsTo(string p_path) {
+	unsigned int l_assetMax = assets.size();
+	string l_assetXML = "";
+	string l_hash = "";
+	for (unsigned int i = 0; i < l_assetMax; ++i) {
+		//ASSET_KAGE are KSF files considered as Scenes
+		if (assets[i]->getAssetType() != KageAsset::AssetType::ASSET_KAGE) {
+			l_hash = getHashAt(i);
+
+			filesystem::path l_sourceFile = filesystem::temp_directory_path() / _KageStudioAsset / l_hash;
+			filesystem::path l_assetFile = filesystem::path(p_path) / l_hash;
+				string l_filenames = l_sourceFile.u8string() + " " + l_assetFile.u8string();
+				
+				//filesystem::copy(l_sourceFile, l_assetFile, filesystem::copy_options::overwrite_existing);
+				//as above code is not working with GCC 13
+				if (filesystem::exists(l_assetFile)) {
+					filesystem::remove_all(l_assetFile);
+				}
+				std::ifstream  src(l_sourceFile.u8string(), std::ios::binary);
+				std::ofstream  dst( l_assetFile.u8string(), std::ios::binary);
+					dst << src.rdbuf();
+			
+			l_assetXML += ("<asset label=\"" + getLabelAt(i) + "\" hash=\"" + l_hash + "\">" + getFilePathAt(i) + getFileNameAt(i) + "</asset>\n");
+		}
+	}
+	return l_assetXML;
+}

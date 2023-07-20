@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2022  Mj Mendoza IV
+ * Copyright (C) 2011~2023  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -85,6 +85,7 @@
 			int propYindex2;
 			double propWidth = 0;
 			double propHeight = 0;
+			double propRotation = 0;
 			double nodeX = 0;
 			double nodeY = 0;
 			unsigned int nodeIndexX = 0;
@@ -167,7 +168,6 @@
 			void tryMultiSelectShapes();
 			void tryMultiSelectShapes_populateShapes();
 			unsigned int getShape(unsigned int p_index, vector<VectorData> p_v);
-
 			
 			void updateShapeColor(bool p_doFill = true, bool p_doStroke = true);
 			void updateShapeX(double p_value, bool p_stackDo = true);

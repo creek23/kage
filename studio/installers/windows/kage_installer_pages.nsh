@@ -15,6 +15,7 @@ Section "Core (2.3 MB)" SEC01
   File "${FILE_PATH}\kagestudio.exe"
   File "${FILE_PATH}\LICENSE.txt"
   File "${FILE_PATH}\README.txt"
+  File "${FILE_PATH}\kage.ico"
   File "${FILE_PATH}\ksf.ico"
 
   ;Store installation folder
@@ -166,11 +167,19 @@ Section -Post
   
   ;write assoc's
     ;KSF
-    WriteRegStr HKCR ".ksf" "" "KageStudio.File"
-    WriteRegStr HKCR ".ksf\ShellNew" "NullFile" ""
+    WriteRegStr HKCR ".kage" "" "KageStudio.File"
+;    WriteRegStr HKCR ".kage\ShellNew" "NullFile" ""
     WriteRegStr HKCR "KageStudio.File" "" "Kage Studio File"
     WriteRegStr HKCR "KageStudio.File\shell\Open\command" "" "$INSTDIR\kagestudio.exe %1"
-    WriteRegStr HKCR "KageStudio.File\DefaultIcon" "" "$INSTDIR\ksf.ico"
+    WriteRegStr HKCR "KageStudio.File\DefaultIcon" "" "$INSTDIR\kage.ico"
+    
+  ;write assoc's
+    ;KSF
+    WriteRegStr HKCR ".ksf" "" "KageScene.File"
+;    WriteRegStr HKCR ".ksf\ShellNew" "NullFile" ""
+    WriteRegStr HKCR "KageScene.File" "" "Kage Scene File"
+    WriteRegStr HKCR "KageScene.File\shell\Open\command" "" "$INSTDIR\kagestudio.exe %1"
+    WriteRegStr HKCR "KageScene.File\DefaultIcon" "" "$INSTDIR\ksf.ico"
     
     ;WriteRegStr HKCR "dir" "entry" "value" -- template
     
@@ -254,9 +263,13 @@ Section Uninstall
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
   
   ;remove reg entries made by installer
-  DeleteRegKey HKCR ".ksf"
+  DeleteRegKey HKCR ".kage"
   DeleteRegKey HKCR "Kage Studio"
   DeleteRegKey HKCR "KageStudio.File"
+  
+  DeleteRegKey HKCR ".ksf"
+  DeleteRegKey HKCR "Kage Scene"
+  DeleteRegKey HKCR "KageScene.File"
   
   DeleteRegKey /ifempty HKLM "Software\Kage Studio"
   

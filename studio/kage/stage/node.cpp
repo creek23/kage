@@ -105,7 +105,7 @@ void KageStage::updateNodeX(double p_value, bool p_stackDo) {
 				}
 			}
 		} else if (v[selectedNodes[l_selectedNode]].vectorType == VectorData::TYPE_IMAGE) {
-			//TODO:handle X for images
+			v[selectedNodes[l_selectedNode]].points[1].x += l_propXdiff;
 		}
 	}
 	
@@ -157,7 +157,7 @@ void KageStage::updateNodeY(double p_value, bool p_stackDo) {
 				}
 			}
 		} else if (v[selectedNodes[l_selectedNode]].vectorType == VectorData::TYPE_IMAGE) {
-			//TODO:handle Y for images
+			v[selectedNodes[l_selectedNode]].points[1].y += l_propYdiff;
 		}
 	}
 	
@@ -227,6 +227,7 @@ void KageStage::handleNodes_selection() {
 					break;
 				case VectorData::TYPE_MOVE:
 					typeMovesIndex = i;
+					break;
 				case VectorData::TYPE_LINE:
 					break;
 				case VectorData::TYPE_CURVE_QUADRATIC:
@@ -672,7 +673,17 @@ void KageStage::handleNodesMouseUp() {
 				selectedNodes.push_back(i);
 			}
 		} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
-			if (handleNodes_getNearestShape(v[i].points[1].x, v[i].points[1].y, i, v)) {
+			//TODO: factor-in rotation
+			if (handleNodes_getNearestShape(v[i].points[1].x                                        , v[i].points[1].y                                        , i, v)) {
+				selectedNodes.push_back(i);
+			}
+			if (handleNodes_getNearestShape(v[i].points[1].x + (v[i].points[2].x * v[i].points[3].x), v[i].points[1].y                                        , i, v)) {
+				selectedNodes.push_back(i);
+			}
+			if (handleNodes_getNearestShape(v[i].points[1].x + (v[i].points[2].x * v[i].points[3].x), v[i].points[1].y + (v[i].points[2].y * v[i].points[3].y), i, v)) {
+				selectedNodes.push_back(i);
+			}
+			if (handleNodes_getNearestShape(v[i].points[1].x                                        , v[i].points[1].y + (v[i].points[2].y * v[i].points[3].y), i, v)) {
 				selectedNodes.push_back(i);
 			}
 		}
@@ -682,7 +693,7 @@ void KageStage::handleNodesMouseUp() {
 		if (KageStage::toolMode == MODE_SELECT) {
 			_kage->propStageSetVisible(false);
 			_kage->propFillStrokeSetVisible(true);
-			_kage->propShapePropertiesSetVisible(true);
+			_kage->propDisplayObjectPropertiesSetVisible(true);
 		}
 	}
 	if (selectedNodes.size() > 0) {
@@ -829,7 +840,30 @@ unsigned int KageStage::getSelectedShapeViaNode(unsigned int p_index, vector<Vec
 				break;
 			}
 			case VectorData::TYPE_TEXT:
+				break;
 			case VectorData::TYPE_IMAGE:
+				if (propX > p_v[i].points[1].x) {
+					propX = p_v[i].points[1].x;
+					propXindex1 = i;
+					propXindex2 = 1;
+				}
+				if (propX > p_v[i].points[1].x * (p_v[i].points[2].x * p_v[i].points[3].x)) {
+					propX = p_v[i].points[1].x * (p_v[i].points[2].x * p_v[i].points[3].x);
+					propXindex1 = i;
+					propXindex2 = 1;//how?!?!?
+				}
+				if (propY > p_v[i].points[1].y) {
+					propY = p_v[i].points[1].y;
+					propYindex1 = i;
+					propYindex2 = 1;
+				}
+				if (propY > p_v[i].points[1].y * (p_v[i].points[2].y * p_v[i].points[3].y)) {
+					propY = p_v[i].points[1].y * (p_v[i].points[2].y * p_v[i].points[3].y);
+					propYindex1 = i;
+					propYindex2 = 1;//how?!?!?
+				}
+				cout << "\nIMAGE propX " << propX << endl;
+				cout << "\nIMAGE propY " << propY << endl;
 				break;
 			case VectorData::TYPE_INIT: {
 				unsigned int vsize = p_v.size();
@@ -858,6 +892,16 @@ unsigned int KageStage::getSelectedShapeViaNode(unsigned int p_index, vector<Vec
 								propHeight = p_v[j].points[k].y - propY;
 							}
 						}
+					} else if (p_v[j].vectorType == VectorData::TYPE_IMAGE) {
+						//TODO: factor-in rotation
+							if (propWidth < (p_v[j].points[2].x * p_v[j].points[3].x)) {
+								propWidth = (p_v[j].points[2].x * p_v[j].points[3].x);
+								cout << "\nIMAGE propWidth " << propWidth << endl;
+							}
+							if (propHeight < (p_v[j].points[2].y * p_v[j].points[3].y)) {
+								propHeight = (p_v[j].points[2].y * p_v[j].points[3].y);
+								cout << "\nIMAGE propHeight " << propHeight << endl;
+							}
 					}
 				}
 				//got it!

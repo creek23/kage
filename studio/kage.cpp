@@ -228,6 +228,14 @@ Kage::Kage(string p_filePath) :
 		sigc::mem_fun(*this, &Kage::LockUnlockLayer_onClick)
 	);
 	m_refActionGroup->add(
+		Gtk::Action::create("ToggleOnionSkin", "Toggle _Onion Skin", "Toggle Onion Skin"),
+		sigc::mem_fun(*this, &Kage::ToggleOnionSkin_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("ToggleOnionLayer", "Toggle _Onion Layer", "Toggle Onion Layer"),
+		sigc::mem_fun(*this, &Kage::ToggleOnionLayer_onClick)
+	);
+	m_refActionGroup->add(
 		Gtk::Action::create("RaiseLayer", "Raise Layer", "Raise Current Layer"),
 		Gtk::AccelKey("<shift><control>Page_Up"),
 		sigc::mem_fun(*this, &Kage::LayerMoveUp_onClick)

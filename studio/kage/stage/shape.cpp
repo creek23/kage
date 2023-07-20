@@ -306,6 +306,9 @@ void KageStage::handleShapes_moveShape(double p_diffX, double p_diffY) {
 					v[typeMovesIndex].points[0].x += p_diffX;
 					v[typeMovesIndex].points[0].y += p_diffY;
 				}
+			} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
+				v[i].points[1].x += (p_diffX*1000); //not sure why 1000 is the magic number
+				v[i].points[1].y += (p_diffY*1000); //TODO: revisit later to know why
 			} else if (v[i].vectorType == VectorData::TYPE_INIT
 					&& i != selectedShapes[l_shapeIndex]) {
 				break;
@@ -416,7 +419,10 @@ void KageStage::updateShapeX(double p_value, bool p_stackDo) {
 			} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
 				v[i].points[0].x += l_propXdiff;
 			} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
-				//TODO:handle X for images
+				//p1 x/y == ID / imageBuff
+				//p2 x/y == x / y
+				//p3 x/y == scale / rotate
+				v[i].points[1].x += l_propXdiff;
 			} else if (v[i].vectorType == VectorData::TYPE_INIT
 					&& i != selectedShapes[l_shapeIndex]) {
 				break;
@@ -477,7 +483,10 @@ void KageStage::updateShapeY(double p_value, bool p_stackDo) {
 			} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
 				v[i].points[0].y += l_propYdiff;
 			} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
-				//TODO:handle Y for images
+				//p1 x/y == ID / imageBuff
+				//p2 x/y == x / y
+				//p3 x/y == scale / rotate
+				v[i].points[1].y += l_propYdiff;
 			} else if (v[i].vectorType == VectorData::TYPE_INIT
 					&& i != selectedShapes[l_shapeIndex]) {
 				break;
@@ -537,7 +546,10 @@ void KageStage::updateShapeWidth(double p_value) {
 			} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
 				v[i].points[0].x = propX + ((v[i].points[0].x-l_propXprev) / propWidth * (p_value / KageStage::currentScale));
 			} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
-				//TODO:handle Y for images
+				//p1 x/y == ID / imageBuff
+				//p2 x/y == x / y
+				//p3 x/y == scale / rotate
+				v[i].points[1].x = propX + ((v[i].points[1].x-l_propXprev) / propWidth * (p_value / KageStage::currentScale));
 			} else if (v[i].vectorType == VectorData::TYPE_INIT
 					&& i != selectedShapes[l_shapeIndex]) {
 				break;
@@ -596,7 +608,10 @@ void KageStage::updateShapeHeight(double p_value) {
 			} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
 				v[i].points[0].y = propY + ((v[i].points[0].y-l_propYprev) / propHeight * (p_value / KageStage::currentScale));
 			} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
-				//TODO:handle Y for images
+				//p1 x/y == ID / imageBuff
+				//p2 x/y == x / y
+				//p3 x/y == scale / rotate
+				v[i].points[1].y = propY + ((v[i].points[1].y-l_propYprev) / propHeight * (p_value / KageStage::currentScale));
 			} else if (v[i].vectorType == VectorData::TYPE_INIT
 					&& i != selectedShapes[l_shapeIndex]) {
 				break;

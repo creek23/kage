@@ -1276,8 +1276,10 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
 						cairoImageSurface = cairoPNG[p_vectorData[i].points[0].y];
 						
 						//Cairo::RefPtr<Cairo::ImageSurface> lpTarget;
-						int xPos = p_vectorData[i].points[1].x;//*KageStage::currentScale;
-						int yPos = p_vectorData[i].points[1].y;//*KageStage::currentScale;
+						int xImagePos = p_vectorData[i].points[1].x;
+						int yImagePos = p_vectorData[i].points[1].y;
+						int xPos = xImagePos * KageStage::currentScale*_zoomValue;
+						int yPos = yImagePos * KageStage::currentScale*_zoomValue;
 						//Cairo::RefPtr<Cairo::ImageSurface> lpSource;
 						float xScale = p_vectorData[i].points[2].x;
 						float yScale = p_vectorData[i].points[2].y;
@@ -1297,8 +1299,8 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
 							yPos += imageHeight;
 						}
 						
-						float translateX = (float)((float)(0.5f*imageWidth *_zoomValue)) + origin.x;
-						float translateY = (float)((float)(0.5f*imageHeight*_zoomValue)) + origin.y;
+						float translateX = (float)((float)(0.5f*imageWidth *_zoomValue)+xPos) + origin.x;
+						float translateY = (float)((float)(0.5f*imageHeight*_zoomValue)+yPos) + origin.y;
 						if (imageWidth >= 0) {
 							p_context->translate(translateX, translateY);
 						} else {
@@ -1319,13 +1321,15 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
 							p_context->scale(xScale * _zoomValue, yScale * _zoomValue);
 						}
 		
-						p_context->set_source(cairoImageSurface, origin.x / _zoomValue, origin.y / _zoomValue);
+						p_context->set_source(cairoImageSurface,
+												(origin.x / _zoomValue) + (xPos/KageStage::currentScale / _zoomValue),
+												(origin.y / _zoomValue) + (yPos/KageStage::currentScale / _zoomValue));
 						
-						if (       _mouseLocation.x               <= xPos + origin.x
-								&& _mouseLocation.x + imageWidth  >= xPos + origin.x
-								&& _mouseLocation.y               <= yPos + origin.y
-								&& _mouseLocation.y + imageHeight >= yPos + origin.y) {
-							_mouseLocationShapeIndex = l_mouseLocationShapeIndex;
+						if (       _mouseLocation.x <= xImagePos +  imageWidth + origin.x
+								&& _mouseLocation.x >= xImagePos               + origin.x
+								&& _mouseLocation.y <= yImagePos + imageHeight + origin.y
+								&& _mouseLocation.y >= yImagePos               + origin.y) {
+							_mouseLocationShapeIndex = i;
 						}
 						
 						if (l_bTransparent == false) {
@@ -1333,7 +1337,7 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
 						} else {
 							p_context->paint_with_alpha(alphaValue / 255.0f);
 						}
-
+						
 						p_context->restore();
 					} catch (std::bad_alloc const &ex) {
 						cout << "handling zoom error: bad_alloc" << endl;
@@ -1366,18 +1370,29 @@ unsigned int KageStage::addImage(unsigned int p_ID) {
 	}
 	
 	double l_x1, l_y1;
-	l_x1 = ((draw1.x + draw2.x)/2);
-	l_y1 = ((draw1.y + draw2.y)/2);
-	Cairo::RefPtr<Cairo::ImageSurface> l_tmp;
-	cairoPNG.push_back(l_tmp);
-	PointData  p1(     p_ID, cairoPNG.size()-1);
-	PointData  p2(  draw1.x,           draw1.y);
-	PointData  p3(      1.0,               1.0);
-	PointData p_anchor(l_x1,              l_y1);
-	VectorDataManager v;
-		v.addInit(p_anchor);
-		v.addImage(p1, p2, p3);
-	_kage->addDataToFrame(v);
+	
+	draw1.x = draw1.x / KageStage::currentScale / _zoomValue;
+	draw1.y = draw1.y / KageStage::currentScale / _zoomValue;
+		draw2.x = draw2.x / KageStage::currentScale / _zoomValue;
+		draw2.y = draw2.y / KageStage::currentScale / _zoomValue;
+
+		l_x1 = ((draw1.x + draw2.x)/2);
+		l_y1 = ((draw1.y + draw2.y)/2);
+		Cairo::RefPtr<Cairo::ImageSurface> l_tmp;
+		cairoPNG.push_back(l_tmp);
+		PointData  p1(     p_ID, cairoPNG.size()-1);
+		PointData  p2(  draw1.x,           draw1.y);
+		PointData  p3(      1.0,               1.0);
+		PointData p_anchor(l_x1,              l_y1);
+		VectorDataManager v;
+			v.addInit(p_anchor);
+			v.addImage(p1, p2, p3);
+		_kage->addDataToFrame(v);
+	
+	draw1.x = draw1.x * KageStage::currentScale * _zoomValue;
+	draw1.y = draw1.y * KageStage::currentScale * _zoomValue;
+		draw2.x = draw2.x * KageStage::currentScale * _zoomValue;
+		draw2.y = draw2.y * KageStage::currentScale * _zoomValue;
 	
 	_kage->stackDo();
 	

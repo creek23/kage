@@ -671,6 +671,10 @@ void KageStage::handleNodesMouseUp() {
 			if (handleNodes_getNearestShape(v[i].points[2].x, v[i].points[2].y, i, v)) {
 				selectedNodes.push_back(i);
 			}
+		} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
+			if (handleNodes_getNearestShape(v[i].points[1].x, v[i].points[1].y, i, v)) {
+				selectedNodes.push_back(i);
+			}
 		}
 	}
 	if (selectedShape != UINT_MAX) {

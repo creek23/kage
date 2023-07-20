@@ -99,6 +99,8 @@ bool KageTimeline::on_key_press_event(GdkEventKey *e) {
 		if (_kage->switchToPreviousFrame()) {
 			--g_frameSelectIndex;
 		}
+	} else if (e->keyval == GDK_KEY_Escape) {
+		_kage->Stop_onClick();
 	}
 
 	return true;
@@ -200,6 +202,8 @@ bool KageTimeline::invalidateToRender() {
 	return true;
 }
 
+const unsigned int FRAME_WIDTH_OFFSET = 8;
+const unsigned int FRAME_HEIGHT_OFFSET = 23;
 bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 	if (KageScene::LOADING_MODE == true) {
 		return true;
@@ -256,8 +260,6 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 		bool l_selected = isSelected();
 		bool l_tween = false;
 		//draw background
-		const unsigned int FRAME_WIDTH_OFFSET = 8;
-		const unsigned int FRAME_HEIGHT_OFFSET = 23;
 		p_context->move_to(FRAME_WIDTH_OFFSET,            0);
 		p_context->line_to(       get_width(),            0);
 		p_context->line_to(       get_width(), get_height());
@@ -288,6 +290,25 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 			l_x += (FRAME_WIDTH_OFFSET * _kage->_document.Project._fps);
 		}
 		
+		unsigned int l_frames;
+		double l_layerSelectIndex = UINT_MAX;
+		KageLayer *l_layer;
+		KageFrame *l_frame;
+		for (unsigned int i = 0; i < l_layers; ++i) {
+			l_layer = _kage->_document.Scenes[_kage->_document.getActiveSceneID()].Layers[i];
+			l_frames = l_layer->Frames.size();
+			for (unsigned int j = 0; j < l_frames; ++j) {
+				l_frame = l_layer->Frames[j];
+				l_current = l_layer->isCurrentFrame(l_frame->frameID);
+				l_selected = l_frame->isSelected();
+				if (l_current && l_selected) {
+					l_layerSelectIndex = i;
+					g_frameSelectIndex = j;
+					i = l_layers;
+					break;
+				}
+			}
+		}
 		//draw selected frame index
 		p_context->move_to(g_frameSelectIndex * FRAME_WIDTH_OFFSET + (FRAME_WIDTH_OFFSET/2) + FRAME_WIDTH_OFFSET,            0);
 		p_context->line_to(g_frameSelectIndex * FRAME_WIDTH_OFFSET + (FRAME_WIDTH_OFFSET/2) + FRAME_WIDTH_OFFSET, get_height());
@@ -296,20 +317,15 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 
 
 		l_y = get_height() - FRAME_HEIGHT_OFFSET;
-		unsigned int l_frames = 0;
 		for (unsigned int i = 0; i < l_layers; ++i) {
-			double l_layerSelectIndex = UINT_MAX;
-			KageLayer *l_layer = _kage->_document.Scenes[_kage->_document.getActiveSceneID()].Layers[i];
+			l_layer = _kage->_document.Scenes[_kage->_document.getActiveSceneID()].Layers[i];
 			l_frames = l_layer->Frames.size();
-			double l_x = FRAME_WIDTH_OFFSET;//offset due to VBox divider mouse-handling
+			l_x = FRAME_WIDTH_OFFSET;//offset due to VBox divider mouse-handling
 			for (unsigned int j = 0; j < l_frames; ++j) {
-				KageFrame *l_frame = l_layer->Frames[j];
-				bool l_current = l_layer->isCurrentFrame(l_frame->frameID);
-				bool l_selected = l_frame->isSelected();
+				l_frame = l_layer->Frames[j];
+				l_current = l_layer->isCurrentFrame(l_frame->frameID);
+				l_selected = l_frame->isSelected();
 				bool l_tween = (l_frame->getTween() > 0);
-				if (l_current && l_selected) {
-					l_layerSelectIndex = i;
-				}
 				switch (l_frame->getExtension()) {
 					case KageFrame::EXTENSION_NOT:
 					case KageFrame::EXTENSION_END:

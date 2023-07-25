@@ -37,6 +37,12 @@
 		<file>share/frame/drawn_x_sel.png</file>
 		<file>share/frame/drawn_x_sel_twn.png</file>
 		<file>share/frame/drawn_x_twn.png</file>
+		<file>share/frame/add.png</file>
+		<file>share/frame/clear.png</file>
+		<file>share/frame/copy.png</file>
+		<file>share/frame/cut.png</file>
+		<file>share/frame/paste.png</file>
+		<file>share/frame/remove.png</file>
 		<file>share/layer/visible_true.png</file>
 		<file>share/layer/visible_false.png</file>
 		<file>share/layer/locked_true.png</file>

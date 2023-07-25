@@ -934,10 +934,9 @@ VectorDataManager KageLayer::getFrameData() {
 VectorDataManager KageLayer::getFrameDataAt(unsigned int p_frame) {
 	if (p_frame > 0 && p_frame <= getFrameCount()) {
 		--p_frame; //layer now becomes Frame Index
-//TODO: revert back once Frame EXTENSION setting/getting is corrected
-//		if (_scene->_document->_kage->_toggleOnion.get_active() == true || _scene->_document->_kage->_toggleOnionLayer.get_active() == true) {
-//			return getFrameTweenData(p_frame);
-//		}
+		if (_scene->_document->_kage->_toggleOnion.get_active() == true || _scene->_document->_kage->_toggleOnionLayer.get_active() == true) {
+			return getFrameTweenData(p_frame);
+		}
 		return Frames[p_frame]->getFrameData();
 	}
 	

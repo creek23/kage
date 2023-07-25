@@ -640,8 +640,8 @@ Kage::Kage(string p_filePath) :
 						m_Timeline_Layer_VBox2.pack_start(m_Timeline_Layer_HScrollbar, Gtk::PACK_SHRINK);
 							m_Timeline_Layer_HScrollbar.set_adjustment(m_Timeline_Layer_ScrolledWindow.get_hadjustment());
 					m_Timeline_Layer_VBox1.pack_start(m_Timeline_Layer_Controls_HBox, Gtk::PACK_SHRINK);
-						m_Timeline_Layer_Controls_HBox.pack_start(m_Timeline_Label, Gtk::PACK_EXPAND_WIDGET);
-							m_Timeline_Label.set_label("     Layer     ");
+						m_Timeline_Layer_Controls_HBox.pack_start(m_Timeline_Layer_Label, Gtk::PACK_EXPAND_WIDGET);
+							m_Timeline_Layer_Label.set_label("     Layer     ");
 						m_Timeline_Layer_Controls_HBox.pack_start(_btnLayerAdd, Gtk::PACK_SHRINK);
 							_btnLayerAdd_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/layer/layer_add.png");
 								_btnLayerAdd_img = Gtk::Image(_btnLayerAdd_pixbuf);
@@ -776,9 +776,104 @@ Kage::Kage(string p_filePath) :
 						m_Timeline_Frame_VBox2.pack_start(m_Timeline_HScrollbar, Gtk::PACK_SHRINK);
 							m_Timeline_HScrollbar.set_adjustment(m_Timeline_Frame_ScrolledWindow.get_hadjustment());
 					m_Timeline_Frame_VBox1.pack_start(m_Timeline_Controls_HBox, Gtk::PACK_SHRINK);
-						m_Timeline_Controls_HBox.pack_start(m_Timeline_CurrentFrame, Gtk::PACK_EXPAND_PADDING);
-							m_Timeline_CurrentFrame.set_label("Timeline");
-							m_Timeline_CurrentFrame.set_size_request(22, 22);
+						m_Timeline_Controls_HBox.pack_start(m_Timeline_Label, Gtk::PACK_EXPAND_PADDING);
+							m_Timeline_Label.set_label("Timeline");
+							m_Timeline_Label.set_size_request(22, 22);
+						
+						m_Timeline_Controls_HBox.pack_start(_btnTimelineFrameAdd, Gtk::PACK_SHRINK);
+							_btnTimelineFrameAdd_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/frame/add.png");
+								_btnTimelineFrameAdd_img = Gtk::Image(_btnTimelineFrameAdd_pixbuf);
+									_btnTimelineFrameAdd.set_image(_btnTimelineFrameAdd_img);
+										_btnTimelineFrameAdd.property_always_show_image();
+										_btnTimelineFrameAdd.set_tooltip_text("Add Frame (F7)");
+										_btnTimelineFrameAdd.set_focus_on_click(false);
+										_btnTimelineFrameAdd.show();
+										
+										ctx = _btnTimelineFrameAdd.get_style_context();
+										//ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										_btnTimelineFrameAdd.set_name("gtkbutton");
+										
+										_btnTimelineFrameAdd.set_size_request(16, 16);
+										_btnTimelineFrameAdd.signal_clicked().connect(sigc::mem_fun(*this, &Kage::AddFrame_onClick));
+						m_Timeline_Controls_HBox.pack_start(_btnTimelineFrameRemove, Gtk::PACK_SHRINK);
+							_btnTimelineFrameRemove_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/frame/remove.png");
+								_btnTimelineFrameRemove_img = Gtk::Image(_btnTimelineFrameRemove_pixbuf);
+									_btnTimelineFrameRemove.set_image(_btnTimelineFrameRemove_img);
+										_btnTimelineFrameRemove.property_always_show_image();
+										_btnTimelineFrameRemove.set_tooltip_text("Remove Frame (Shift+F7)");
+										_btnTimelineFrameRemove.set_focus_on_click(false);
+										_btnTimelineFrameRemove.show();
+										
+										ctx = _btnTimelineFrameRemove.get_style_context();
+										//ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										_btnTimelineFrameRemove.set_name("gtkbutton");
+										
+										_btnTimelineFrameRemove.set_size_request(16, 16);
+										_btnTimelineFrameRemove.signal_clicked().connect(sigc::mem_fun(*this, &Kage::RemoveFrame_onClick));
+						m_Timeline_Controls_HBox.pack_start(_btnTimelineFrameCut, Gtk::PACK_SHRINK);
+							_btnTimelineFrameCut_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/frame/cut.png");
+								_btnTimelineFrameCut_img = Gtk::Image(_btnTimelineFrameCut_pixbuf);
+									_btnTimelineFrameCut.set_image(_btnTimelineFrameCut_img);
+										_btnTimelineFrameCut.property_always_show_image();
+										_btnTimelineFrameCut.set_tooltip_text("Cut Frame (Ctrl+Shift+X)");
+										_btnTimelineFrameCut.set_focus_on_click(false);
+										_btnTimelineFrameCut.show();
+										
+										ctx = _btnTimelineFrameCut.get_style_context();
+										//ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										_btnTimelineFrameCut.set_name("gtkbutton");
+										
+										_btnTimelineFrameCut.set_size_request(16, 16);
+										_btnTimelineFrameCut.signal_clicked().connect(sigc::mem_fun(*this, &Kage::CutFrame_onClick));
+						m_Timeline_Controls_HBox.pack_start(_btnTimelineFrameCopy, Gtk::PACK_SHRINK);
+							_btnTimelineFrameCopy_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/frame/copy.png");
+								_btnTimelineFrameCopy_img = Gtk::Image(_btnTimelineFrameCopy_pixbuf);
+									_btnTimelineFrameCopy.set_image(_btnTimelineFrameCopy_img);
+										_btnTimelineFrameCopy.property_always_show_image();
+										_btnTimelineFrameCopy.set_tooltip_text("Copy Frame (Ctrl+Shift+C)");
+										_btnTimelineFrameCopy.set_focus_on_click(false);
+										_btnTimelineFrameCopy.show();
+										
+										ctx = _btnTimelineFrameCopy.get_style_context();
+										//ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										_btnTimelineFrameCopy.set_name("gtkbutton");
+										
+										_btnTimelineFrameCopy.set_size_request(16, 16);
+										_btnTimelineFrameCopy.signal_clicked().connect(sigc::mem_fun(*this, &Kage::CopyFrame_onClick));
+						m_Timeline_Controls_HBox.pack_start(_btnTimelineFramePaste, Gtk::PACK_SHRINK);
+							_btnTimelineFramePaste_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/frame/paste.png");
+								_btnTimelineFramePaste_img = Gtk::Image(_btnTimelineFramePaste_pixbuf);
+									_btnTimelineFramePaste.set_image(_btnTimelineFramePaste_img);
+										_btnTimelineFramePaste.property_always_show_image();
+										_btnTimelineFramePaste.set_tooltip_text("Paste Frame (Ctrl+Shift+V)");
+										_btnTimelineFramePaste.set_focus_on_click(false);
+										_btnTimelineFramePaste.show();
+										
+										ctx = _btnTimelineFramePaste.get_style_context();
+										//ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										_btnTimelineFramePaste.set_name("gtkbutton");
+										
+										_btnTimelineFramePaste.set_size_request(16, 16);
+										_btnTimelineFramePaste.signal_clicked().connect(sigc::mem_fun(*this, &Kage::PasteFrame_onClick));
+						m_Timeline_Controls_HBox.pack_start(_btnTimelineFrameClear, Gtk::PACK_SHRINK);
+							_btnTimelineFrameClear_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/frame/clear.png");
+								_btnTimelineFrameClear_img = Gtk::Image(_btnTimelineFrameClear_pixbuf);
+									_btnTimelineFrameClear.set_image(_btnTimelineFrameClear_img);
+										_btnTimelineFrameClear.property_always_show_image();
+										_btnTimelineFrameClear.set_tooltip_text("Clear Frame (Ctrl+Shift+Del)");
+										_btnTimelineFrameClear.set_focus_on_click(false);
+										_btnTimelineFrameClear.show();
+										
+										ctx = _btnTimelineFrameClear.get_style_context();
+										//ctx->add_provider_for_screen(screen, css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+										_btnTimelineFrameClear.set_name("gtkbutton");
+										
+										_btnTimelineFrameClear.set_size_request(16, 16);
+										_btnTimelineFrameClear.signal_clicked().connect(sigc::mem_fun(*this, &Kage::DeleteFrame_onClick));
+
+						m_Timeline_Controls_HBox.pack_start(m_Timeline_Playback_Label, Gtk::PACK_EXPAND_PADDING);
+							m_Timeline_Playback_Label.set_label("Playback");
+							m_Timeline_Playback_Label.set_size_request(22, 22);
 						m_Timeline_Controls_HBox.pack_start(_btnTimelineRewind, Gtk::PACK_SHRINK);
 							_btnTimelineRewind_pixbuf = Gdk::Pixbuf::create_from_resource("/kage/share/timeline/rewind.png");
 								_btnTimelineRewind_img = Gtk::Image(_btnTimelineRewind_pixbuf);
@@ -3702,7 +3797,7 @@ void Kage::parseKAGE_Children(vector<XmlTag> p_children) {
 				if (StringHelper::toLower(l_originalFileName).substr(l_len, 4) == ".png") {
 					//add PNG Asset
 					l_assetFilePath = filesystem::path(kagePath).remove_filename().u8string() + l_hash;
-					unsigned int l_image = _assetManager.addAsset(l_assetFilePath);
+					unsigned int l_image = _assetManager.addImageAsset(l_assetFilePath);
 					cout << "l_image " << l_image << endl;
 					if (l_image != UINT_MAX) {
 						_assetManager.setAssetType(KageAsset::AssetType::ASSET_IMAGE);
@@ -3717,13 +3812,12 @@ void Kage::parseKAGE_Children(vector<XmlTag> p_children) {
 						_assetManager.setFileNameAt(_assetManager.assetCount()-1, filesystem::path(l_originalFileName).filename().u8string());
 						_assetManager.setHashAt(_assetManager.assetCount()-1, l_hash);
 						_assetManager.render(_stage.cairoPNG.size()-1);
-						cout << "Importing of PNG is under construction " << l_assetFilePath << endl;
 					} else {
 						cout << "Failed to import " << l_assetFilePath << endl;
 					}
 				}
 			} else {
-				cout << "hash " << l_hash << "\t" << StringHelper::kHash(l_originalFileName) << endl;
+				cout << "hash " << l_hash << "\t" << StringHelper::kHash(l_originalFileName, 24) << endl;
 			}
 			--l_assetCount;
 		} else if (l_tagname == "stage") {

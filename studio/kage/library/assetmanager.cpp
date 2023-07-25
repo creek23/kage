@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2022  Mj Mendoza IV
+ * Copyright (C) 2011~2023  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -120,6 +120,78 @@ unsigned int KageAssetManager::addAsset(string p_name) {
 			(*assets.back()).setFilePath(l_filePath); //is it still relevant if we have the hash version?
 			(*assets.back()).setFileName(l_fileName);
 			(*assets.back()).setAssetHash(l_hash);
+	
+	_currentAssetID = (*assets.back()).assetID;
+	_currentAssetIndex = assets.size()-1;
+	
+	return assetCtr++;
+}
+
+/**
+ * @brief Used by Kage when opening KAGE files with PNG Assets
+ * Blindly accepts that p_name is actually a PNG file.
+ * 
+ * @param p_name Image file with full path
+ * @return unsigned int 
+ */
+unsigned int KageAssetManager::addImageAsset(string p_name) {
+	string l_filePath;
+	string l_fileName;
+	
+	string l_hash = StringHelper::kHash(p_name, 24);
+	if (p_name == "") {
+		return UINT_MAX;
+	} else {
+		filesystem::path l_sourceFile = p_name;
+		if (filesystem::exists(l_sourceFile) == true) {
+			l_fileName = l_sourceFile.filename().u8string();
+			l_filePath = filesystem::path(p_name).remove_filename().u8string();
+			l_hash = l_fileName;
+			cout << "l_fileName " << l_fileName << endl;
+			cout << "l_filePath " << l_filePath << endl;
+			filesystem::path l_currentPath = filesystem::current_path();
+			filesystem::current_path(filesystem::temp_directory_path());
+			
+				filesystem::create_directories(_KageStudioAsset);
+				//const auto copyOptions = filesystem::copy_options::update_existing;
+									//| filesystem::copy_options::recursive; <-- use in future when importing project file which will import ALL assets
+				filesystem::path l_assetFile = filesystem::temp_directory_path() / _KageStudioAsset / l_hash;
+				if (filesystem::exists(l_assetFile) == true) {
+					//delete l_assetFile
+					const char* filename = l_assetFile.u8string().c_str();
+
+					//if (filesystem::remove_all(l_assetFile) == false) { //it's not deleting somehow
+					if (std::remove(filename) != 0) {
+						std::perror("Error deleting file");
+						return UINT_MAX;
+					} else {
+						std::puts("File successfully deleted");
+					}
+				}
+				
+				//filesystem::copy(l_sourceFile, l_assetFile, filesystem::copy_options::update_existing);
+				//as above code is not working with GCC 13
+				std::ifstream src(l_sourceFile.u8string(), std::ios::binary);
+				std::ofstream dst( l_assetFile.u8string(), std::ios::binary);
+					dst << src.rdbuf();
+			
+			filesystem::current_path(l_currentPath);
+			
+			p_name = l_fileName;
+		} else {
+			return UINT_MAX;
+		} 
+	}
+	
+	assets.push_back(Gtk::manage(new KageAsset(this, assetCtr)));
+		pack_end(*assets.back(), Gtk::PACK_SHRINK);
+			(*assets.back()).setLabel(p_name);
+			(*assets.back()).set_size_request(100, 23);
+			(*assets.back()).set_focus_on_click(false);
+			(*assets.back()).setFilePath(l_filePath); //is it still relevant if we have the hash version?
+			(*assets.back()).setFileName(l_fileName);
+			(*assets.back()).setAssetHash(l_hash);
+	
 	_currentAssetID = (*assets.back()).assetID;
 	_currentAssetIndex = assets.size()-1;
 	
@@ -237,16 +309,57 @@ void KageAssetManager::setSelected(KageAsset *p_asset) {
 	} else {
 		for (unsigned int i = 0; i < assetCount(); ++i) {
 			if (assets[i]->assetID == _currentAssetID) {
-				_currentAssetIndex = i;
 				assets[i]->setSelected(false);
 				break;
 			}
+		}
+	}
+	for (unsigned int i = 0; i < assetCount(); ++i) {
+		if (assets[i]->assetID == p_asset->assetID) {
+			_currentAssetIndex = i;
+			break;
 		}
 	}
 	p_asset->setSelected(true);
 	_currentAssetID = p_asset->assetID;
 	
 //	_kage->setCurrentFrame(_kage->getCurrentFrame());
+}
+
+/**
+ * @brief For use by Asset when Arrow Up is pressed
+ * 
+ * @param p_asset source asset where Key Press happened
+ */
+void KageAssetManager::setAboveAssetSelected(KageAsset *p_asset) {
+	for (unsigned int i = 0; i < assetCount(); ++i) {
+		if (assets[i]->assetID == p_asset->assetID && i < assetCount()-1) {
+			p_asset->setSelected(false);
+			_currentAssetIndex = i+1;
+			_currentAssetID = assets[_currentAssetIndex]->assetID;
+			assets[_currentAssetIndex]->setSelected(true);
+			assets[_currentAssetIndex]->render();
+			break;
+		}
+	}
+}
+
+/**
+ * @brief For use by Asset when Arrow Down is pressed
+ * 
+ * @param p_asset source asset where Key Press happened
+ */
+void KageAssetManager::setBelowAssetSelected(KageAsset *p_asset) {
+	for (unsigned int i = 0; i < assetCount(); ++i) {
+		if (assets[i]->assetID == p_asset->assetID && i > 0) {
+			p_asset->setSelected(false);
+			_currentAssetIndex = i-1;
+			_currentAssetID = assets[_currentAssetIndex]->assetID;
+			assets[_currentAssetIndex]->setSelected(true);
+			assets[_currentAssetIndex]->render();
+			break;
+		}
+	}
 }
 
 /** Not to be confused of getCurrentAsset().  This function returns the

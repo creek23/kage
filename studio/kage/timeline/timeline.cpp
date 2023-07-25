@@ -315,7 +315,6 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 		p_context->set_source_rgb(0.75f, 0.0f, 0.0f);
 		p_context->stroke();
 
-
 		l_y = get_height() - FRAME_HEIGHT_OFFSET;
 		for (unsigned int i = 0; i < l_layers; ++i) {
 			l_layer = _kage->_document.Scenes[_kage->_document.getActiveSceneID()].Layers[i];
@@ -426,9 +425,24 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 			
 			//dont highlight non-selected layer
 			if (l_layerSelectIndex != i) {
-				p_context->rectangle(FRAME_WIDTH_OFFSET, l_y, get_width(), FRAME_HEIGHT_OFFSET);
-				p_context->set_source_rgba(0.85f, 0.85f, 0.85f, 0.25f);
-				p_context->fill();
+				if (_kage->_toggleOnion.get_active() == true) {
+					if (g_frameSelectIndex-2 > 0) {
+						//draw left side
+						p_context->rectangle(FRAME_WIDTH_OFFSET, l_y, (g_frameSelectIndex-2) * FRAME_WIDTH_OFFSET, FRAME_HEIGHT_OFFSET);
+						p_context->set_source_rgba(0.85f, 0.85f, 0.85f, 0.25f);
+						p_context->fill();
+					}
+					if (g_frameSelectIndex+2 < l_frames-1) {
+						//draw left side
+						p_context->rectangle((g_frameSelectIndex+2) * FRAME_WIDTH_OFFSET + FRAME_WIDTH_OFFSET + FRAME_WIDTH_OFFSET, l_y, get_width(), FRAME_HEIGHT_OFFSET);
+						p_context->set_source_rgba(0.85f, 0.85f, 0.85f, 0.25f);
+						p_context->fill();
+					}
+				} else {
+					p_context->rectangle(FRAME_WIDTH_OFFSET, l_y, get_width(), FRAME_HEIGHT_OFFSET);
+					p_context->set_source_rgba(0.85f, 0.85f, 0.85f, 0.25f);
+					p_context->fill();
+				}
 			}
 			
 			l_y -= FRAME_HEIGHT_OFFSET;

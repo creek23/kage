@@ -39,9 +39,12 @@
 			virtual ~KageAssetManager();
 			unsigned int assetCount();
 			unsigned int addAsset(string p_name = "");
+			unsigned int addImageAsset(string p_name = "");
 			void deleteAsset();
 			bool removeAllAssets();
 			void setSelected(KageAsset *p_asset);
+			void setAboveAssetSelected(KageAsset *p_asset);
+			void setBelowAssetSelected(KageAsset *p_asset);
 			KageAsset *getAsset();
 			unsigned int getCurrentAsset();
 			void setCurrentAsset(unsigned int p_asset);

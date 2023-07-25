@@ -993,8 +993,8 @@ void KageStage::handleShapes() {
 	anchor_upperLeft.x = DBL_MAX;
 	anchor_upperLeft.y = DBL_MAX;
 	
-	anchor_lowerRight.x = -100000;
-	anchor_lowerRight.y = -100000;
+	anchor_lowerRight.x = DBL_MIN;
+	anchor_lowerRight.y = DBL_MIN;
 	double l_anchorX = 0;
 	double l_anchorY = 0;
 	unsigned int vsize = v.size();
@@ -1051,14 +1051,6 @@ void KageStage::handleShapes() {
 				cr->set_line_cap(Cairo::LINE_CAP_ROUND);
 					cr->stroke();
 	cr->unset_dash();
-	
-	//draw center anchor
-/*		cr->set_line_width(1.0);
-	cr->arc(anchor_center.x, anchor_center.y, 7, 0, 2 * M_PI);
-		cr->set_source_rgba(1.0,1.0,1.0,1.0);
-			cr->fill_preserve();
-		cr->set_source_rgba(0.0, 0.0, 0.0, 1.0);
-			cr->stroke();*/
 	
 	if (_rotateMode == true) {
 		if (l_selectedShapes_size == 1) {

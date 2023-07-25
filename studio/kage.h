@@ -194,7 +194,7 @@
 			
 			Gtk::HBox m_Timeline_Layer_Controls_HBox;
 			Gtk::HBox m_Timeline_Controls_HBox;
-			Gtk::Label m_Timeline_Label;
+			Gtk::Label m_Timeline_Layer_Label;
 			Gtk::Button _btnLayerAdd;
 				Gtk::Image                _btnLayerAdd_img;
 				Glib::RefPtr<Gdk::Pixbuf> _btnLayerAdd_pixbuf;
@@ -213,6 +213,29 @@
 			Gtk::Button _btnLayerMoveBottom;
 				Gtk::Image                _btnLayerMoveBottom_img;
 				Glib::RefPtr<Gdk::Pixbuf> _btnLayerMoveBottom_pixbuf;
+			
+			Gtk::Label m_Timeline_Label;
+			
+			Gtk::Button _btnTimelineFrameAdd;
+				Gtk::Image                _btnTimelineFrameAdd_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnTimelineFrameAdd_pixbuf;
+			Gtk::Button _btnTimelineFrameRemove;
+				Gtk::Image                _btnTimelineFrameRemove_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnTimelineFrameRemove_pixbuf;
+			Gtk::Button _btnTimelineFrameCut;
+				Gtk::Image                _btnTimelineFrameCut_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnTimelineFrameCut_pixbuf;
+			Gtk::Button _btnTimelineFrameCopy;
+				Gtk::Image                _btnTimelineFrameCopy_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnTimelineFrameCopy_pixbuf;
+			Gtk::Button _btnTimelineFramePaste;
+				Gtk::Image                _btnTimelineFramePaste_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnTimelineFramePaste_pixbuf;
+			Gtk::Button _btnTimelineFrameClear;
+				Gtk::Image                _btnTimelineFrameClear_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnTimelineFrameClear_pixbuf;
+			
+			Gtk::Label m_Timeline_Playback_Label;
 			
 			Gtk::Button _btnTimelineRewind;
 				Gtk::Image                _btnTimelineRewind_img;
@@ -242,7 +265,7 @@
 			protected:
 				Gtk::Image                _toggleOnionLayer_img;
 				Glib::RefPtr<Gdk::Pixbuf> _toggleOnionLayer_pixbuf;
-			Gtk::Label m_Timeline_CurrentFrame;
+			
 			Gtk::VBox m_Timeline_Frame_VBox1;
 			Gtk::Label m_TimelineFrame_Label;
 			Gtk::VBox m_Timeline_Frame_VBox2;

@@ -1,6 +1,6 @@
 # GdkPixbuf Image Loader Modules file
 # Automatically generated file, do not edit
-# Created by gdk-pixbuf-query-loaders from gdk-pixbuf-2.40.0
+# Created by gdk-pixbuf-query-loaders from gdk-pixbuf-2.42.10
 #
 # LoaderDir = C:\msys64\mingw64\lib\gdk-pixbuf-2.0\2.10.0\loaders
 #
@@ -9,6 +9,12 @@
 "application/x-navi-animation" ""
 "ani" ""
 "RIFF    ACON" "    xxxx    " 100
+
+"lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\libpixbufloader-avif.dll"
+"avif" 5 "gdk-pixbuf" "AV1 Image File Format" "BSD"
+"image/avif" ""
+"avif" ""
+"    ftypavif" "zzz         " 100
 
 "lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\libpixbufloader-bmp.dll"
 "bmp" 5 "gdk-pixbuf" "BMP" "LGPL"
@@ -22,6 +28,12 @@
 "gif" ""
 "GIF8" "" 100
 
+"lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\libpixbufloader-heif.dll"
+"heif/avif" 4 "pixbufloader-heif" "HEIF/AVIF Image" "LGPL3"
+"image/heif" "image/heic" "image/avif" ""
+"heif" "heic" "avif" ""
+"    ftyp" "xxxx    " 100
+
 "lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\libpixbufloader-icns.dll"
 "icns" 4 "gdk-pixbuf" "MacOS X icon" "GPL"
 "image/x-icns" ""
@@ -34,13 +46,6 @@
 "ico" "cur" ""
 "  \001   " "zz znz" 100
 "  \002   " "zz znz" 100
-
-"lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\libpixbufloader-jasper.dll"
-"jpeg2000" 4 "gdk-pixbuf" "JPEG 2000" "LGPL"
-"image/jp2" "image/jpeg2000" "image/jpx" ""
-"jp2" "jpc" "jpx" "j2k" "jpf" ""
-"    jP" "!!!!  " 100
-"\377O\377Q" "" 100
 
 "lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\libpixbufloader-jpeg.dll"
 "jpeg" 5 "gdk-pixbuf" "JPEG" "LGPL"

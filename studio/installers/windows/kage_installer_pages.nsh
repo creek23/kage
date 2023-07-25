@@ -46,7 +46,7 @@ Section "Gtkmm (45.4 MB)" SEC03
   File "${FILE_PATH}\libdatrie-1.dll"
   File "${FILE_PATH}\libepoxy-0.dll"
   File "${FILE_PATH}\libexpat-1.dll"
-  File "${FILE_PATH}\libffi-7.dll"
+  File "${FILE_PATH}\libffi-8.dll"
   File "${FILE_PATH}\libfontconfig-1.dll"
   File "${FILE_PATH}\libfreetype-6.dll"
   File "${FILE_PATH}\libfribidi-0.dll"
@@ -71,7 +71,7 @@ Section "Gtkmm (45.4 MB)" SEC03
   File "${FILE_PATH}\libpangoft2-1.0-0.dll"
   File "${FILE_PATH}\libpangomm-1.4-1.dll"
   File "${FILE_PATH}\libpangowin32-1.0-0.dll"
-  File "${FILE_PATH}\libpcre-1.dll"
+  File "${FILE_PATH}\libpcre2-8-0.dll"
   File "${FILE_PATH}\libpixman-1-0.dll"
   File "${FILE_PATH}\libpng16-16.dll"
   File "${FILE_PATH}\libsigc-2.0-0.dll"
@@ -91,11 +91,12 @@ Section "Gtkmm (45.4 MB)" SEC03
   SetOutPath "$INSTDIR\lib\gdk-pixbuf-2.0\2.10.0\loaders"
   SetOverwrite ifnewer
   File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-ani.dll"
+  File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-avif.dll"
   File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-bmp.dll"
   File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-gif.dll"
+  File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-heif.dll"
   File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-icns.dll"
   File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-ico.dll"
-  File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-jasper.dll"
   File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-jpeg.dll"
   File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-png.dll"
   File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-pnm.dll"
@@ -109,13 +110,7 @@ Section "Gtkmm (45.4 MB)" SEC03
   SetOutPath "$INSTDIR\share\icons"
   SetOverwrite ifnewer
   
-  File "${FILE_PATH}\share\icons\Adwaita.zip" ;; to be unzipped on post-install
-  
-  SetOutPath "$INSTDIR\share\icons\hicolor"
-  SetOverwrite ifnewer
-  
-  File "${FILE_PATH}\share\icons\hicolor\icon-theme.cache"
-  File "${FILE_PATH}\share\icons\hicolor\index.theme"
+  File "${FILE_PATH}\share\icons\icons.zip" ;; to be unzipped on post-install
   
 SectionEnd
 
@@ -188,14 +183,14 @@ Section -Post
   ;unzip Adwaita.zip then delete after
   InitPluginsDir
     ; Call plug-in. Push filename to ZIP first, and the dest. folder last.
-    nsisunz::UnzipToLog "$INSTDIR\share\icons\Adwaita.zip" "$INSTDIR\share\icons\"
+    nsisunz::UnzipToLog "$INSTDIR\share\icons\icons.zip" "$INSTDIR\share\icons\"
      
     ; Always check result on stack
     Pop $0
     StrCmp $0 "success" ok
       DetailPrint "$0" ;print error message to log
     ok:
-    Delete "$INSTDIR\share\icons\Adwaita.zip"
+    Delete "$INSTDIR\share\icons\icons.zip"
   
 SectionEnd
 

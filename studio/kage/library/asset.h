@@ -75,6 +75,7 @@
 			void addEventsListener();
 
 			void render(unsigned int p_assetID);
+			void render();
 		protected:
 			string _assetHash;
 

@@ -84,6 +84,10 @@ bool KageAsset::on_key_press_event(GdkEventKey *e) {
 	std::cout << " KageFrame(L " << assetID << ") on_key_press_event" << std::endl;
 	if (e->keyval == GDK_KEY_Control_L || e->keyval == GDK_KEY_Control_R) {
 		_CTRL = true;
+	} else if (e->keyval == GDK_KEY_Up || e->keyval == GDK_KEY_KP_Up) {
+		_assetManager->setAboveAssetSelected(this);
+	} else if (e->keyval == GDK_KEY_Down || e->keyval == GDK_KEY_KP_Down) {
+		_assetManager->setBelowAssetSelected(this);
 	}
 	Kage::timestamp_OUT();
 	return true;
@@ -284,6 +288,9 @@ string KageAsset::getLabel() {
 }
 void KageAsset::setSelected(bool p_selected) {
 	_selected = p_selected;
+	if (p_selected == true) {
+		setFocus();
+	}
 	invalidateToRender();
 }
 bool KageAsset::isSelected() {
@@ -308,4 +315,8 @@ void KageAsset::render(unsigned int p_assetID) {
 	_assetManager->renderLibrary(p_assetID);
 
 //	invalidateToRender();
+}
+
+void KageAsset::render() {
+	_assetManager->renderLibrary(_renderAssetID);
 }

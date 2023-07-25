@@ -905,6 +905,8 @@ void KageStage::cleanSlate() {
 	_zoomRatio = 1.0f;
 	__stageArea.x = _kage->_document.Project._width;
 	__stageArea.y = _kage->_document.Project._height;
+
+	cairoPNG.clear();
 	
 	initNodeTool();
 	
@@ -1294,7 +1296,7 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
 						float xScale      = p_vectorData[i].points[3].x;
 						float yScale      = p_vectorData[i].points[3].y;
 						float Rotate      = p_vectorData[i].points[4].x;
-						float alphaValue  = p_vectorData[i].points[4].y;
+						float alphaValue  = p_vectorData[i].points[4].y * p_alpha;
 						float rotationPointX = p_vectorData[l_mouseLocationShapeIndex].points[0].x * KageStage::currentScale * _zoomValue;
 						float rotationPointY = p_vectorData[l_mouseLocationShapeIndex].points[0].y * KageStage::currentScale * _zoomValue;
 						bool l_bMirrored = false;
@@ -1677,11 +1679,11 @@ void KageStage::handleEyedrop() {
 	vector<VectorData> v = _kage->getFrameData().getVectorData();
 	bool l_move = false;
 	
-	anchor_upperLeft.x = 100000;
-	anchor_upperLeft.y = 100000;
+	anchor_upperLeft.x = DBL_MAX;
+	anchor_upperLeft.y = DBL_MAX;
 	
-	anchor_lowerRight.x = -100000;
-	anchor_lowerRight.y = -100000;
+	anchor_lowerRight.x = DBL_MIN;
+	anchor_lowerRight.y = DBL_MIN;
 	
 	unsigned int vsize = v.size();
 	for (unsigned int i = selectedShape; i < vsize; ++i) {

@@ -1,5 +1,7 @@
 #!/bin/sh
 cp ../../kagestudio ./kagestudio/usr/bin/kagestudio
+cp ../../LICENSE.txt ./kagestudio/usr/share/doc/copyright
+cp ../../README.txt ./kagestudio/usr/share/doc/README
 sudo chmod 777 kagestudio*.deb
 sudo rm kagestudio*amd64.deb
 dpkg --build ./kagestudio .

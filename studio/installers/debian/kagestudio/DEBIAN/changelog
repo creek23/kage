@@ -1,3 +1,39 @@
+kagestudio (2023.07.23) jammy; urgency=low
+
+  * 0.7 maintenance release; codename Ellen
+
+-- Mj Mendoza IV <mj.mendoza.iv@gmail.com> Tue, 25 July 21:19:23 -0800
+
+kagestudio (2022.12.28) jammy; urgency=low
+
+  * first 0.7 package
+
+-- Mj Mendoza IV <mj.mendoza.iv@gmail.com> Wed, 28 December 19:45:29 -0800
+
+kagestudio (2022.09.20) jammy; urgency=low
+
+  * second 0.6 maintenance package
+
+-- Mj Mendoza IV <mj.mendoza.iv@gmail.com> Tue, 20 September 11:51:38 -0800
+
+kagestudio (2022.08.08) jammy; urgency=low
+
+  * first 0.6 maintenance package
+
+-- Mj Mendoza IV <mj.mendoza.iv@gmail.com> Tue, 09 August 14:57:13 -0800
+
+kagestudio (2022.06.22) focal; urgency=low
+
+  * first 0.6 package
+
+-- Mj Mendoza IV <mj.mendoza.iv@gmail.com> Wed, 22 June 2022 05:27:07 -0800
+
+kagestudio (2022.02.25) focal; urgency=low
+
+  * second 0.5 maintenance package
+
+-- Mj Mendoza IV <mj.mendoza.iv@gmail.com> Wed, 03 March 2022 00:51:19 -0800
+
 kagestudio (2022.01.10) focal; urgency=low
 
   * first 0.5 maintenance package
@@ -10,23 +46,3 @@ kagestudio (2021.12.22) focal; urgency=low
 
 -- Mj Mendoza IV <mj.mendoza.iv@gmail.com>  Wed, 22 December 2021 06:56:13
 +0800
-
-
-kagestudio (2021.04.16) focal; urgency=low
-
-  * last 0.4 maintenance package
-
--- Mj Mendoza IV <mj.mendoza.iv@gmail.com>  Thu, 16 December 2021 02:12:39
-+0800
-
-kagestudio (2020.07.27) focal; urgency=low
-
-  * last 0.3 maintenance package.
-
- -- Mj Mendoza IV <mj.mendoza.iv@gmail.com>  Mon, 27 July 2020 06:04:52 +0800 
-
-kagestudio (2020.05.12) focal; urgency=low
-
-  * first Kage Studio deb release.
-
- -- Mj Mendoza IV <mj.mendoza.iv@gmail.com>  Tue, 12 May 2020 03:02:24 +0800 

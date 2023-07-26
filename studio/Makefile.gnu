@@ -10,12 +10,9 @@ SOURCES = \
 	./kage/data/color.cpp \
 	./kage/data/strokecolor.cpp \
 	./kage/data/vectordata.cpp \
-	./kage/timeline/frame.cpp \
-	./kage/timeline/frame_padding.cpp \
-	./kage/timeline/frameset.cpp \
-	./kage/timeline/framesmanager.cpp \
 	./kage/timeline/layer.cpp \
 	./kage/timeline/layermanager.cpp \
+	./kage/timeline/timeline.cpp \
 	./kage/unre/kagedo.cpp \
 	./kage/unre/unre.cpp \
 	./kage/stage/stage.cpp \
@@ -28,12 +25,16 @@ SOURCES = \
 	./kage/library/asset.cpp \
 	./kage/library/assetmanager.cpp \
 	./kage/library/library.cpp \
+	./kage/properties/asset.cpp \
 	./kage/properties/fillstroke.cpp \
 	./kage/properties/frametween.cpp \
 	./kage/properties/locationsize.cpp \
 	./kage/properties/nodexy.cpp \
 	./kage/properties/stage.cpp \
 	./kage/vectordatamanager.cpp \
+	./kage/data/frame.cpp \
+	./kage/data/layer.cpp \
+	./kage/data/scene.cpp \
 	./kage/document.cpp \
 	./util/xml/xmltoken.cpp \
 	./util/xml/xmltagproperty.cpp \

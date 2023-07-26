@@ -2,15 +2,20 @@ Current version is v0.7.230723
 Kage Studio is a simple, Free and Open Source 2D Animation Software
 written by Mj Mendoza IV <mj.mendoza.iv at gmail dot com>
 
-Kage Studio uses FFMPEG to produce AVI
+Kage Studio uses FFMPEG to produce MP4, MKV, OGV, AVI, MOV
 FFMPEG is by FFmpeg team.  see ffmpeg.org
 
 Kage Studio uses GTKMM3 as User Interface
 GTKMM3 is by GTK Team.  see gtkmm.org
 
+
 Demo:
 =====
 Open file "demo.ksf" or, check out these links:
+ * https://www.youtube.com/watch?v=mb4geCP4NSM
+ * https://www.youtube.com/watch?v=_5KOjVuyXMc
+ * https://www.youtube.com/watch?v=RJ6j1g49arU
+ * https://www.youtube.com/watch?v=cVlSzyq31UQ
  * https://www.youtube.com/watch?v=CELOVDCIoQ4
  * https://www.youtube.com/watch?v=MogqL4ue3AA
  * https://www.youtube.com/watch?v=8NTx-fIn0h0
@@ -51,6 +56,7 @@ HOW TO COMPILE Kage Studio (on MacOS)
 3 cd to this path
 4 then type: 'make -f Makefile.mac resource'
 5 finally type: 'make -f Makefile.mac'
+
 
 License:
 ========

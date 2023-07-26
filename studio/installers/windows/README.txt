@@ -12,6 +12,9 @@ Demo:
 =====
 Open file "demo.ksf" or, check out these links:
  * https://www.youtube.com/watch?v=mb4geCP4NSM
+ * https://www.youtube.com/watch?v=_5KOjVuyXMc
+ * https://www.youtube.com/watch?v=RJ6j1g49arU
+ * https://www.youtube.com/watch?v=cVlSzyq31UQ
  * https://www.youtube.com/watch?v=CELOVDCIoQ4
  * https://www.youtube.com/watch?v=MogqL4ue3AA
  * https://www.youtube.com/watch?v=8NTx-fIn0h0

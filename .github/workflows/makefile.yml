@@ -17,8 +17,8 @@ jobs:
     - name: Install dependencies
       run: sudo apt install make libgtkmm-3.0-dev build-essential
 
-    - name: Run check
+    - name: Create Resources
       run: cd studio; make -f Makefile.gnu resource
 
-    - name: Run distcheck
-      run: make -f Makefile.gnu
+    - name: Create Binary
+      run: cd studio; make -f Makefile.gnu

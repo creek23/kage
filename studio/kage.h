@@ -130,6 +130,7 @@
 			void ToggleProperties_onClick();
 				void TogglePropertiesFill_onClick();
 				void TogglePropertiesStroke_onClick();
+				void ToggleDarkTheme_onClick();
 			void ShapeGroup_onClick();
 			void ShapeUngroup_onClick();
 			void Raise_onClick();
@@ -404,6 +405,8 @@
 			static void timestamp_IN();
 			static void timestamp_OUT();
 			static unsigned int TAB_COUNT;
+
+			static gboolean NotDarkMode;
 			
 			bool switchToPreviousFrame();
 			bool switchToNextFrame();

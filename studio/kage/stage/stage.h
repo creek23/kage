@@ -90,6 +90,13 @@
 			double nodeY = 0;
 			unsigned int nodeIndexX = 0;
 			unsigned int nodeIndexY = 0;
+			float propAlpha = 1.0f;
+
+			const int IMAGE_ID_BUFF       = 0; //p1 x/y == ID / imageBuff
+			const int IMAGE_X_Y           = 1; //p2 x/y == x / y
+			const int IMAGE_WIDTH_HEIGHT  = 2; //p3 x/y == width / height
+			const int IMAGE_SCALEX_SCALEY = 3; //p4 x/y == scaleX / scaleY
+			const int IMAGE_ROTATE_ALPHA  = 4; //p5 x/y == rotate / alpha
 			
 			void printVectors();
 			void cleanSlate();
@@ -147,6 +154,9 @@
 			void handleEyedropMouseUp();
 			Glib::RefPtr<Gdk::Pixbuf> _bg;
 			Cairo::RefPtr<Cairo::Surface> _bgcr;
+			
+			void updateShapeRotation(float l_rotation);
+			void updateImageAlpha(float l_alpha);
 			
 			bool selectAllShapes();
 			bool deselectSelectedShapes();

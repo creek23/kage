@@ -202,6 +202,11 @@ Kage::Kage(string p_filePath) :
 //		Gtk::AccelKey("Escape"),
 		sigc::mem_fun(*this, &Kage::TogglePropertiesStroke_onClick)
 	);
+	m_refActionGroup->add(
+		Gtk::Action::create("ToggleDarkTheme", "Toggle _Dark Theme", "ToggleDarkTheme"),
+//		Gtk::AccelKey("Escape"),
+		sigc::mem_fun(*this, &Kage::ToggleDarkTheme_onClick)
+	);
 	//==================================================================
 	m_refActionGroup->add(
 		Gtk::Action::create("LayerAdd", "_Add Layer", "Add New Layer"),
@@ -515,6 +520,8 @@ Kage::Kage(string p_filePath) :
 		"			<menuitem action='ToggleProperties'/>"
 		"			<menuitem action='TogglePropertiesFill'/>"
 		"			<menuitem action='TogglePropertiesStroke'/>"
+		"			<separator/>"
+		"			<menuitem action='ToggleDarkTheme'/>"
 		"		</menu>"
 		"		<menu action='LayerMenu'>"
 		"			<menuitem action='LayerAdd'/>"
@@ -1200,6 +1207,16 @@ void Kage::TogglePropertiesFill_onClick() {
 }
 void Kage::TogglePropertiesStroke_onClick() {
 	m_propFillStroke.TogglePropertiesStroke_onClick();
+}
+
+gboolean Kage::NotDarkMode = TRUE;
+void Kage::ToggleDarkTheme_onClick() {
+	g_object_set(
+		gtk_settings_get_default(),
+		"gtk-application-prefer-dark-theme", Kage::NotDarkMode,
+		NULL);
+	cout << "NotDarkMode " << NotDarkMode;
+	NotDarkMode = !NotDarkMode;
 }
 
 void Kage::ShapeGroup_onClick() {
@@ -1904,6 +1921,7 @@ void Kage::updateAssetProperties() {
 	m_propAsset.setWidthText(   sanitizeToZeroDouble(_stage.propWidth    * _stage.currentScale));
 	m_propAsset.setHeightText(  sanitizeToZeroDouble(_stage.propHeight   * _stage.currentScale));
 	m_propAsset.setRotationText(sanitizeToZeroDouble(_stage.propRotation                      ));
+	m_propAsset.setScaleAlpha(  sanitizeToZeroDouble(_stage.propAlpha                         ));
 }
 
 void Kage::updateNodeXY() {
@@ -1922,7 +1940,6 @@ void Kage::stackDo() {
 		}
 	} else {
 		_undoRedoManager.stackDo(getCurrentLayer(), getCurrentFrame(), _undoBase);
-		
 	}
 	
 	_undoRedoManager.stackDo(getCurrentLayer(), getCurrentFrame(), getFrameData().getVectorData());
@@ -3360,17 +3377,17 @@ string Kage::saveFrame() {
 				l_ostringstream << "\t<curve>" << v[i].points[0].x*_stage.currentScale << " " << v[i].points[0].y*_stage.currentScale << " " << v[i].points[1].x*_stage.currentScale << " " << v[i].points[1].y*_stage.currentScale << " " << v[i].points[2].x*_stage.currentScale << " " << v[i].points[2].y*_stage.currentScale << "</curve>\n";
 				break;
 			case VectorData::TYPE_IMAGE:
-				//p1 x/y == ID / imageBuff
-				//p2 x/y == x / y
-				//p3 x/y == width / height
-				//p4 x/y == scaleX / scaleY
-				//p5 x/y == rotate / alpha
+				//p1 IMAGE_ID_BUFF       x/y == ID / imageBuff
+				//p2 IMAGE_X_Y           x/y == x / y
+				//p3 IMAGE_WIDTH_HEIGHT  x/y == width / height
+				//p4 IMAGE_SCALEX_SCALEY x/y == scaleX / scaleY
+				//p5 IMAGE_ROTATE_ALPHA  x/y == rotate / alpha
 				l_ostringstream << "\t<image"
-						<<       " id=\"" << v[i].points[0].x                     <<   "\" buff=\"" << v[i].points[0].y
-						<<      "\" x=\"" << v[i].points[1].x*_stage.currentScale <<      "\" y=\"" << v[i].points[1].y*_stage.currentScale
-						<<  "\" width=\"" << v[i].points[2].x*_stage.currentScale << "\" height=\"" << v[i].points[2].y*_stage.currentScale
-						<< "\" scaleX=\"" << v[i].points[3].x                     << "\" scaleY=\"" << v[i].points[3].y
-						<< "\" rotate=\"" << v[i].points[4].x                     <<  "\" alpha=\"" << v[i].points[4].y
+						<<       " id=\"" << v[i].points[_stage.IMAGE_ID_BUFF      ].x                     <<   "\" buff=\"" << v[i].points[_stage.IMAGE_ID_BUFF      ].y
+						<<      "\" x=\"" << v[i].points[_stage.IMAGE_X_Y          ].x*_stage.currentScale <<      "\" y=\"" << v[i].points[_stage.IMAGE_X_Y          ].y*_stage.currentScale
+						<<  "\" width=\"" << v[i].points[_stage.IMAGE_WIDTH_HEIGHT ].x*_stage.currentScale << "\" height=\"" << v[i].points[_stage.IMAGE_WIDTH_HEIGHT ].y*_stage.currentScale
+						<< "\" scaleX=\"" << v[i].points[_stage.IMAGE_SCALEX_SCALEY].x                     << "\" scaleY=\"" << v[i].points[_stage.IMAGE_SCALEX_SCALEY].y
+						<< "\" rotate=\"" << v[i].points[_stage.IMAGE_ROTATE_ALPHA ].x                     <<  "\" alpha=\"" << v[i].points[_stage.IMAGE_ROTATE_ALPHA ].y
 						<< "\" hash=\"\" />\n";
 				break;
 		}
@@ -3509,11 +3526,11 @@ string Kage::dumpFrame(bool bKS) {
 				//p.y = v[i].points[1].y;
 				break;
 			case VectorData::TYPE_IMAGE:
-				//p1 x/y == ID / imageBuff
-				//p2 x/y == x / y
-				//p3 x/y == width / height
-				//p4 x/y == scaleX / scaleY
-				//p5 x/y == rotate / alpha
+				//p1 IMAGE_ID_BUFF       x/y == ID / imageBuff
+				//p2 IMAGE_X_Y           x/y == x / y
+				//p3 IMAGE_WIDTH_HEIGHT  x/y == width / height
+				//p4 IMAGE_SCALEX_SCALEY x/y == scaleX / scaleY
+				//p5 IMAGE_ROTATE_ALPHA  x/y == rotate / alpha
 				break;
 		}
 	}
@@ -3614,11 +3631,11 @@ string Kage::dumpFrameToSvg() {
 				
 				break;
 			case VectorData::TYPE_IMAGE:
-				//p1 x/y == ID / imageBuff
-				//p2 x/y == x / y
-				//p3 x/y == width / height
-				//p4 x/y == scaleX / scaleY
-				//p5 x/y == rotate / alpha
+				//p1 IMAGE_ID_BUFF       x/y == ID / imageBuff
+				//p2 IMAGE_X_Y           x/y == x / y
+				//p3 IMAGE_WIDTH_HEIGHT  x/y == width / height
+				//p4 IMAGE_SCALEX_SCALEY x/y == scaleX / scaleY
+				//p5 IMAGE_ROTATE_ALPHA  x/y == rotate / alpha
 				break;
 		}
 	}

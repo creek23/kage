@@ -1009,10 +1009,15 @@ void KageStage::handleShapes() {
 				handleShapes_updateAnchors(v[i].points[1].x, v[i].points[1].y);
 				handleShapes_updateAnchors(v[i].points[2].x, v[i].points[2].y);
 			} else if (v[i].vectorType == VectorData::TYPE_IMAGE) {
-				double xImagePos   = v[i].points[1].x;
-				double yImagePos   = v[i].points[1].y;
-				double imageWidth  = v[i].points[2].x * v[i].points[3].x;
-				double imageHeight = v[i].points[2].y * v[i].points[3].y;
+				//p1 IMAGE_ID_BUFF       x/y == ID / imageBuff
+				//p2 IMAGE_X_Y           x/y == x / y
+				//p3 IMAGE_WIDTH_HEIGHT  x/y == width / height
+				//p4 IMAGE_SCALEX_SCALEY x/y == scaleX / scaleY
+				//p5 IMAGE_ROTATE_ALPHA  x/y == rotate / alpha
+				double xImagePos   = v[i].points[IMAGE_X_Y].x;
+				double yImagePos   = v[i].points[IMAGE_X_Y].y;
+				double imageWidth  = v[i].points[IMAGE_WIDTH_HEIGHT].x * v[i].points[IMAGE_SCALEX_SCALEY].x;
+				double imageHeight = v[i].points[IMAGE_WIDTH_HEIGHT].y * v[i].points[IMAGE_SCALEX_SCALEY].y;
 				//TODO: factor-in rotation
 				cout << "xImagePos\t" << xImagePos << "\tyImagePos\t" << yImagePos << endl;
 				cout << "imageWidth\t" << imageWidth << "\timageHeight\t" << imageHeight << endl;

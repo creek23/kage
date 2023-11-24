@@ -859,6 +859,11 @@ void KageStage::printVectors() {
 				std::cout << "TEXT" << std::endl;
 				break;
 			case VectorData::TYPE_IMAGE:
+				//p1 IMAGE_ID_BUFF       x/y == ID / imageBuff
+				//p2 IMAGE_X_Y           x/y == x / y
+				//p3 IMAGE_WIDTH_HEIGHT  x/y == width / height
+				//p4 IMAGE_SCALEX_SCALEY x/y == scaleX / scaleY
+				//p5 IMAGE_ROTATE_ALPHA  x/y == rotate / alpha
 				std::cout << "IMAGE" << std::endl;
 				break;
 			case VectorData::TYPE_INIT:
@@ -1273,32 +1278,32 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
 					p_context->show_text("Hello, world");
 				break;
 			case VectorData::TYPE_IMAGE:
-				//p1 x/y == ID / imageBuff
-				//p2 x/y == x / y
-				//p3 x/y == width / height
-				//p4 x/y == scaleX / scaleY
-				//p5 x/y == rotate / alpha
+				//p1 IMAGE_ID_BUFF       x/y == ID / imageBuff
+				//p2 IMAGE_X_Y           x/y == x / y
+				//p3 IMAGE_WIDTH_HEIGHT  x/y == width / height
+				//p4 IMAGE_SCALEX_SCALEY x/y == scaleX / scaleY
+				//p5 IMAGE_ROTATE_ALPHA  x/y == rotate / alpha
 				{
 					try {
 						p_context->save();
-						if (!cairoPNG[p_vectorData[i].points[0].y]) {
-							cairoPNG[p_vectorData[i].points[0].y] = Cairo::ImageSurface::create_from_png(_kage->_assetManager.getImagePathByID(p_vectorData[i].points[0].x));
+						if (!cairoPNG[p_vectorData[i].points[IMAGE_ID_BUFF].y]) {
+							cairoPNG[p_vectorData[i].points[IMAGE_ID_BUFF].y] = Cairo::ImageSurface::create_from_png(_kage->_assetManager.getImagePathByID(p_vectorData[i].points[IMAGE_ID_BUFF].x));
 							cout << "image loaded" << endl;
 						}
 						cairoImageSurface = cairoPNG[p_vectorData[i].points[0].y];
 						
-						float xImagePos   = p_vectorData[i].points[1].x;
-						float yImagePos   = p_vectorData[i].points[1].y;
+						float xImagePos   = p_vectorData[i].points[IMAGE_X_Y].x;
+						float yImagePos   = p_vectorData[i].points[IMAGE_X_Y].y;
 						float xPos = xImagePos * KageStage::currentScale * _zoomValue;
 						float yPos = yImagePos * KageStage::currentScale * _zoomValue;
-						float imageWidth  = p_vectorData[i].points[2].x;
-						float imageHeight = p_vectorData[i].points[2].y;
-						float xScale      = p_vectorData[i].points[3].x;
-						float yScale      = p_vectorData[i].points[3].y;
-						float Rotate      = p_vectorData[i].points[4].x;
-						float alphaValue  = p_vectorData[i].points[4].y * p_alpha;
-						float rotationPointX = p_vectorData[l_mouseLocationShapeIndex].points[0].x * KageStage::currentScale * _zoomValue;
-						float rotationPointY = p_vectorData[l_mouseLocationShapeIndex].points[0].y * KageStage::currentScale * _zoomValue;
+						float imageWidth  = p_vectorData[i].points[IMAGE_WIDTH_HEIGHT].x;
+						float imageHeight = p_vectorData[i].points[IMAGE_WIDTH_HEIGHT].y;
+						float xScale      = p_vectorData[i].points[IMAGE_SCALEX_SCALEY].x;
+						float yScale      = p_vectorData[i].points[IMAGE_SCALEX_SCALEY].y;
+						float Rotate      = p_vectorData[i].points[IMAGE_ROTATE_ALPHA].x;
+						float alphaValue  = p_vectorData[i].points[IMAGE_ROTATE_ALPHA].y * p_alpha;
+						float rotationPointX = p_vectorData[l_mouseLocationShapeIndex].points[IMAGE_ID_BUFF].x * KageStage::currentScale * _zoomValue;
+						float rotationPointY = p_vectorData[l_mouseLocationShapeIndex].points[IMAGE_ID_BUFF].y * KageStage::currentScale * _zoomValue;
 						bool l_bMirrored = false;
 						bool l_bFlipped  = false;
 						bool l_bTransparent = (alphaValue != 1.0f);
@@ -1341,6 +1346,7 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<Vect
 								&& _mouseLocation.y <= yPos + (imageHeight * KageStage::currentScale * _zoomValue) + origin.y
 								&& _mouseLocation.y >= yPos                                                        + origin.y) {
 							_mouseLocationShapeIndex = l_mouseLocationShapeIndex;
+							propAlpha = alphaValue;
 							_kage->_displayObjectIsShape = false;
 						}
 						
@@ -1531,32 +1537,32 @@ void KageStage::renderFrameOffset(Cairo::RefPtr<Cairo::Context> p_context, vecto
 					p_context->show_text("Hello, world");
 				break;
 			case VectorData::TYPE_IMAGE:
-				//p1 x/y == ID / imageBuff
-				//p2 x/y == x / y
-				//p3 x/y == width / height
-				//p4 x/y == scaleX / scaleY
-				//p5 x/y == rotate / alpha
+				//p1 IMAGE_ID_BUFF       x/y == ID / imageBuff
+				//p2 IMAGE_X_Y           x/y == x / y
+				//p3 IMAGE_WIDTH_HEIGHT  x/y == width / height
+				//p4 IMAGE_SCALEX_SCALEY x/y == scaleX / scaleY
+				//p5 IMAGE_ROTATE_ALPHA  x/y == rotate / alpha
 				{
 					try {
 						p_context->save();
-						if (!cairoPNG[p_vectorData[i].points[0].y]) {
-							cairoPNG[p_vectorData[i].points[0].y] = Cairo::ImageSurface::create_from_png(_kage->_assetManager.getImagePathByID(p_vectorData[i].points[0].x));
+						if (!cairoPNG[p_vectorData[i].points[IMAGE_ID_BUFF].y]) {
+							cairoPNG[p_vectorData[i].points[IMAGE_ID_BUFF].y] = Cairo::ImageSurface::create_from_png(_kage->_assetManager.getImagePathByID(p_vectorData[i].points[IMAGE_ID_BUFF].x));
 							cout << "image loaded" << endl;
 						}
 						cairoImageSurface = cairoPNG[p_vectorData[i].points[0].y];
 						
-						float xImagePos   = p_vectorData[i].points[1].x;
-						float yImagePos   = p_vectorData[i].points[1].y;
+						float xImagePos   = p_vectorData[i].points[IMAGE_X_Y].x;
+						float yImagePos   = p_vectorData[i].points[IMAGE_X_Y].y;
 						float xPos = xImagePos * KageStage::currentScale * _zoomValue;
 						float yPos = yImagePos * KageStage::currentScale * _zoomValue;
-						float imageWidth  = p_vectorData[i].points[2].x;
-						float imageHeight = p_vectorData[i].points[2].y;
-						float xScale      = p_vectorData[i].points[3].x;
-						float yScale      = p_vectorData[i].points[3].y;
-						float Rotate      = p_vectorData[i].points[4].x;
-						float alphaValue  = p_vectorData[i].points[4].y;
-						float rotationPointX = p_vectorData[l_mouseLocationShapeIndex].points[0].x * KageStage::currentScale * _zoomValue;
-						float rotationPointY = p_vectorData[l_mouseLocationShapeIndex].points[0].y * KageStage::currentScale * _zoomValue;
+						float imageWidth  = p_vectorData[i].points[IMAGE_WIDTH_HEIGHT].x;
+						float imageHeight = p_vectorData[i].points[IMAGE_WIDTH_HEIGHT].y;
+						float xScale      = p_vectorData[i].points[IMAGE_SCALEX_SCALEY].x;
+						float yScale      = p_vectorData[i].points[IMAGE_SCALEX_SCALEY].y;
+						float Rotate      = p_vectorData[i].points[IMAGE_ROTATE_ALPHA].x;
+						float alphaValue  = p_vectorData[i].points[IMAGE_ROTATE_ALPHA].y;
+						float rotationPointX = p_vectorData[l_mouseLocationShapeIndex].points[IMAGE_ID_BUFF].x * KageStage::currentScale * _zoomValue;
+						float rotationPointY = p_vectorData[l_mouseLocationShapeIndex].points[IMAGE_ID_BUFF].y * KageStage::currentScale * _zoomValue;
 						bool l_bMirrored = false;
 						bool l_bFlipped  = false;
 						bool l_bTransparent = (alphaValue != 1.0f);
@@ -1748,4 +1754,36 @@ void KageStage::handleEyedropMouseMove() {
 void KageStage::handleEyedropMouseUp() {
 	handleNodesMouseUp();
 	_kage->updateColors();
+}
+
+
+/**
+ * @brief updates selected Image's Alpha
+ * 
+ * @param l_alpha
+ */
+void KageStage::updateImageAlpha(float l_alpha) {
+	if (_kage->_displayObjectIsShape == true) {
+		//TODO: should also apply Alpha to the whole selected shape
+	} else {
+		unsigned int l_selectedShapes_size = selectedShapes.size();
+		for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
+			vector<VectorData> v = _kage->getFrameData().getVectorData();
+			unsigned int vsize = v.size();
+			unsigned int l_vStartIndex = selectedShapes[l_shapeIndex];
+			for (unsigned int i = l_vStartIndex; i < vsize; ++i) {
+				if (v[i].vectorType == VectorData::TYPE_IMAGE) {
+					v[i].points[IMAGE_ROTATE_ALPHA].y = l_alpha;
+					_kage->setFrameData(v);
+
+					_kage->stackDo();
+					
+					invalidateToRender();
+					
+					return;
+				}
+			}
+			
+		}
+	}
 }

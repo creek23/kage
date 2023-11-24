@@ -207,7 +207,11 @@ bool KageLayerUI::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 		if (isSelected() == true) {
 			cr->set_source_rgb(1, 1, 1);
 		} else {
-			cr->set_source_rgb(0, 0, 0);
+			if (Kage::NotDarkMode) {
+				cr->set_source_rgb(0, 0, 0);
+			} else {
+				cr->set_source_rgb(1, 1, 1);
+			}
 		}
 		cr->move_to(50, 15);
 		cr->show_text(_label);

@@ -77,12 +77,12 @@ PropertyAsset::PropertyAsset(Kage* p_kage) :
             m_EntryRotation.set_size_request(20, 24);
             m_EntryRotation.set_width_chars(9);
             m_EntryRotation.set_max_length(9);
-            setHeightText(_kage->_stage.propHeight);
+            setRotationText(_kage->_stage.propRotation);
             m_EntryRotation.signal_activate().connect(
                 sigc::mem_fun(*this, &PropertyAsset::EntryRotation_onEnter));
         m_propAssetV2.pack_start(_scaleAlpha, Gtk::PACK_SHRINK);
                 _scaleAlpha.set_digits(0);
-                _scaleAlpha.set_value(100);
+                setScaleAlpha(_kage->_stage.propAlpha);
                 _scaleAlpha.set_value_pos(Gtk::POS_TOP);
                 _scaleAlpha.set_draw_value();
                 _scaleAlpha.signal_value_changed().connect(
@@ -125,13 +125,12 @@ void PropertyAsset::EntryRotation_onEnter() {
 	
 	setRotationText(l_dbl);
 	//TODO: apply rotation to selected image
-	//_kage->_stage.updateShapeHeight(l_dbl);
+	//_kage->_stage.updateShapeRotation(l_dbl);
 }
 
 void PropertyAsset::Alpha_onChange() {
 	double l_alpha = _scaleAlpha.get_value();
-    //TODO: set alpha to selected image
-	//_kage->_stage.updateImageAlpha(l_alpha / 100.f);
+	_kage->_stage.updateImageAlpha(l_alpha / 100.f);
 }
 
 void PropertyAsset::setXText(double p_x) {
@@ -152,6 +151,10 @@ void PropertyAsset::setHeightText(double p_height) {
 
 void PropertyAsset::setRotationText(double p_rotation) {
     m_EntryRotation.set_text(StringHelper::doubleToString(p_rotation));
+}
+
+void PropertyAsset::setScaleAlpha(double p_alpha) {
+    _scaleAlpha.set_value(p_alpha * 100);
 }
 
 unsigned int PropertyAsset::getScaleAlpha() {

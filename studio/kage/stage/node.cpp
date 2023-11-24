@@ -291,6 +291,11 @@ void KageStage::handleNodes_selection() {
 					break;
 				case VectorData::TYPE_TEXT:
 				case VectorData::TYPE_IMAGE:
+					//p1 IMAGE_ID_BUFF       x/y == ID / imageBuff
+					//p2 IMAGE_X_Y           x/y == x / y
+					//p3 IMAGE_WIDTH_HEIGHT  x/y == width / height
+					//p4 IMAGE_SCALEX_SCALEY x/y == scaleX / scaleY
+					//p5 IMAGE_ROTATE_ALPHA  x/y == rotate / alpha
 				case VectorData::TYPE_INIT:
 					typeMovesIndex = _NO_SELECTION;
 				default:
@@ -472,6 +477,11 @@ void KageStage::handleNodes_relocation() {
 					break;
 				case VectorData::TYPE_TEXT:
 				case VectorData::TYPE_IMAGE:
+					//p1 IMAGE_ID_BUFF       x/y == ID / imageBuff
+					//p2 IMAGE_X_Y           x/y == x / y
+					//p3 IMAGE_WIDTH_HEIGHT  x/y == width / height
+					//p4 IMAGE_SCALEX_SCALEY x/y == scaleX / scaleY
+					//p5 IMAGE_ROTATE_ALPHA  x/y == rotate / alpha
 				case VectorData::TYPE_INIT:
 				default:
 					break;
@@ -631,6 +641,11 @@ void KageStage::handleNodes_rendering() {
 					break;
 				case VectorData::TYPE_TEXT:
 				case VectorData::TYPE_IMAGE:
+					//p1 IMAGE_ID_BUFF       x/y == ID / imageBuff
+					//p2 IMAGE_X_Y           x/y == x / y
+					//p3 IMAGE_WIDTH_HEIGHT  x/y == width / height
+					//p4 IMAGE_SCALEX_SCALEY x/y == scaleX / scaleY
+					//p5 IMAGE_ROTATE_ALPHA  x/y == rotate / alpha
 				case VectorData::TYPE_INIT:
 					if (i != selectedShapes[l_selectedShape]) {
 						i = vsize;
@@ -842,23 +857,28 @@ unsigned int KageStage::getSelectedShapeViaNode(unsigned int p_index, vector<Vec
 			case VectorData::TYPE_TEXT:
 				break;
 			case VectorData::TYPE_IMAGE:
-				if (propX > p_v[i].points[1].x) {
-					propX = p_v[i].points[1].x;
+				//p1 IMAGE_ID_BUFF       x/y == ID / imageBuff
+				//p2 IMAGE_X_Y           x/y == x / y
+				//p3 IMAGE_WIDTH_HEIGHT  x/y == width / height
+				//p4 IMAGE_SCALEX_SCALEY x/y == scaleX / scaleY
+				//p5 IMAGE_ROTATE_ALPHA  x/y == rotate / alpha
+				if (propX > p_v[i].points[IMAGE_X_Y].x) {
+					propX = p_v[i].points[IMAGE_X_Y].x;
 					propXindex1 = i;
 					propXindex2 = 1;
 				}
-				if (propX > p_v[i].points[1].x * (p_v[i].points[2].x * p_v[i].points[3].x)) {
-					propX = p_v[i].points[1].x * (p_v[i].points[2].x * p_v[i].points[3].x);
+				if (propX > p_v[i].points[IMAGE_X_Y].x * (p_v[i].points[2].x * p_v[i].points[IMAGE_SCALEX_SCALEY].x)) {
+					propX = p_v[i].points[IMAGE_X_Y].x * (p_v[i].points[2].x * p_v[i].points[IMAGE_SCALEX_SCALEY].x);
 					propXindex1 = i;
 					propXindex2 = 1;//how?!?!?
 				}
-				if (propY > p_v[i].points[1].y) {
-					propY = p_v[i].points[1].y;
+				if (propY > p_v[i].points[IMAGE_X_Y].y) {
+					propY = p_v[i].points[IMAGE_X_Y].y;
 					propYindex1 = i;
 					propYindex2 = 1;
 				}
-				if (propY > p_v[i].points[1].y * (p_v[i].points[2].y * p_v[i].points[3].y)) {
-					propY = p_v[i].points[1].y * (p_v[i].points[2].y * p_v[i].points[3].y);
+				if (propY > p_v[i].points[IMAGE_X_Y].y * (p_v[i].points[2].y * p_v[i].points[IMAGE_SCALEX_SCALEY].y)) {
+					propY = p_v[i].points[IMAGE_X_Y].y * (p_v[i].points[2].y * p_v[i].points[IMAGE_SCALEX_SCALEY].y);
 					propYindex1 = i;
 					propYindex2 = 1;//how?!?!?
 				}

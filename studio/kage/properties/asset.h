@@ -69,6 +69,7 @@
 				void setWidthText(double p_width);
 				void setHeightText(double p_height);
 				void setRotationText(double p_rotation);
+				void setScaleAlpha(double p_alpha);
 				
 				unsigned int getScaleAlpha();
 	};

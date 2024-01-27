@@ -1,0 +1,44 @@
+//KS
+<init>440.57 439.12</init>
+<fill color="rgba(114, 159, 207, 255)">
+	<stroke color="rgba(32, 74, 135, 255)" thickness="3"/>
+	<move>404.9 427.45</move>
+	<curve>416.35 413.66 413.56 409.66 424.73 395.64</curve>
+	<curve>452.62 407.13 460.25 416.29 476.25 454.81</curve>
+	<curve>473.99 468.45 469.29 476.63 453.31 482.6</curve>
+	<curve>428.29 469.6 424.2 461.64 404.9 427.45</curve>
+	<closepath/>
+</fill>
+
+//SVG
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5093-38-2"
+       id="linearGradient5129-3-6"
+       x1="957.82251"
+       y1="431.80759"
+       x2="1000.4249"
+       y2="431.80759"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.99999887,-0.00150119,0.00150119,0.99999887,-871.7423,268.62363)" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient5093-38-2">
+      <stop
+         style="stop-color:#ce6c00;stop-opacity:1"
+         offset="0"
+         id="stop5095-48-2" />
+      <stop
+         style="stop-color:#e1b311;stop-opacity:1"
+         offset="1"
+         id="stop5097-01-5" />
+    </linearGradient>
+    <path
+       style="fill:url(#linearGradient5129);fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 38.020053,42.38923 c -2.3943,21.23401 -18.881463,22.72141 -10.074763,41.668285 3.6608,-1.91861 1.551005,-5.62355 6.378705,-8.00696 2.5722,1.74344 -1.361675,5.06739 0.883425,8.28501 7.1729,-4.09053 20.6737,-14.774475 22.9576,-19.624035 1.1419,-2.42477 6.733,6.29622 10.5444,9.11709 1.267,-7.5815 0.5143,-25.08698 -4.1017,-27.46169 z"
+       id="path4261"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccsccc"
+       inkscape:export-filename="2.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />

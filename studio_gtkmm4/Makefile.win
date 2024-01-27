@@ -1,0 +1,67 @@
+# Makefile for KageStudio
+BIN = kagestudio.exe
+CXX = g++
+CXXFLAGS = -c -I./ -isystem /c/msys64/mingw64/include/c++/12.1.0/ `pkg-config gtkmm-4.0 glibmm-2.68 --cflags | sed 's/ -I/ -isystem /g'` -std=gnu++17 -fmax-errors=5 -Wfatal-errors -g -D KAGE_DEBUG -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED
+CXXLINKS = `pkg-config gtkmm-4.0 glibmm-2.68 --libs | sed 's/ -I/ -isystem /g'`
+
+
+RES = windres
+RESFILE = kage.res
+RCFILE = kage.rc
+
+SOURCES = \
+	./kage/data/anchor.cpp \
+	./kage/data/point.cpp \
+	./kage/data/color.cpp \
+	./kage/data/strokecolor.cpp \
+	./kage/data/vectordata.cpp \
+	./kage/timeline/frame.cpp \
+	./kage/timeline/frame_padding.cpp \
+	./kage/timeline/frameset.cpp \
+	./kage/timeline/framesmanager.cpp \
+	./kage/timeline/layer.cpp \
+	./kage/timeline/layermanager.cpp \
+	./kage/unre/kagedo.cpp \
+	./kage/unre/unre.cpp \
+	./kage/stage.cpp \
+	./kage/stage_node.cpp \
+	./kage/stage_oval.cpp \
+	./kage/stage_poly.cpp \
+	./kage/stage_rect.cpp \
+	./kage/stage_pencil.cpp \
+	./kage/stage_shape.cpp \
+	./kage/vectordatamanager.cpp \
+	./util/xml/xmltoken.cpp \
+	./util/xml/xmltagproperty.cpp \
+	./util/xml/xmltag.cpp \
+	./util/xml/xml.cpp \
+	./util/string/stringhelper.cpp \
+	./util/cairo/cairo_kage.cpp \
+	kage.cpp \
+	gtkkageapp.cpp \
+	resources.cpp \
+	about.cpp \
+	layer_rename.cpp \
+	main.cpp
+
+OBJECTS = $(SOURCES:.cpp=.o)
+
+%.o : %.cpp
+	$(CXX) $(CXXFLAGS) $< -o $@
+
+all: kagestudio
+
+resource:
+	glib-compile-resources --generate-source --target=resources.cpp image.gresource.xml
+
+$(RESFILE):
+	glib-compile-resources --generate-source --target=resources.cpp image.gresource.xml
+	$(RES) $(RCFILE) -O coff -o $(RESFILE)
+
+kagestudio: $(RESFILE) $(OBJECTS)
+	@echo creating $(BIN)
+	$(CXX) $(OBJECTS) $(RESFILE) -o $(BIN) $(CXXLINKS)
+
+clean:
+	@echo deleting .o, $(RESFILE), and $(BIN)
+	rm $(OBJECTS) $(RESFILE) $(BIN)

@@ -1,0 +1,43 @@
+<KageStudio version="2019.10.14">
+<stage width="600" height="600" background="rgb(255, 255, 255)" fps="12" layers="1" frames="1" />
+<layer1>
+<frame1>
+<init/>
+<fill color="rgba(255, 255, 255, 255)">
+<stroke color="rgba(0, 0, 0, 255)" thickness="10"/>
+<move>34.83 336.05</move>
+<cubiccurve>212 140 385 144 551.65 336.36</cubiccurve>
+<cubiccurve>376 528 225 531 34.83 336.05</cubiccurve>
+<closepath/>
+</fill>
+<init/>
+<fill color="rgba(238, 238, 236, 255)">
+<stroke color="rgba(0, 0, 0, 255)" thickness="0.0"/>
+<move>416 236</move>
+<cubiccurve>471 362 326 466 113 390</cubiccurve>
+<cubiccurve>251 510 381 497 536 338</cubiccurve>
+<cubiccurve>490 292 487 281 416 236</cubiccurve>
+<closepath/>
+</fill>
+<init/>
+<fill color="rgba(0, 0, 0, 255)">
+<stroke color="rgba(0, 0, 0, 255)" thickness="10"/>
+<move>180.5 336.49</move>
+<cubiccurve>180.5 270.33 227.89 226.24 299 226.24</cubiccurve>
+<cubiccurve>370.09 226.24 417.5 270.33 417.5 336.49</cubiccurve>
+<cubiccurve>417.5 402.67 370.09 447.75 299 447.75</cubiccurve>
+<cubiccurve>227.89 447.75 180.5 402.67 180.5 336.49</cubiccurve>
+<closepath/>
+</fill>
+<init/>
+<fill color="rgba(0, 0, 0, 255)">
+<stroke color="rgba(0, 0, 0, 255)" thickness="10"/>
+<move>35 335</move>
+<cubiccurve>161 99 454 97 555 336</cubiccurve>
+<cubiccurve>370 181 241 180 35 335</cubiccurve>
+<closepath/>
+</fill>
+
+</frame1>
+</layer1>
+</KageStudio>

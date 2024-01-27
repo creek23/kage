@@ -1,0 +1,73 @@
+<KageStudio version="2020.03.10">
+<stage width="600.01" height="600" background="rgb(255, 255, 255)" fps="12" layers="1" frames="1" />
+<layer1 label="Layer 1" visible="true" locked="false">
+<frame1>
+<init>300 300</init>
+<fill color="rgba(199, 22, 1, 255)">
+	<stroke color="rgba(255, 0, 0, 0)" thickness="3"/>
+	<move>5.96 299.98</move>
+	<curve>5.96 123.57 123.6 5.96 300.02 5.96</curve>
+	<curve>476.39 5.96 594.01 123.57 594.01 299.98</curve>
+	<curve>594.01 476.36 476.39 595 300.02 595</curve>
+	<curve>123.6 595 5.96 476.36 5.96 299.98</curve>
+	<closepath/>
+</fill>
+<init>302.14 290.29</init>
+<fill color="rgba(245, 35, 17, 255)">
+	<stroke color="rgba(255, 0, 0, 0)" thickness="3"/>
+	<move>29.97 290.36</move>
+	<curve>29.97 131.51 138.57 26.83 302.14 26.83</curve>
+	<curve>465.59 26.83 575.04 131.51 575.04 290.36</curve>
+	<curve>575.04 449.12 465.59 556.91 302.14 556.91</curve>
+	<curve>138.57 556.91 29.97 449.12 29.97 290.36</curve>
+	<closepath/>
+</fill>
+<init>306.26 317.39</init>
+<fill color="rgba(249, 57, 15, 97)">
+	<stroke color="rgba(255, 0, 0, 0)" thickness="3"/>
+	<move>157.7 318.26</move>
+	<curve>157.7 238.92 215.15 186.88 302.17 186.88</curve>
+	<curve>389.25 186.88 447.93 238.92 447.93 318.26</curve>
+	<curve>447.93 397.62 389.25 451.9 302.17 451.9</curve>
+	<curve>215.15 451.9 157.7 397.62 157.7 318.26</curve>
+	<closepath/>
+</fill>
+<init>302.97 218.93</init>
+<fill color="rgba(255, 90, 63, 117)">
+	<stroke color="rgba(167, 11, 8, 0)" thickness="3"/>
+	<move>86.97 123.96</move>
+	<curve>157.99 34.97 382.77 -14.98 512.03 122.04</curve>
+	<curve>436.03 148.96 252.99 127.96 307.98 226.96</curve>
+	<curve>447.99 464.98 -130.95 496 86.97 123.96</curve>
+	<closepath/>
+</fill>
+<init>586 300</init>
+<fill color="rgba(255, 90, 63, 117)">
+	<stroke color="rgba(167, 11, 8, 0)" thickness="3"/>
+	<move>438.66 557.81</move>
+	<curve>507.77 518.73 585.95 453.27 589.66 292.73</curve>
+	<curve>467.32 550.13 301.39 577.81 105.94 518.73</curve>
+	<curve>158.65 579.63 314.13 614.16 438.66 557.81</curve>
+	<closepath/>
+</fill>
+<init>323.5 293</init>
+<fill color="rgba(103, 16, 4, 255)">
+	<stroke color="rgba(167, 11, 8, 0)" thickness="3"/>
+	<move>200.02 99.94</move>
+	<curve>200.02 304.98 200.02 284.98 200.02 490</curve>
+	<curve>197.98 533.96 260.02 535.94 260.02 490</curve>
+	<curve>260.02 440 260.02 460 260.02 410</curve>
+	<curve>284.76 390 284.76 390 309.49 370</curve>
+	<curve>352.77 435.49 352.77 435.49 396.03 500.94</curve>
+	<curve>421.03 540.01 472.99 510 445.04 467.98</curve>
+	<curve>399.51 401 399.51 401 354.02 334</curve>
+	<curve>399.51 293.46 399.51 293.46 445.04 252.97</curve>
+	<curve>480.04 219.96 437 181.93 401.04 211.95</curve>
+	<curve>330.49 273.46 330.49 273.46 260.02 335</curve>
+	<curve>260.02 224.46 260.02 210.45 260.02 99.94</curve>
+	<curve>261.02 60.93 198.99 61.96 200.02 99.94</curve>
+	<closepath/>
+</fill>
+</frame1>
+</layer1>
+</KageStudio>

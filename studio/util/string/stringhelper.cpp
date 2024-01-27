@@ -1,7 +1,7 @@
 /*
  * stringhelper.cpp
  * 
- * Copyright 2011-2023 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
+ * Copyright 2011-2024 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -100,7 +100,7 @@ bool StringHelper::toBoolean(string p_src) {
 }
 
 vector<string> StringHelper::split(const string &p_source, const string &p_delimiter) {
-	vector<string> l_return;
+	std::vector<string> l_return;
 	if (p_delimiter.empty()) {
 		l_return.push_back(p_source);
 		return l_return;
@@ -192,4 +192,20 @@ string StringHelper::kHash(string par, int p_len) {
 	ss >> sHash;
 	
 	return sHash.substr(0, p_len);
+}
+
+string StringHelper::replace(std::string s, std::string const& p_find, std::string const& p_replace) {
+    std::size_t pos = s.find(p_find);
+    if (pos == std::string::npos) return s;
+    s.replace(pos, p_find.length(), p_replace);
+	return s;
+}
+
+string StringHelper::replaceAll(std::string s, std::string const& p_find, std::string const& p_replace) {
+	std::string temp;
+	do {
+		temp = s;
+		s = StringHelper::replace(s, p_find, p_replace);
+	} while (temp != s);
+	return temp;
 }

@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2023  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ unsigned int KageAssetManager::addAsset(string p_name) {
 	int l_len = strlen(p_name.c_str()) - 4;
 	if (p_name == "") {
 		//p_name = Glib::ustring::compose("Asset %1", assetCtr);
-		cout << "NOTE: creating Kage Asset will have no existing file unless User save the Project";
+		std::cout << "NOTE: creating Kage Asset will have no existing file unless User save the Project";
 		//TODO: make this create Asset for KSF
 		return UINT_MAX;
 	} else if (StringHelper::toLower(p_name).substr(l_len, 4) == ".ksf") {
@@ -147,8 +147,8 @@ unsigned int KageAssetManager::addImageAsset(string p_name) {
 			l_fileName = l_sourceFile.filename().u8string();
 			l_filePath = filesystem::path(p_name).remove_filename().u8string();
 			l_hash = l_fileName;
-			cout << "l_fileName " << l_fileName << endl;
-			cout << "l_filePath " << l_filePath << endl;
+			std::cout << "l_fileName " << l_fileName << std::endl;
+			std::cout << "l_filePath " << l_filePath << std::endl;
 			filesystem::path l_currentPath = filesystem::current_path();
 			filesystem::current_path(filesystem::temp_directory_path());
 			
@@ -201,7 +201,7 @@ unsigned int KageAssetManager::addImageAsset(string p_name) {
 void KageAssetManager::deleteAsset() {
 	if (_currentAssetIndex < assetCount() && assets[_currentAssetIndex]->assetID == _currentAssetID) {
 		if (assets[_currentAssetIndex]->isSelected()) {
-			cout << " deleting; index " << _currentAssetIndex << endl;
+			std::cout << " deleting; index " << _currentAssetIndex << std::endl;
 			remove(*assets[_currentAssetIndex]);
 			delete assets[_currentAssetIndex];
 			assets.erase (assets.begin() + (_currentAssetIndex));
@@ -213,14 +213,14 @@ void KageAssetManager::deleteAsset() {
 			_currentAssetID = assets[_currentAssetIndex]->assetID;
 			assets[_currentAssetIndex]->setSelected(true);
 		} else {
-			cout << " asset not selected" << endl;
+			std::cout << " asset not selected" << std::endl;
 		}
 	} else {
-		cout << " unknown asset; identifying..." << endl;
+		std::cout << " unknown asset; identifying..." << std::endl;
 		for (unsigned int i = 0; i < assetCount(); ++i) {
 			if (assets[i]->assetID == _currentAssetID) {
 				if (assets[i]->isSelected()) {
-					cout << " deleting; index " << i << endl;
+					std::cout << " deleting; index " << i << std::endl;
 					remove(*assets[i]);
 					delete assets[i];
 					assets.erase (assets.begin() + (i-1));
@@ -323,7 +323,7 @@ void KageAssetManager::setSelected(KageAsset *p_asset) {
 	p_asset->setSelected(true);
 	_currentAssetID = p_asset->assetID;
 	
-//	_kage->setCurrentFrame(_kage->getCurrentFrame());
+//	_kage->setDocumentSceneLayerCurrentFrame(_kage->getDocumentSceneLayerCurrentFrame(), false);
 }
 
 /**
@@ -465,7 +465,7 @@ void KageAssetManager::renderStage() {
 		return;
 	}
 	Kage::timestamp_IN();
-	cout << " KageAssetManager::renderStage <" << endl;
+	std::cout << " KageAssetManager::renderStage <" << std::endl;
 //	_kage->forceRenderFrames();
 //	_kage->refreshUI();
 	Kage::timestamp_OUT();
@@ -484,8 +484,9 @@ unsigned int KageAssetManager::assetCount() {
 void KageAssetManager::renameAsset(KageAsset *p_asset) {
 	setSelected(p_asset);
 	
-	AssetRenameDialog* pDialog = new AssetRenameDialog(*_kage, p_asset);
+	LabelRenameDialog* pDialog = new LabelRenameDialog(*_kage, p_asset->getLabel());
 		pDialog->run();
+	p_asset->setLabel(pDialog->getLabel());
 	delete pDialog;
 }
 
@@ -507,8 +508,9 @@ void KageAssetManager::renameAsset() {
 	}
 	
 	if (l_asset) {
-		AssetRenameDialog* pDialog = new AssetRenameDialog(*_kage, l_asset);
+		LabelRenameDialog* pDialog = new LabelRenameDialog(*_kage, l_asset->getLabel());
 			pDialog->run();
+		l_asset->setLabel(pDialog->getLabel());
 		delete pDialog;
 	}
 }
@@ -663,8 +665,9 @@ bool KageAssetManager::exists(string p_filePath) {
 	bool l_return = false;
 	unsigned int l_assetCount = assetCount();
 	string l_assetHash = StringHelper::kHash(p_filePath, 24);
+	std::cout << "l_assetHash " << l_assetHash << std::endl;
 	for (unsigned int i = 0; i < l_assetCount; ++i) {
-		cout << " " << assets[i]->getAssetHash() << " == " << l_assetHash << endl;
+		std::cout << " " << assets[i]->getAssetHash() << " == " << l_assetHash << std::endl;
 		if (assets[i]->getAssetHash() == l_assetHash) {
 			return true;
 		}
@@ -690,14 +693,14 @@ void KageAssetManager::setAssetHash(string p_assetHash) {
 }
 
 string KageAssetManager::getImagePathByID(unsigned int p_index) {
-	cout << "p_index " << p_index << endl;
+	std::cout << "p_index " << p_index << std::endl;
 	filesystem::path path_tempPath = filesystem::temp_directory_path();
 //	stringstream stream_tempPath;
 //	stream_tempPath << path_tempPath;
 //	string l_tempPath;
 //	stream_tempPath >> l_tempPath;
 	string l_tempPath { path_tempPath.u8string() };
-	cout << "      ? " << l_tempPath << _KageStudioAsset << "\\" << assets[p_index]->getAssetHash() << endl;
+	std::cout << "      ? " << l_tempPath << _KageStudioAsset << "\\" << assets[p_index]->getAssetHash() << std::endl;
 	if (p_index < assetCount() && assets[p_index]->getAssetHash() != "") {
 	#ifdef __linux__
 		return _KageStudioAsset + "/" + assets[p_index]->getAssetHash();
@@ -710,7 +713,7 @@ string KageAssetManager::getImagePathByID(unsigned int p_index) {
 		#endif
 	#endif
 	} else {
-		cout << "\n\n\ngetImagePathByID FAIL!!!\n\n\n" << endl;
+		std::cout << "\n\n\ngetImagePathByID FAIL!!!\n\n\n" << std::endl;
 		return "";
 	}
 }

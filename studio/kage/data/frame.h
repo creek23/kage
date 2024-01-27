@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2023  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@
 			
 			//Glib::RefPtr<Gdk::Window> window;
 			
-			KageFrame(KageLayer *p_layer, unsigned p_layerID, unsigned int p_frameID);
+			KageFrame(KageLayer *p_layer, unsigned int p_frameID);
 			virtual ~KageFrame();
 			
 			bool isEmpty();
@@ -63,7 +63,6 @@
 			void setCode(bool p_newCode);
 			bool getCode();
 			
-			unsigned int layerID;     //which layer does it reside?
 			unsigned int frameID;     //which frame among frames in a layer?
 			void setNull(bool p_null);
 			bool isNull();
@@ -77,26 +76,29 @@
 			
 			static bool _gotFocus;
 			
-			vector<unsigned int> raiseSelectedShape(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> lowerSelectedShape(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> groupSelectedShapes(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> ungroupSelectedShapes(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> duplicateShapes(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> raiseSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> lowerSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> groupSelectedShapes(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> ungroupSelectedShapes(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> duplicateShapes(vector<unsigned int> p_selectedShapes);
 			bool flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes);
 			bool flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes);
 			
 			bool recenterRotationPoint(vector<unsigned int> p_selectedShapes);
 			
 			void addDataToFrame(VectorDataManager v);
+			std::vector<VectorData> copySelectedShapes(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> pasteSelectedShapes(vector<VectorData> p_copiedShapes);
+			bool deleteSelectedShapes(vector<unsigned int> p_selectedShapes);
 		protected:
 			bool _null;
 			bool _selected;
 			bool _current;
 			unsigned int _tweenX;
 			unsigned int _tweenY;
-			
+		public:
 			KageFrame::extension _extension;
 			
 			KageLayer *_layer;

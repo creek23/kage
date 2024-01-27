@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2023  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -92,13 +92,13 @@
 			unsigned int nodeIndexY = 0;
 			float propAlpha = 1.0f;
 
-			const int IMAGE_ID_BUFF       = 0; //p1 x/y == ID / imageBuff
-			const int IMAGE_X_Y           = 1; //p2 x/y == x / y
-			const int IMAGE_WIDTH_HEIGHT  = 2; //p3 x/y == width / height
-			const int IMAGE_SCALEX_SCALEY = 3; //p4 x/y == scaleX / scaleY
-			const int IMAGE_ROTATE_ALPHA  = 4; //p5 x/y == rotate / alpha
+			#define IMAGE_ID_BUFF       0 //p1 x/y == ID / imageBuff
+			#define IMAGE_X_Y           1 //p2 x/y == x / y
+			#define IMAGE_WIDTH_HEIGHT  2 //p3 x/y == width / height
+			#define IMAGE_SCALEX_SCALEY 3 //p4 x/y == scaleX / scaleY
+			#define IMAGE_ROTATE_ALPHA  4 //p5 x/y == rotate / alpha
 			
-			void printVectors();
+			void printVectors(vector<VectorData> p_vectorData);
 			void cleanSlate();
 			void invalidateToRender();
 			bool _invalidated;
@@ -110,10 +110,10 @@
 			double currentScale; /// for use with zoom; default value is _kage->_document.Project._width; can be changed as preferred
 			void clearScreen(Cairo::RefPtr<Cairo::Context> p_context);
 			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context, bool p_force = false);
-			void renderOnionFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> p_vectorData, double p_alpha);
-			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> p_vectorData, double p_alpha = 1.0);
+			void renderOnionFrame(Cairo::RefPtr<Cairo::Context> p_context, std::vector<VectorData> p_vectorData, double p_alpha);
+			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context, std::vector<VectorData> p_vectorData, double p_alpha = 1.0);
 			void renderFrameOffset(Cairo::RefPtr<Cairo::Context> p_context, bool p_force = false, double p_offsetX = 0.0, double p_offsetY = 0.0);
-			void renderFrameOffset(Cairo::RefPtr<Cairo::Context> p_context, vector<VectorData> p_vectorData, double p_alpha = 1.0, double p_offsetX = 0.0, double p_offsetY = 0.0);
+			void renderFrameOffset(Cairo::RefPtr<Cairo::Context> p_context, std::vector<VectorData> p_vectorData, double p_alpha = 1.0, double p_offsetX = 0.0, double p_offsetY = 0.0);
 			unsigned int addImage(unsigned int p_ID);
 			void initNodeTool();
 			void handleShapes();
@@ -133,7 +133,7 @@
 			void handleNodes_rendering();
 			void handleNodesMouseDown();
 			void handleNodesMouseUp();
-			bool handleNodes_getNearestShape(double p_x, double p_y, unsigned int p_index, vector<VectorData> p_v);
+			bool handleNodes_getNearestShape(double p_x, double p_y, unsigned int p_index, std::vector<VectorData> p_v);
 			void handleDrawOvalMouseUp();
 			void handleDrawRectMouseUp();
 			void handleDrawPolyMouseUp();
@@ -177,7 +177,7 @@
 			void trySingleSelectShape();
 			void tryMultiSelectShapes();
 			void tryMultiSelectShapes_populateShapes();
-			unsigned int getShape(unsigned int p_index, vector<VectorData> p_v);
+			unsigned int getShape(unsigned int p_index, std::vector<VectorData> p_v);
 			
 			void updateShapeColor(bool p_doFill = true, bool p_doStroke = true);
 			void updateShapeX(double p_value, bool p_stackDo = true);
@@ -187,10 +187,10 @@
 			void updateNodeX(double p_value, bool p_stackDo = true);
 			void updateNodeY(double p_value, bool p_stackDo = true);
 			bool _stackDo = false;
-			vector<VectorData> _vectorDataCopyBuffer;
-			vector<VectorData> _vectorDataZOrderBufferA;
-			vector<VectorData> _vectorDataZOrderBufferB;
-			vector<VectorData> _vectorDataZOrderBufferC;
+			std::vector<VectorData> _vectorDataCopyBuffer;
+			std::vector<VectorData> _vectorDataZOrderBufferA;
+			std::vector<VectorData> _vectorDataZOrderBufferB;
+			std::vector<VectorData> _vectorDataZOrderBufferC;
 			
 			bool renderToPNG(string p_path, bool p_transparent);
 			bool renderToPNGOffset(string p_path, bool p_transparent, double p_offsetX = 0.0, double p_offsetY = 0.0);
@@ -211,18 +211,16 @@
 			PointData _rotateReference;
 			
 			PointData applyZoomRatio(PointData p_value);
-			void applyZoom();
-			vector<VectorData> applyZoom(vector<VectorData> p_v);
 			
 			bool _rotateMode;
 			bool _rotateApply;
 			
 			void setSelectedShapes(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> getSelectedShapes();
+			std::vector<unsigned int> getSelectedShapes();
 
 			void unpressKeys();
 
-			vector<Cairo::RefPtr<Cairo::ImageSurface>> cairoPNG;
+			std::vector<Cairo::RefPtr<Cairo::ImageSurface>> cairoPNG;
 			static Cairo::RefPtr<Cairo::ImageSurface> cairoImageSurface;
 		protected:
 			ToolMode prevTool; //used by Hand-tool shortcut [spacebar]
@@ -261,9 +259,10 @@
 			unsigned int selectedNode;
 			unsigned int mouseOnShape;
 			unsigned int selectedShape;
-			vector<unsigned int> selectedNodes;
-			vector<unsigned int> selectedShapes;
-			
+		public:
+			std::vector<unsigned int> selectedNodes;
+			std::vector<unsigned int> selectedShapes;
+		protected:
 			AnchorData::type mouseOnAnchor;
 			void renderNode(double p_x, double p_y, unsigned int p_state = 5);
 			void renderNodeControl(double p_x, double p_y, bool p_selected);
@@ -279,7 +278,7 @@
 			
 			bool deleteSelectedNode(unsigned int p_index);
 			
-			unsigned int getSelectedShapeViaNode(unsigned int p_index, vector<VectorData> p_v);
+			unsigned int getSelectedShapeViaNode(unsigned int p_index, std::vector<VectorData> p_v);
 			double _nodeToMouseDistance;
 			
 			AnchorData anchor_upperLeft;

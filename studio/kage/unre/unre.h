@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2022  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,17 +37,15 @@
 			UnRe();
 			virtual ~UnRe();
 			
-			void stackDo(unsigned int p_layer, unsigned int p_frame, vector<VectorData> p_data);
+			void stackDo(unsigned int p_scene, unsigned int p_layer, unsigned int p_frame, std::vector<VectorData> p_data);
 			KageDo undo();
 			KageDo redo();
 			KageDo previewUndo();
 			
 			void clear();
-			
-			void applyZoom(PointData p_originBefore, PointData p_originAfter, PointData p_zoomReference, double p_zoomRatio);
 		protected:
 			unsigned int _stackIndex;
-			vector<KageDo> _undoStack;
+			std::vector<KageDo> _undoStack;
 			
 			///for use of applyZoom
 			PointData applyZoomRatio(PointData p_zoomReference, double p_zoomRatio, PointData p_value);

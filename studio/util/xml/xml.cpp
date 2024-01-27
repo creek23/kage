@@ -1,7 +1,7 @@
 /*
  * xml.cpp
  * 
- * Copyright 2019-2020 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
+ * Copyright 2019-2024 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ string BasicXml::toString() {
 	for (unsigned int i = 0; i < _xmlTagProperties.size(); ++i) {
 		l_ostringstream << _xmlTagProperties[i].toString() << " ";
 	}
-	l_ostringstream << "\t" << _root.toString() << endl;
+	l_ostringstream << "\t" << _root.toString() << std::endl;
 	
 	return l_ostringstream.str();
 }
@@ -219,7 +219,7 @@ bool BasicXml::parse() {
 				}
 			}
 			if (l_commentDone == false) {
-				cout << "Unable to parse content; incomplete comment-tag" << endl;
+				std::cout << "Unable to parse content; incomplete comment-tag" << std::endl;
 				return "";
 			}
 		} else {
@@ -254,19 +254,19 @@ bool BasicXml::tokenize() {
 
 
 void BasicXml::listChildren(vector<XmlTag> p_tags, string p_tab) {
-	cout << endl;
+	std::cout << std::endl;
 	for (unsigned int i = 0; i < p_tags.size(); ++i) {
-		cout << p_tab << "[" << i << "]\t" << p_tags[i].getName() << " -> ";
-		vector<XmlTagProperty> l_properties = p_tags[i].getProperties();
+		std::cout << p_tab << "[" << i << "]\t" << p_tags[i].getName() << " -> ";
+		std::vector<XmlTagProperty> l_properties = p_tags[i].getProperties();
 		for (unsigned int j = 0; j < l_properties.size(); ++j) {
-			cout << l_properties[j].getName() << "='"<< l_properties[j].getValue() << "' ";
+			std::cout << l_properties[j].getName() << "='"<< l_properties[j].getValue() << "' ";
 		}
 		listChildren(p_tags[i]._children, "\t" + p_tab);
 	}
 }
 
 void BasicXml::printXML() {
-	cout << "[0]\t" << _root.getName() << " -> ";
+	std::cout << "[0]\t" << _root.getName() << " -> ";
 	listChildren(_root._children, "\t");
 }
 
@@ -275,10 +275,10 @@ bool BasicXml::setXML(string p_xmldata) {
 		if (tokenize()) {
 			return true;
 		} else {
-			cout << "BasicXml: unable to tokenize";
+			std::cout << "BasicXml: unable to tokenize";
 		}
 	} else {
-		cout << "BasicXml: unable to parse";
+		std::cout << "BasicXml: unable to parse";
 	}
 	return false;
 }
@@ -287,7 +287,7 @@ string BasicXml::getXMLChildren(vector<XmlTag> p_children, string p_tab) {
 	string l_xml = "";
 	for (unsigned int i = 0; i < p_children.size(); ++i) {
 		l_xml += p_tab + "<" + p_children[i].getName();
-		vector<XmlTagProperty> l_properties = p_children[i].getProperties();
+		std::vector<XmlTagProperty> l_properties = p_children[i].getProperties();
 		if (l_properties.size() > 0) {
 			l_xml += " ";
 		}
@@ -315,12 +315,12 @@ string BasicXml::getXMLChildren(vector<XmlTag> p_children, string p_tab) {
 }
 
 string BasicXml::getXML() {
-	vector<XmlTag> l_root;
+	std::vector<XmlTag> l_root;
 	l_root.push_back(_root);
 	return getXMLChildren(l_root, "");
 	#ifdef zxcasd
 		string l_xml = "<" + _root.getName();
-		vector<XmlTagProperty> l_properties = _root.getProperties();
+		std::vector<XmlTagProperty> l_properties = _root.getProperties();
 		if (l_properties.size() > 0) {
 			l_xml += " ";
 		}
@@ -341,7 +341,7 @@ string BasicXml::getXML() {
 void BasicXml::debugToken(unsigned int p_index) {
 	for (unsigned int i = 0; i < p_index; ++i) {
 		if (_tokens[i].getValue() != " " && _tokens[i].getValue() != "\t") {
-			std::cout << i << "\t? " << _tokens[i].getValue() << endl;
+			std::cout << i << "\t? " << _tokens[i].getValue() << std::endl;
 		}
 	}
 }
@@ -351,14 +351,14 @@ unsigned int BasicXml::createTag(unsigned int p_index, XmlTag &p_xmlTagParent) {
 	unsigned int i = p_index;
 		i = expectFor(i, "<");
 		if (i == -1) {
-			cout << "unable to parse; expecting XML." << endl;
+			std::cout << "unable to parse; expecting XML." << std::endl;
 			return i;
 		}
 		
 		if (_tokens[i].getValue() == "<") {
 			i = skipWhitespace(i+1);
 			if (i == -1) {
-				cout << "unable to parse; XML is incomplete." << endl;
+				std::cout << "unable to parse; XML is incomplete." << std::endl;
 				return i;
 			}
 			
@@ -375,13 +375,13 @@ unsigned int BasicXml::createTag(unsigned int p_index, XmlTag &p_xmlTagParent) {
 			
 			i = skipWhitespace(i+1);
 			if (i == -1) {
-				cout << "unable to parse; XML TAG is incomplete." << endl;
+				std::cout << "unable to parse; XML TAG is incomplete." << std::endl;
 				return i;
 			}
 			
 			bool l_tagPairNeeded = true;
 			//get properties until '>'
-			vector<XmlTagProperty> l_xmlTagProperties;
+			std::vector<XmlTagProperty> l_xmlTagProperties;
 			l_xmlTagProperties.clear();
 				while (_tokens[i].getValue() != ">") {
 					if (_tokens[i].getValue() == "/") {
@@ -398,13 +398,13 @@ unsigned int BasicXml::createTag(unsigned int p_index, XmlTag &p_xmlTagParent) {
 						i = expectFor(i+1, "=");
 						if (i == -1) {
 							debugToken(l_debug);
-							cout << "unable to parse; XML TAG property is incomplete." << endl;
+							std::cout << "unable to parse; XML TAG property is incomplete." << std::endl;
 							return i;
 						}
 						
 						i = skipWhitespace(i+1);
 						if (i == -1) {
-							cout << "unable to parse; XML TAG property is incomplete.." << endl;
+							std::cout << "unable to parse; XML TAG property is incomplete.." << std::endl;
 							return i;
 						}
 						
@@ -414,7 +414,7 @@ unsigned int BasicXml::createTag(unsigned int p_index, XmlTag &p_xmlTagParent) {
 				
 					i = skipWhitespace(i+1);
 					if (i == -1) {
-						cout << "unable to parse; XML TAG property is incomplete..." << endl;
+						std::cout << "unable to parse; XML TAG property is incomplete..." << std::endl;
 						return i;
 					}
 				}
@@ -423,7 +423,7 @@ unsigned int BasicXml::createTag(unsigned int p_index, XmlTag &p_xmlTagParent) {
 				//register XML TAG and try to populate children
 				p_xmlTagParent.setProperties(l_xmlTagProperties);
 			} else {
-				cout << "unable to parse; XML TAG is incomplete.." << endl;
+				std::cout << "unable to parse; XML TAG is incomplete.." << std::endl;
 				return i;
 			}
 			
@@ -434,7 +434,7 @@ unsigned int BasicXml::createTag(unsigned int p_index, XmlTag &p_xmlTagParent) {
 				
 				i = skipWhitespace(i+1);
 				if (i == -1) {
-					cout << "unable to parse; XML is incomplete.." << endl;
+					std::cout << "unable to parse; XML is incomplete.." << std::endl;
 					return i;
 				}
 				
@@ -444,7 +444,7 @@ unsigned int BasicXml::createTag(unsigned int p_index, XmlTag &p_xmlTagParent) {
 					//try to get CHILD TAG; <tag property='x'><CHILD>
 					i = skipWhitespace(i+1);
 					if (i == -1) {
-						cout << "unable to parse; XML is incomplete..." << endl;
+						std::cout << "unable to parse; XML is incomplete..." << std::endl;
 						return i;
 					}
 					
@@ -452,13 +452,13 @@ unsigned int BasicXml::createTag(unsigned int p_index, XmlTag &p_xmlTagParent) {
 						//possibly a closing-TAG?
 						i = expectFor(i+1, p_xmlTagParent.getName());
 						if (i == -1) {
-							cout << "unable to parse possibly-malformed XML." << endl;
+							std::cout << "unable to parse possibly-malformed XML." << std::endl;
 							return i;
 						}
 						
 						i = expectFor(i+1, ">");
 						if (i == -1) {
-							cout << "unable to parse; expecting XML .." << endl;
+							std::cout << "unable to parse; expecting XML .." << std::endl;
 							return i;
 						}
 						l_tagPairNeeded = false;
@@ -466,7 +466,7 @@ unsigned int BasicXml::createTag(unsigned int p_index, XmlTag &p_xmlTagParent) {
 						//possibly a child TAG?
 						i = getPreviousIndex(i-1);
 						if (i == -1) {
-							cout << "unable to parse; XML is incomplete..." << endl;
+							std::cout << "unable to parse; XML is incomplete..." << std::endl;
 							return i;
 						}
 						
@@ -474,7 +474,7 @@ unsigned int BasicXml::createTag(unsigned int p_index, XmlTag &p_xmlTagParent) {
 						p_xmlTagParent._children.push_back(l_xmlTagChild);
 						i = createTag(i, p_xmlTagParent._children[p_xmlTagParent._children.size()-1]);
 						if (i == -1) {
-							cout << "unable to create Child Tag for " << p_xmlTagParent.getName() << endl;
+							std::cout << "unable to create Child Tag for " << p_xmlTagParent.getName() << std::endl;
 							return i;
 						}
 					}
@@ -491,7 +491,7 @@ unsigned int BasicXml::createTag(unsigned int p_index, XmlTag &p_xmlTagParent) {
 						//try to get CHILD TAG; <tag property='x'><CHILD>
 						i = skipWhitespace(i+1);
 						if (i == -1) {
-							cout << "unable to parse; XML is incomplete..." << endl;
+							std::cout << "unable to parse; XML is incomplete..." << std::endl;
 							return i;
 						}
 						
@@ -499,13 +499,13 @@ unsigned int BasicXml::createTag(unsigned int p_index, XmlTag &p_xmlTagParent) {
 							//possibly a closing-TAG?
 							i = expectFor(i+1, p_xmlTagParent.getName());
 							if (i == -1) {
-								cout << "unable to parse; expecting XML  ." << endl;
+								std::cout << "unable to parse; expecting XML  ." << std::endl;
 								return i;
 							}
 							
 							i = expectFor(i+1, ">");
 							if (i == -1) {
-								cout << "unable to parse; expecting XML  .." << endl;
+								std::cout << "unable to parse; expecting XML  .." << std::endl;
 								return i;
 							}
 							return i; //DONE?
@@ -513,7 +513,7 @@ unsigned int BasicXml::createTag(unsigned int p_index, XmlTag &p_xmlTagParent) {
 							//possibly a child TAG?
 							i = getPreviousIndex(i);
 							if (i == -1) {
-								cout << "unable to parse; XML is incomplete  ..." << endl;
+								std::cout << "unable to parse; XML is incomplete  ..." << std::endl;
 								return i;
 							}
 							
@@ -521,7 +521,7 @@ unsigned int BasicXml::createTag(unsigned int p_index, XmlTag &p_xmlTagParent) {
 							p_xmlTagParent._children.push_back(l_xmlTagChild);
 							i = createTag(i, p_xmlTagParent._children[p_xmlTagParent._children.size()-1]);
 							if (i == -1) {
-								cout << "unable to create Child Tag for " << p_xmlTagParent.getName();
+								std::cout << "unable to create Child Tag for " << p_xmlTagParent.getName();
 								return i;
 							}
 						}

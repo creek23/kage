@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2022  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ void VectorDataManager::clear() {
 }
 
 void VectorDataManager::push(VectorDataManager p_vectorsData) {
-	vector<VectorData> l_v = p_vectorsData.getVectorData();
+	std::vector<VectorData> l_v = p_vectorsData.getVectorData();
 	int isrc = l_v.size();
 	
 	for (int i = 0; i < isrc; ++i) {
@@ -93,7 +93,7 @@ void VectorDataManager::addInit(PointData p_point) {
 	}
 	add(VectorData::TYPE_INIT, l_vectorData.fillColor, l_vectorData.stroke);
 	
-	vector<PointData> ps;
+	std::vector<PointData> ps;
 		ps.push_back(p_point);
 	vectorData[vectorData.size()-1].setPoints(ps);
 }
@@ -103,10 +103,10 @@ bool VectorDataManager::recenterRotationPoint(vector<unsigned int> p_selectedSha
 		return false;
 	}
 	
-	vector<unsigned int> l_selectedShapesOld(p_selectedShapes);
+	std::vector<unsigned int> l_selectedShapesOld(p_selectedShapes);
 		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater <unsigned int>());
 	
-	vector<VectorData> v = getVectorData();
+	std::vector<VectorData> v = getVectorData();
 	
 	unsigned l_initIndex = UINT_MAX;
 	
@@ -186,7 +186,7 @@ bool VectorDataManager::recenterRotationPoint(vector<unsigned int> p_selectedSha
 		if (l_initIndex != UINT_MAX) {
 			PointData l_point((l_leftMost + l_rightMost ) / 2,
 							  (l_topMost  + l_bottomMost) / 2);
-			vector<PointData> ps;
+			std::vector<PointData> ps;
 				ps.push_back(l_point);
 			v[l_initIndex].setPoints(ps);
 			l_return = true;
@@ -230,7 +230,7 @@ void VectorDataManager::addEndFill() {
 }
 
 VectorDataManager VectorDataManager::clone() {
-	vector<VectorData> l_vectorData;
+	std::vector<VectorData> l_vectorData;
 	unsigned int count = vectorData.size();
 		for (unsigned int i = 0; i < count; ++i) {
 			l_vectorData.push_back(vectorData[i].clone());
@@ -259,7 +259,7 @@ void VectorDataManager::addLinePoly(PointData p_point, double p_x, double p_y) {
 	}
 	add(VectorData::TYPE_CURVE_CUBIC, l_vectorData.fillColor, l_vectorData.stroke);
 	
-	vector<PointData> ps;
+	std::vector<PointData> ps;
 		ps.push_back(
 			PointData(
 				(p_x + p_point.x)/2,
@@ -277,12 +277,12 @@ void VectorDataManager::addLinePoly(PointData p_point, double p_x, double p_y) {
 }
 
 void VectorDataManager::addLine(PointData p_point) {
-	vector<PointData> p_prevPoints = vectorData[vectorData.size()-1].getPoints();
+	std::vector<PointData> p_prevPoints = vectorData[vectorData.size()-1].getPoints();
 	
 	VectorData l_vectorData = vectorData[vectorData.size()-1];
 	add(VectorData::TYPE_CURVE_CUBIC, l_vectorData.fillColor, l_vectorData.stroke);
 	
-	vector<PointData> ps;
+	std::vector<PointData> ps;
 		ps.push_back(
 			PointData(
 				(p_prevPoints[p_prevPoints.size()-1].x + p_point.x)/2,
@@ -310,7 +310,7 @@ void VectorDataManager::addMove(PointData p_point) {
 	}
 	add(VectorData::TYPE_MOVE, l_vectorData.fillColor, l_vectorData.stroke);
 	
-	vector<PointData> ps;
+	std::vector<PointData> ps;
 		ps.push_back(p_point);
 	vectorData[vectorData.size()-1].setPoints(ps);
 }
@@ -350,7 +350,7 @@ void VectorDataManager::addCurve(PointData p_point1, PointData p_point2, PointDa
 	}
 	add(p_curveType, l_vectorData.fillColor, l_vectorData.stroke);
 	
-	vector<PointData> ps;
+	std::vector<PointData> ps;
 		ps.push_back(p_point1);
 		ps.push_back(p_point2);
 		ps.push_back(p_point3);
@@ -368,7 +368,7 @@ void VectorDataManager::addImage(PointData p_IDandBuff, PointData p_xy, PointDat
 	}
 	add(VectorData::TYPE_IMAGE, l_vectorData.fillColor, l_vectorData.stroke);
 	
-	vector<PointData> ps;
+	std::vector<PointData> ps;
 		ps.push_back(p_IDandBuff);
 		ps.push_back(p_xy);
 		ps.push_back(p_size);
@@ -377,94 +377,178 @@ void VectorDataManager::addImage(PointData p_IDandBuff, PointData p_xy, PointDat
 	vectorData[vectorData.size()-1].setPoints(ps);
 }
 bool VectorDataManager::isEmpty() {
-	return (getVectorData().size() == 0);
+	return (vectorData.size() == 0);
+}
+
+unsigned int VectorDataManager::getShape(unsigned int p_index) {
+	if (p_index == _NO_SELECTION) {
+		return -1;
+	}
+	for (unsigned int i = p_index; i >= 0 && i != UINT_MAX; --i) {
+		if (vectorData[i].vectorType == VectorData::TYPE_INIT) {
+			return i;
+		}
+	}
+	
+	return -1;
+}
+bool VectorDataManager::isSelectedShape(unsigned int p_index) {
+	bool l_gotit = false;
+	unsigned int ssize = _selectedShapes.size();
+	for (unsigned int i = 0; i < ssize; ++i) {
+		if (_selectedShapes[i] == p_index) {
+			l_gotit = true;
+			break;
+		}
+	}
+	
+	return l_gotit;
+}
+void VectorDataManager::addSelectedShape(unsigned int p_index) {
+	if (p_index == _NO_SELECTION) return;
+	if (isSelectedShape(p_index) == false) {
+		_selectedShapes.push_back(p_index);
+		//do we need below code from stage-shape.cpp?
+		//anchor_rotate.x = 0;
+		//anchor_rotate.y = 0;
+	}
 }
 
 
+vector<unsigned int> VectorDataManager::tryMultiSelectShapes_populateShapes() {
+	_selectedShapes.clear();
+	if (vectorData.size() == 0) {
+		return _selectedShapes;
+	}
+	for (unsigned int i = 0; i < _selectedNodes.size(); ++i) {
+		addSelectedShape(getShape(_selectedNodes[i]));
+	}
+	return _selectedShapes;
+}
+
+vector<unsigned int> VectorDataManager::selectAllShapes() {
+	std::vector<unsigned int> l_selectedShapes;
+	l_selectedShapes.clear();
+	std::cout << " KageStage::selectAllShapes " << l_selectedShapes.size() << std::endl;
+	
+	unsigned int vsize = vectorData.size();
+	if (vsize == 0) {
+		std::cout << " KageStage::selectAllShapes A " << std::endl;
+		return l_selectedShapes;
+	}
+	
+	_selectedNodes.clear();
+	for (unsigned int i = 0; i < vsize; ++i) {
+		_selectedNodes.push_back(i);
+	}
+	
+	l_selectedShapes = tryMultiSelectShapes_populateShapes();
+	_selectedNodes.clear();
+	
+	std::cout << " KageStage::selectAllShapes B " << std::endl;
+	return l_selectedShapes;
+}
+
+bool VectorDataManager::cutSelectedShapes() {
+	//TODO: cut-prevention should be done on Frame as Frame got access to _layer->isLocked()
+	//if (_kage->isLayerLocked() == true) {
+	//	return false;
+	//}
+	if (_selectedShapes.size() == 0) {
+		return false;
+	}
+	std::vector<VectorData> l_copiedItem;
+	l_copiedItem = copySelectedShapes(_selectedShapes);
+	if (l_copiedItem.size() > 0) {
+		if (deleteSelectedShapes(_selectedShapes) == true) {
+			_selectedShapes.clear();
+			return true;
+		}
+	}
+	
+	return false;
+}
+
 vector<VectorData> VectorDataManager::copySelectedShapes(vector<unsigned int> p_selectedShapes) {
-	vector<VectorData> l_vectorDataCopyBuffer;
+	std::vector<VectorData> l_vectorDataCopyBuffer;
 	l_vectorDataCopyBuffer.clear();
 	
 	if (p_selectedShapes.size() == 0) {
 		return l_vectorDataCopyBuffer;
 	}
 	
-	vector<unsigned int> l_selectedShapesOld(p_selectedShapes);
+	std::vector<unsigned int> l_selectedShapesOld(p_selectedShapes);
 		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end());
 	
-	vector<VectorData> l_vectorData = getVectorData();
-	unsigned int vsize = l_vectorData.size();
+	unsigned int vsize = vectorData.size();
 	
 	unsigned int l_selectedShapes_size = l_selectedShapesOld.size();
 	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
 		for (unsigned int i = l_selectedShapesOld[l_shapeIndex]; i < vsize; ++i) {
-			if (l_vectorData[i].vectorType == VectorData::TYPE_INIT
+			if (vectorData[i].vectorType == VectorData::TYPE_INIT
 					&& i != l_selectedShapesOld[l_shapeIndex]) {
 				break;
+				//are we not copying INITs?
 			} else {
-				l_vectorDataCopyBuffer.push_back(l_vectorData[i]);
+				l_vectorDataCopyBuffer.push_back(vectorData[i]);
 			}
 		}
 	}
-	Kage::timestamp_OUT();
+	
 	return l_vectorDataCopyBuffer;
 }
 
 vector<unsigned int> VectorDataManager::pasteSelectedShapes(vector<VectorData> p_vectorDataCopyBuffer) {
 	unsigned int l_vectorDataCopyBuffer_size = p_vectorDataCopyBuffer.size();
-	vector<unsigned int> l_selectedNodes;
-	l_selectedNodes.clear();
+	
+	_selectedNodes.clear();
 	if (l_vectorDataCopyBuffer_size == 0) {
-		return l_selectedNodes;
+		std::cout << "VectorDataManager::pasteSelectedShapes FAIL" << std::endl;
+		return _selectedNodes;
 	}
-	
-	vector<VectorData> l_vectorData = getVectorData();
-	
+	std::cout << "VectorDataManager::pasteSelectedShapes PASS " + p_vectorDataCopyBuffer.size() << " " << vectorData.size() << std::endl;
 	for (unsigned int i = 0; i < l_vectorDataCopyBuffer_size; ++i) {
-		l_vectorData.push_back(p_vectorDataCopyBuffer[i]);
-		l_selectedNodes.push_back(l_vectorData.size()-1);
+		vectorData.push_back(p_vectorDataCopyBuffer[i]);
+		_selectedNodes.push_back(vectorData.size()-1);
 	}
 	
-	setVectorData(l_vectorData);
-	
-	return l_selectedNodes;
+	return _selectedNodes;
 }
 
 bool VectorDataManager::deleteSelectedShapes(vector<unsigned int> p_selectedShapes) {
 	unsigned int l_selectedShapes_size = p_selectedShapes.size();
 	
 	if (l_selectedShapes_size == 0) {
+		std::cout << "deleteSelectedShapes A " << std::endl;
 		return false;
 	}
 	
-	vector<unsigned int> l_selectedShapesOld(p_selectedShapes);
+	std::vector<unsigned int> l_selectedShapesOld(p_selectedShapes);
 		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater  <unsigned int>());
 	
-	vector<VectorData> l_vectorData = getVectorData();
-	unsigned int vsize = l_vectorData.size();
+	unsigned int vsize = vectorData.size();
 	if (vsize < l_selectedShapes_size) { //attempt to fix https://sourceforge.net/p/kage/tickets/15/
 		//initNodeTool();
+		std::cout << "deleteSelectedShapes B " << std::endl;
 		return false;
 	}
 	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
 		unsigned int l_temp = vsize;
 		for (unsigned int i = l_selectedShapesOld[l_shapeIndex]; i < vsize; ++i) {
-			if (l_vectorData[i].vectorType == VectorData::TYPE_INIT
+			if (vectorData[i].vectorType == VectorData::TYPE_INIT
 					&& i != l_selectedShapesOld[l_shapeIndex]) {
 				l_temp = i;
 				break;
 			}
 		}
 		if (l_selectedShapesOld[l_shapeIndex] > l_temp) {
-			cout << "predicting a crash!!!" << endl;
+			std::cout << "predicting a crash!!!" << std::endl;
 		}
-		l_vectorData.erase (l_vectorData.begin() + l_selectedShapesOld[l_shapeIndex],
-		                    l_vectorData.begin() + l_temp);
+		vectorData.erase (vectorData.begin() + l_selectedShapesOld[l_shapeIndex],
+		                    vectorData.begin() + l_temp);
 	}
-	p_selectedShapes.clear();
 	
-	setVectorData(l_vectorData);
-	
+	std::cout << "deleteSelectedShapes C " << std::endl;
 	return true;
 }
 
@@ -481,7 +565,7 @@ bool VectorDataManager::deleteSelectedShapes(vector<unsigned int> p_selectedShap
   \sa lowerSelectedShape(), raiseToTopSelectedShape() and lowerToBottomSelectedShape()
 */
 vector<unsigned int> VectorDataManager::raiseSelectedShape(vector<unsigned int> p_selectedShapes) {
-	vector<unsigned int> l_selectedShapes;
+	std::vector<unsigned int> l_selectedShapes;
 	l_selectedShapes.clear();
 	if (p_selectedShapes.size() == 0) {
 		return l_selectedShapes;
@@ -489,64 +573,63 @@ vector<unsigned int> VectorDataManager::raiseSelectedShape(vector<unsigned int> 
 	
 	l_selectedShapes = p_selectedShapes;
 		sort(l_selectedShapes.begin(), l_selectedShapes.end(), greater <unsigned int>());
-	vector<unsigned int> l_selectedShapesNew;
+	std::vector<unsigned int> l_selectedShapesNew;
 		l_selectedShapesNew.clear();
 	
-	vector<VectorData> v = getVectorData();
-	vector<VectorData> l_vectorDataZOrderBufferA;
-	vector<VectorData> l_vectorDataZOrderBufferB;
-	vector<VectorData> l_vectorDataZOrderBufferC;
+	std::vector<VectorData> l_vectorDataZOrderBufferA;
+	std::vector<VectorData> l_vectorDataZOrderBufferB;
+	std::vector<VectorData> l_vectorDataZOrderBufferC;
 	l_vectorDataZOrderBufferA.clear();
 	l_vectorDataZOrderBufferB.clear();
 	l_vectorDataZOrderBufferC.clear();
 	
 	for (unsigned int l_selectedShape = 0; l_selectedShape < l_selectedShapes.size(); ++l_selectedShape) {
-		unsigned int vsize = v.size();
+		unsigned int vsize = vectorData.size();
 		unsigned int l_temp = UINT_MAX;
 		unsigned int l_shapeBstart = UINT_MAX;
 		for (unsigned int i = l_selectedShapes[l_selectedShape]; i < vsize; ++i) {
-			if (v[i].vectorType == VectorData::TYPE_INIT
+			if (vectorData[i].vectorType == VectorData::TYPE_INIT
 					&& i != l_selectedShapes[l_selectedShape]) {			
 				l_shapeBstart = i;
 				l_temp = i;
 				for (i = i; i < vsize; ++i) {
-					if (v[i].vectorType == VectorData::TYPE_INIT
+					if (vectorData[i].vectorType == VectorData::TYPE_INIT
 							&& i != l_shapeBstart) {
 						for (i = i; i < vsize; ++i) {
-							l_vectorDataZOrderBufferC.push_back(v[i]);
+							l_vectorDataZOrderBufferC.push_back(vectorData[i]);
 						}
 						l_temp = vsize;
 						break;
 					} else {
-						l_vectorDataZOrderBufferB.push_back(v[i]);
+						l_vectorDataZOrderBufferB.push_back(vectorData[i]);
 						l_temp = i+1;
 					}
 				}
 				break;
 			} else {
-				l_vectorDataZOrderBufferA.push_back(v[i]);
+				l_vectorDataZOrderBufferA.push_back(vectorData[i]);
 			}
 		}
 		if (l_temp == UINT_MAX) {
 			l_vectorDataZOrderBufferA.clear();
 			l_selectedShapesNew.push_back(l_selectedShapes[l_selectedShape]);
 		} else {
-			v.erase (v.begin() + l_selectedShapes[l_selectedShape],
-					 v.begin() + l_temp);
+			vectorData.erase (vectorData.begin() + l_selectedShapes[l_selectedShape],
+					vectorData.begin() + l_temp);
 				for (unsigned int i = 0; i < l_vectorDataZOrderBufferB.size(); ++i) {
-					v.push_back(l_vectorDataZOrderBufferB[i]);
+					vectorData.push_back(l_vectorDataZOrderBufferB[i]);
 				}
 					l_vectorDataZOrderBufferB.clear();
 				
-				l_selectedShapesNew.push_back(v.size());
+				l_selectedShapesNew.push_back(vectorData.size());
 				
 				for (unsigned int i = 0; i < l_vectorDataZOrderBufferA.size(); ++i) {
-					v.push_back(l_vectorDataZOrderBufferA[i]);
+					vectorData.push_back(l_vectorDataZOrderBufferA[i]);
 				}
 					l_vectorDataZOrderBufferA.clear();
 				
 				for (unsigned int i = 0; i < l_vectorDataZOrderBufferC.size(); ++i) {
-					v.push_back(l_vectorDataZOrderBufferC[i]);
+					vectorData.push_back(l_vectorDataZOrderBufferC[i]);
 				}
 					l_vectorDataZOrderBufferC.clear();
 		}
@@ -557,8 +640,6 @@ vector<unsigned int> VectorDataManager::raiseSelectedShape(vector<unsigned int> 
 			l_selectedShapes.push_back(l_selectedShapesNew[i]);
 		}
 	}
-	
-	setVectorData(v);
 	
 	return l_selectedShapes;
 }
@@ -575,7 +656,7 @@ vector<unsigned int> VectorDataManager::raiseSelectedShape(vector<unsigned int> 
   \sa raiseSelectedShape(), raiseToTopSelectedShape() and lowerToBottomSelectedShape()
 */
 vector<unsigned int> VectorDataManager::lowerSelectedShape(vector<unsigned int> p_selectedShapes) {
-	vector<unsigned int> l_selectedShapes;
+	std::vector<unsigned int> l_selectedShapes;
 	l_selectedShapes.clear();
 	if (p_selectedShapes.size() == 0) {
 		return l_selectedShapes;
@@ -583,41 +664,40 @@ vector<unsigned int> VectorDataManager::lowerSelectedShape(vector<unsigned int> 
 	
 	l_selectedShapes = p_selectedShapes;
 		sort(l_selectedShapes.begin(), l_selectedShapes.end(), greater <unsigned int>());
-	vector<unsigned int> l_selectedShapesNew;
+	std::vector<unsigned int> l_selectedShapesNew;
 		l_selectedShapesNew.clear();
 	
-	vector<VectorData> v = getVectorData();
-	vector<VectorData> l_vectorDataZOrderBufferA;
-	vector<VectorData> l_vectorDataZOrderBufferB;
-	vector<VectorData> l_vectorDataZOrderBufferC;
+	std::vector<VectorData> l_vectorDataZOrderBufferA;
+	std::vector<VectorData> l_vectorDataZOrderBufferB;
+	std::vector<VectorData> l_vectorDataZOrderBufferC;
 	l_vectorDataZOrderBufferA.clear();
 	l_vectorDataZOrderBufferB.clear();
 	l_vectorDataZOrderBufferC.clear();
 	
 	for (unsigned int l_selectedShape = 0; l_selectedShape < l_selectedShapes.size(); ++l_selectedShape) {
-		unsigned int vsize = v.size();
+		unsigned int vsize = vectorData.size();
 		unsigned int l_temp = vsize;
 		for (unsigned int i = l_selectedShapes[l_selectedShape]; i < vsize; ++i) {
-			if (v[i].vectorType == VectorData::TYPE_INIT
+			if (vectorData[i].vectorType == VectorData::TYPE_INIT
 					&& i != l_selectedShapes[l_selectedShape]) {
 				for (i = i; i < vsize; ++i) {
-					l_vectorDataZOrderBufferC.push_back(v[i]);
+					l_vectorDataZOrderBufferC.push_back(vectorData[i]);
 				}
 				l_temp = i;
 				break;
 			} else {
-				l_vectorDataZOrderBufferA.push_back(v[i]);
+				l_vectorDataZOrderBufferA.push_back(vectorData[i]);
 			}
 		}
 			for (unsigned int i = l_selectedShapes[l_selectedShape]-1; i >= 0 && i != UINT_MAX; --i) {
-				if (v[i].vectorType == VectorData::TYPE_INIT) {
+				if (vectorData[i].vectorType == VectorData::TYPE_INIT) {
 					unsigned int l_tempSelectedShape = i;
 					for (i = i; i < l_selectedShapes[l_selectedShape]; ++i) {
-						if (v[i].vectorType == VectorData::TYPE_INIT
+						if (vectorData[i].vectorType == VectorData::TYPE_INIT
 								&& i != l_tempSelectedShape) {
 							break;
 						} else {
-							l_vectorDataZOrderBufferB.push_back(v[i]);
+							l_vectorDataZOrderBufferB.push_back(vectorData[i]);
 						}
 					}
 					l_selectedShapes[l_selectedShape] = l_tempSelectedShape;
@@ -625,25 +705,25 @@ vector<unsigned int> VectorDataManager::lowerSelectedShape(vector<unsigned int> 
 				}
 			}
 		
-		v.erase (v.begin() + l_selectedShapes[l_selectedShape],
-				 v.begin() + l_temp);
+		vectorData.erase (vectorData.begin() + l_selectedShapes[l_selectedShape],
+				vectorData.begin() + l_temp);
 			
-			l_selectedShapes[l_selectedShape] = v.size();
+			l_selectedShapes[l_selectedShape] = vectorData.size();
 			
-			l_selectedShapesNew.push_back(v.size());
+			l_selectedShapesNew.push_back(vectorData.size());
 			
 			for (unsigned int i = 0; i < l_vectorDataZOrderBufferA.size(); ++i) {
-				v.push_back(l_vectorDataZOrderBufferA[i]);
+				vectorData.push_back(l_vectorDataZOrderBufferA[i]);
 			}
 				l_vectorDataZOrderBufferA.clear();
 			
 			for (unsigned int i = 0; i < l_vectorDataZOrderBufferB.size(); ++i) {
-				v.push_back(l_vectorDataZOrderBufferB[i]);
+				vectorData.push_back(l_vectorDataZOrderBufferB[i]);
 			}
 				l_vectorDataZOrderBufferB.clear();
 			
 			for (unsigned int i = 0; i < l_vectorDataZOrderBufferC.size(); ++i) {
-				v.push_back(l_vectorDataZOrderBufferC[i]);
+				vectorData.push_back(l_vectorDataZOrderBufferC[i]);
 			}
 				l_vectorDataZOrderBufferC.clear();
 	}
@@ -653,8 +733,6 @@ vector<unsigned int> VectorDataManager::lowerSelectedShape(vector<unsigned int> 
 			l_selectedShapes.push_back(l_selectedShapesNew[i]);
 		}
 	}
-	
-	setVectorData(v);
 	
 	return l_selectedShapes;
 }
@@ -667,7 +745,7 @@ vector<unsigned int> VectorDataManager::lowerSelectedShape(vector<unsigned int> 
  *  \sa raiseSelectedShape(), lowerSelectedShape() and lowerToBottomSelectedShape()
  */
 vector<unsigned int> VectorDataManager::raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes) {
-	vector<unsigned int> l_selectedShapes;
+	std::vector<unsigned int> l_selectedShapes;
 	l_selectedShapes.clear();
 	if (p_selectedShapes.size() == 0) {
 		return l_selectedShapes;
@@ -675,9 +753,9 @@ vector<unsigned int> VectorDataManager::raiseToTopSelectedShape(vector<unsigned 
 	
 	l_selectedShapes = p_selectedShapes;
 	
-	vector<VectorData> l_vectorDataCopyBuffer = copySelectedShapes(l_selectedShapes);
+	std::vector<VectorData> l_vectorDataCopyBuffer = copySelectedShapes(l_selectedShapes);
 	if (l_vectorDataCopyBuffer.size() > 0) {
-		if (deleteSelectedShapes(l_selectedShapes) == true) {
+		if (deleteSelectedShapes(p_selectedShapes) == true) {
 			return pasteSelectedShapes(l_vectorDataCopyBuffer);
 		}
 	}
@@ -696,7 +774,7 @@ vector<unsigned int> VectorDataManager::raiseToTopSelectedShape(vector<unsigned 
  *  \sa raiseSelectedShape(), lowerSelectedShape() and raiseToTopSelectedShape()
  */
 vector<unsigned int> VectorDataManager::lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes) {
-	vector<unsigned int> l_selectedShapes;
+	std::vector<unsigned int> l_selectedShapes;
 	l_selectedShapes.clear();
 	if (p_selectedShapes.size() == 0) {
 		return l_selectedShapes;
@@ -704,16 +782,16 @@ vector<unsigned int> VectorDataManager::lowerToBottomSelectedShape(vector<unsign
 	
 	l_selectedShapes = p_selectedShapes;
 	
-	vector<VectorData> l_vectorDataCopyBuffer = copySelectedShapes(l_selectedShapes);
+	std::vector<VectorData> l_vectorDataCopyBuffer = copySelectedShapes(l_selectedShapes);
 	if (l_vectorDataCopyBuffer.size() > 0) {
-		if (deleteSelectedShapes(l_selectedShapes) == true) {
+		if (deleteSelectedShapes(p_selectedShapes) == true) {
 			l_selectedShapes.clear();
 			for (unsigned int i = 0; i < l_vectorDataCopyBuffer.size(); ++i) {
 				if (l_vectorDataCopyBuffer[i].vectorType == VectorData::TYPE_INIT) {
 					l_selectedShapes.push_back(i);
 				}
 			}
-			vector<VectorData> v = getVectorData();
+			std::vector<VectorData> v = getVectorData();
 				for (unsigned int i = 0; i < v.size(); ++i) {
 					l_vectorDataCopyBuffer.push_back(v[i]);
 				}
@@ -728,7 +806,7 @@ vector<unsigned int> VectorDataManager::lowerToBottomSelectedShape(vector<unsign
 }
 
 vector<unsigned int> VectorDataManager::groupSelectedShapes(vector<unsigned int> p_selectedShapes) {
-	vector<unsigned int> l_selectedShapes;
+	std::vector<unsigned int> l_selectedShapes;
 	l_selectedShapes.clear();
 	if (p_selectedShapes.size() == 0) {
 		return l_selectedShapes;
@@ -736,9 +814,9 @@ vector<unsigned int> VectorDataManager::groupSelectedShapes(vector<unsigned int>
 	
 	l_selectedShapes = p_selectedShapes;
 	
-	vector<VectorData> l_vectorDataCopyBuffer = copySelectedShapes(l_selectedShapes);
+	std::vector<VectorData> l_vectorDataCopyBuffer = copySelectedShapes(l_selectedShapes);
 	if (l_vectorDataCopyBuffer.size() > 0) {
-		if (deleteSelectedShapes(l_selectedShapes) == true) {			
+		if (deleteSelectedShapes(p_selectedShapes) == true) {			
 			///erase index if vectorType is TYPE INIT
 			for (unsigned int i = 0; i < l_vectorDataCopyBuffer.size(); ++i) {
 				if (l_vectorDataCopyBuffer[i].vectorType == VectorData::TYPE_INIT
@@ -754,7 +832,7 @@ vector<unsigned int> VectorDataManager::groupSelectedShapes(vector<unsigned int>
 	return l_selectedShapes;
 }
 vector<unsigned int> VectorDataManager::ungroupSelectedShapes(vector<unsigned int> p_selectedShapes) {
-	vector<unsigned int> l_selectedShapes;
+	std::vector<unsigned int> l_selectedShapes;
 	l_selectedShapes.clear();
 	if (p_selectedShapes.size() == 0) {
 		return l_selectedShapes;
@@ -762,11 +840,11 @@ vector<unsigned int> VectorDataManager::ungroupSelectedShapes(vector<unsigned in
 	
 	l_selectedShapes = p_selectedShapes;
 	
-	vector<VectorData> l_vectorDataCopyBuffer = copySelectedShapes(l_selectedShapes);
+	std::vector<VectorData> l_vectorDataCopyBuffer = copySelectedShapes(l_selectedShapes);
 	if (l_vectorDataCopyBuffer.size() > 0) {
-		if (deleteSelectedShapes(l_selectedShapes) == true) {			
+		if (deleteSelectedShapes(p_selectedShapes) == true) {			
 			///insert TYPE INIT between ENDFILL and FILL
-			vector<VectorData> l_vectorDataZOrderBuffer;
+			std::vector<VectorData> l_vectorDataZOrderBuffer;
 			l_vectorDataZOrderBuffer.clear();
 			for (unsigned int i = 0; i < l_vectorDataCopyBuffer.size(); ++i) {
 				l_vectorDataZOrderBuffer.push_back(l_vectorDataCopyBuffer[i]);
@@ -778,7 +856,7 @@ vector<unsigned int> VectorDataManager::ungroupSelectedShapes(vector<unsigned in
 						l_vectorData.stroke = StrokeColorData();
 						l_vectorData.fillColor = ColorData();
 					l_vectorDataZOrderBuffer.push_back(l_vectorData);
-						vector<PointData> ps;
+						std::vector<PointData> ps;
 							PointData l_point(0.0, 0.0);
 								ps.push_back(l_point);
 						l_vectorDataZOrderBuffer[l_vectorDataZOrderBuffer.size()-1].setPoints(ps);
@@ -797,7 +875,7 @@ vector<unsigned int> VectorDataManager::ungroupSelectedShapes(vector<unsigned in
 }
 
 vector<unsigned int> VectorDataManager::duplicateShapes(vector<unsigned int> p_selectedShapes) {
-	vector<unsigned int> l_selectedShapes;
+	std::vector<unsigned int> l_selectedShapes;
 	l_selectedShapes.clear();
 	if (p_selectedShapes.size() == 0) {
 		return l_selectedShapes;
@@ -805,7 +883,7 @@ vector<unsigned int> VectorDataManager::duplicateShapes(vector<unsigned int> p_s
 	
 	l_selectedShapes = p_selectedShapes;
 	
-	vector<VectorData> l_vectorDataCopyBuffer = copySelectedShapes(l_selectedShapes);
+	std::vector<VectorData> l_vectorDataCopyBuffer = copySelectedShapes(l_selectedShapes);
 	if (l_vectorDataCopyBuffer.size() > 0) {
 		return pasteSelectedShapes(l_vectorDataCopyBuffer);
 	}
@@ -818,10 +896,8 @@ bool VectorDataManager::flipHorizontalSelectedShape(vector<unsigned int> p_selec
 		return false;
 	}
 	
-	vector<unsigned int> l_selectedShapesOld(p_selectedShapes);
+	std::vector<unsigned int> l_selectedShapesOld(p_selectedShapes);
 		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater <unsigned int>());
-	
-	vector<VectorData> v = getVectorData();
 	
 	double l_leftPoint = DBL_MAX;
 	double l_rightPoint = DBL_MIN;
@@ -829,33 +905,33 @@ bool VectorDataManager::flipHorizontalSelectedShape(vector<unsigned int> p_selec
 	
 	/// 1. get left-most, right-most, mid-point
 	for (unsigned int l_selectedShape = 0; l_selectedShape < l_selectedShapesOld.size(); ++l_selectedShape) {
-		unsigned int vsize = v.size();
+		unsigned int vsize = vectorData.size();
 		for (unsigned int i = l_selectedShapesOld[l_selectedShape]; i < vsize; ++i) {
-			if (v[i].vectorType == VectorData::TYPE_INIT
+			if (vectorData[i].vectorType == VectorData::TYPE_INIT
 					&& i != l_selectedShapesOld[l_selectedShape]) {
 				break;
-			} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
-					|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
-				if (v[i].points[0].x < l_leftPoint) {
-					l_leftPoint = v[i].points[0].x;
-				} else if (v[i].points[0].x > l_rightPoint) {
-					l_rightPoint = v[i].points[0].x;
+			} else if (vectorData[i].vectorType == VectorData::TYPE_CURVE_CUBIC
+					|| vectorData[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
+				if (vectorData[i].points[0].x < l_leftPoint) {
+					l_leftPoint = vectorData[i].points[0].x;
+				} else if (vectorData[i].points[0].x > l_rightPoint) {
+					l_rightPoint = vectorData[i].points[0].x;
 				}
-				if (v[i].points[1].x < l_leftPoint) {
-					l_leftPoint = v[i].points[1].x;
-				} else if (v[i].points[1].x > l_rightPoint) {
-					l_rightPoint = v[i].points[1].x;
+				if (vectorData[i].points[1].x < l_leftPoint) {
+					l_leftPoint = vectorData[i].points[1].x;
+				} else if (vectorData[i].points[1].x > l_rightPoint) {
+					l_rightPoint = vectorData[i].points[1].x;
 				}
-				if (v[i].points[2].x < l_leftPoint) {
-					l_leftPoint = v[i].points[2].x;
-				} else if (v[i].points[2].x > l_rightPoint) {
-					l_rightPoint = v[i].points[2].x;
+				if (vectorData[i].points[2].x < l_leftPoint) {
+					l_leftPoint = vectorData[i].points[2].x;
+				} else if (vectorData[i].points[2].x > l_rightPoint) {
+					l_rightPoint = vectorData[i].points[2].x;
 				}
-			} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
-				if (v[i].points[0].x < l_leftPoint) {
-					l_leftPoint = v[i].points[0].x;
-				} else if (v[i].points[0].x > l_rightPoint) {
-					l_rightPoint = v[i].points[0].x;
+			} else if (vectorData[i].vectorType == VectorData::TYPE_MOVE) {
+				if (vectorData[i].points[0].x < l_leftPoint) {
+					l_leftPoint = vectorData[i].points[0].x;
+				} else if (vectorData[i].points[0].x > l_rightPoint) {
+					l_rightPoint = vectorData[i].points[0].x;
 				}
 			}
 		}
@@ -864,39 +940,37 @@ bool VectorDataManager::flipHorizontalSelectedShape(vector<unsigned int> p_selec
 	
 	/// 2. loop among selected shapes' points and invert point against location in left-mid-right
 	for (unsigned int l_selectedShape = 0; l_selectedShape < l_selectedShapesOld.size(); ++l_selectedShape) {
-		unsigned int vsize = v.size();
+		unsigned int vsize = vectorData.size();
 		for (unsigned int i = l_selectedShapesOld[l_selectedShape]; i < vsize; ++i) {
-			if (v[i].vectorType == VectorData::TYPE_INIT
+			if (vectorData[i].vectorType == VectorData::TYPE_INIT
 					&& i != l_selectedShapesOld[l_selectedShape]) {
 				break;
-			} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
-					|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
-				if (v[i].points[0].x < l_midPoint) {
-					v[i].points[0].x += ((l_midPoint-v[i].points[0].x) * 2);
-				} else if (v[i].points[0].x > l_midPoint) {
-					v[i].points[0].x -= ((v[i].points[0].x-l_midPoint) * 2);
+			} else if (vectorData[i].vectorType == VectorData::TYPE_CURVE_CUBIC
+					|| vectorData[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
+				if (vectorData[i].points[0].x < l_midPoint) {
+					vectorData[i].points[0].x += ((l_midPoint-vectorData[i].points[0].x) * 2);
+				} else if (vectorData[i].points[0].x > l_midPoint) {
+					vectorData[i].points[0].x -= ((vectorData[i].points[0].x-l_midPoint) * 2);
 				}
-				if (v[i].points[1].x < l_midPoint) {
-					v[i].points[1].x += ((l_midPoint-v[i].points[1].x) * 2);
-				} else if (v[i].points[1].x > l_midPoint) {
-					v[i].points[1].x -= ((v[i].points[1].x-l_midPoint) * 2);
+				if (vectorData[i].points[1].x < l_midPoint) {
+					vectorData[i].points[1].x += ((l_midPoint-vectorData[i].points[1].x) * 2);
+				} else if (vectorData[i].points[1].x > l_midPoint) {
+					vectorData[i].points[1].x -= ((vectorData[i].points[1].x-l_midPoint) * 2);
 				}
-				if (v[i].points[2].x < l_midPoint) {
-					v[i].points[2].x += ((l_midPoint-v[i].points[2].x) * 2);
-				} else if (v[i].points[2].x > l_midPoint) {
-					v[i].points[2].x -= ((v[i].points[2].x-l_midPoint) * 2);
+				if (vectorData[i].points[2].x < l_midPoint) {
+					vectorData[i].points[2].x += ((l_midPoint-vectorData[i].points[2].x) * 2);
+				} else if (vectorData[i].points[2].x > l_midPoint) {
+					vectorData[i].points[2].x -= ((vectorData[i].points[2].x-l_midPoint) * 2);
 				}
-			} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
-				if (v[i].points[0].x < l_midPoint) {
-					v[i].points[0].x += ((l_midPoint-v[i].points[0].x) * 2);
-				} else if (v[i].points[0].x > l_midPoint) {
-					v[i].points[0].x -= ((v[i].points[0].x-l_midPoint) * 2);
+			} else if (vectorData[i].vectorType == VectorData::TYPE_MOVE) {
+				if (vectorData[i].points[0].x < l_midPoint) {
+					vectorData[i].points[0].x += ((l_midPoint-vectorData[i].points[0].x) * 2);
+				} else if (vectorData[i].points[0].x > l_midPoint) {
+					vectorData[i].points[0].x -= ((vectorData[i].points[0].x-l_midPoint) * 2);
 				}
 			}
 		}
 	}
-	
-	setVectorData(v);
 	
 	return true;
 }
@@ -905,10 +979,8 @@ bool VectorDataManager::flipVerticalSelectedShape(vector<unsigned int> p_selecte
 		return false;
 	}
 	
-	vector<unsigned int> l_selectedShapesOld(p_selectedShapes);
+	std::vector<unsigned int> l_selectedShapesOld(p_selectedShapes);
 		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater <unsigned int>());
-	
-	vector<VectorData> v = getVectorData();
 	
 	double l_upperPoint = DBL_MAX;
 	double l_lowerPoint = DBL_MIN;
@@ -916,33 +988,33 @@ bool VectorDataManager::flipVerticalSelectedShape(vector<unsigned int> p_selecte
 	
 	/// 1. get upper-most, lower-most, mid-point
 	for (unsigned int l_selectedShape = 0; l_selectedShape < l_selectedShapesOld.size(); ++l_selectedShape) {
-		unsigned int vsize = v.size();
+		unsigned int vsize = vectorData.size();
 		for (unsigned int i = l_selectedShapesOld[l_selectedShape]; i < vsize; ++i) {
-			if (v[i].vectorType == VectorData::TYPE_INIT
+			if (vectorData[i].vectorType == VectorData::TYPE_INIT
 					&& i != l_selectedShapesOld[l_selectedShape]) {
 				break;
-			} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
-					|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
-				if (v[i].points[0].y < l_upperPoint) {
-					l_upperPoint = v[i].points[0].y;
-				} else if (v[i].points[0].y > l_lowerPoint) {
-					l_lowerPoint = v[i].points[0].y;
+			} else if (vectorData[i].vectorType == VectorData::TYPE_CURVE_CUBIC
+					|| vectorData[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
+				if (vectorData[i].points[0].y < l_upperPoint) {
+					l_upperPoint = vectorData[i].points[0].y;
+				} else if (vectorData[i].points[0].y > l_lowerPoint) {
+					l_lowerPoint = vectorData[i].points[0].y;
 				}
-				if (v[i].points[1].y < l_upperPoint) {
-					l_upperPoint = v[i].points[1].y;
-				} else if (v[i].points[1].y > l_lowerPoint) {
-					l_lowerPoint = v[i].points[1].y;
+				if (vectorData[i].points[1].y < l_upperPoint) {
+					l_upperPoint = vectorData[i].points[1].y;
+				} else if (vectorData[i].points[1].y > l_lowerPoint) {
+					l_lowerPoint = vectorData[i].points[1].y;
 				}
-				if (v[i].points[2].y < l_upperPoint) {
-					l_upperPoint = v[i].points[2].y;
-				} else if (v[i].points[2].y > l_lowerPoint) {
-					l_lowerPoint = v[i].points[2].y;
+				if (vectorData[i].points[2].y < l_upperPoint) {
+					l_upperPoint = vectorData[i].points[2].y;
+				} else if (vectorData[i].points[2].y > l_lowerPoint) {
+					l_lowerPoint = vectorData[i].points[2].y;
 				}
-			} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
-				if (v[i].points[0].y < l_upperPoint) {
-					l_upperPoint = v[i].points[0].y;
-				} else if (v[i].points[0].y > l_lowerPoint) {
-					l_lowerPoint = v[i].points[0].y;
+			} else if (vectorData[i].vectorType == VectorData::TYPE_MOVE) {
+				if (vectorData[i].points[0].y < l_upperPoint) {
+					l_upperPoint = vectorData[i].points[0].y;
+				} else if (vectorData[i].points[0].y > l_lowerPoint) {
+					l_lowerPoint = vectorData[i].points[0].y;
 				}
 			}
 		}
@@ -951,39 +1023,37 @@ bool VectorDataManager::flipVerticalSelectedShape(vector<unsigned int> p_selecte
 	
 	/// 2. loop among selected shapes' points and invert point against location in upper-mid-lower
 	for (unsigned int l_selectedShape = 0; l_selectedShape < l_selectedShapesOld.size(); ++l_selectedShape) {
-		unsigned int vsize = v.size();
+		unsigned int vsize = vectorData.size();
 		for (unsigned int i = l_selectedShapesOld[l_selectedShape]; i < vsize; ++i) {
-			if (v[i].vectorType == VectorData::TYPE_INIT
+			if (vectorData[i].vectorType == VectorData::TYPE_INIT
 					&& i != l_selectedShapesOld[l_selectedShape]) {
 				break;
-			} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
-					|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
-				if (v[i].points[0].y < l_midPoint) {
-					v[i].points[0].y += ((l_midPoint-v[i].points[0].y) * 2);
-				} else if (v[i].points[0].y > l_midPoint) {
-					v[i].points[0].y -= ((v[i].points[0].y-l_midPoint) * 2);
+			} else if (vectorData[i].vectorType == VectorData::TYPE_CURVE_CUBIC
+					|| vectorData[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
+				if (vectorData[i].points[0].y < l_midPoint) {
+					vectorData[i].points[0].y += ((l_midPoint-vectorData[i].points[0].y) * 2);
+				} else if (vectorData[i].points[0].y > l_midPoint) {
+					vectorData[i].points[0].y -= ((vectorData[i].points[0].y-l_midPoint) * 2);
 				}
-				if (v[i].points[1].y < l_midPoint) {
-					v[i].points[1].y += ((l_midPoint-v[i].points[1].y) * 2);
-				} else if (v[i].points[1].y > l_midPoint) {
-					v[i].points[1].y -= ((v[i].points[1].y-l_midPoint) * 2);
+				if (vectorData[i].points[1].y < l_midPoint) {
+					vectorData[i].points[1].y += ((l_midPoint-vectorData[i].points[1].y) * 2);
+				} else if (vectorData[i].points[1].y > l_midPoint) {
+					vectorData[i].points[1].y -= ((vectorData[i].points[1].y-l_midPoint) * 2);
 				}
-				if (v[i].points[2].y < l_midPoint) {
-					v[i].points[2].y += ((l_midPoint-v[i].points[2].y) * 2);
-				} else if (v[i].points[2].y > l_midPoint) {
-					v[i].points[2].y -= ((v[i].points[2].y-l_midPoint) * 2);
+				if (vectorData[i].points[2].y < l_midPoint) {
+					vectorData[i].points[2].y += ((l_midPoint-vectorData[i].points[2].y) * 2);
+				} else if (vectorData[i].points[2].y > l_midPoint) {
+					vectorData[i].points[2].y -= ((vectorData[i].points[2].y-l_midPoint) * 2);
 				}
-			} else if (v[i].vectorType == VectorData::TYPE_MOVE) {
-				if (v[i].points[0].y < l_midPoint) {
-					v[i].points[0].y += ((l_midPoint-v[i].points[0].y) * 2);
-				} else if (v[i].points[0].y > l_midPoint) {
-					v[i].points[0].y -= ((v[i].points[0].y-l_midPoint) * 2);
+			} else if (vectorData[i].vectorType == VectorData::TYPE_MOVE) {
+				if (vectorData[i].points[0].y < l_midPoint) {
+					vectorData[i].points[0].y += ((l_midPoint-vectorData[i].points[0].y) * 2);
+				} else if (vectorData[i].points[0].y > l_midPoint) {
+					vectorData[i].points[0].y -= ((vectorData[i].points[0].y-l_midPoint) * 2);
 				}
 			}
 		}
 	}
-	
-	setVectorData(v);
 	
 	return true;
 }

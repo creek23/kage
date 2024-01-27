@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2023  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,10 @@
 KageLayer::KageLayer(KageScene *p_scene, unsigned int p_layerID, unsigned int p_frameCount) {
 	_scene = p_scene;
 	layerID = p_layerID;
+	setSelected(false);
+	setVisible(true);
+	setLock(false);	
+	setLabel("Layer " + StringHelper::unsignedIntegerToString(p_layerID));
 	frameCtr = 0;
 	for (unsigned int i = 0; i < p_frameCount; ++i) {
 		addFrame();
@@ -41,19 +45,25 @@ KageLayer::KageLayer(KageScene *p_scene, unsigned int p_layerID, unsigned int p_
 
 KageLayer::~KageLayer() {
 	_scene = NULL;
+	for (unsigned int i = Frames.size()-1; i > 0 && i != UINT_MAX; --i) {
+		delete Frames[i];
+		Frames[i] = NULL;
+	}
+	Frames.clear();
 }
 
 bool KageLayer::addFrame() {
 	unsigned int l_currentFrame = getCurrentFrame();
 	
 	++frameCtr;
-	Frames.push_back(new KageFrame(this, layerID, frameCtr));
+	Frames.push_back(new KageFrame(this, frameCtr));
 	
 	if (KageScene::LOADING_MODE == true) {
 		return true;
 	}
 	
-	if (l_currentFrame == getFrameCount()) {
+	if (l_currentFrame == Frames.size()) {
+		//when does currentFrame equal to Frames size when new frame is added?!?
 		if (Frames.size() > 1) {
 			KageFrame::extension l_extension = Frames[Frames.size()-2]->getExtension();
 			if (l_extension == KageFrame::EXTENSION_NOT) {
@@ -61,11 +71,12 @@ bool KageLayer::addFrame() {
 			} else if (l_extension == KageFrame::EXTENSION_END) {
 				//keep
 			}
+			//what happens if previous is extension?
 		}
-	} else if (l_currentFrame < getFrameCount()) {
-		unsigned int l_frameIndex = getFrameCount();
+	} else if (l_currentFrame < Frames.size()) {
+		unsigned int l_frameIndex = Frames.size();
 		while (l_frameIndex > l_currentFrame+1) {
-			setCurrentFrame(l_frameIndex);
+			setCurrentFrame(l_frameIndex, false);
 			moveToLeft();
 			--l_frameIndex;
 		}
@@ -91,7 +102,7 @@ bool KageLayer::addFrame() {
 			} else if (l_extension == KageFrame::EXTENSION_END) {
 				//keep
 			}
-			setCurrentFrame(l_currentFrame); //restore Current Frame because moveToLeft changed Current Frame
+			setCurrentFrame(l_currentFrame, false); //restore Current Frame because moveToLeft changed Current Frame
 		}
 	}
 	
@@ -146,7 +157,7 @@ void KageLayer::duplicateFrame() {
 				}
 			} else if (l_extension == KageFrame::EXTENSION_END) {
 				//keep previous
-				cout << " at END with " << Frames[l_currentFrame]->getExtension() << endl;
+				std::cout << " at END with " << Frames[l_currentFrame]->getExtension() << std::endl;
 				Frames[l_currentFrame]->setExtension(KageFrame::EXTENSION_NOT);
 			}
 		}
@@ -166,24 +177,25 @@ bool KageLayer::removeFrame() {
 	unsigned int l_currentFrame = getCurrentFrame();
 	unsigned int l_currentFrameIndex = l_currentFrame-1;
 	if (Frames[l_currentFrameIndex]->isNull() == true
-			|| (l_currentFrame == getFrameCount() && l_currentFrame > 1)) {
-		if (getFrameCount() > 1) {
+			|| (l_currentFrame == Frames.size() && l_currentFrame > 1)) {
+		if (Frames.size() > 1) {
 			Frames.erase (Frames.begin()+Frames.size()-1);
-			setCurrentFrame(--l_currentFrame);
+			setCurrentFrame(--l_currentFrame, false);
 			return true;
 		} else {
-			cout << "last frame? do nothing" << endl;
+			std::cout << "last frame? do nothing" << std::endl;
 		}
-	} else if (getFrameCount() > 1) {
+	} else if (Frames.size() > 1) {
 		KageFrame::extension l_extensionPrevious;
 		KageFrame::extension l_extensionNext;
 		VectorDataManager l_frameData;
-		for (unsigned int i = l_currentFrameIndex; i < getFrameCount()-1; ++i) {
+		for (unsigned int i = l_currentFrameIndex; i < Frames.size()-1; ++i) {
 			if (Frames[i]->isNull() == false) {
 				unsigned int l_tween = Frames[i+1]->getTween();
 				if (i > 0) {
 					switchToNextFrame();
-						l_frameData = getFrameData().clone();
+						//l_frameData = getFrameData().clone();
+						l_frameData.setVectorData(getFrameData().getVectorData());
 					l_extensionPrevious = Frames[i-1]->getExtension();
 					l_extensionNext     = Frames[i+1]->getExtension();
 					if (l_extensionPrevious == KageFrame::EXTENSION_NOT) {
@@ -243,12 +255,13 @@ bool KageLayer::removeFrame() {
 				
 				//loop to the rest of the frameset
 				KageFrame::extension l_extension;
-				for (unsigned int j = i+1; j < getFrameCount()-1; ++j) {
+				for (unsigned int j = i+1; j < Frames.size()-1; ++j) {
 					l_tween     = Frames[j+1]->getTween();
 					l_extension = Frames[j+1]->getExtension();
 					Frames[j  ]->setExtension(l_extension);
 					switchToNextFrame();
-						l_frameData = getFrameData().clone();
+						//l_frameData = getFrameData().clone();
+						l_frameData.setVectorData(getFrameData().getVectorData());
 					switchToPreviousFrame();
 						Frames[j]->forceSetTween(l_tween);
 						if (l_tween == false ||
@@ -264,11 +277,11 @@ bool KageLayer::removeFrame() {
 				break;
 			}
 		}
-		Frames[getFrameCount()-1]->forceSetTween(false);
-		Frames[getFrameCount()-1]->setNull(true);
-		Frames[getFrameCount()-1]->setExtension(KageFrame::EXTENSION_NOT); //see issue #120 -- https://sourceforge.net/p/kage/tickets/120/
-		setCurrentFrame(l_currentFrame);
-	} else if (getFrameCount() == 1) {
+		Frames[Frames.size()-1]->forceSetTween(false);
+		Frames[Frames.size()-1]->setNull(true);
+		Frames[Frames.size()-1]->setExtension(KageFrame::EXTENSION_NOT); //see issue #120 -- https://sourceforge.net/p/kage/tickets/120/
+		setCurrentFrame(l_currentFrame, false);
+	} else if (Frames.size() == 1) {
 		VectorDataManager l_frameData;
 		setFrameData(l_frameData);
 	}
@@ -277,14 +290,14 @@ bool KageLayer::removeFrame() {
 }
 
 bool KageLayer::moveToLeft() {
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		if (_currentFrameIndex > 0) {
 			swap(Frames[_currentFrameIndex], Frames[_currentFrameIndex-1]);
 			--_currentFrameIndex;
 			return true;
 		}
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				if (_currentFrameIndex > 0) {
@@ -300,13 +313,13 @@ bool KageLayer::moveToLeft() {
 }
 bool KageLayer::moveToLeftAt(unsigned int p_frame) {
 	bool l_return = false;
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		while (_currentFrameIndex > p_frame) {
 			l_return = moveToLeft();
 		}
 		return l_return;
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				while (_currentFrameIndex > p_frame) {
@@ -320,13 +333,13 @@ bool KageLayer::moveToLeftAt(unsigned int p_frame) {
 }
 bool KageLayer::moveToLeftMost() {
 	bool l_return = false;
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		while (_currentFrameIndex > 0) {
 			l_return = moveToLeft();
 		}
 		return l_return;
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				while (_currentFrameIndex > 0) {
@@ -342,8 +355,8 @@ bool KageLayer::moveToLeftMost() {
 void KageLayer::extendFrame() {
 	++frameCtr;
 	unsigned int l_currentFrame = getCurrentFrame();
-	unsigned int l_frameCount = getFrameCount();
-	Frames.push_back(new KageFrame(this, layerID, frameCtr));
+	unsigned int l_frameCount = Frames.size();
+	Frames.push_back(new KageFrame(this, frameCtr));
 	
 	if (KageScene::LOADING_MODE == true) {
 		return;
@@ -360,9 +373,9 @@ void KageLayer::extendFrame() {
 		}
 		Frames[Frames.size()-1]->setExtension(KageFrame::EXTENSION_END);
 	} else if (l_currentFrame < l_frameCount) {
-		unsigned int l_frameIndex = getFrameCount();
+		unsigned int l_frameIndex = Frames.size();
 		while (l_frameIndex > l_currentFrame+1) {
-			setCurrentFrame(l_frameIndex);
+			setCurrentFrame(l_frameIndex, false);
 			moveToLeft();
 			--l_frameIndex;
 		}
@@ -395,25 +408,29 @@ void KageLayer::extendFrame() {
 			Frames[l_currentFrame-1]->setExtension(KageFrame::EXTENSION_MID);
 			Frames[l_currentFrame  ]->setExtension(KageFrame::EXTENSION_END);
 		}
-		setCurrentFrame(l_currentFrame); //restore Current Frame because moveToLeft changed Current Frame
+		setCurrentFrame(l_currentFrame, false); //restore Current Frame because moveToLeft changed Current Frame
 	}
 }
-
-void KageLayer::removeAllFrames() {
+static int FRAME_SIZE = 0; //who is using this?
+bool KageLayer::removeAllFrames() {
 	frameCtr = 0;
+	FRAME_SIZE = Frames.size();
+	for (unsigned int i = Frames.size()-1; i >= 0 && i != UINT_MAX; --i) {
+		delete Frames[i];
+		Frames[i] = NULL;
+	}
 	Frames.clear();
+	FRAME_SIZE = Frames.size();
+	
+	return true;
 }
 
 unsigned int KageLayer::getID() {
 	return layerID;
 }
 
-unsigned int KageLayer::getFrameCount() {
-	return Frames.size();
-}
-
-bool KageLayer::selectAll(bool p_selectAll) {
-	for (unsigned int i = 0; i < getFrameCount(); ++i) {
+bool KageLayer::selectAllFrame(bool p_selectAll) {
+	for (unsigned int i = 0; i < Frames.size(); ++i) {
 		Frames[i]->setSelected(p_selectAll);
 	}
 	return true;
@@ -426,23 +443,32 @@ KageScene *KageLayer::getScene() {
 /** For use of Kage.  When a KageLayer is clicked, KageLayerManager will
  * call this function via Kage then sets currently active Frame along Layer
  * \param p_frame is Frame Number known to KageFrame(/Layer?)
+ * \param p_addSelected add more selected Frame or not
  * \sa getCurrentFrame()
 */
-void KageLayer::setCurrentFrame(unsigned int p_frame) {
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
-		Frames[_currentFrameIndex]->setSelected(false);
-		Frames[_currentFrameIndex]->setCurrent(false);
-	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
-			if (Frames[i]->frameID == _currentFrameID) {
-				Frames[i]->setSelected(false);
-				Frames[i]->setCurrent(false);
-				break;
+void KageLayer::setCurrentFrame(unsigned int p_frame, bool p_addSelected) {
+	unsigned int l_fromFrameIndex = UINT_MAX;
+	if (p_addSelected == true) {
+		//get current frame to select range of frames
+		if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+			l_fromFrameIndex = _currentFrameIndex;
+		} else {
+			for (unsigned int i = 0; i < Frames.size(); ++i) {
+				if (Frames[i]->frameID == _currentFrameID) {
+					l_fromFrameIndex = i;
+					break;
+				}
 			}
+		}
+	} else {
+		//clear previous
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
+//			Frames[i]->setSelected(false);
+			Frames[i]->setCurrent(false);
 		}
 	}
 	
-	unsigned int l_count = getFrameCount();
+	unsigned int l_count = Frames.size();
 	if (p_frame > l_count) {
 		p_frame = l_count;
 	}
@@ -451,15 +477,34 @@ void KageLayer::setCurrentFrame(unsigned int p_frame) {
 	}
 	_currentFrameIndex = p_frame-1;
 	_currentFrameID = Frames[_currentFrameIndex]->frameID;
-	Frames[_currentFrameIndex]->setSelected(true);
+//	Frames[_currentFrameIndex]->setSelected(true);
 	Frames[_currentFrameIndex]->setCurrent(true);
+
+	if (p_addSelected == true) {
+		unsigned int l_start = 0;
+		unsigned int l_stop = 0;
+		if (_currentFrameIndex < l_fromFrameIndex) {
+			l_start = _currentFrameIndex;
+			l_stop = l_fromFrameIndex;
+		} else {
+			l_start = l_fromFrameIndex;
+			l_stop = _currentFrameIndex;
+		}
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
+			if (i >= l_start && i <= l_stop) {
+				Frames[i]->setSelected(true);
+			} else {
+				Frames[i]->setSelected(false);
+			}
+		}
+	}
 }
 
 unsigned int KageLayer::getCurrentFrame() {
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return _currentFrameIndex+1;
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				return i+1;
 			}
@@ -469,10 +514,10 @@ unsigned int KageLayer::getCurrentFrame() {
 }
 
 KageFrame *KageLayer::getFrame() {
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return Frames[_currentFrameIndex];
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				return Frames[i];
 			}
@@ -481,7 +526,7 @@ KageFrame *KageLayer::getFrame() {
 	return NULL;
 }
 KageFrame *KageLayer::getFrameAt(unsigned int p_frame) {
-	if (p_frame < 1 || p_frame > getFrameCount()) {
+	if (p_frame < 1 || p_frame > Frames.size()) {
 		return NULL;
 	}
 	
@@ -489,7 +534,7 @@ KageFrame *KageLayer::getFrameAt(unsigned int p_frame) {
 }
 
 unsigned int KageLayer::getFrameNumberByID(unsigned int p_frameID) {
-	for (unsigned int i = 0; i < getFrameCount(); ++i) {
+	for (unsigned int i = 0; i < Frames.size(); ++i) {
 		if (Frames[i]->frameID == p_frameID) {
 			return i+1;
 		}
@@ -498,19 +543,19 @@ unsigned int KageLayer::getFrameNumberByID(unsigned int p_frameID) {
 	return 0;
 }
 
-
-/** For use of KageFrame.  When a KageFrame is clicked, previously clicked
- * KageFrame should be un-selected.
- * \param p_frame is pointer to KageFrame who called this function
-*/
+/**
+ * For use of KageScene when Frame is added or duplicated
+ * 
+ * \param p_frame is pointer to current KageFrame before Frame-add or Frame-duplicate
+ */
 void KageLayer::setSelected(KageFrame *p_frame) {
-	_scene->selectAll(false);
-	_scene->setCurrentLayerByID(p_frame->layerID);
+	_scene->selectAllLayerFrame(false);
+	_scene->setCurrentLayerByID(p_frame->_layer->ID);
 	_scene->setCurrentFrameByID(p_frame->frameID);
-/*	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+/*	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		Frames[_currentFrameIndex]->setSelected(false);
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				_currentFrameID = Frames[i]->frameID;
@@ -524,10 +569,10 @@ void KageLayer::setSelected(KageFrame *p_frame) {
 }
 
 vector<unsigned int> KageLayer::raiseSelectedShape(vector<unsigned int> p_selectedShapes) {
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return Frames[_currentFrameIndex]->raiseSelectedShape(p_selectedShapes);
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				_currentFrameID = Frames[i]->frameID;
@@ -535,14 +580,14 @@ vector<unsigned int> KageLayer::raiseSelectedShape(vector<unsigned int> p_select
 			}
 		}
 	}
-	vector<unsigned int> l_nullReturn;
+	std::vector<unsigned int> l_nullReturn;
 	return l_nullReturn;
 }
 vector<unsigned int> KageLayer::lowerSelectedShape(vector<unsigned int> p_selectedShapes) {
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return Frames[_currentFrameIndex]->lowerSelectedShape(p_selectedShapes);
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				_currentFrameID = Frames[i]->frameID;
@@ -550,14 +595,14 @@ vector<unsigned int> KageLayer::lowerSelectedShape(vector<unsigned int> p_select
 			}
 		}
 	}
-	vector<unsigned int> l_nullReturn;
+	std::vector<unsigned int> l_nullReturn;
 	return l_nullReturn;
 }
 vector<unsigned int> KageLayer::raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes) {
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return Frames[_currentFrameIndex]->raiseToTopSelectedShape(p_selectedShapes);
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				_currentFrameID = Frames[i]->frameID;
@@ -565,14 +610,14 @@ vector<unsigned int> KageLayer::raiseToTopSelectedShape(vector<unsigned int> p_s
 			}
 		}
 	}
-	vector<unsigned int> l_nullReturn;
+	std::vector<unsigned int> l_nullReturn;
 	return l_nullReturn;
 }
 vector<unsigned int> KageLayer::lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes) {
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return Frames[_currentFrameIndex]->lowerToBottomSelectedShape(p_selectedShapes);
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				_currentFrameID = Frames[i]->frameID;
@@ -580,15 +625,15 @@ vector<unsigned int> KageLayer::lowerToBottomSelectedShape(vector<unsigned int> 
 			}
 		}
 	}
-	vector<unsigned int> l_nullReturn;
+	std::vector<unsigned int> l_nullReturn;
 	return l_nullReturn;
 }
 
 vector<unsigned int> KageLayer::groupSelectedShapes(vector<unsigned int> p_selectedShapes) {
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return Frames[_currentFrameIndex]->groupSelectedShapes(p_selectedShapes);
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				_currentFrameID = Frames[i]->frameID;
@@ -596,14 +641,14 @@ vector<unsigned int> KageLayer::groupSelectedShapes(vector<unsigned int> p_selec
 			}
 		}
 	}
-	vector<unsigned int> l_nullReturn;
+	std::vector<unsigned int> l_nullReturn;
 	return l_nullReturn;
 }
 vector<unsigned int> KageLayer::ungroupSelectedShapes(vector<unsigned int> p_selectedShapes) {
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return Frames[_currentFrameIndex]->ungroupSelectedShapes(p_selectedShapes);
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				_currentFrameID = Frames[i]->frameID;
@@ -611,15 +656,15 @@ vector<unsigned int> KageLayer::ungroupSelectedShapes(vector<unsigned int> p_sel
 			}
 		}
 	}
-	vector<unsigned int> l_nullReturn;
+	std::vector<unsigned int> l_nullReturn;
 	return l_nullReturn;
 }
 
 vector<unsigned int> KageLayer::duplicateShapes(vector<unsigned int> p_selectedShapes) {
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return Frames[_currentFrameIndex]->duplicateShapes(p_selectedShapes);
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				_currentFrameID = Frames[i]->frameID;
@@ -627,15 +672,15 @@ vector<unsigned int> KageLayer::duplicateShapes(vector<unsigned int> p_selectedS
 			}
 		}
 	}
-	vector<unsigned int> l_nullReturn;
+	std::vector<unsigned int> l_nullReturn;
 	return l_nullReturn;
 }
 
 bool KageLayer::flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes) {
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return Frames[_currentFrameIndex]->flipHorizontalSelectedShape(p_selectedShapes);
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				_currentFrameID = Frames[i]->frameID;
@@ -647,10 +692,10 @@ bool KageLayer::flipHorizontalSelectedShape(vector<unsigned int> p_selectedShape
 	return false;
 }
 bool KageLayer::flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes) {
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return doFlipVerticalSelectedShapeOn(_currentFrameIndex, p_selectedShapes);
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				_currentFrameID = Frames[i]->frameID;
@@ -661,7 +706,7 @@ bool KageLayer::flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes)
 	
 	return false;
 }
-	bool KageLayer::doFlipVerticalSelectedShapeOn(unsigned int p_frameIndex, vector<unsigned int> p_selectedShapes) {
+	bool KageLayer::doFlipVerticalSelectedShapeOn(unsigned int p_frameIndex, std::vector<unsigned int> p_selectedShapes) {
 		if (       Frames[p_frameIndex]->getExtension() == KageFrame::EXTENSION_NOT
 				|| Frames[p_frameIndex]->getExtension() == KageFrame::EXTENSION_START) {
 			return Frames[p_frameIndex]->flipVerticalSelectedShape(p_selectedShapes);
@@ -669,7 +714,7 @@ bool KageLayer::flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes)
 			return doFlipVerticalSelectedShapeOnExtendedFrame(p_frameIndex-1, p_selectedShapes);
 		}
 	}
-	bool KageLayer::doFlipVerticalSelectedShapeOnExtendedFrame(unsigned int p_frameIndex, vector<unsigned int> p_selectedShapes) {
+	bool KageLayer::doFlipVerticalSelectedShapeOnExtendedFrame(unsigned int p_frameIndex, std::vector<unsigned int> p_selectedShapes) {
 		while (p_frameIndex > 0) {
 			if (       Frames[p_frameIndex]->getExtension() == KageFrame::EXTENSION_NOT
 					|| Frames[p_frameIndex]->getExtension() == KageFrame::EXTENSION_START) {
@@ -682,10 +727,10 @@ bool KageLayer::flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes)
 	}
 
 bool KageLayer::recenterRotationPoint(vector<unsigned int> p_selectedShapes) {
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return Frames[_currentFrameIndex]->recenterRotationPoint(p_selectedShapes);
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				_currentFrameID = Frames[i]->frameID;
@@ -698,11 +743,11 @@ bool KageLayer::recenterRotationPoint(vector<unsigned int> p_selectedShapes) {
 }
 
 bool KageLayer::addDataToFrame(VectorDataManager p_vectorsData) {
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		Frames[_currentFrameIndex]->addDataToFrame(p_vectorsData);
 		return true;
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				_currentFrameID = Frames[i]->frameID;
@@ -716,11 +761,11 @@ bool KageLayer::addDataToFrame(VectorDataManager p_vectorsData) {
 }
 
 bool KageLayer::setFrameData(VectorDataManager p_vectorsData) {
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		Frames[_currentFrameIndex]->setFrameData(p_vectorsData.clone());
 		return true;
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				_currentFrameID = Frames[i]->frameID;
@@ -749,7 +794,7 @@ VectorDataManager KageLayer::getFrameTweenData(unsigned int p_frameIndex) {
 				break;
 			}
 		}
-		for (unsigned int j = p_frameIndex+1; j < getFrameCount(); ++j) {
+		for (unsigned int j = p_frameIndex+1; j < Frames.size(); ++j) {
 			l_extension = Frames[j]->getExtension();
 			if (	   l_extension == KageFrame::EXTENSION_START
 					|| l_extension == KageFrame::EXTENSION_NOT) {
@@ -760,13 +805,15 @@ VectorDataManager KageLayer::getFrameTweenData(unsigned int p_frameIndex) {
 		VectorDataManager l_dataHead;
 		VectorDataManager l_dataTail;
 		if (l_tweenHead != UINT_MAX) {
-			l_dataHead = Frames[l_tweenHead]->getFrameData();
+			//l_dataHead = Frames[l_tweenHead]->getFrameData();
+			l_dataHead.setVectorData(Frames[l_tweenHead]->getFrameData().getVectorData());
 		}
 		if (l_tweenTail != UINT_MAX) {
-			l_dataTail = Frames[l_tweenTail]->getFrameData();
+			//l_dataTail = Frames[l_tweenTail]->getFrameData();
+			l_dataTail.setVectorData(Frames[l_tweenTail]->getFrameData().getVectorData());
 		}
-		vector<VectorData> l_vHead = l_dataHead.getVectorData();
-		vector<VectorData> l_vTail = l_dataTail.getVectorData();
+		std::vector<VectorData> l_vHead = l_dataHead.getVectorData();
+		std::vector<VectorData> l_vTail = l_dataTail.getVectorData();
 		unsigned int l_tweenDistance    =  l_tweenTail - l_tweenHead;
 		unsigned int l_tweenInterpolate = p_frameIndex - l_tweenHead;
 		double l_progress = (double) l_tweenInterpolate / (double) l_tweenDistance;
@@ -916,10 +963,10 @@ VectorDataManager KageLayer::getFrameTweenData(unsigned int p_frameIndex) {
 }
 
 VectorDataManager KageLayer::getFrameData() {
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		return getFrameTweenData(_currentFrameIndex);
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				_currentFrameID = Frames[i]->frameID;
@@ -927,12 +974,12 @@ VectorDataManager KageLayer::getFrameData() {
 			}
 		}
 	}
-	cout << "getFrameData is returning empty";
+	std::cout << "getFrameData is returning empty";
 	VectorDataManager l_nullReturn;
 	return l_nullReturn;
 }
 VectorDataManager KageLayer::getFrameDataAt(unsigned int p_frame) {
-	if (p_frame > 0 && p_frame <= getFrameCount()) {
+	if (p_frame > 0 && p_frame <= Frames.size()) {
 		--p_frame; //layer now becomes Frame Index
 		if (_scene->_document->_kage->_toggleOnion.get_active() == true || _scene->_document->_kage->_toggleOnionLayer.get_active() == true) {
 			return getFrameTweenData(p_frame);
@@ -945,7 +992,7 @@ VectorDataManager KageLayer::getFrameDataAt(unsigned int p_frame) {
 }
 
 VectorDataManager KageLayer::getPreviousFrameData(unsigned int p_frameID) {
-	for (unsigned int i = 1; i < getFrameCount(); ++i) {
+	for (unsigned int i = 1; i < Frames.size(); ++i) {
 		if (Frames[i]->frameID == p_frameID) {
 			return Frames[i-1]->getFrameData();
 		}
@@ -956,7 +1003,7 @@ VectorDataManager KageLayer::getPreviousFrameData(unsigned int p_frameID) {
 }
 
 bool KageLayer::setFrameDataToPreviousFrame(VectorDataManager p_vectorsData, unsigned int p_frameID) {
-	for (unsigned int i = 1; i < getFrameCount(); ++i) {
+	for (unsigned int i = 1; i < Frames.size(); ++i) {
 		if (Frames[i]->frameID == p_frameID) {
 			Frames[i-1]->setFrameData(p_vectorsData);
 			return true;
@@ -967,7 +1014,7 @@ bool KageLayer::setFrameDataToPreviousFrame(VectorDataManager p_vectorsData, uns
 }
 
 bool KageLayer::addDataToPreviousFrame(VectorDataManager p_vectorsData, unsigned int p_frameID) {
-	for (unsigned int i = 1; i < getFrameCount(); ++i) {
+	for (unsigned int i = 1; i < Frames.size(); ++i) {
 		if (Frames[i]->frameID == p_frameID) {
 			Frames[i-1]->addDataToFrame(p_vectorsData);
 			return true;
@@ -978,8 +1025,8 @@ bool KageLayer::addDataToPreviousFrame(VectorDataManager p_vectorsData, unsigned
 }
 
 bool KageLayer::setPreviousFrameTween(unsigned int p_frameID, unsigned int p_tween) {
-	cout << " KageLayer::setPreviousFrameTween() " << p_frameID << endl;
-	for (unsigned int i = 1; i < getFrameCount(); ++i) {
+	std::cout << " KageLayer::setPreviousFrameTween() " << p_frameID << std::endl;
+	for (unsigned int i = 1; i < Frames.size(); ++i) {
 		if (Frames[i]->frameID == p_frameID) {
 			Frames[i-1]->setTween(p_tween);
 			return true;
@@ -989,10 +1036,10 @@ bool KageLayer::setPreviousFrameTween(unsigned int p_frameID, unsigned int p_twe
 	return false;
 }
 bool KageLayer::setExtendedFrameTween(unsigned int p_frameID, unsigned int p_tween) {
-	cout << " KageLayer::setExtendedFrameTween() " << p_frameID << endl;
-	for (unsigned int i = 0; i < getFrameCount(); ++i) {
+	std::cout << " KageLayer::setExtendedFrameTween() " << p_frameID << std::endl;
+	for (unsigned int i = 0; i < Frames.size(); ++i) {
 		if (Frames[i]->frameID == p_frameID) {
-			for (unsigned int j = i+1; j < getFrameCount(); ++j) {
+			for (unsigned int j = i+1; j < Frames.size(); ++j) {
 				Frames[j]->forceSetTween(p_tween);
 				if (Frames[j]->getExtension() == KageFrame::EXTENSION_END) {
 					break;
@@ -1009,12 +1056,12 @@ bool KageLayer::setExtendedFrameTween(unsigned int p_frameID, unsigned int p_twe
 }
 
 bool KageLayer::forceSetTween(unsigned int p_tween) {
-//	cout << " KageLayer::forceSetTween() " << p_tween << endl;
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+//	std::cout << " KageLayer::forceSetTween() " << p_tween << std::endl;
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		Frames[_currentFrameIndex]->forceSetTween(p_tween);
 		return true;
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				_currentFrameID = Frames[i]->frameID;
@@ -1028,12 +1075,12 @@ bool KageLayer::forceSetTween(unsigned int p_tween) {
 }
 
 bool KageLayer::setTween(unsigned int p_tween) {
-	cout << " KageLayer::setTween() " << p_tween << endl;
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	std::cout << " KageLayer::setTween() " << p_tween << std::endl;
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		Frames[_currentFrameIndex]->setTween(p_tween);
 		return true;
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				_currentFrameID = Frames[i]->frameID;
@@ -1046,11 +1093,11 @@ bool KageLayer::setTween(unsigned int p_tween) {
 	return false;
 }
 unsigned int KageLayer::getTween() {
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		unsigned int l_ret = Frames[_currentFrameIndex]->getTween();
 		return l_ret;
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				_currentFrameIndex = i;
 				_currentFrameID = Frames[i]->frameID;
@@ -1064,10 +1111,10 @@ unsigned int KageLayer::getTween() {
 }
 
 bool KageLayer::switchToPreviousFrame() {
-	for (unsigned int i = 1; i < getFrameCount(); ++i) {
+	for (unsigned int i = 1; i < Frames.size(); ++i) {
 		if (Frames[i]->frameID == _currentFrameID) {
 			///index + 1 = becomes frameNumber for current. then -1 becomes frameNumber of Previous Frame; thus `setCurrentFrame(i)'
-			setCurrentFrame(i);
+			setCurrentFrame(i, false);
 			return true;
 		}
 	}
@@ -1076,10 +1123,10 @@ bool KageLayer::switchToPreviousFrame() {
 }
 
 bool KageLayer::switchToPreviousFrame(unsigned int p_frameID) {
-	for (unsigned int i = 1; i < getFrameCount(); ++i) {
+	for (unsigned int i = 1; i < Frames.size(); ++i) {
 		if (Frames[i]->frameID == p_frameID) {
 			///index + 1 = becomes frameNumber for current. then -1 becomes frameNumber of Previous Frame; thus `setCurrentFrame(i)'
-			setCurrentFrame(i);
+			setCurrentFrame(i, false);
 			return true;
 		}
 	}
@@ -1088,10 +1135,10 @@ bool KageLayer::switchToPreviousFrame(unsigned int p_frameID) {
 }
 
 bool KageLayer::switchToNextFrame() {
-	for (unsigned int i = 0; i < getFrameCount(); ++i) {
+	for (unsigned int i = 0; i < Frames.size(); ++i) {
 		if (Frames[i]->frameID == _currentFrameID) {
 			///index + 1 = becomes frameNumber for current. then +1 becomes frameNumber of Next Frame
-			setCurrentFrame(i+2);
+			setCurrentFrame(i+2, false);
 			return true;
 		}
 	}
@@ -1100,10 +1147,10 @@ bool KageLayer::switchToNextFrame() {
 }
 
 bool KageLayer::switchToNextFrame(unsigned int p_frameID) {
-	for (unsigned int i = 0; i < getFrameCount(); ++i) {
+	for (unsigned int i = 0; i < Frames.size(); ++i) {
 		if (Frames[i]->frameID == p_frameID) {
 			///index + 1 = becomes frameNumber for current. then +1 becomes frameNumber of Next Frame
-			setCurrentFrame(i+2);
+			setCurrentFrame(i+2, false);
 			return true;
 		}
 	}
@@ -1112,6 +1159,9 @@ bool KageLayer::switchToNextFrame(unsigned int p_frameID) {
 }
 
 bool KageLayer::isCurrentFrame(unsigned int p_frameID) {
+	if (_currentFrameIndex > Frames.size()) {
+		return false;
+	}
 	if (Frames[_currentFrameIndex]->frameID == p_frameID
 			&& _currentFrameID == p_frameID) {
 		return true;
@@ -1139,11 +1189,11 @@ bool KageLayer::canReUseNextFrame() {
  * \param p_extension if start/mid/end of frame extension
  */
 void KageLayer::setFrameExtension(KageFrame::extension p_extension) {
-	if (_currentFrameIndex < getFrameCount() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
+	if (_currentFrameIndex < Frames.size() && Frames[_currentFrameIndex]->frameID == _currentFrameID) {
 		Frames[_currentFrameIndex]->setExtension(p_extension);
 		return;
 	} else {
-		for (unsigned int i = 0; i < getFrameCount(); ++i) {
+		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
 				Frames[_currentFrameIndex]->setExtension(p_extension);
 				return;
@@ -1159,4 +1209,46 @@ void KageLayer::setFrameExtension(KageFrame::extension p_extension) {
  */
 unsigned int KageLayer::getActiveFrameID() {
 	return _activeFrame;
+}
+
+void KageLayer::setSelected(bool p_selected) {
+	_selected = p_selected;
+}
+bool KageLayer::isSelected() {
+	return _selected;
+}
+
+void KageLayer::setVisible(bool p_visible) {
+	_visible = p_visible;
+}
+bool KageLayer::isVisible() {
+	return _visible;
+}
+void KageLayer::toggleVisibility() {
+	if (_visible == true) {
+		_visible = false;
+	} else {
+		_visible = true;
+	}
+}
+
+void KageLayer::setLock(bool p_lock) {
+	_lock = p_lock;
+}
+bool KageLayer::isLocked() {
+	return _lock;
+}
+void KageLayer::toggleLock() {
+	if (_lock == true) {
+		_lock = false;
+	} else {
+		_lock = true;
+	}
+}
+
+void KageLayer::setLabel(string p_label) {
+	_label = p_label;
+}
+string KageLayer::getLabel() {
+	return _label;
 }

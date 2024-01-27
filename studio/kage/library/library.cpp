@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2023  Mj Mendoza IV
+ * Copyright (C) 2023-2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -94,7 +94,7 @@ bool KageLibrary::on_event(GdkEvent *e) {
 		on_expose_event((GdkEventExpose*) e);
 	} else if (e->type == GDK_FOCUS_CHANGE) {
 		//filter out from echos
-		cout << "GDK_FOCUS_CHANGE e->send_event " << ((GdkEventFocus*)e)->send_event << " e->in " << ((GdkEventFocus*)e)->in << endl;
+		std::cout << "GDK_FOCUS_CHANGE e->send_event " << ((GdkEventFocus*)e)->send_event << " e->in " << ((GdkEventFocus*)e)->in << std::endl;
 		if (((GdkEventFocus*)e)->in) {
 			KageLibrary::_gotFocus = true;
 		} else {
@@ -103,7 +103,7 @@ bool KageLibrary::on_event(GdkEvent *e) {
 	} else if (e->type == GDK_KEY_PRESS) {
 		on_key_press_event((GdkEventKey*) e);
 	} else if (e->type == GDK_KEY_RELEASE) {
-//		_frameset->getFsm()->setCurrentFrame(getCurrentFrame());
+//		_frameset->getFsm()->setCurrentFrame(getDocumentSceneLayerCurrentFrame(), false);
 		//filter out from echos
 	} else if (e->type == GDK_CONFIGURE) {
 		//filter out from echos 
@@ -117,7 +117,6 @@ void KageLibrary::forceRender() {
 		return;
 	}
 		invalidateToRender();
-	Kage::timestamp_OUT();
 }
 bool KageLibrary::invalidateToRender() {
 	if (KageScene::LOADING_MODE == true) {
@@ -138,6 +137,7 @@ bool KageLibrary::invalidateToRender() {
 }
 
 bool KageLibrary::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
+	std::cout << "KageLibrary::on_draw" << std::endl;
 	if (KageScene::LOADING_MODE == true) {
 		return true;
 	}
@@ -164,10 +164,15 @@ bool KageLibrary::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 		p_context->line_to(get_width(), 120);
 		p_context->line_to(  0, 120);
 		p_context->line_to(  0,   0);
-		p_context->set_source_rgba(0.85f, 0.85f, 0.85f, 1.0f);
+		if (Kage::NotDarkMode) {
+			p_context->set_source_rgba(0.85f, 0.85f, 0.85f, 1.0f);
+		} else {
+			p_context->set_source_rgb(0.60f, 0.60f, 0.60f);
+		}
 		p_context->fill_preserve();
 
 		//TODO: check if _renderAssetID is IMAGE
+		std::cout << "_renderAssetID " << _renderAssetID << " " << UINT_MAX << std::endl;
 		if (_renderAssetID != UINT_MAX && _kage->_stage.cairoPNG[_renderAssetID]) {
 			try {
 				KageStage::cairoImageSurface = _kage->_stage.cairoPNG[_renderAssetID];
@@ -191,7 +196,7 @@ bool KageLibrary::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 					p_context->paint();
 				p_context->restore();
 			} catch (std::bad_alloc const &ex) {
-				cout << "handling zoom error: bad_alloc" << endl;
+				std::cout << "handling zoom error: bad_alloc" << std::endl;
 			} catch (std::exception ex) {
 				//unhandled exception (type ) in signal handler:
 				//what: std::bad_alloc
@@ -236,7 +241,7 @@ KageLibrary::extension KageLibrary::getExtension() {
 
 VectorDataManager KageLibrary::getFrameData() {
 	if (_null == true) {
-		cout << "KageLibrary::getFrameData is returning empty" << endl;
+		std::cout << "KageLibrary::getFrameData is returning empty" << std::endl;
 		VectorDataManager l_nullReturn;
 		return l_nullReturn;
 	}
@@ -256,7 +261,7 @@ void KageLibrary::setFocus() {
 }
 
 vector<unsigned int> KageLibrary::raiseSelectedShape(vector<unsigned int> p_selectedShapes) {
-	vector<unsigned int> foo;
+	std::vector<unsigned int> foo;
 	return foo;
 }
 void KageLibrary::addDataToFrame(VectorDataManager v) {

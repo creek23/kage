@@ -1,7 +1,7 @@
 /*
  * testBasicXml.cpp
  * 
- * Copyright 2019 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
+ * Copyright 2019-2024 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,9 +28,9 @@ int main() {
 	string l_xmlData = BasicXml::openXMLFile("test.xml");
 	BasicXml l_xml;
 	if (l_xml.setXML(l_xmlData)) {
-		cout << l_xml.getXML();
+		std::cout << l_xml.getXML();
 	} else {
-		cout << "unable to setXML";
+		std::cout << "unable to setXML";
 	}
 	
 	return 0;

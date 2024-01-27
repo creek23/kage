@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2023  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -397,8 +397,8 @@ void PropertyFillStroke::EntryFillRGBA_onEnter() {
 	l_G = _kage->hexToInt255(l_sG);
 	l_B = _kage->hexToInt255(l_sB);
 
-	cout << "\n\nRGBA A " << l_sR << "\t" << l_sG << "\t" << l_sB << "\t" << l_sA << endl;
-	cout << "\n\nRGBA B " << l_R  << "\t" << l_G  << "\t" << l_B  << "\t" << l_A << endl << endl << endl;
+	std::cout << "\n\nRGBA A " << l_sR << "\t" << l_sG << "\t" << l_sB << "\t" << l_sA << std::endl;
+	std::cout << "\n\nRGBA B " << l_R  << "\t" << l_G  << "\t" << l_B  << "\t" << l_A << std::endl << std::endl << std::endl;
 	_scaleFillR.set_value(l_R);
 	_scaleFillG.set_value(l_G);
 	_scaleFillB.set_value(l_B);
@@ -567,8 +567,8 @@ void PropertyFillStroke::EntryStrokeRGBA_onEnter() {
 	l_G = _kage->hexToInt255(l_sG);
 	l_B = _kage->hexToInt255(l_sB);
 
-	cout << "\n\nRGBA A " << l_sR << "\t" << l_sG << "\t" << l_sB << "\t" << l_sA << endl;
-	cout << "\n\nRGBA B " << l_R  << "\t" << l_G  << "\t" << l_B  << "\t" << l_A << endl << endl << endl;
+	std::cout << "\n\nRGBA A " << l_sR << "\t" << l_sG << "\t" << l_sB << "\t" << l_sA << std::endl;
+	std::cout << "\n\nRGBA B " << l_R  << "\t" << l_G  << "\t" << l_B  << "\t" << l_A << std::endl << std::endl << std::endl;
 	_scaleStrokeR.set_value(l_R);
 	_scaleStrokeG.set_value(l_G);
 	_scaleStrokeB.set_value(l_B);

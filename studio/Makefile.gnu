@@ -10,8 +10,8 @@ SOURCES = \
 	./kage/data/color.cpp \
 	./kage/data/strokecolor.cpp \
 	./kage/data/vectordata.cpp \
-	./kage/timeline/layer.cpp \
-	./kage/timeline/layermanager.cpp \
+	./kage/timeline/layers.cpp \
+	./kage/timeline/scenes.cpp \
 	./kage/timeline/timeline.cpp \
 	./kage/unre/kagedo.cpp \
 	./kage/unre/unre.cpp \
@@ -45,8 +45,7 @@ SOURCES = \
 	kage.cpp \
 	resources.cpp \
 	about.cpp \
-	asset_rename.cpp \
-	layer_rename.cpp \
+	label_rename.cpp \
 	main.cpp
 
 OBJECTS = $(SOURCES:.cpp=.o)

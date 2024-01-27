@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2023  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,43 +42,51 @@
 
 	class KageScene {
 		protected:
-			void init(KageDocument *p_document);
+			void init(KageDocument *p_document, unsigned int p_sceneID);
 
 			unsigned int ID;
 			bool _selected;
 			bool _saved;
 			unsigned int _activeLayerID;
+			unsigned int _activeLayerIndex;
+			unsigned int _activeLayer; //effectively _activeLayerIndex+1
+
+			unsigned int layerCtr; ///will be used to create Unique LayerUI IDs
+			
+			string _label; //Scene label
 		public:
 			static bool LOADING_MODE;
-			KageScene(KageDocument *p_document, string p_filepath);
+			KageScene(KageDocument *p_document, unsigned int p_sceneID, string p_filepath);
 
-			vector<KageLayer *> Layers;
+			unsigned int getID();
+
+			std::vector<KageLayer *> Layers;
 
 			bool open(string p_filepath);
 			bool save();
 			
+			void setSelected(bool p_selected);
 			bool isSelected();
 			bool isSaved();
-
-		public:
-			KageScene(KageDocument *p_document);
-			KageScene(KageDocument *p_document, KageScene *p_scene);
+			
+			KageScene(KageDocument *p_document, unsigned int p_sceneID);
+			KageScene(KageDocument *p_document, unsigned int p_sceneID, KageScene *p_scene);
 			virtual ~KageScene();
-			void addLayer(unsigned int p_layerID);
+			void addLayer();
 			void deleteLayer(unsigned int p_layerID);
-			bool addFrame();
-			bool extendFrame();
-			bool duplicateFrame();
-			bool removeFrame();
-			void setCurrentFrame(unsigned int p_frame);
+			bool removeLayerAt(unsigned int p_layerIndex);
+			bool addLayerFrame();
+			bool extendLayerFrame();
+			bool duplicateLayerFrame();
+			bool removeLayerFrame();
+			void setLayerCurrentFrame(unsigned int p_frame, bool p_addSelected);
 			void setCurrentFrameByID(unsigned int p_frameID);
 			unsigned int getCurrentFrame();
-			void setCurrentLayer(unsigned int p_currentLayer);
+			void setCurrentLayer(unsigned int p_currentLayer, bool p_addSelected);
 			void setCurrentLayerByID(unsigned int p_layerID);
 			unsigned int getCurrentLayer(); //currently used by getFrame()
-			unsigned int layerCount();
 			unsigned int frameCount();
-			void selectAll(bool p_selectAll);
+			void selectAllLayerFrame(bool p_selectAll);
 			KageFrame *getFrame();
 			KageFrame *getFrameAt(unsigned int p_frame);
 			KageLayer *getLayer();
@@ -93,13 +101,13 @@
 			bool moveDown();
 			bool moveToBottom();
 			
-			vector<unsigned int> raiseSelectedShape(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> lowerSelectedShape(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> groupSelectedShapes(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> ungroupSelectedShapes(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> duplicateShapes(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> raiseSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> lowerSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> groupSelectedShapes(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> ungroupSelectedShapes(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> duplicateShapes(vector<unsigned int> p_selectedShapes);
 			bool flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes);
 			bool flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes);
 			
@@ -114,17 +122,31 @@
 			bool setTween(unsigned int p_tween);
 			unsigned int getTween();
 			
-			bool switchToPreviousFrame(); ///Called by Kage for navigating to Previous Frame
-			bool switchToPreviousFrame(unsigned int p_frameID); ///Called by KageFrame for navigating to Previous Frame
-			bool switchToNextFrame(); ///Called by Kage for navigating to Next Frame
-			bool switchToNextFrame(unsigned int p_frameID); ///Called by KageFrame for navigating to Next Frame
+			bool layerSwitchToPreviousFrame(); ///Called by Kage for navigating to Previous Frame
+			bool layerSwitchToPreviousFrame(unsigned int p_frameID); ///Called by KageFrame for navigating to Previous Frame
+			bool layerSwitchToNextFrame(); ///Called by Kage for navigating to Next Frame
+			bool layerSwitchToNextFrame(unsigned int p_frameID); ///Called by KageFrame for navigating to Next Frame
 			
 			void setFrameExtension(KageFrame::extension p_extension);
+
+			void extendFrameAt(unsigned int p_layerIndex, unsigned int p_frameIndex, unsigned int p_frameCount);
 			//Kage *_kage;
 			KageDocument *_document;
 			KageScene *_parent;
 
 			unsigned int getActiveLayerID();
 			void setActiveLayerID(unsigned int p_layerID);
+			string getLayerLabel();
+			void setLayerLabel(string p_label);
+			void toggleLayerVisibility();
+			bool isLayerVisible();
+			void setLayerVisible(bool p_visible);
+			void toggleLayerLock();
+			bool isLayerLocked();
+			void setLayerLocked(bool p_locked);
+
+			string getLabel();
+			void setLabel(string p_label);
+			
 	};
 #endif //GTKMM_KAGE_SCENE_H

@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2023  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -85,6 +85,11 @@
 		protected:
 			bool _saved;
 			unsigned int _activeSceneID;
+			unsigned int _activeSceneIndex;
+
+			unsigned int sceneCtr; ///will be used to create Unique sceneCtr IDs
+			
+			unsigned int _activeScene;
 		public:
 			KageProject Project;
 			Kage *_kage;
@@ -99,6 +104,10 @@
 			bool openProject();
 			bool saveProject();
 			bool isSaved();
+
+			unsigned int addScene(string p_sceneLabel);
+			bool removeAllScenes();
+			bool removeSceneAt(unsigned int p_sceneIndex);
 			
 			enum AssetType {
 				ASSET_IMAGE,
@@ -113,18 +122,35 @@
 				string Name;
 			};
 			//TODO: each instance of asset will reference to this
-			vector<Asset> Assets;
+			std::vector<Asset> Assets;
 			
 			//TODO: each Scene will be saved as separate KSF file
-			vector<KageScene> Scenes;
-			static unsigned int ACTIVE_SCENE;
+			std::vector<KageScene*> Scenes;
 
+			KageScene *getScene();
+			unsigned int getCurrentScene(); ///returns index+1
+			void setCurrentScene(unsigned int p_scene); //p_scene-1 is index
 			unsigned int getActiveSceneID();
 			void setActiveSceneID(unsigned int p_activeSceneID);
 			unsigned int getActiveLayerID();
 			unsigned int getActiveFrameID();
 
 			unsigned int frameCount();
-			void setCurrentFrame(unsigned int p_frame);
+			void setSceneLayerCurrentFrame(unsigned int p_frame);
+			void renameLayer();
+			string getLayerLabel();
+			void setLayerLabel(string p_label);
+			void toggleLayerVisibility();
+			bool isLayerVisible();
+			void setLayerVisible(bool p_visible);
+			void toggleLayerLock();
+			bool isLayerLocked();
+			void setLayerLocked(bool p_lock);
+			
+			void renameScene();
+			bool moveSceneUp();
+			bool moveSceneDown();
+			bool moveSceneToTop();
+			bool moveSceneToBottom();
 	};
 #endif //GTKMM_KAGE_DOCUMENT_H

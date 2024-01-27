@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2022  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 vector<string> g_argv;
 vector<string> argHandler(int &argc, char *argv[]) {
 	int i;
-	vector<string> l_argv;
+	std::vector<string> l_argv;
 	string l_tmp;
 		for (i = 0; i < argc; ++i) {
 			l_argv.push_back(argv[i]);
@@ -44,13 +44,13 @@ int main(int argc, char *argv[]) {
 	//App_Path = getFilePath(g_argv[0]);
 	//App_EXEName = getFileName(g_argv[0]);
 	string l_filePath = "";
-	cout << "KAGE g_argv " << g_argv.size() << endl;
+	std::cout << "KAGE g_argv " << g_argv.size() << std::endl;
 	if (g_argv.size() > 0) {
 		if (g_argv.size() > 1) {
 			l_filePath = g_argv[1];
 		}
 		for (unsigned int i = 0; i < g_argv.size(); ++i) {
-			cout << " * `" << g_argv[i] << "'" << endl;
+			std::cout << " * `" << g_argv[i] << "'" << std::endl;
 		}
 	}
 	

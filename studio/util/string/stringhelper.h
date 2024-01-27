@@ -1,7 +1,7 @@
 /*
  * stringhelper.h
  * 
- * Copyright 2011-2020 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
+ * Copyright 2011-2024 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,9 +43,12 @@
 			static long toLong(string p_str);
 			static double toDouble(string p_str);
 			static bool toBoolean(string p_str);
-			static vector<string> split(const string &p_source, const string &p_delimiter);
+			static std::vector<string> split(const string &p_source, const string &p_delimiter);
 			static string trim(string p_source);
 			static string kHash(string par, int p_len = 8);
+
+			static string replace(std::string s, std::string const& p_find, std::string const& p_replace);
+			static string replaceAll(std::string s, std::string const& p_find, std::string const& p_replace);
 	};
 	
 #endif //UTIL_STRING_HELPER_H

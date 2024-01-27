@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2023  Mj Mendoza IV
+ * Copyright (C) 2023-2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -125,7 +125,7 @@ void PropertyAsset::EntryRotation_onEnter() {
 	
 	setRotationText(l_dbl);
 	//TODO: apply rotation to selected image
-	//_kage->_stage.updateShapeRotation(l_dbl);
+	_kage->_stage.updateShapeRotation(l_dbl);
 }
 
 void PropertyAsset::Alpha_onChange() {

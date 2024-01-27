@@ -30,14 +30,15 @@
 	
 	class KageDo {
 		public:
-			unsigned int _frame;
+			unsigned int _scene;
 			unsigned int _layer;
+			unsigned int _frame;
 			KageDo();
-			KageDo(unsigned int p_layer, unsigned int p_frame);
+			KageDo(unsigned int p_scene, unsigned int p_layer, unsigned int p_frame);
 			virtual ~KageDo();
 			
 			void setVectorData(vector<VectorData> p_vectorData);
-			vector<VectorData> getVectorData();
+			std::vector<VectorData> getVectorData();
 			KageDo clone();
 			
 			void clear();
@@ -48,6 +49,6 @@
 		protected:
 			void add(VectorData::type p_type, ColorData p_fill, StrokeColorData p_stroke);
 			
-			vector<VectorData> _vectorData;
+			std::vector<VectorData> _vectorData;
 	};
 #endif //GTKMM_KAGE_MANAGER_UNRE_KAGEDO_H

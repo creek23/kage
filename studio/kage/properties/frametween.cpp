@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2023  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -73,8 +73,12 @@ void PropertyFrameTween::FrameTween_onChange() {
 		l_tweenY = 3;
 	}
 	
-	_kage->_document.Scenes[_kage->_document.getActiveSceneID()].setTween(l_tweenX + l_tweenY);
-	std::cout << "FrameTween_onChange X = " << nameX << " Y = " << nameY << " l_tweenX " << (l_tweenX+l_tweenY) << std::endl;
+	try {
+		_kage->_document.getScene()->setTween(l_tweenX + l_tweenY);
+	} catch (std::exception& e) {
+		std::cout << "PropertyFrameTween::FrameTween_onChange Exception : " << e.what() << std::endl;
+	}
+    std::cout << "FrameTween_onChange X = " << nameX << " Y = " << nameY << " l_tweenX " << (l_tweenX+l_tweenY) << std::endl;
 }
 
 void PropertyFrameTween::setTweenXText(string p_tween) {

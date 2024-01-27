@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2023  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -84,9 +84,9 @@ void PropertyStage::EntryStageArea_onEnter() {
 }
 void PropertyStage::EntryStageFPS_onEnter() {
 	string t = m_EntryStageFPS.get_text();
-	cout << "_kage->_document.Project._fps " << _kage->_document.Project._fps << " t " << t << endl;
+	std::cout << "_kage->_document.Project._fps " << _kage->_document.Project._fps << " t " << t << std::endl;
 	_kage->_document.Project._fps = StringHelper::toUnsignedInteger(t);
-	cout << "_kage->_document.Project._fps ..." << _kage->_document.Project._fps << " t " << t << endl;
+	std::cout << "_kage->_document.Project._fps ..." << _kage->_document.Project._fps << " t " << t << std::endl;
 	setFPSText(_kage->_document.Project._fps);
 }
 

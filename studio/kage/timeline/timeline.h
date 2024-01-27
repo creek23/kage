@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2023  Mj Mendoza IV
+ * Copyright (C) 2023-2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,9 +69,7 @@
 			static Glib::RefPtr<Gdk::Pixbuf> imageDRAWN_X_SEL;
 			static Glib::RefPtr<Gdk::Pixbuf> imageDRAWN_X_SEL_TWN;
 			static Glib::RefPtr<Gdk::Pixbuf> imageDRAWN_X_TWN;
-		protected:
-			Kage* _kage;
-		public:
+			
 			static bool DEBUG_ON;
 			
 			Glib::RefPtr<Gdk::Window> window;
@@ -90,13 +88,15 @@
 			
 			static bool _gotFocus;
 			
-			vector<unsigned int> raiseSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> raiseSelectedShape(vector<unsigned int> p_selectedShapes);
 			
 			void addDataToFrame(VectorDataManager v);
 		protected:
+			Kage* _kage;
 			//Override default signal handler:
 			virtual bool on_expose_event(GdkEventExpose *e);
 			virtual bool on_key_press_event(GdkEventKey *e) override;
+			virtual bool on_key_release_event(GdkEventKey *e) override;
 			virtual bool on_event(GdkEvent *e) override;
 			
 			bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
@@ -108,7 +108,7 @@
 			bool _current;
 			
 			VectorDataManager vectorsData;
-
+			
 			PointData draw1;
 			PointData draw2;
 	};

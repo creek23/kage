@@ -1,7 +1,7 @@
 /*
  * xmltag.cpp
  * 
- * Copyright 2019 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
+ * Copyright 2019-2024 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ XmlTag::XmlTag(string p_name) {
 	_xmlTagProperties.clear();
 }
 
-XmlTag::XmlTag(string p_name, vector<XmlTagProperty> p_xmlTagProperties) {
+XmlTag::XmlTag(string p_name, std::vector<XmlTagProperty> p_xmlTagProperties) {
 	setName(p_name);
 	setProperties(p_xmlTagProperties);
 }
@@ -49,8 +49,8 @@ XmlTag XmlTag::clone() {
 
 bool XmlTag::equalTo(XmlTag p_xmlTag) {
 	if (getName() == p_xmlTag.getName() && getProperties().size() == p_xmlTag.getProperties().size()) {
-		vector<XmlTagProperty> l_xmlTagPropertiesA = getProperties();
-		vector<XmlTagProperty> l_xmlTagPropertiesB = p_xmlTag.getProperties();
+		std::vector<XmlTagProperty> l_xmlTagPropertiesA = getProperties();
+		std::vector<XmlTagProperty> l_xmlTagPropertiesB = p_xmlTag.getProperties();
 		unsigned int l_count = 0;
 		for (unsigned int i = 0; i < l_xmlTagPropertiesA.size(); ++i) {
 			if (l_xmlTagPropertiesA[i].equalTo(l_xmlTagPropertiesB[i])) {
@@ -72,15 +72,15 @@ void XmlTag::copy(XmlTag p_xmlTag) {
 std::string XmlTag::toString() {
 	std::ostringstream l_ostringstream;
 		l_ostringstream << getName() << " ";
-//	vector<XmlTagProperty> l_xmlTagProperties = getProperties();
+//	std::vector<XmlTagProperty> l_xmlTagProperties = getProperties();
 //	for (unsigned int i = 0; i < l_xmlTagProperties.size(); ++i) {
 //		l_ostringstream << l_xmlTagProperties[i].toString() << " ";
 	for (unsigned int i = 0; i < _xmlTagProperties.size(); ++i) {
 		l_ostringstream << _xmlTagProperties[i].toString() << " ";
 	}
-	l_ostringstream << endl;
+	l_ostringstream << std::endl;
 	for (unsigned int i = 0; i < _children.size(); ++i) {
-		l_ostringstream << "\t" << _children[i].toString() << endl;
+		l_ostringstream << "\t" << _children[i].toString() << std::endl;
 	}
 	return l_ostringstream.str();
 }
@@ -101,7 +101,7 @@ string XmlTag::getName() {
 }
 
 vector<XmlTagProperty> XmlTag::getProperties() {
-	vector<XmlTagProperty> l_xmlTagProperties;
+	std::vector<XmlTagProperty> l_xmlTagProperties;
 	l_xmlTagProperties.clear();
 	for (unsigned int i = 0; i < _xmlTagProperties.size(); ++i) {
 		XmlTagProperty l_XmlTagProperty;

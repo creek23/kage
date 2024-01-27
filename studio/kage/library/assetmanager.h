@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2023  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,14 +19,14 @@
  * 
  */
 
-#ifndef GTKMM_KAGE_ASSET_MANAGER_LAYER_H
-	#define GTKMM_KAGE_ASSET_MANAGER_LAYER_H
+#ifndef GTKMM_KAGE_ASSET_MANAGER_H
+	#define GTKMM_KAGE_ASSET_MANAGER_H
 	
 	#include <gtkmm/box.h>
 	#include <gtkmm/label.h>
 	#include <gtkmm/button.h>
 	#include "asset.h"
-	#include "../../asset_rename.h"
+	#include "../../label_rename.h"
 	#include "../../util/string/stringhelper.h"
 	
 	#include <filesystem>
@@ -94,4 +94,4 @@
 			unsigned int _currentAssetID;
 			unsigned int _currentAssetIndex;
 	};
-#endif // GTKMM_KAGE_ASSET_MANAGER_LAYER_H
+#endif // GTKMM_KAGE_ASSET_MANAGER_H

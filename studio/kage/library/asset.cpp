@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2023  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ KageAsset::KageAsset(KageAssetManager *p_assetManager, unsigned p_assetID) {
 	_assetManager = p_assetManager;
 	assetID = p_assetID;
 	set_size_request(180, 24);
-    cout << "wxh "<< get_width() << " " << get_height() << endl;
+    std::cout << "wxh "<< get_width() << " " << get_height() << std::endl;
 	_selected = false;
 	_assetType = KageAsset::AssetType::ASSET_IMAGE;
 	_label = "Asset " + StringHelper::unsignedIntegerToString(p_assetID);
@@ -56,7 +56,7 @@ KageAsset::KageAsset(KageAssetManager *p_assetManager, unsigned p_assetID) {
 							sigc::mem_fun(*this, &KageAsset::txtLabel_onEnter));
 	_txtLabel.show();
 	show();
-    cout << "wxh "<< get_width() << " " << get_height() << endl;
+    std::cout << "wxh "<< get_width() << " " << get_height() << std::endl;
 
 	_CTRL = false;
 }
@@ -81,7 +81,7 @@ void KageAsset::txtLabel_onEnter() {
 
 bool KageAsset::on_key_press_event(GdkEventKey *e) {
 	Kage::timestamp_IN();
-	std::cout << " KageFrame(L " << assetID << ") on_key_press_event" << std::endl;
+	std::cout << " KageAsset(L " << assetID << ") on_key_press_event" << std::endl;
 	if (e->keyval == GDK_KEY_Control_L || e->keyval == GDK_KEY_Control_R) {
 		_CTRL = true;
 	} else if (e->keyval == GDK_KEY_Up || e->keyval == GDK_KEY_KP_Up) {
@@ -94,7 +94,7 @@ bool KageAsset::on_key_press_event(GdkEventKey *e) {
 }
 bool KageAsset::on_key_release_event(GdkEventKey *e) {
 	Kage::timestamp_IN();
-	std::cout << " KageFrame(L " << assetID << ") on_key_release_event" << std::endl;
+	std::cout << " KageAsset(L " << assetID << ") on_key_release_event" << std::endl;
 	if (e->keyval == GDK_KEY_Control_L || e->keyval == GDK_KEY_Control_R) {
 		_CTRL = false;
 	}
@@ -165,7 +165,7 @@ void KageAsset::forceRender() {
 	if (KageScene::LOADING_MODE == true) {
 		return;
 	}
-	Kage::timestamp_IN(); cout << " KageAsset::forceRender()" << endl;
+	Kage::timestamp_IN(); std::cout << " KageAsset::forceRender()" << std::endl;
 	invalidateToRender();
 	Kage::timestamp_OUT();
 }
@@ -173,7 +173,7 @@ bool KageAsset::invalidateToRender() {
 	if (KageScene::LOADING_MODE == true) {
 		return true;
 	}
-	Kage::timestamp_IN(); cout << " KageAsset::invalidateToRender()" << endl;
+	Kage::timestamp_IN(); std::cout << " KageAsset::invalidateToRender()" << std::endl;
 	if (!window) {
 		window = get_window();
 	}
@@ -184,7 +184,7 @@ bool KageAsset::invalidateToRender() {
 		if (window)
 			window->invalidate_rect(r, false);
 	} catch (std::exception& e) {
-		std::cerr << "Exception caught : " << e.what() << std::endl;
+		std::cerr << "KageAsset::invalidateToRender Exception : " << e.what() << std::endl;
 	}
 	
 	Kage::timestamp_OUT();
@@ -219,7 +219,11 @@ bool KageAsset::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
 				cr->line_to(get_width(), get_height());
 				cr->line_to(          0, get_height());
 			cr->close_path();
-				cr->set_source_rgb(0.0, 0.47, 0.84);
+				if (Kage::NotDarkMode) {
+					cr->set_source_rgb(0.00f, 0.47f, 0.84f);
+				} else {
+					cr->set_source_rgb(0.58f, 0.07f, 0.00f);
+				}
 				cr->fill_preserve();
 		}
 		

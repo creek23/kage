@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2022  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@
 			virtual ~VectorDataManager();
 			
 			void setVectorData(vector<VectorData> p_vectorData);
-			vector<VectorData> getVectorData();
+			std::vector<VectorData> getVectorData();
 			VectorDataManager clone();
 			
 			void clear();
@@ -66,28 +66,37 @@
 			
 			bool isEmpty();
 			
-			vector<unsigned int> raiseSelectedShape(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> lowerSelectedShape(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> groupSelectedShapes(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> ungroupSelectedShapes(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> duplicateShapes(vector<unsigned int> p_selectedShapes);
+			//for use on z-ordering~ish
+			std::vector<unsigned int> raiseSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> lowerSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> groupSelectedShapes(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> ungroupSelectedShapes(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> duplicateShapes(vector<unsigned int> p_selectedShapes);
 			bool flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes);
 			bool flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes);
 			
 			bool recenterRotationPoint(vector<unsigned int> p_selectedShapes);
+			
+			const unsigned int _NO_SELECTION = -1;
+			std::vector<unsigned int> _selectedNodes;
+			std::vector<unsigned int> _selectedShapes;
+			unsigned int getShape(unsigned int p_index);
+			bool isSelectedShape(unsigned int p_index);
+			void addSelectedShape(unsigned int p_index);
+			std::vector<unsigned int> tryMultiSelectShapes_populateShapes();
+			std::vector<unsigned int> selectAllShapes();
+			bool cutSelectedShapes();
+			std::vector<VectorData> copySelectedShapes(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> pasteSelectedShapes(vector<VectorData> p_vectorDataCopyBuffer);
+			bool deleteSelectedShapes(vector<unsigned int> p_selectedShapes);
 		protected:
 			void add(VectorData::type p_type, ColorData p_fill, StrokeColorData p_stroke);
 			void add(VectorData::type p_type, string p_fillGradientID, StrokeColorData p_stroke);
 			
-			vector<VectorData> vectorData;
+			std::vector<VectorData> vectorData;
 			
 			void addCurve(PointData p_point1, PointData p_point2, PointData p_point3, VectorData::type p_curveType);
-			
-			//for use on z-ordering~ish
-			vector<VectorData> copySelectedShapes(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> pasteSelectedShapes(vector<VectorData> p_vectorDataCopyBuffer);
-			bool deleteSelectedShapes(vector<unsigned int> p_selectedShapes);
 	};
 #endif //GTKMM_KAGE_MANAGER_DATA_VECTOR_Hx

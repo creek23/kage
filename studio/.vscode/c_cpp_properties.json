@@ -47,8 +47,8 @@
             "cppStandard": "gnu++17",
             "browse": {
                 "path": [
-                    "C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/11.2.0/include",
-                    "C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/11.2.0/include-fixed",
+                    "C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/13.1.0/include",
+                    "C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/13.1.0/include-fixed",
                     "C:/msys64/mingw64/include/*",
                     "${workspaceRoot}"
                 ],

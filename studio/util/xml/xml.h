@@ -1,7 +1,7 @@
 /*
  * xml.h
  * 
- * Copyright 2019 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
+ * Copyright 2019-2024 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@
 			void copy(BasicXml p_xmlTag);
 			bool equalTo(BasicXml p_xmlTag);
 			
-			vector<XmlToken> _tokens;
+			std::vector<XmlToken> _tokens;
 			bool tokenize();
 			XmlTag getRoot();
 			
@@ -74,8 +74,8 @@
 			string getXMLChildren(vector<XmlTag> p_children, string p_tab);
 			
 			string _xmlContent;
-			vector<XmlTagProperty> _xmlTagProperties;
+			std::vector<XmlTagProperty> _xmlTagProperties;
 			XmlTag _root;
-//			vector<XmlTag> _children;
+//			std::vector<XmlTag> _children;
 	};
 #endif //KAGE_UTIL_XML_H

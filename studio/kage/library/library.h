@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2023  Mj Mendoza IV
+ * Copyright (C) 2023-2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@
 			
 			static bool _gotFocus;
 			
-			vector<unsigned int> raiseSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> raiseSelectedShape(vector<unsigned int> p_selectedShapes);
 
 			bool recenterRotationPoint(vector<unsigned int> p_selectedShapes);
 			

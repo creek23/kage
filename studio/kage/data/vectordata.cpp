@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2022  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ vector<PointData> VectorData::getPoints() {
 
 VectorData VectorData::clone() {
 	VectorData l_vectorData(getType());
-	vector<PointData> l_points;
+	std::vector<PointData> l_points;
 		for (unsigned int i = 0; i < count; ++i) {
 			l_points.push_back(points[i].clone());
 		}

@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2022  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,8 +34,8 @@ void UnRe::clear() {
 	_undoStack.clear();
 }
 
-void UnRe::stackDo(unsigned int p_layer, unsigned int p_frame, vector<VectorData> p_data) {
-	KageDo p_kageDo(p_layer, p_frame);
+void UnRe::stackDo(unsigned int p_scene, unsigned int p_layer, unsigned int p_frame, std::vector<VectorData> p_data) {
+	KageDo p_kageDo(p_scene, p_layer, p_frame);
 		p_kageDo.setVectorData(p_data);
 	
 	unsigned int l_size = _undoStack.size();
@@ -44,7 +44,7 @@ void UnRe::stackDo(unsigned int p_layer, unsigned int p_frame, vector<VectorData
 	}
 	
 	_undoStack.push_back(p_kageDo.clone());
-	cout << "UNDO SIZE: " << _undoStack.size() << endl;
+	std::cout << "UNDO SIZE: " << _undoStack.size() << std::endl;
 	
 	++_stackIndex;
 }
@@ -112,33 +112,4 @@ PointData UnRe::applyZoomRatio(PointData p_zoomReference, double p_zoomRatio, Po
 	}
 	
 	return p_value.clone();
-}
-
-void UnRe::applyZoom(PointData p_originBefore, PointData p_originAfter, PointData p_zoomReference, double p_zoomRatio) {
-	unsigned int l_size = _undoStack.size();
-	for (unsigned int l_undoStackIndex = 0; l_undoStackIndex < l_size; ++l_undoStackIndex) {
-		vector<VectorData> v = _undoStack[l_undoStackIndex].getVectorData();
-		
-		for (unsigned int i = 0; i < v.size(); ++i) {
-			if (v[i].vectorType == VectorData::TYPE_MOVE
-					|| v[i].vectorType == VectorData::TYPE_LINE) {
-				v[i].points[0].x += p_originBefore.x;
-				v[i].points[0].y += p_originBefore.y;
-					v[i].points[0] = applyZoomRatio(p_zoomReference, p_zoomRatio, v[i].points[0]);
-				v[i].points[0].x -= p_originAfter.x;
-				v[i].points[0].y -= p_originAfter.y;
-			} else if (v[i].vectorType == VectorData::TYPE_CURVE_CUBIC
-					|| v[i].vectorType == VectorData::TYPE_CURVE_QUADRATIC) {
-				for (unsigned int j = 0; j < 3; ++j) {
-					v[i].points[j].x += p_originBefore.x;
-					v[i].points[j].y += p_originBefore.y;
-						v[i].points[j] = applyZoomRatio(p_zoomReference, p_zoomRatio, v[i].points[j]);
-					v[i].points[j].x -= p_originAfter.x;
-					v[i].points[j].y -= p_originAfter.y;
-				}
-			}
-		}
-		
-		_undoStack[l_undoStackIndex].setVectorData(v);
-	}
 }

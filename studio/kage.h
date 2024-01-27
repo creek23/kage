@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2023  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,8 @@
 	#include <gtkmm/messagedialog.h>
 	#include <gtkmm/filechooserdialog.h>
 	#include <gtkmm/cssprovider.h>
-	#include "kage/timeline/layermanager.h"
+	#include "kage/timeline/layers.h"
+	#include "kage/timeline/scenes.h"
 	#include "kage/timeline/timeline.h"
 	#include "kage/stage/stage.h"
 	#include "kage/library/assetmanager.h"
@@ -94,8 +95,10 @@
 			char int15ToHex(unsigned int p);
 			unsigned int hexToInt255(string p);
 			unsigned int hexToInt15(char p);
+
+			KageScenesUI _scenes;
 			
-			KageLayerManager _layerManager;
+			KageLayersUI _layers;
 			KageAssetManager _assetManager;
 			KageTimeline _timeline;
 			
@@ -103,6 +106,13 @@
 			//Signal handlers:
 			void updateStatus(Glib::ustring status_msg);
 			void Quit_onClick();
+			void SceneAdd_onClick();
+			void SceneDel_onClick();
+			void SceneRename_onClick();
+			void SceneMoveToNext_onClick();
+			void SceneMoveToPrevious_onClick();
+			void SceneMoveToLast_onClick();
+			void SceneMoveToFirst_onClick();
 			void LayerAdd_onClick();
 			void LayerRename_onClick();
 			void ShowHideLayer_onClick();
@@ -158,7 +168,7 @@
 			void TweenFrame_onClick();
 			void RemoveTweenFrame_onClick();
 //			void New_onClick();
-			void OpenKSF_onClick();
+			void OpenKAGE_onClick();
 			void ExportKS_onClick();
 			void ExportHTML5_onClick();
 			void ExportSVG_onClick();
@@ -267,6 +277,32 @@
 				Gtk::Image                _toggleOnionLayer_img;
 				Glib::RefPtr<Gdk::Pixbuf> _toggleOnionLayer_pixbuf;
 			
+			Gtk::Button _btnSceneAdd;
+				Gtk::Image                _btnSceneAdd_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnSceneAdd_pixbuf;
+			Gtk::Button _btnSceneRemove;
+				Gtk::Image                _btnSceneRemove_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnSceneRemove_pixbuf;
+			Gtk::Button _btnSceneToNext;
+				Gtk::Image                _btnSceneToNext_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnSceneToNext_pixbuf;
+			Gtk::Button _btnSceneToPrevious;
+				Gtk::Image                _btnSceneToPrevious_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnSceneToPrevious_pixbuf;
+			Gtk::Button _btnSceneToFirst;
+				Gtk::Image                _btnSceneToFirst_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnSceneToFirst_pixbuf;
+			Gtk::Button _btnSceneToLast;
+				Gtk::Image                _btnSceneToLast_img;
+				Glib::RefPtr<Gdk::Pixbuf> _btnSceneToLast_pixbuf;
+			
+			Gtk::HPaned m_Timeline_Scene_HPaned;
+			Gtk::HBox m_Timeline_Scene_HBox;
+			Gtk::ScrolledWindow m_Timeline_Scene_ScrolledWindow;
+			Gtk::VScrollbar m_Timeline_Scene_VScrollbar;
+			Gtk::HBox m_Timeline_Scene_Controls_HBox;
+			Gtk::Label m_LabelScene;
+			Gtk::VBox m_Timeline_Scene_VBox;
 			Gtk::VBox m_Timeline_Frame_VBox1;
 			Gtk::Label m_TimelineFrame_Label;
 			Gtk::VBox m_Timeline_Frame_VBox2;
@@ -281,12 +317,14 @@
 			Gtk::HSeparator m_Separator_Toolbar2;
 			Gtk::HSeparator m_Separator_Toolbar3;
 			Gtk::HSeparator m_Separator_Toolbar4;
+			Gtk::HSeparator m_Separator_Scene1;
+			Gtk::HSeparator m_Separator_Scene2;
 			Gtk::HSeparator m_Separator_Library1;
 			Gtk::HSeparator m_Separator_Library2;
 			Gtk::Label m_LabelProp;
 			Gtk::ScrolledWindow m_Property_Pane_ScrolledWindow;
 			Gtk::VScrollbar     m_Property_Pane_VScrollbar;
-			Gtk::Label m_LabelLibrary;			
+			Gtk::Label m_LabelLibrary;
 			
 			Gtk::Label m_LblHolder_Toolbar;
 			Gtk::ScrolledWindow m_Stage_Pane_ScrolledWindow;
@@ -295,7 +333,9 @@
 			
 			void addToolButton(const Glib::ustring &label);
 			Gtk::ToggleButton m_ToggleBtnSelect;
+		public:
 			void btnDebug_onClick();
+		protected:
 			void btnAbout_onClick();
 			void CheckUpdate_onClick();
 			void Website_onClick();
@@ -339,8 +379,8 @@
 			bool fileWrite(string p_path, string p_msg, std::ofstream &p_file, bool &p_flag);
 			
 			string openTextFile(string p_path);
-			vector<double> parseNumbers(string p_numbers);
-			vector<int> parseColorString(string p_color);
+			std::vector<double> parseNumbers(string p_numbers);
+			std::vector<int> parseColorString(string p_color);
 			void parseKAGE_Children(vector<XmlTag> p_children);
 			void parseKAGE(string p_content);
 			void parseKSF_Children(vector<XmlTag> p_children);
@@ -370,7 +410,7 @@
 			guint frameCounter;
 			//bool _isPlaying;
 			
-			vector<VectorData> _undoBase;
+			std::vector<VectorData> _undoBase;
 			
 			bool continueNewFileWithUnsavedWork();
 			
@@ -378,6 +418,7 @@
 			int _area_properties_pane1;
 			int _area_properties_pane2;
 			
+			bool m_LabelScene_onClick(GdkEventButton *event);//, gpointer user_data);
 			bool m_LabelLibrary_onClick(GdkEventButton *event);//, gpointer user_data);
 		public:
 			KageStage _stage;
@@ -408,8 +449,8 @@
 
 			static gboolean NotDarkMode;
 			
-			bool switchToPreviousFrame();
-			bool switchToNextFrame();
+			bool sceneLayerSwitchToPreviousFrame();
+			bool sceneLayerSwitchToNextFrame();
 			
 			void propStageSetVisible(bool p_visible);
 			void propFillStrokeSetVisible(bool p_visible);
@@ -427,17 +468,18 @@
 			
 			UnRe _undoRedoManager;
 			void stackDo();
-			void stackDoZoom(PointData p_originBefore, PointData p_originAfter, PointData p_zoomReference, double p_zoomRatio);
 			
 			void New_onClick();
 			bool doDeleteFrame();
 			
 			bool isLayerLocked();
-			unsigned int getCurrentLayer();
-			void setCurrentLayer(unsigned int p_layer);
-			unsigned int getCurrentFrame();
+			unsigned int getDocumentCurrentScene();
+			void setDocumentCurrentScene(unsigned int p_scene);
+			unsigned int getDocumentSceneCurrentLayer();
+			void setDocumentSceneCurrentLayer(unsigned int p_layer, bool p_addSelected);
+			unsigned int getDocumentSceneLayerCurrentFrame();
 			void setCurrentLayerByID(unsigned int p_layerID);
-			void setCurrentFrame(unsigned int p_layer);
+			void setDocumentSceneLayerCurrentFrame(unsigned int p_frame, bool p_addSelected);
 			
 			void displayMouseXY(double p_x, double p_y);
 			
@@ -447,9 +489,22 @@
 			void focusOnStage();
 
 			KageDocument _document;
+			KageDocument _documentCopyBuffer; ///will contain copied Scene/s, its Layer/s, it's Frames
+			std::vector<VectorData> g_copiedData;
+			std::vector<unsigned int> g_selectedItems;
 			
 			void setStageBG(Gdk::Color p_Color);
 			Gdk::Color getStageBG();
 	};
+	
+	//from Timeline -- for use by Timeline and LayersUI
+	const unsigned int FRAME_WIDTH = 12;
+	const unsigned int FRAME_WIDTH_OFFSET = 8;
+	const unsigned int FRAME_HEIGHT = 23;
+	const unsigned int FRAME_HEIGHT_OFFSET = 23;
+	//from Timeline -- for use by Timeline and LayersUI
+	extern unsigned int g_layerSelectIndex;
+	extern unsigned int g_frameSelectIndex;
+
 
 #endif //GTKMM_KAGE_H

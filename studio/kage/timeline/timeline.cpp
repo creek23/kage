@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2023  Mj Mendoza IV
+ * Copyright (C) 2023-2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -83,26 +83,100 @@ KageTimeline::KageTimeline(Kage* p_kage) :
 	add_events(Gdk::ENTER_NOTIFY_MASK | Gdk::LEAVE_NOTIFY_MASK);
 	add_events(Gdk::FOCUS_CHANGE_MASK);
 	add_events(Gdk::POINTER_MOTION_MASK);
+
+	//if (!KageTimeline::imageNULL) {
+		try {
+			KageTimeline::imageNULL           = Gdk::Pixbuf::create_from_resource("/kage/share/frame/null.png");
+			KageTimeline::imageNULL_CUR       = Gdk::Pixbuf::create_from_resource("/kage/share/frame/null_cur.png");
+			KageTimeline::imageNULL_X         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/null_x.png");
+			KageTimeline::imageNULL_X_CUR     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/null_x_cur.png");
+			KageTimeline::imageBLANK             = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank.png");
+			KageTimeline::imageBLANK_CUR         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_cur.png");
+			KageTimeline::imageBLANK_CUR_SEL     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_cur_sel.png");
+			KageTimeline::imageBLANK_CUR_SEL_TWN = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_cur_sel_twn.png");
+			KageTimeline::imageBLANK_CUR_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_cur_twn.png");
+			KageTimeline::imageBLANK_SEL         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_sel.png");
+			KageTimeline::imageBLANK_SEL_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_sel_twn.png");
+			KageTimeline::imageBLANK_TWN         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_twn.png");
+			KageTimeline::imageBLANK_X             = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x.png");
+			KageTimeline::imageBLANK_X_CUR         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_cur.png");
+			KageTimeline::imageBLANK_X_CUR_SEL     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_cur_sel.png");
+			KageTimeline::imageBLANK_X_CUR_SEL_TWN = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_cur_sel_twn.png");
+			KageTimeline::imageBLANK_X_CUR_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_cur_twn.png");
+			KageTimeline::imageBLANK_X_SEL         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_sel.png");
+			KageTimeline::imageBLANK_X_SEL_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_sel_twn.png");
+			KageTimeline::imageBLANK_X_TWN         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_twn.png");
+			KageTimeline::imageDRAWN             = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn.png");
+			KageTimeline::imageDRAWN_CUR         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_cur.png");
+			KageTimeline::imageDRAWN_CUR_SEL     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_cur_sel.png");
+			KageTimeline::imageDRAWN_CUR_SEL_TWN = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_cur_sel_twn.png");
+			KageTimeline::imageDRAWN_CUR_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_cur_twn.png");
+			KageTimeline::imageDRAWN_SEL         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_sel.png");
+			KageTimeline::imageDRAWN_SEL_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_sel_twn.png");
+			KageTimeline::imageDRAWN_TWN         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_twn.png");
+			KageTimeline::imageDRAWN_X             = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x.png");
+			KageTimeline::imageDRAWN_X_CUR         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_cur.png");
+			KageTimeline::imageDRAWN_X_CUR_SEL     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_cur_sel.png");
+			KageTimeline::imageDRAWN_X_CUR_SEL_TWN = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_cur_sel_twn.png");
+			KageTimeline::imageDRAWN_X_CUR_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_cur_twn.png");
+			KageTimeline::imageDRAWN_X_SEL         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_sel.png");
+			KageTimeline::imageDRAWN_X_SEL_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_sel_twn.png");
+			KageTimeline::imageDRAWN_X_TWN         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_twn.png");
+		} catch (const Gio::ResourceError &ex) {
+			std::cerr << "KageTimeline::ResourceError: " << ex.what() << std::endl;
+		} catch (const Gdk::PixbufError &ex) {
+			std::cerr << "KageTimeline::PixbufError: " << ex.what() << std::endl;
+		}
+	//}
 }
 
 KageTimeline::~KageTimeline() {
 	//
 }
 
-unsigned int g_frameSelectIndex;
+bool g_FrameModifier = false;
+bool g_FrameModifierOngoing = false;
+bool g_multipleSelect = false;
+enum FrameModifier {
+	MODIFY_NOT,
+	MODIFY_MOVE,
+	MODIFY_EXTEND
+};
+FrameModifier g_FrameModify = FrameModifier::MODIFY_NOT;
+int g_FrameModifyLayerIndex;
+int g_FrameModifyFrameIndexStart;
+int g_FrameModifyFrameIndexStop;
+int g_FrameModifyFrameIndex;
+
 bool KageTimeline::on_key_press_event(GdkEventKey *e) {
 	if (e->keyval == GDK_KEY_period) {
-		if (_kage->switchToNextFrame()) {
+		if (_kage->sceneLayerSwitchToNextFrame()) {
 			++g_frameSelectIndex;
 		}
 	} else if (e->keyval == GDK_KEY_comma) {
-		if (_kage->switchToPreviousFrame()) {
+		if (_kage->sceneLayerSwitchToPreviousFrame()) {
 			--g_frameSelectIndex;
 		}
 	} else if (e->keyval == GDK_KEY_Escape) {
 		_kage->Stop_onClick();
+	} else if (e->keyval == GDK_KEY_Control_L || e->keyval == GDK_KEY_Control_R) {
+		g_FrameModifier = true; //toggle Frame-move/resize listeners
+		invalidateToRender();
+	} else if (e->keyval == GDK_KEY_Shift_L || e->keyval == GDK_KEY_Shift_R) {
+		g_multipleSelect = true;
 	}
 
+	return true;
+}
+bool KageTimeline::on_key_release_event(GdkEventKey *e) {
+	if (e->keyval == GDK_KEY_Control_L || e->keyval == GDK_KEY_Control_R) {
+		g_FrameModifier = false; //toggle-off Frame-move/resize listeners
+		g_FrameModify = FrameModifier::MODIFY_NOT;
+		invalidateToRender();
+	} else if (e->keyval == GDK_KEY_Shift_L || e->keyval == GDK_KEY_Shift_R) {
+		g_multipleSelect = false;
+	}
+	
 	return true;
 }
 bool KageTimeline::on_expose_event(GdkEventExpose* e) {
@@ -129,24 +203,81 @@ bool KageTimeline::on_event(GdkEvent *e) {
 	} else if (e->type == GDK_BUTTON_RELEASE) {
 		KageTimeline::mouseIsDown = false;
 		grab_focus();
+		unsigned int l_realDrawX = 0;
+		unsigned int l_layerCount = 0;
+		try {
+			l_layerCount = _kage->_document.getScene()->Layers.size();
+		} catch (std::exception& e) {
+			std::cout << "KageTime::on_event Exception : " << e.what() << std::endl;
+		}
+		unsigned int l_layerHeight = l_layerCount * FRAME_HEIGHT;
 		if (draw1.x == draw2.x && draw1.y == draw2.y) {
 			//single SELECT frame
-			const unsigned int FRAME_WIDTH_OFFSET = 8;
-			const unsigned int FRAME_HEIGHT = 23;
-			unsigned int p_frameIndex = ((draw1.x-FRAME_WIDTH_OFFSET) - ((unsigned int)(draw1.x-FRAME_WIDTH_OFFSET) % 8)) / 8;
-			unsigned int p_layerCount = _kage->_document.Scenes[_kage->_document.getActiveSceneID()].Layers.size();
-			unsigned int p_layerHeight = p_layerCount * FRAME_HEIGHT;
-			if (get_height() >= p_layerHeight) {
-				draw1.y -= (get_height() - p_layerHeight); //remove excess
+			l_realDrawX = draw1.x - FRAME_WIDTH_OFFSET;
+			unsigned int p_frameIndex = ((l_realDrawX) - ((l_realDrawX) % FRAME_WIDTH)) / FRAME_WIDTH;
+			if (get_height() >= l_layerHeight) {
+				draw1.y -= (get_height() - l_layerHeight); //remove excess
 			} else {
-				draw1.y += (p_layerHeight-get_height()); //pad hidden layers
+				draw1.y += (l_layerHeight-get_height()); //pad hidden layers
 			}
-			unsigned int l_layerSelectIndex = (draw1.y - ((unsigned int)draw1.y % FRAME_HEIGHT)) / FRAME_HEIGHT;
+			g_layerSelectIndex = (draw1.y - ((unsigned int)draw1.y % FRAME_HEIGHT)) / FRAME_HEIGHT;
 			g_frameSelectIndex = p_frameIndex;
-			_kage->setCurrentLayer(p_layerCount-l_layerSelectIndex);
-			_kage->setCurrentFrame(p_frameIndex+1);
+			_kage->setDocumentSceneCurrentLayer(l_layerCount-g_layerSelectIndex, g_multipleSelect);
+			_kage->setDocumentSceneLayerCurrentFrame(p_frameIndex+1, g_multipleSelect);
 		} else {
-			//TODO: multi-SELECT frames
+			//multi-SELECT frames
+			//identify all frames within draw1.x to draw2.x
+			l_realDrawX = draw1.x - FRAME_WIDTH_OFFSET;
+			unsigned int l_frameStartIndex = ((l_realDrawX) - (l_realDrawX % FRAME_WIDTH)) / FRAME_WIDTH;
+			l_realDrawX = draw2.x - FRAME_WIDTH_OFFSET;
+			unsigned int l_frameStopIndex  = ((l_realDrawX) - (l_realDrawX % FRAME_WIDTH)) / FRAME_WIDTH;
+			if (l_frameStopIndex < l_frameStartIndex) {
+				unsigned int l_tmpFrameIndex = l_frameStopIndex;
+				l_frameStopIndex = l_frameStartIndex;
+				l_frameStartIndex = l_tmpFrameIndex;
+			}
+			if (l_realDrawX < (FRAME_WIDTH/2)) {
+				//do nothing
+			} else {
+				l_frameStartIndex += 1;
+			}
+			l_frameStopIndex  -= 1;
+			
+			//identify all layers within draw1.y to draw2.y
+			if (get_height() >= l_layerHeight) {
+				draw1.y -= (get_height() - l_layerHeight); //remove excess
+				draw2.y -= (get_height() - l_layerHeight); //remove excess
+			} else {
+				draw1.y += (l_layerHeight-get_height()); //pad hidden layers
+				draw2.y += (l_layerHeight-get_height()); //pad hidden layers
+			}
+			unsigned int l_layerStartIndex = ((draw1.y - ((unsigned int)draw1.y % FRAME_HEIGHT)) / FRAME_HEIGHT) + 1;
+			unsigned int l_layerStopIndex  = ((draw2.y - ((unsigned int)draw2.y % FRAME_HEIGHT)) / FRAME_HEIGHT);
+			cout << "l_layerStartIndex " << l_layerStartIndex << " l_layerStopIndex " << l_layerStopIndex;
+			l_layerStartIndex = l_layerCount - l_layerStartIndex;
+			l_layerStopIndex  = l_layerCount - l_layerStopIndex;
+			if (l_layerStopIndex < l_layerStartIndex) {
+				unsigned int l_tmpLayerIndex = l_layerStopIndex;
+				l_layerStopIndex = l_layerStartIndex;
+				l_layerStartIndex = l_tmpLayerIndex;
+			}
+			cout << "\t " << l_layerStartIndex << " " << l_layerStopIndex << endl;
+			//loop from start to stop to select frames in between
+			for (unsigned int l_layerIndex = 0; l_layerIndex < _kage->_document.getScene()->Layers.size(); ++l_layerIndex) {
+				if (l_layerIndex >= l_layerStartIndex && l_layerIndex < l_layerStopIndex) {
+					for (unsigned int l_frameIndex = 0; l_frameIndex < _kage->_document.getScene()->Layers[l_layerIndex]->Frames.size(); ++l_frameIndex) {
+						if (l_frameIndex >= l_frameStartIndex && l_frameIndex <= l_frameStopIndex) {
+							_kage->_document.getScene()->Layers[l_layerIndex]->Frames[l_frameIndex]->setSelected(true);
+						} else {
+							_kage->_document.getScene()->Layers[l_layerIndex]->Frames[l_frameIndex]->setSelected(false);
+						}
+					}
+				} else {
+					for (unsigned int l_frameIndex = 0; l_frameIndex < _kage->_document.getScene()->Layers[l_layerIndex]->Frames.size(); ++l_frameIndex) {
+						_kage->_document.getScene()->Layers[l_layerIndex]->Frames[l_frameIndex]->setSelected(false);
+					}
+				}
+			}
 		}
 		invalidateToRender();
 	} else if (e->type == GDK_BUTTON_PRESS) {
@@ -159,7 +290,7 @@ bool KageTimeline::on_event(GdkEvent *e) {
 		on_expose_event((GdkEventExpose*) e);
 	} else if (e->type == GDK_FOCUS_CHANGE) {
 		//filter out from echos
-		cout << "GDK_FOCUS_CHANGE e->send_event " << ((GdkEventFocus*)e)->send_event << " e->in " << ((GdkEventFocus*)e)->in << endl;
+		std::cout << "KageTimeline GDK_FOCUS_CHANGE e->send_event " << ((GdkEventFocus*)e)->send_event << " e->in " << ((GdkEventFocus*)e)->in << std::endl;
 		if (((GdkEventFocus*)e)->in) {
 			KageTimeline::_gotFocus = true;
 		} else {
@@ -168,7 +299,8 @@ bool KageTimeline::on_event(GdkEvent *e) {
 	} else if (e->type == GDK_KEY_PRESS) {
 		on_key_press_event((GdkEventKey*) e);
 	} else if (e->type == GDK_KEY_RELEASE) {
-//		_frameset->getFsm()->setCurrentFrame(getCurrentFrame());
+		on_key_release_event((GdkEventKey*) e);
+//		_frameset->getFsm()->setCurrentFrame(getDocumentSceneLayerCurrentFrame(), false);
 		//filter out from echos
 	} else if (e->type == GDK_CONFIGURE) {
 		//filter out from echos 
@@ -181,8 +313,7 @@ void KageTimeline::forceRender() {
 	if (KageScene::LOADING_MODE == true) {
 		return;
 	}
-		invalidateToRender();
-	Kage::timestamp_OUT();
+	invalidateToRender();
 }
 bool KageTimeline::invalidateToRender() {
 	if (KageScene::LOADING_MODE == true) {
@@ -202,8 +333,6 @@ bool KageTimeline::invalidateToRender() {
 	return true;
 }
 
-const unsigned int FRAME_WIDTH_OFFSET = 8;
-const unsigned int FRAME_HEIGHT_OFFSET = 23;
 bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 	if (KageScene::LOADING_MODE == true) {
 		return true;
@@ -212,50 +341,6 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 		window = get_window();
 	}
 	if (window) {
-		if (!KageTimeline::imageNULL) {
-			try {
-				KageTimeline::imageNULL           = Gdk::Pixbuf::create_from_resource("/kage/share/frame/null.png");
-				KageTimeline::imageNULL_CUR       = Gdk::Pixbuf::create_from_resource("/kage/share/frame/null_cur.png");
-				KageTimeline::imageNULL_X         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/null_x.png");
-				KageTimeline::imageNULL_X_CUR     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/null_x_cur.png");
-				KageTimeline::imageBLANK             = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank.png");
-				KageTimeline::imageBLANK_CUR         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_cur.png");
-				KageTimeline::imageBLANK_CUR_SEL     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_cur_sel.png");
-				KageTimeline::imageBLANK_CUR_SEL_TWN = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_cur_sel_twn.png");
-				KageTimeline::imageBLANK_CUR_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_cur_twn.png");
-				KageTimeline::imageBLANK_SEL         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_sel.png");
-				KageTimeline::imageBLANK_SEL_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_sel_twn.png");
-				KageTimeline::imageBLANK_TWN         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_twn.png");
-				KageTimeline::imageBLANK_X             = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x.png");
-				KageTimeline::imageBLANK_X_CUR         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_cur.png");
-				KageTimeline::imageBLANK_X_CUR_SEL     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_cur_sel.png");
-				KageTimeline::imageBLANK_X_CUR_SEL_TWN = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_cur_sel_twn.png");
-				KageTimeline::imageBLANK_X_CUR_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_cur_twn.png");
-				KageTimeline::imageBLANK_X_SEL         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_sel.png");
-				KageTimeline::imageBLANK_X_SEL_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_sel_twn.png");
-				KageTimeline::imageBLANK_X_TWN         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/blank_x_twn.png");
-				KageTimeline::imageDRAWN             = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn.png");
-				KageTimeline::imageDRAWN_CUR         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_cur.png");
-				KageTimeline::imageDRAWN_CUR_SEL     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_cur_sel.png");
-				KageTimeline::imageDRAWN_CUR_SEL_TWN = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_cur_sel_twn.png");
-				KageTimeline::imageDRAWN_CUR_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_cur_twn.png");
-				KageTimeline::imageDRAWN_SEL         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_sel.png");
-				KageTimeline::imageDRAWN_SEL_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_sel_twn.png");
-				KageTimeline::imageDRAWN_TWN         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_twn.png");
-				KageTimeline::imageDRAWN_X             = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x.png");
-				KageTimeline::imageDRAWN_X_CUR         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_cur.png");
-				KageTimeline::imageDRAWN_X_CUR_SEL     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_cur_sel.png");
-				KageTimeline::imageDRAWN_X_CUR_SEL_TWN = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_cur_sel_twn.png");
-				KageTimeline::imageDRAWN_X_CUR_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_cur_twn.png");
-				KageTimeline::imageDRAWN_X_SEL         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_sel.png");
-				KageTimeline::imageDRAWN_X_SEL_TWN     = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_sel_twn.png");
-				KageTimeline::imageDRAWN_X_TWN         = Gdk::Pixbuf::create_from_resource("/kage/share/frame/drawn_x_twn.png");
-			} catch (const Gio::ResourceError &ex) {
-				std::cerr << "KageTimeline::ResourceError: " << ex.what() << std::endl;
-			} catch (const Gdk::PixbufError &ex) {
-				std::cerr << "KageTimeline::PixbufError: " << ex.what() << std::endl;
-			}
-		}
 		bool l_current = false;
 		bool l_selected = isSelected();
 		bool l_tween = false;
@@ -265,17 +350,22 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 		p_context->line_to(       get_width(), get_height());
 		p_context->line_to(FRAME_WIDTH_OFFSET, get_height());
 		p_context->line_to(FRAME_WIDTH_OFFSET,            0);
-		p_context->set_source_rgb(0.75f, 0.75f, 0.75f);
+		if (Kage::NotDarkMode) {
+			p_context->set_source_rgb(0.75f, 0.75f, 0.75f);
+		} else {
+			p_context->set_source_rgb(0.38f, 0.38f, 0.38f);
+		}
 		p_context->fill();
-		p_context->set_source_rgb(0.75f, 0.75f, 0.75f);
-		p_context->stroke();
-
-		unsigned int l_layers = _kage->_document.Scenes[_kage->_document.getActiveSceneID()].Layers.size();
+		
 		double l_y = get_height();
 		//draw timeline grid
 		while (l_y + (FRAME_HEIGHT_OFFSET*2) > 0) {
 			p_context->rectangle(FRAME_WIDTH_OFFSET, l_y, get_width(), FRAME_HEIGHT_OFFSET);
-			p_context->set_source_rgb(0.9f, 0.9f, 0.9f);
+			if (Kage::NotDarkMode) {
+				p_context->set_source_rgb(0.9f, 0.9f, 0.9f);
+			} else {
+				p_context->set_source_rgb(0.75f, 0.75f, 0.75f);
+			}
 			p_context->fill();
 			
 			l_y -= (FRAME_HEIGHT_OFFSET*2);
@@ -287,16 +377,28 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 			p_context->set_source_rgb(0.80f, 0.80f, 0.80f);
 			p_context->set_line_width(1.0f);
 			p_context->stroke();
-			l_x += (FRAME_WIDTH_OFFSET * _kage->_document.Project._fps);
+			l_x += (FRAME_WIDTH * _kage->_document.Project._fps);
 		}
 		
 		unsigned int l_frames;
 		double l_layerSelectIndex = UINT_MAX;
 		KageLayer *l_layer;
 		KageFrame *l_frame;
+		unsigned int l_layers = 0;
+		try {
+			l_layers = _kage->_document.getScene()->Layers.size();
+		} catch (std::exception& e) {
+			std::cout << "KageTimeline::on_draw Exception : " << e.what() << std::endl;
+		}
 		for (unsigned int i = 0; i < l_layers; ++i) {
-			l_layer = _kage->_document.Scenes[_kage->_document.getActiveSceneID()].Layers[i];
-			l_frames = l_layer->Frames.size();
+			l_layer = NULL;
+			l_frames = 0;
+			try {
+				l_layer = _kage->_document.getScene()->Layers[i];
+				l_frames = l_layer->Frames.size();
+			} catch (std::exception& e) {
+				std::cout << "KageTimeline::on_draw Exception : " << e.what() << std::endl;
+			}
 			for (unsigned int j = 0; j < l_frames; ++j) {
 				l_frame = l_layer->Frames[j];
 				l_current = l_layer->isCurrentFrame(l_frame->frameID);
@@ -310,15 +412,21 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 			}
 		}
 		//draw selected frame index
-		p_context->move_to(g_frameSelectIndex * FRAME_WIDTH_OFFSET + (FRAME_WIDTH_OFFSET/2) + FRAME_WIDTH_OFFSET,            0);
-		p_context->line_to(g_frameSelectIndex * FRAME_WIDTH_OFFSET + (FRAME_WIDTH_OFFSET/2) + FRAME_WIDTH_OFFSET, get_height());
+		p_context->move_to(g_frameSelectIndex * FRAME_WIDTH + (FRAME_WIDTH/2) + FRAME_WIDTH_OFFSET,            0);
+		p_context->line_to(g_frameSelectIndex * FRAME_WIDTH + (FRAME_WIDTH/2) + FRAME_WIDTH_OFFSET, get_height());
 		p_context->set_source_rgb(0.75f, 0.0f, 0.0f);
 		p_context->stroke();
 
 		l_y = get_height() - FRAME_HEIGHT_OFFSET;
 		for (unsigned int i = 0; i < l_layers; ++i) {
-			l_layer = _kage->_document.Scenes[_kage->_document.getActiveSceneID()].Layers[i];
-			l_frames = l_layer->Frames.size();
+			l_layer = NULL;
+			l_frames = 0;
+			try {
+				l_layer = _kage->_document.getScene()->Layers[i];
+				l_frames = l_layer->Frames.size();
+			} catch (std::exception& e) {
+				std::cout << "KageTimeline::on_draw Exception : " << e.what() << std::endl;
+			}
 			l_x = FRAME_WIDTH_OFFSET;//offset due to VBox divider mouse-handling
 			for (unsigned int j = 0; j < l_frames; ++j) {
 				l_frame = l_layer->Frames[j];
@@ -420,7 +528,7 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 						break;
 				}
 				p_context->paint();
-				l_x += FRAME_WIDTH_OFFSET;
+				l_x += FRAME_WIDTH;
 			}
 			
 			//dont highlight non-selected layer
@@ -428,13 +536,13 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 				if (_kage->_toggleOnion.get_active() == true) {
 					if (g_frameSelectIndex-2 > 0) {
 						//draw left side
-						p_context->rectangle(FRAME_WIDTH_OFFSET, l_y, (g_frameSelectIndex-2) * FRAME_WIDTH_OFFSET, FRAME_HEIGHT_OFFSET);
+						p_context->rectangle(FRAME_WIDTH_OFFSET, l_y, (g_frameSelectIndex-2) * FRAME_WIDTH, FRAME_HEIGHT_OFFSET);
 						p_context->set_source_rgba(0.85f, 0.85f, 0.85f, 0.25f);
 						p_context->fill();
 					}
 					if (g_frameSelectIndex+2 < l_frames-1) {
 						//draw left side
-						p_context->rectangle((g_frameSelectIndex+2) * FRAME_WIDTH_OFFSET + FRAME_WIDTH_OFFSET + FRAME_WIDTH_OFFSET, l_y, get_width(), FRAME_HEIGHT_OFFSET);
+						p_context->rectangle((g_frameSelectIndex+2) * FRAME_WIDTH + FRAME_WIDTH + FRAME_WIDTH_OFFSET, l_y, get_width(), FRAME_HEIGHT_OFFSET);
 						p_context->set_source_rgba(0.85f, 0.85f, 0.85f, 0.25f);
 						p_context->fill();
 					}
@@ -445,15 +553,15 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 				}
 			}
 			
-			l_y -= FRAME_HEIGHT_OFFSET;
+			l_y -= FRAME_HEIGHT;
 		}
 
 		//resize widget as per current frame/layer count
 		int l_width, l_height;
 		get_size_request(l_width, l_height);
-		if (l_width/FRAME_WIDTH_OFFSET != l_frames+1 /* +1 is for offset due to VBox divider mouse-handling*/
-				|| l_height/FRAME_HEIGHT_OFFSET != l_layers) {
-			l_width = (l_frames+1) * FRAME_WIDTH_OFFSET;
+		if (l_width/FRAME_WIDTH < l_frames+1 /* +1 is for offset due to VBox divider mouse-handling*/
+				|| l_height/FRAME_HEIGHT_OFFSET < l_layers) {
+			l_width = (l_frames+1) * FRAME_WIDTH;
 			l_height = l_layers * FRAME_HEIGHT_OFFSET;
 			set_size_request(l_width, l_height);
 		}
@@ -463,8 +571,12 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 		//draw currently selected Layer/Frame
 		p_context->select_font_face ("Arial", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_BOLD);
 		p_context->set_font_size(16);
-		p_context->set_source_rgb(0.25f, 0.5f, 0.25f);
-		l_text = "Layer " + StringHelper::unsignedIntegerToString(_kage->getCurrentLayer()) + " Frame " + StringHelper::unsignedIntegerToString(_kage->getCurrentFrame());// + " ? " + StringHelper::unsignedIntegerToString(g_frameSelectIndex);
+		if (Kage::NotDarkMode) {
+			p_context->set_source_rgb(0.00f, 0.47f, 0.84f);
+		} else {
+			p_context->set_source_rgb(0.58f, 0.07f, 0.00f);
+		}
+		l_text = "Layer " + StringHelper::unsignedIntegerToString(_kage->getDocumentSceneCurrentLayer()) + " Frame " + StringHelper::unsignedIntegerToString(_kage->getDocumentSceneLayerCurrentFrame());// + " ? " + StringHelper::unsignedIntegerToString(g_frameSelectIndex);
 		p_context->get_text_extents(l_text, extents);
 			p_context->move_to( get_width() - (extents.width + 24), get_height() - 24);
 
@@ -488,13 +600,13 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 			p_context->get_text_extents(l_text, extents);
 				p_context->move_to( l_x-(extents.width/2), get_height()-2);
 				p_context->show_text(l_text);
-			l_x += (FRAME_WIDTH_OFFSET * _kage->_document.Project._fps);
+			l_x += (FRAME_WIDTH * _kage->_document.Project._fps);
 			++l_ctr;
 		}
 		
 		//render mouse-multiselect
 		if (mouseIsDown == true) {
-			vector<double> dashes;
+			std::vector<double> dashes;
 				dashes.push_back(4.0); /* ink */
 				dashes.push_back(4.0); /* skip */
 			
@@ -522,7 +634,7 @@ bool KageTimeline::isSelected() {
 
 VectorDataManager KageTimeline::getFrameData() {
 	if (_null == true) {
-		cout << "KageTimeline::getFrameData is returning empty" << endl;
+		std::cout << "KageTimeline::getFrameData is returning empty" << std::endl;
 		VectorDataManager l_nullReturn;
 		return l_nullReturn;
 	}
@@ -538,7 +650,7 @@ void KageTimeline::setFocus() {
 }
 
 vector<unsigned int> KageTimeline::raiseSelectedShape(vector<unsigned int> p_selectedShapes) {
-	vector<unsigned int> foo;
+	std::vector<unsigned int> foo;
 	return foo;
 }
 void KageTimeline::addDataToFrame(VectorDataManager v) {

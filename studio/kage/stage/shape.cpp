@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2023  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ void KageStage::handleShapes_scaleNorth() {
 		return;
 	}
 	
-	vector<VectorData> v = _kage->getFrameData().getVectorData();
+	std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 	unsigned int typeMovesIndex = -1;
 	unsigned int vsize = v.size();
 	unsigned int l_selectedShapes_size = selectedShapes.size();
@@ -128,7 +128,7 @@ void KageStage::handleShapes_scaleEast() {
 		return;
 	}
 	
-	vector<VectorData> v = _kage->getFrameData().getVectorData();
+	std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 	unsigned int typeMovesIndex = -1;
 	unsigned int vsize = v.size();
 	unsigned int l_selectedShapes_size = selectedShapes.size();
@@ -188,7 +188,7 @@ void KageStage::handleShapes_scaleWest() {
 		return;
 	}
 	
-	vector<VectorData> v = _kage->getFrameData().getVectorData();
+	std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 	unsigned int typeMovesIndex = -1;
 	unsigned int vsize = v.size();
 	unsigned int l_selectedShapes_size = selectedShapes.size();
@@ -251,7 +251,7 @@ void KageStage::handleShapes_scaleSouth() {
 		return;
 	}
 	
-	vector<VectorData> v = _kage->getFrameData().getVectorData();
+	std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 	unsigned int typeMovesIndex = -1;
 	unsigned int vsize = v.size();
 	unsigned int l_selectedShapes_size = selectedShapes.size();
@@ -305,7 +305,7 @@ void KageStage::handleShapes_moveShape(double p_diffX, double p_diffY) {
 		return;
 	}
 	
-	vector<VectorData> v = _kage->getFrameData().getVectorData();
+	std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 	unsigned int typeMovesIndex = UINT_MAX;
 	unsigned int vsize = v.size();
 	unsigned int l_selectedShapes_size = selectedShapes.size();
@@ -366,7 +366,7 @@ void KageStage::updateShapeColor(bool p_doFill, bool p_doStroke) {
 	if (p_doFill == false && p_doStroke == false) {
 		return;
 	}
-	vector<VectorData> v = _kage->getFrameData().getVectorData();
+	std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 	unsigned int vsize = v.size();
 	unsigned int l_selectedShapes_size = selectedShapes.size();
 	for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
@@ -409,7 +409,7 @@ void KageStage::updateShapeX(double p_value, bool p_stackDo) {
 		return;
 	}
 	
-	vector<VectorData> v = _kage->getFrameData().getVectorData();
+	std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 	
 	propX = DBL_MAX;
 	propXindex1 = UINT_MAX;
@@ -479,7 +479,7 @@ void KageStage::updateShapeY(double p_value, bool p_stackDo) {
 		return;
 	}
 	
-	vector<VectorData> v = _kage->getFrameData().getVectorData();
+	std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 	
 	propX = DBL_MAX;
 	propXindex1 = UINT_MAX;
@@ -550,7 +550,7 @@ void KageStage::updateShapeWidth(double p_value) {
 		return;
 	}
 	
-	vector<VectorData> v = _kage->getFrameData().getVectorData();
+	std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 	
 	propX = DBL_MAX;
 	propXindex1 = UINT_MAX;
@@ -617,7 +617,7 @@ void KageStage::updateShapeHeight(double p_value) {
 		return;
 	}
 	
-	vector<VectorData> v = _kage->getFrameData().getVectorData();
+	std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 	
 	propX = DBL_MAX;
 	propXindex1 = UINT_MAX;
@@ -696,7 +696,7 @@ void KageStage::handleShapes_modifyingShapeRotate() {
 	double l_angleDiff;
 	
 	unsigned int l_selectedShapes_size = selectedShapes.size();
-	vector<VectorData> v = _kage->getFrameData().getVectorData();
+	std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 	if (l_selectedShapes_size > 0) {
 		for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
 			for (unsigned int i = selectedShapes[l_shapeIndex]; i < v.size(); ++i) {
@@ -838,14 +838,13 @@ void KageStage::handleShapes_modifyingShape() {
 	} else if (mouseOnAnchor == AnchorData::TYPE_MOVE) {
 		//move the whole shape around
 		handleShapes_moveShape(
-			((draw2.x - origin.x) / KageStage::currentScale / _zoomValue) - anchor_center.x,
-			((draw2.y - origin.y) / KageStage::currentScale / _zoomValue) - anchor_center.y);
-		
-		anchor_center.x = (draw2.x - origin.x) / KageStage::currentScale / _zoomValue;
-		anchor_center.y = (draw2.y - origin.y) / KageStage::currentScale / _zoomValue;
+			((draw2.x - origin.x) / KageStage::currentScale / _zoomValue) - ((draw1.x - origin.x) / KageStage::currentScale / _zoomValue),
+			((draw2.y - origin.y) / KageStage::currentScale / _zoomValue) - ((draw1.y - origin.y) / KageStage::currentScale / _zoomValue));
+		draw1.x = draw2.x;
+		draw1.y = draw2.y;
 	} else if (mouseOnAnchor == AnchorData::TYPE_ROTATE) {
 		AnchorData l_anchor;
-		vector<VectorData> v = _kage->getFrameData().getVectorData();
+		std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 			unsigned int vsize = v.size();
 			unsigned int l_selectedShapes_size = selectedShapes.size();
 			for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
@@ -903,7 +902,7 @@ void KageStage::handleShapes_modifyingShape() {
 		
 		double l_angleDiff;
 		
-		vector<VectorData> v = _kage->getFrameData().getVectorData();
+		std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 		unsigned int l_selectedShapes_size = selectedShapes.size();
 		if (l_selectedShapes_size > 0) {
 			for (unsigned int l_shapeIndex = 0; l_shapeIndex < l_selectedShapes_size; ++l_shapeIndex) {
@@ -960,12 +959,12 @@ void KageStage::handleShapes_modifyingShape() {
 		}
 	} else {
 		if (_rotateMode == true) {
-			vector<VectorData> v = _kage->getFrameData().getVectorData();
+			std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 			renderFrame(cr, v);
 		}
 	}
 	
-	vector<double> dashes;
+	std::vector<double> dashes;
 		dashes.push_back(4.0); /* ink */
 		dashes.push_back(4.0); /* skip */
 	
@@ -988,7 +987,7 @@ void KageStage::handleShapes() {
 		return;
 	}
 	
-	vector<VectorData> v = _kage->getFrameData().getVectorData();
+	std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 	
 	anchor_upperLeft.x = DBL_MAX;
 	anchor_upperLeft.y = DBL_MAX;
@@ -1016,11 +1015,11 @@ void KageStage::handleShapes() {
 				//p5 IMAGE_ROTATE_ALPHA  x/y == rotate / alpha
 				double xImagePos   = v[i].points[IMAGE_X_Y].x;
 				double yImagePos   = v[i].points[IMAGE_X_Y].y;
-				double imageWidth  = v[i].points[IMAGE_WIDTH_HEIGHT].x * v[i].points[IMAGE_SCALEX_SCALEY].x;
-				double imageHeight = v[i].points[IMAGE_WIDTH_HEIGHT].y * v[i].points[IMAGE_SCALEX_SCALEY].y;
+				double imageWidth  = v[i].points[IMAGE_WIDTH_HEIGHT].x * v[i].points[IMAGE_SCALEX_SCALEY].x;//(double)cairoImageSurface->get_width() /KageStage::currentScale;
+				double imageHeight = v[i].points[IMAGE_WIDTH_HEIGHT].y * v[i].points[IMAGE_SCALEX_SCALEY].y;//(double)cairoImageSurface->get_height()/KageStage::currentScale;
 				//TODO: factor-in rotation
-				cout << "xImagePos\t" << xImagePos << "\tyImagePos\t" << yImagePos << endl;
-				cout << "imageWidth\t" << imageWidth << "\timageHeight\t" << imageHeight << endl;
+				std::cout << "xImagePos\t" << xImagePos << "\tyImagePos\t" << yImagePos << std::endl;
+				std::cout << "imageWidth\t" << imageWidth << "\timageHeight\t" << imageHeight << std::endl;
 				propX = xImagePos;
 				propY = yImagePos;
 				propWidth    = imageWidth;
@@ -1040,7 +1039,7 @@ void KageStage::handleShapes() {
 		}
 	}
 	
-	vector<double> dashes;
+	std::vector<double> dashes;
 		dashes.push_back(4.0); /* ink */
 		dashes.push_back(4.0); /* skip */
 	
@@ -1195,7 +1194,7 @@ void KageStage::trySingleSelectShape() {
 }
 void KageStage::tryMultiSelectShapes_populateShapes() {
 	selectedShapes.clear();
-	vector<VectorData> v = _kage->getFrameData().getVectorData();
+	std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 	if (v.size() == 0) {
 		return;
 	}
@@ -1204,7 +1203,7 @@ void KageStage::tryMultiSelectShapes_populateShapes() {
 	}
 }
 void KageStage::tryMultiSelectShapes() {
-	vector<VectorData> v = _kage->getFrameData().getVectorData();
+	std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 	if (v.size() == 0) {
 		return;
 	}
@@ -1270,7 +1269,7 @@ void KageStage::tryMultiSelectShapes() {
 	invalidateToRender();
 }
 
-unsigned int KageStage::getShape(unsigned int p_index, vector<VectorData> p_v) {
+unsigned int KageStage::getShape(unsigned int p_index, std::vector<VectorData> p_v) {
 	if (p_index == _NO_SELECTION) {
 		return -1;
 	}
@@ -1323,10 +1322,10 @@ bool KageStage::copySelectedShapes() {
 		return false;
 	}
 	
-	vector<unsigned int> l_selectedShapesOld(selectedShapes);
+	std::vector<unsigned int> l_selectedShapesOld(selectedShapes);
 		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end());
 	
-	vector<VectorData> v = _kage->getFrameData().getVectorData();
+	std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 	unsigned int vsize = v.size();
 	_vectorDataCopyBuffer.clear();
 	unsigned int l_selectedShapes_size = l_selectedShapesOld.size();
@@ -1407,7 +1406,7 @@ bool KageStage::pasteSelectedShapes() {
 		return false;
 	}
 	
-	vector<VectorData> v = _kage->getFrameData().getVectorData();
+	std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 	
 	selectedNodes.clear();
 	for (unsigned int i = 0; i < l_vectorDataCopyBuffer_size; ++i) {
@@ -1441,10 +1440,10 @@ bool KageStage::deleteSelectedShapes() {
 		return false;
 	}
 	
-	vector<unsigned int> l_selectedShapesOld(selectedShapes);
+	std::vector<unsigned int> l_selectedShapesOld(selectedShapes);
 		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater  <unsigned int>());
 	
-	vector<VectorData> v = _kage->getFrameData().getVectorData();
+	std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 	
 	unsigned int vsize = v.size();
 	std::cout << " vectordata size " << vsize << std::endl;
@@ -1463,7 +1462,7 @@ bool KageStage::deleteSelectedShapes() {
 			}
 		}
 		if (l_selectedShapesOld[l_shapeIndex] > l_temp) {
-			cout << "predicting a crash!!!" << endl;
+			std::cout << "predicting a crash!!!" << std::endl;
 		}
 		v.erase (v.begin() + l_selectedShapesOld[l_shapeIndex],
 				 v.begin() + l_temp);
@@ -1477,7 +1476,7 @@ bool KageStage::deleteSelectedShapes() {
 }
 
 void KageStage::updateShapeXY() {
-	vector<VectorData> v = _kage->getFrameData().getVectorData();
+	std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 	
 	propX = DBL_MAX;
 	propXindex1 = UINT_MAX;
@@ -1506,7 +1505,7 @@ void KageStage::updateShapeXY() {
 	} else {
 		nodeX = DBL_MAX;
 		nodeY = DBL_MAX;
-		vector<VectorData> v = _kage->getFrameData().getVectorData();
+		std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 		unsigned int vsize = v.size();
 		for (unsigned int i = 0; i < nsize; ++i) {
 			for (unsigned int j = i; j < vsize; ++j) {

@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2022  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ void KageStage::handleDrawPolyMouseUp() {
 			_polyVectors.addLinePoly(PointData(polyXhead,polyYhead), polyXtail, polyYtail);
 			_polyVectors.addClosePath();
 			_polyVectors.addEndFill();
-				vector<unsigned int> l_shape;
+				std::vector<unsigned int> l_shape;
 					l_shape.push_back(0);
 			_polyVectors.recenterRotationPoint(l_shape);
 			_kage->addDataToFrame(_polyVectors);
@@ -50,7 +50,7 @@ void KageStage::handleDrawPolyMouseUp() {
 		} else if (draw1.x-(5/KageStage::currentScale/_zoomValue) <= polyXtail && draw1.x+(5/KageStage::currentScale/_zoomValue) >= polyXtail
 				&& draw1.y-(5/KageStage::currentScale/_zoomValue) <= polyYtail && draw1.y+(5/KageStage::currentScale/_zoomValue) >= polyYtail) {
 			_polyVectors.addEndFill();
-				vector<unsigned int> l_shape;
+				std::vector<unsigned int> l_shape;
 					l_shape.push_back(0);
 			_polyVectors.recenterRotationPoint(l_shape);
 			_kage->addDataToFrame(_polyVectors);

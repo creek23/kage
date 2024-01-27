@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2023  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,28 +39,21 @@
 	class KageLayer {
 		public:
 			unsigned int ID;
-			bool _visible;
-			bool _locked;
-			bool _selected;
-			vector<KageFrame*> Frames;
+			std::vector<KageFrame*> Frames;
 
-			//KageLayer();
-
-			
 			KageLayer(KageScene *p_scene, unsigned int p_layerID, unsigned int p_frameCount);
 			virtual ~KageLayer();
 			unsigned int getID();
-			bool selectAll(bool p_selectAll);
-			unsigned int getFrameCount();
+			bool selectAllFrame(bool p_selectAll);
 			bool addFrame();
 			void duplicateFrame();
 			void extendFrame();
 			bool removeFrame();
 			unsigned int getCurrentFrame();
-			void setCurrentFrame(unsigned int p_frame);
+			void setCurrentFrame(unsigned int p_frame, bool p_addSelected);
 			void setCurrentFrameByID(unsigned int p_frameID);
 			
-			void removeAllFrames();
+			bool removeAllFrames();
 			
 			KageScene *getScene();
 			KageFrame *getFrame();
@@ -69,17 +62,17 @@
 			
 			void setSelected(KageFrame *p_frame);
 			
-			vector<unsigned int> raiseSelectedShape(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> lowerSelectedShape(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> groupSelectedShapes(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> ungroupSelectedShapes(vector<unsigned int> p_selectedShapes);
-			vector<unsigned int> duplicateShapes(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> raiseSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> lowerSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> groupSelectedShapes(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> ungroupSelectedShapes(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> duplicateShapes(vector<unsigned int> p_selectedShapes);
 			bool flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes);
 			bool flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes);
-				bool doFlipVerticalSelectedShapeOn(unsigned int p_frameIndex, vector<unsigned int> p_selectedShapes);
-				bool doFlipVerticalSelectedShapeOnExtendedFrame(unsigned int p_frameIndex, vector<unsigned int> p_selectedShapes);
+				bool doFlipVerticalSelectedShapeOn(unsigned int p_frameIndex, std::vector<unsigned int> p_selectedShapes);
+				bool doFlipVerticalSelectedShapeOnExtendedFrame(unsigned int p_frameIndex, std::vector<unsigned int> p_selectedShapes);
 			
 			bool recenterRotationPoint(vector<unsigned int> p_selectedShapes);
 			
@@ -108,10 +101,10 @@
 			void setFrameExtension(KageFrame::extension p_extension);
 			unsigned int getActiveFrameID();
 		protected:
-			unsigned int layerID;
 //			unsigned int layerCtr;
 			unsigned int frameCtr;
 		protected:
+			unsigned int layerID;
 			
 			KageScene *_scene;
 			unsigned int _currentFrameID;
@@ -122,5 +115,26 @@
 			bool moveToLeftMost();                   ///Moves Current Frame to Left
 
 			unsigned int _activeFrame;
+
+			//GUI-related
+			bool _selected;
+			bool _visible;
+			bool _lock;
+			string _label;
+		public:
+			//GUI-related
+			void setSelected(bool p_selected);
+			bool isSelected();
+			
+			void setVisible(bool p_visible);
+			bool isVisible();
+			void toggleVisibility();
+			
+			void setLock(bool p_lock);
+			bool isLocked();
+			void toggleLock();
+			
+			void setLabel(string p_label);
+			string getLabel();
 	};
 #endif //GTKMM_KAGE_LAYER_H

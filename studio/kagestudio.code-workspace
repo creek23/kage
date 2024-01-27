@@ -64,7 +64,32 @@
 			"thread": "cpp",
 			"cinttypes": "cpp",
 			"typeinfo": "cpp",
-			"valarray": "cpp"
+			"valarray": "cpp",
+			"strstream": "cpp",
+			"set": "cpp",
+			"unordered_set": "cpp",
+			"iomanip": "cpp",
+			"codecvt": "cpp",
+			"optional": "cpp",
+			"*.inc": "cpp"
 		}
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [{
+			"name": "C++ Launch (Windows)",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/kagestudio.exe",
+			/*"symbolSearchPath": "C:\\Symbols;C:\\SymbolDir2",*/
+			"externalConsole": false,
+			"logging": {
+			  "moduleLoad": true,
+			  "trace": true
+			},
+			"cwd": "${workspaceFolder}",
+			/*"visualizerFile": "${workspaceFolder}/my.natvis",*/
+			"showDisplayString": true
+		  }]
 	}
 }

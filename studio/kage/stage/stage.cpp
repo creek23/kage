@@ -190,29 +190,18 @@ bool KageStage::on_key_release_event(GdkEventKey *e) {
 			} else if (e->keyval == GDK_KEY_C || e->keyval == GDK_KEY_c) {
 				std::cout << "\tGDK_KEY_C COPY\n\n\n";
 				//operationSuccess = copySelectedShapes();
-				try {
-					_kage->g_copiedData = _kage->_document.getScene()->getLayer()->getFrame()->copySelectedShapes(
-					//_kage->_document.getScene()->getLayer()->getFrame()->vectorsData._selectedShapes
-						selectedShapes
-					);
-					std::cout << "copied " << _kage->g_copiedData.size() << std::endl;
-				} catch (std::exception& e) {
-					std::cout << "KageStage::on_key_release_event COPY Exception : " << e.what() << std::endl;
-				}
+				_kage->Copy_onClick();
 			} else if (e->keyval == GDK_KEY_V || e->keyval == GDK_KEY_v) {
 				std::cout << "\tGDK_KEY_V PASTE\n\n\n";
 				//operationSuccess = pasteSelectedShapes();
-				try {
-					selectedNodes = _kage->_document.getScene()->getLayer()->getFrame()->pasteSelectedShapes(_kage->g_copiedData);
-					operationSuccess = true;
-				} catch (std::exception& e) {
-					std::cout << "KageStage::on_key_release_event PASTE Exception : " << e.what() << std::endl;
-				}
+				_kage->Paste_onClick();
 			} else if (e->keyval == GDK_KEY_A || e->keyval == GDK_KEY_a) {
+				std::cout << "\tGDK_KEY_A SELECT\n\n\n";
 				if (toolMode != KageStage::MODE_SELECT) {
 					_kage->ToolSelect_onClick();
 				}
-				operationSuccess = selectAllShapes();
+				//operationSuccess = selectAllShapes();
+				_kage->SelectAll_onClick();
 			/*} else if (e->keyval == GDK_KEY_Z || e->keyval == GDK_KEY_z) {
 				_kage->Undo_onClick();
 				return true;

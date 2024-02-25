@@ -87,10 +87,10 @@ unsigned int KageAssetManager::addAsset(std::string p_name) {
 				std::filesystem::path l_assetFile = std::filesystem::temp_directory_path() / _KageStudioAsset / l_hash;
 				if (std::filesystem::exists(l_assetFile) == true) {
 					//delete l_assetFile
-					const char* filename = l_assetFile.u8string().c_str();
+//					const char* filename = l_assetFile.u8string().c_str();
 
-					//if (std::filesystem::remove_all(l_assetFile) == false) { //it's not deleting somehow
-					if (std::remove(filename) != 0) {
+					if (std::filesystem::remove_all(l_assetFile) == false) { //it's not deleting somehow
+//					if (std::remove(filename) != 0) {
 						std::perror("Error deleting file");
 						return UINT_MAX;
 					} else {
@@ -703,13 +703,13 @@ std::string KageAssetManager::getImagePathByID(unsigned int p_index) {
 	std::cout << "      ? " << l_tempPath << _KageStudioAsset << "\\" << assets[p_index]->getAssetHash() << std::endl;
 	if (p_index < assetCount() && assets[p_index]->getAssetHash() != "") {
 	#ifdef __linux__
-		return _KageStudioAsset + "/" + assets[p_index]->getAssetHash();
+		return l_tempPath + _KageStudioAsset + "/" + assets[p_index]->getAssetHash();
 	#elif _WIN32
 		return l_tempPath + _KageStudioAsset + "\\" + assets[p_index]->getAssetHash();
 	#elif __APPLE__
 		#include <TargetConditionals.h>
 		#if TARGET_OS_MAC
-			return _KageStudioAsset + "/" + assets[p_index]->getAssetHash();
+			return l_tempPath + _KageStudioAsset + "/" + assets[p_index]->getAssetHash();
 		#endif
 	#endif
 	} else {

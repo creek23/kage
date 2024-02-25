@@ -127,8 +127,9 @@
 			void ToggleOnion_onClick();
 			void ToolButtons_onClick(Gtk::ToggleButton *p_sourceButton);
 			void onActionActivate();
-			//void Undo_onClick();
-			//void Redo_onClick();
+		public:
+			void Undo_onClick();
+			void Redo_onClick();
 			void Cut_onClick();
 			void Copy_onClick();
 			void Paste_onClick();
@@ -136,6 +137,7 @@
 			void Duplicate_onClick();
 			void SelectAll_onClick();
 			void Deselect_onClick();
+		protected:
 			void ToggleTimeline_onClick();
 			void ToggleProperties_onClick();
 				void TogglePropertiesFill_onClick();
@@ -433,8 +435,6 @@
 			PropertyFrameTween m_propFrameTween;
 			KageLibrary  _library;
 			Gdk::Color m_Color; //fill or stroke?
-			void Undo_onClick();
-			void Redo_onClick();
 			void Stop_onClick();
 			bool _isPlaying;
 			

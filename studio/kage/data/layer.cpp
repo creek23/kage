@@ -557,6 +557,7 @@ KageFrame *KageLayer::getFrame() {
 	} else {
 		for (unsigned int i = 0; i < Frames.size(); ++i) {
 			if (Frames[i]->frameID == _currentFrameID) {
+				_currentFrameIndex = i;
 				return Frames[i];
 			}
 		}

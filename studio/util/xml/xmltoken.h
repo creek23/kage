@@ -1,7 +1,7 @@
 /*
  * xmltoken.h
  * 
- * Copyright 2019 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
+ * Copyright 2019~2024 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,18 +26,17 @@
 	
 	#include <string>
 	#include <sstream>
-	using namespace std;
 	
 	class XmlToken {
 		public:
 			XmlToken();
-			XmlToken(string p_value);
+			XmlToken(std::string p_value);
 			virtual ~XmlToken();
 			
-			void setValue(string p_value);
-			string getValue();
+			void setValue(std::string p_value);
+			std::string getValue();
 			
 		protected:
-			string _value;
+			std::string _value;
 	};
 #endif //KAGE_UTIL_XML_TOKEN_H

@@ -1255,6 +1255,11 @@ void Kage::Copy_onClick() {
 		if (g_copiedData.size() > 0) {
 		//if ( _stage.copySelectedShapes() == true) {
 			//forceRenderFrames(); //why re-render the frames?
+			updateStatus("Selection copied");
+		} else {
+			std::ostringstream tmpStringStream;
+				tmpStringStream << _stage.selectedShapes.size();
+			updateStatus("Copy failed; Selected " + tmpStringStream.str());
 		}
 	} catch (std::exception& e) {
     	std::cout << "Kage::Copy_onClick Exception : " << e.what() << std::endl;
@@ -1268,6 +1273,8 @@ void Kage::Paste_onClick() {
 		if (g_selectedItems.size() > 0) {
 			forceRenderFrames();
 			stackDo();
+		} else {
+			updateStatus("Paste failed; Copy-buffer is empty");
 		}
 	} catch (std::exception& e) {
     	std::cout << "Kage::Paste_onClick Exception : " << e.what() << std::endl;
@@ -1538,6 +1545,7 @@ void Kage::Delete_onClick() {
 	if (KageStage::toolMode == KageStage::MODE_SELECT) {
 		Kage::timestamp_IN(); std::cout << " Kage::Delete_onClick SHAPE" << std::endl;
 		try {
+			stackDo(); //store current scene/layer/frame before deletion
 			if (_document.getScene()->getLayer()->getFrame()->deleteSelectedShapes(_stage.selectedShapes) == true) {
 				forceRenderFrames();
 				stackDo();
@@ -1754,6 +1762,11 @@ void Kage::CopyFrame_onClick() {
 	unsigned int l_sceneIndex = _document.getCurrentScene()-1;
 	unsigned int l_layerBufferCount = 0;
 	unsigned int l_frameBufferCount = 0;
+
+	unsigned int l_sceneBufferIndex = _documentCopyBuffer.getCurrentScene()-1;
+	unsigned int l_layerBufferIndex = 0;
+	unsigned int l_frameBufferIndex = 0;
+	
 		//count all selected frames/layers
 		for (unsigned int l_layerIndex = 0; l_layerIndex < _document.Scenes[l_sceneIndex]->Layers.size(); ++l_layerIndex) {
 			for (unsigned int l_frameIndex = 0; l_frameIndex < _document.Scenes[l_sceneIndex]->Layers[l_layerIndex]->Frames.size(); ++l_frameIndex) {
@@ -1770,18 +1783,16 @@ void Kage::CopyFrame_onClick() {
 		l_frameBufferCount = l_frameBufferCount / l_layerBufferCount;
 		//resize copybuffer
 		for (unsigned int l_layerIndex = 0; l_layerIndex < l_layerBufferCount; ++l_layerIndex) {
-			if (_documentCopyBuffer.Scenes[l_sceneIndex]->Layers.size() < l_layerIndex+1) {
-				_documentCopyBuffer.Scenes[l_sceneIndex]->addLayer();
+			if (_documentCopyBuffer.Scenes[l_sceneBufferIndex]->Layers.size() < l_layerIndex+1) {
+				_documentCopyBuffer.Scenes[l_sceneBufferIndex]->addLayer();
 			}
 			for (unsigned int l_frameIndex = 0; l_frameIndex < l_frameBufferCount; ++l_frameIndex) {
-				if (_documentCopyBuffer.Scenes[l_sceneIndex]->Layers[l_layerIndex]->Frames.size() < l_frameIndex+1) {
-					_documentCopyBuffer.Scenes[l_sceneIndex]->Layers[l_layerIndex]->addFrame();
+				if (_documentCopyBuffer.Scenes[l_sceneBufferIndex]->Layers[l_layerIndex]->Frames.size() < l_frameIndex+1) {
+					_documentCopyBuffer.Scenes[l_sceneBufferIndex]->Layers[l_layerIndex]->addFrame();
 				}
 			}
 		}
-	unsigned int l_sceneBufferIndex = 0;
-	unsigned int l_layerBufferIndex = 0;
-	unsigned int l_frameBufferIndex = 0;
+
 		//copy selected frame/layer
 		for (unsigned int l_layerIndex = 0; l_layerIndex < _document.Scenes[l_sceneIndex]->Layers.size(); ++l_layerIndex) {
 			for (unsigned int l_frameIndex = 0; l_frameIndex < _document.Scenes[l_sceneIndex]->Layers[l_layerIndex]->Frames.size(); ++l_frameIndex) {
@@ -1825,7 +1836,7 @@ void Kage::CopyFrame_onClick() {
 void Kage::PasteFrame_onClick() {
 	bool l_existingLayerBufferUsed = false;
 	//for (unsigned int l_sceneIndex = 0; l_sceneIndex < _document.Scenes.size(); ++l_sceneIndex) {
-	int l_sceneIndex = _document.getCurrentScene()-1;
+	int l_sceneIndex = 0;//_document.getCurrentScene()-1;
 	int l_currentLayerIndex = getDocumentSceneCurrentLayer() - _documentCopyBuffer.Scenes[l_sceneIndex]->Layers.size();
 	int l_currentFrameIndex = getDocumentSceneLayerCurrentFrame()-1;
 	
@@ -3726,20 +3737,20 @@ void Kage::doSaveProject(std::string p_filename) {
 							"fps=\"" + StringHelper::integerToString(_document._fps) + "\" " +
 							"assets=\"" + StringHelper::unsignedIntegerToString(l_assetMax) + "\" " +
 							"scenes=\"" + StringHelper::unsignedIntegerToString(l_sceneMax) + "\" />");
+			
+		//get parent
+		std::string l_ksfPath = l_projectFileName.parent_path().u8string();
+		if (l_filename == p_filename) {
+			//keep l_kslPath
+		} else {
+			l_ksfPath = l_filename;
+		}
 		
-		saveKageStudio(p_filename, _assetManager.saveAssetsTo(l_filename + l_directory));
-		
+		saveKageStudio(p_filename, _assetManager.saveAssetsTo(l_ksfPath + l_directory));
+
 		l_currentScene = _document.getCurrentScene();
 			std::string l_sceneName;
 			bool l_saved = false;
-			
-			//get parent
-			std::string l_ksfPath = l_projectFileName.parent_path().u8string();
-			if (l_filename == p_filename) {
-				//keep l_kslPath
-			} else {
-				l_ksfPath = l_filename;
-			}
 			
 			try {
 				for (i = 1; i <= l_sceneMax; ++i) {

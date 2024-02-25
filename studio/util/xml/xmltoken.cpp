@@ -1,7 +1,7 @@
 /*
  * xmltoken.cpp
  * 
- * Copyright 2019 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
+ * Copyright 2019~2024 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ XmlToken::XmlToken() {
 	setValue("");
 }
 
-XmlToken::XmlToken(string p_value) {
+XmlToken::XmlToken(std::string p_value) {
 	setValue(p_value);
 }
 
@@ -35,10 +35,10 @@ XmlToken::~XmlToken() {
 	//
 }
 
-void XmlToken::setValue(string p_value) {
+void XmlToken::setValue(std::string p_value) {
 	_value = p_value;
 }
 
-string XmlToken::getValue() {
+std::string XmlToken::getValue() {
 	return _value;
 }

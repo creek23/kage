@@ -284,13 +284,31 @@ void KageFrame::addDataToFrame(VectorDataManager v) {
 }
 
 std::vector<VectorData> KageFrame::copySelectedShapes(std::vector<unsigned int> p_selectedShapes) {
-	return vectorsData.copySelectedShapes(p_selectedShapes);
+	if (       _extension == KageFrame::extension::EXTENSION_NOT
+			|| _extension == KageFrame::extension::EXTENSION_START) {
+		return vectorsData.copySelectedShapes(p_selectedShapes);
+	} else {
+		VectorDataManager l_vectorData = _layer->getPreviousFrameData(frameID);
+		return l_vectorData.copySelectedShapes(p_selectedShapes);
+	}
 }
 
 std::vector<unsigned int> KageFrame::pasteSelectedShapes(std::vector<VectorData> p_copiedShapes) {
-	return vectorsData.pasteSelectedShapes(p_copiedShapes);
+	if (       _extension == KageFrame::extension::EXTENSION_NOT
+			|| _extension == KageFrame::extension::EXTENSION_START) {
+		return vectorsData.pasteSelectedShapes(p_copiedShapes);
+	} else {
+		VectorDataManager l_vectorData = _layer->getPreviousFrameData(frameID);
+		return l_vectorData.pasteSelectedShapes(p_copiedShapes);
+	}
 }
 
 bool KageFrame::deleteSelectedShapes(std::vector<unsigned int> p_selectedShapes) {
-	return vectorsData.deleteSelectedShapes(p_selectedShapes);
+	if (       _extension == KageFrame::extension::EXTENSION_NOT
+			|| _extension == KageFrame::extension::EXTENSION_START) {
+		return vectorsData.deleteSelectedShapes(p_selectedShapes);
+	} else {
+		VectorDataManager l_vectorData = _layer->getPreviousFrameData(frameID);
+		return l_vectorData.deleteSelectedShapes(p_selectedShapes);
+	}
 }

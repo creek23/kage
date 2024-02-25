@@ -13,7 +13,7 @@ Interested individuals, studios, or companies, may join this project. Join the [
 
 Installer:
 ==========
-*Current version is **v0.7.230723*** (codename **Ellen**)
+*Current version is **v0.8.240224***
 
 All installers and precompiled binaries are located in [Kage Studio's SourceForge page](https://sourceforge.net/projects/kage/files/).
 
@@ -28,7 +28,7 @@ To compile source code, change directory inside ```/kage/studio{here}```
 ![Kage Studio on Linux](https://a.fsdn.com/con/app/proj/kage/screenshots/v191017%5B1%5D.png/max/max/1)
  	* **DEB** -- install DEB file and will ask you to install FFMPEG and Gtkmm-3.0 runtime:
 ```
-sudo apt install -f ./kagestudio_0.7-230723_amd64.deb
+sudo apt install -f ./kagestudio_0.8-240224_amd64.deb
 ```
   * **SRC** -- compile source code using:
 ```
@@ -39,7 +39,7 @@ make -f Makefile.gnu
 
  * **Mac** -- choose among ZIP file or SRC file
 ![Kage Studio on Mac](https://kage.sourceforge.io/images/kage_on_mac.png)
- 	* **ZIP** -- requires that you have homebrew installed along with FFMPEG and Gtkmm-3.0 runtime
+ 	* **ZIP** -- simply extract and run kagestudio
 
  	* **SRC** -- compile source code using:
 ```

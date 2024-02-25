@@ -1,9 +1,9 @@
 Package: kagestudio
-Version: 0.7-230723
+Version: 0.8-240210
 Architecture: amd64
 Maintainer: Mj Mendoza IV <mj.mendoza.iv@gmail.com>
 Depends: libcairomm-1.0-1v5,libgtkmm-3.0-1v5, libgdk-pixbuf2.0-0, ffmpeg
-Installed-Size: 2056192
+Installed-Size: 2080768
 Section: Graphics
 Priority: Optional
 Homepage: https://kage.sourceforge.io

@@ -3733,7 +3733,14 @@ void Kage::doSaveProject(std::string p_filename) {
 			std::string l_sceneName;
 			bool l_saved = false;
 			
+			//get parent
 			std::string l_ksfPath = l_projectFileName.parent_path().u8string();
+			if (l_filename == p_filename) {
+				//keep l_kslPath
+			} else {
+				l_ksfPath = l_filename;
+			}
+			
 			try {
 				for (i = 1; i <= l_sceneMax; ++i) {
 					_document.setCurrentScene(i);

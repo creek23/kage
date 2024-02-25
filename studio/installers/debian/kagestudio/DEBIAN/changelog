@@ -1,3 +1,9 @@
+kagestudio (2024.02.10) jammy; urgency=low
+
+  * first 0.8 package
+
+-- Mj Mendoza IV <mj.mendoza.iv@gmail.com> Tue, 11 February 12:20:19 -0800
+
 kagestudio (2023.07.23) jammy; urgency=low
 
   * 0.7 maintenance release; codename Ellen

@@ -1161,7 +1161,7 @@ Kage::Kage(std::string p_filePath) :
 	m_HPane_DrawingArea.property_position() = _area_properties_pane2;
 	
 	if (p_filePath != "") {
-		ksfPath = p_filePath;
+		kagePath = p_filePath;
 		doOpenKAGE();
 	}
 	_UPDATE_SHAPE_COLORS = false;

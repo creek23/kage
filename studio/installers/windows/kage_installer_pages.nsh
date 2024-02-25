@@ -6,7 +6,7 @@ InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
 
-Section "Core (2.3 MB)" SEC01
+Section "Core (2.7 MB)" SEC01
   SectionIn RO
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
@@ -27,10 +27,12 @@ Section "Demo (0.1 MB)" SEC02
   SetOverwrite ifnewer
 
   File "${FILE_PATH}\demo.ksf"
+  ;File "${FILE_PATH}\demo2.kage"
+  ;File "${FILE_PATH}\demo2.ksf"
   
 SectionEnd
 
-Section "Gtkmm (45.4 MB)" SEC03
+Section "Gtkmm (53.4 MB)" SEC03
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
   
@@ -115,7 +117,7 @@ Section "Gtkmm (45.4 MB)" SEC03
 SectionEnd
 
 
-Section "Plugins (63.5 MB)" SEC04
+Section "Plugins (63.4 MB)" SEC04
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
 
@@ -136,6 +138,8 @@ Section -AdditionalIcons
   
   IfFileExists "$INSTDIR\demo.ksf" 0 +2
 	CreateShortCut "$SMPROGRAMS\$StartMenuFolder\Demo.lnk" "$INSTDIR\demo.ksf"
+  IfFileExists "$INSTDIR\demo2.kage" 0 +2
+	CreateShortCut "$SMPROGRAMS\$StartMenuFolder\Demo2.lnk" "$INSTDIR\demo2.kage"
   
 SectionEnd
 
@@ -249,6 +253,8 @@ Section Uninstall
   
   IfFileExists "$INSTDIR\demo.ksf" 0 +2
 	Delete "$SMPROGRAMS\$StartMenuFolder\Demo.lnk"
+  IfFileExists "$INSTDIR\demo2.kage" 0 +2
+  	Delete "$SMPROGRAMS\$StartMenuFolder\Demo2.lnk"
   
   !insertmacro MUI_STARTMENU_GETFOLDER Application $StartMenuFolder
     

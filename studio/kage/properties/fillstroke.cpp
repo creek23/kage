@@ -332,7 +332,7 @@ void PropertyFillStroke::FillAlpha_onChange() {
 
 void PropertyFillStroke::EntryFillRGBA_onEnter() {
 	//see: https://sourceforge.net/p/kage/tickets/66/?limit=25#7488
-	string l_input = m_EntryFillRGBA.get_text();
+	std::string l_input = m_EntryFillRGBA.get_text();
 	unsigned int l_inputLength = l_input.length();
 	unsigned int l_R = 0;
 	unsigned int l_G = 0;
@@ -343,10 +343,10 @@ void PropertyFillStroke::EntryFillRGBA_onEnter() {
 	} else {
 		l_A = KageStage::fillColor.getA();
 	}
-	string l_sR = "";
-	string l_sG = "";
-	string l_sB = "";
-	string l_sA = "";
+	std::string l_sR = "";
+	std::string l_sG = "";
+	std::string l_sB = "";
+	std::string l_sA = "";
 	
 	if (l_inputLength == 1) {
 		l_sR = l_input + l_input;
@@ -502,7 +502,7 @@ void PropertyFillStroke::StrokeAlpha_onChange() {
 }
 void PropertyFillStroke::EntryStrokeRGBA_onEnter() {
 	//see: https://sourceforge.net/p/kage/tickets/66/?limit=25#7488
-	string l_input = m_EntryStrokeRGBA.get_text();
+	std::string l_input = m_EntryStrokeRGBA.get_text();
 	unsigned int l_inputLength = l_input.length();
 	unsigned int l_R = 0;
 	unsigned int l_G = 0;
@@ -513,10 +513,10 @@ void PropertyFillStroke::EntryStrokeRGBA_onEnter() {
 	} else {
 		l_A = KageStage::stroke.getA();
 	}
-	string l_sR = "";
-	string l_sG = "";
-	string l_sB = "";
-	string l_sA = "";
+	std::string l_sR = "";
+	std::string l_sG = "";
+	std::string l_sB = "";
+	std::string l_sA = "";
 	
 	if (l_inputLength == 1) {
 		l_sR = l_input + l_input;
@@ -651,7 +651,7 @@ void PropertyFillStroke::setScaleStrokeRGBA(ColorData p_colordata) {
 void PropertyFillStroke::setStrokeThicknessText(double p_thickness) {
 	m_EntryStrokeThickness.set_text(StringHelper::doubleToString(p_thickness));
 }
-string PropertyFillStroke::getStrokeThicknessText() {
+std::string PropertyFillStroke::getStrokeThicknessText() {
 	return m_EntryStrokeThickness.get_text();
 }
 

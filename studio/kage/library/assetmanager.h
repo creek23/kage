@@ -38,8 +38,8 @@
 			KageAssetManager(Kage *p_kage);
 			virtual ~KageAssetManager();
 			unsigned int assetCount();
-			unsigned int addAsset(string p_name = "");
-			unsigned int addImageAsset(string p_name = "");
+			unsigned int addAsset(std::string p_name = "");
+			unsigned int addImageAsset(std::string p_name = "");
 			void deleteAsset();
 			bool removeAllAssets();
 			void setSelected(KageAsset *p_asset);
@@ -58,30 +58,30 @@
 
 			void renameAsset(KageAsset *p_asset);
 			void renameAsset();
-			void setLabel(string p_label);
-			string getLabel();
+			void setLabel(std::string p_label);
+			std::string getLabel();
 			
 			bool moveToTop();
 			bool moveUp();
 			bool moveDown();
 			bool moveToBottom();
 
-			bool exists(string p_filePath);
-			void setAssetHash(string p_assetHash);
+			bool exists(std::string p_filePath);
+			void setAssetHash(std::string p_assetHash);
 			
-			string _KageStudioAsset;
-			string getImagePathByID(unsigned int p_index);
-			string getImageByID(unsigned int p_id);
-			string getFilePathAt(unsigned int p_index);
-			string getFileNameAt(unsigned int p_index);
-			string getLabelAt(unsigned int p_index);
-			string getHashAt(unsigned int p_index);
-			string getIDAt(unsigned int p_index);
-			bool setFilePathAt(unsigned int p_index, string p_filePath);
-			bool setFileNameAt(unsigned int p_index, string p_fileName);
-			bool setHashAt(unsigned int p_index, string p_hash);
-
-			string saveAssetsTo(string p_path);
+			std::string _KageStudioAsset;
+			std::string getImagePathByID(unsigned int p_index);
+			std::string getImageByID(unsigned int p_id);
+			std::string getFilePathAt(unsigned int p_index);
+			std::string getFileNameAt(unsigned int p_index);
+			std::string getLabelAt(unsigned int p_index);
+			std::string getHashAt(unsigned int p_index);
+			std::string getIDAt(unsigned int p_index);
+			bool setFilePathAt(unsigned int p_index, std::string p_filePath);
+			bool setFileNameAt(unsigned int p_index, std::string p_fileName);
+			bool setHashAt(unsigned int p_index, std::string p_hash);
+			
+			std::string saveAssetsTo(std::string p_path);
 			
 
 			void renderLibrary(unsigned int p_ID);

@@ -27,7 +27,7 @@ BasicXml::BasicXml() {
 	setContent("");
 }
 
-BasicXml::BasicXml(string p_content) {
+BasicXml::BasicXml(std::string p_content) {
 	setContent(p_content);
 }
 
@@ -35,14 +35,14 @@ BasicXml::~BasicXml() {
 	//
 }
 
-void BasicXml::setContent(string p_content) {
+void BasicXml::setContent(std::string p_content) {
 	_xmlContent = p_content;
 }
-string BasicXml::getContent() {
+std::string BasicXml::getContent() {
 	return _xmlContent;
 }
 
-bool BasicXml::parse(string p_content) {
+bool BasicXml::parse(std::string p_content) {
 	setContent(p_content);
 	return parse();
 }
@@ -50,7 +50,7 @@ bool BasicXml::parse(string p_content) {
 XmlTag BasicXml::getRoot() {
 	return _root;
 }
-string BasicXml::toString() {
+std::string BasicXml::toString() {
 	std::ostringstream l_ostringstream;
 	for (unsigned int i = 0; i < _xmlTagProperties.size(); ++i) {
 		l_ostringstream << _xmlTagProperties[i].toString() << " ";
@@ -70,7 +70,7 @@ unsigned int BasicXml::skipWhitespace(unsigned int p_index) {
 	return -1;
 }
 
-unsigned int BasicXml::expectFor(unsigned int p_index, string p_token) {
+unsigned int BasicXml::expectFor(unsigned int p_index, std::string p_token) {
 	unsigned int l_len = _tokens.size();
 	for (unsigned int i = p_index; i < l_len; ++i) {
 		i = skipWhitespace(i);
@@ -83,7 +83,7 @@ unsigned int BasicXml::expectFor(unsigned int p_index, string p_token) {
 	return -1;
 }
 
-unsigned int BasicXml::lookFor(unsigned int p_index, string p_token) {
+unsigned int BasicXml::lookFor(unsigned int p_index, std::string p_token) {
 	unsigned int l_len = _tokens.size();
 	for (unsigned int i = p_index; i < l_len; ++i) {
 		i = skipWhitespace(i);
@@ -106,7 +106,7 @@ unsigned int BasicXml::getPreviousIndex(unsigned int p_index) {
 	return -1;
 }
 
-bool BasicXml::isNumeric(string p_value) {
+bool BasicXml::isNumeric(std::string p_value) {
 	bool l_gotDOT = false;
 	
 	for (unsigned int i = 0; i < p_value.length(); ++i) {
@@ -143,7 +143,7 @@ bool BasicXml::parse() {
 	}
 	unsigned int l_len = strlen(_xmlContent.c_str());
 	
-	string l_token = "";
+	std::string l_token = "";
 	for (unsigned int l_index = 0; l_index < l_len; ++l_index) {
 		if (BasicXml::isNumeric(l_token)
 				&& (_xmlContent[l_index] == '0' || _xmlContent[l_index] == '.' || _xmlContent[l_index] == '-'
@@ -249,11 +249,12 @@ bool BasicXml::tokenize() {
 			return false;
 		}
 	}
+	
 	return true;
 }
 
 
-void BasicXml::listChildren(vector<XmlTag> p_tags, string p_tab) {
+void BasicXml::listChildren(std::vector<XmlTag> p_tags, std::string p_tab) {
 	std::cout << std::endl;
 	for (unsigned int i = 0; i < p_tags.size(); ++i) {
 		std::cout << p_tab << "[" << i << "]\t" << p_tags[i].getName() << " -> ";
@@ -270,7 +271,7 @@ void BasicXml::printXML() {
 	listChildren(_root._children, "\t");
 }
 
-bool BasicXml::setXML(string p_xmldata) {
+bool BasicXml::setXML(std::string p_xmldata) {
 	if (parse(p_xmldata)) {
 		if (tokenize()) {
 			return true;
@@ -283,8 +284,8 @@ bool BasicXml::setXML(string p_xmldata) {
 	return false;
 }
 
-string BasicXml::getXMLChildren(vector<XmlTag> p_children, string p_tab) {
-	string l_xml = "";
+std::string BasicXml::getXMLChildren(std::vector<XmlTag> p_children, std::string p_tab) {
+	std::string l_xml = "";
 	for (unsigned int i = 0; i < p_children.size(); ++i) {
 		l_xml += p_tab + "<" + p_children[i].getName();
 		std::vector<XmlTagProperty> l_properties = p_children[i].getProperties();
@@ -314,12 +315,12 @@ string BasicXml::getXMLChildren(vector<XmlTag> p_children, string p_tab) {
 	return l_xml;
 }
 
-string BasicXml::getXML() {
+std::string BasicXml::getXML() {
 	std::vector<XmlTag> l_root;
 	l_root.push_back(_root);
 	return getXMLChildren(l_root, "");
 	#ifdef zxcasd
-		string l_xml = "<" + _root.getName();
+		std::string l_xml = "<" + _root.getName();
 		std::vector<XmlTagProperty> l_properties = _root.getProperties();
 		if (l_properties.size() > 0) {
 			l_xml += " ";
@@ -535,12 +536,13 @@ unsigned int BasicXml::createTag(unsigned int p_index, XmlTag &p_xmlTagParent) {
 	return i;
 }
 
-string BasicXml::openXMLFile(string p_path) {
+std::string BasicXml::openXMLFile(std::string p_path) {
 	char ch;
-	string l_string = "";
-	fstream fin(p_path, fstream::in);
-	while (fin >> noskipws >> ch) {
+	std::string l_string = "";
+	std::fstream fin(p_path, std::fstream::in);
+	while (fin >> std::noskipws >> ch) {
 		l_string += ch;
 	}
+	
 	return l_string;
 }

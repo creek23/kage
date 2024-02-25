@@ -27,8 +27,6 @@
 	#include "point.h"
 	#include "strokecolor.h"
 	
-	using namespace std;
-	
 	class VectorData {
 		public:
 			enum type {
@@ -51,11 +49,11 @@
 			
 			void setType(type p_type);
 			type getType() const;
-			void setPoints(vector<PointData> p_points);
+			void setPoints(std::vector<PointData> p_points);
 			std::vector<PointData> getPoints();
 			StrokeColorData stroke;
 			ColorData fillColor;
-			string fillColorGradientID;
+			std::string fillColorGradientID;
 			unsigned int count;
 			
 			type vectorType;

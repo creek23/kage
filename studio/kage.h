@@ -49,10 +49,10 @@
 	#include "kage/data/layer.h"
 	#include "kage/data/scene.h"
 	#include "kage/document.h"
+	#include "kage/project.h"
 	#include "about.h"
 //	#include "register.h" -- not implemented yet; this is to gather users for support group
 	
-	#include "kage/unre/kagedo.h"
 	#include "kage/unre/unre.h"
 	
 	#include "util/xml/xmltoken.h"
@@ -71,7 +71,7 @@
 	
 	class Kage : public Gtk::Window {
 		public:
-			Kage(string p_filePath);
+			Kage(std::string p_filePath);
 			virtual ~Kage();
 			
 			void addDataToFrame(VectorDataManager v, bool p_force = false);
@@ -85,15 +85,15 @@
 			void renderFrames();
 			void renderFramesBelowCurrentLayer();
 			void renderFramesAboveCurrentLayer();
-			string saveFrame();
-			string dumpFrame(bool bKS);
-			string dumpFrameToSvg();
+			std::string saveFrame();
+			std::string dumpFrame(bool bKS);
+			std::string dumpFrameToSvg();
 
 			unsigned int getTween();
 			
-			string int255ToHex(unsigned int p);
+			std::string int255ToHex(unsigned int p);
 			char int15ToHex(unsigned int p);
-			unsigned int hexToInt255(string p);
+			unsigned int hexToInt255(std::string p);
 			unsigned int hexToInt15(char p);
 
 			KageScenesUI _scenes;
@@ -187,12 +187,12 @@
 			
 			void doOpenKAGE();
 			void doOpenKSF();
-			void doSaveProjectDialog(string p_title);
-			void doSaveProject(string p_filename);
-			void doSaveDialog(string p_title);
-			bool doSaveKSF(string p_filename);
+			void doSaveProjectDialog(std::string p_title);
+			void doSaveProject(std::string p_filename);
+			void doSaveDialog(std::string p_title);
+			bool doSaveKSF(std::string p_filename);
 			
-			void doExportPNGDialog(string p_title, bool p_transparent);
+			void doExportPNGDialog(std::string p_title, bool p_transparent);
 			
 			//Member widgets:
 			Gtk::VBox m_VBoxRoot;
@@ -339,7 +339,7 @@
 			void btnAbout_onClick();
 			void CheckUpdate_onClick();
 			void Website_onClick();
-			void openWebsite(string p_url);
+			void openWebsite(std::string p_url);
 			std::vector<Gtk::ToggleButton*> toggleButtons;
 				std::vector<Glib::RefPtr<Gdk::Pixbuf>> toggleButtons_pixbuf;
 				std::vector<Gtk::Image>                toggleButtons_img;
@@ -359,33 +359,34 @@
 			unsigned m_ContextId;
 			
 			bool kageInited;
-			string kagePath;
+			std::string kagePath;
 			std::ofstream kageFile;
 			
 			bool ksfInited;
-			string ksfPath;
+			std::string ksfPath;
 			std::ofstream ksfFile;
 			
 			bool expInited;
-			string expPath;
+			std::string expPath;
 			std::ofstream expFile;
-			bool dtrace(string p_msg);
-			bool saveKageStudio(string p_path, string p_msg);
-			bool saveKageStudioFile(string p_path, string p_msg);
-			bool exportHtml5(string p_path, string p_msg);
-			bool exportSvg(string p_path, string p_msg);
-			bool exportKonsolScript(string p_path, string p_msg);
-			bool dump(string p_path, string p_msg);
-			bool fileWrite(string p_path, string p_msg, std::ofstream &p_file, bool &p_flag);
+			bool dtrace(std::string p_msg);
+			bool saveKageStudio(std::string p_path, std::string p_msg);
+			bool saveKageStudioFile(std::string p_path, std::string p_msg);
+			bool exportHtml5(std::string p_path, std::string p_msg);
+			bool exportSvg(std::string p_path, std::string p_msg);
+			bool exportKonsolScript(std::string p_path, std::string p_msg);
+			bool dump(std::string p_path, std::string p_msg);
+			bool fileWrite(std::string p_path, std::string p_msg, std::ofstream &p_file, bool &p_flag);
 			
-			string openTextFile(string p_path);
-			std::vector<double> parseNumbers(string p_numbers);
-			std::vector<int> parseColorString(string p_color);
-			void parseKAGE_Children(vector<XmlTag> p_children);
-			void parseKAGE(string p_content);
-			void parseKSF_Children(vector<XmlTag> p_children);
-			void parseKSF(string p_content);
-			bool runExternal(string p_cmd, string p_param);
+			std::string openTextFile(std::string p_path);
+			std::vector<double> parseNumbers(std::string p_numbers);
+			std::vector<int> parseColorString(std::string p_color);
+			void parseKAGE_Children(std::vector<XmlTag> p_children);
+			void parseKAGE(std::string p_content);
+			void parseKSF_Children(std::vector<XmlTag> p_children);
+			void parseKSF(std::string p_content);
+			std::string runExternalGetResult(std::string p_cmd, std::string p_param);
+			bool runExternal(std::string p_cmd, std::string p_param);
 			
 			void Play_onClick();
 			void PlayFrame_onClick();
@@ -418,7 +419,6 @@
 			int _area_properties_pane1;
 			int _area_properties_pane2;
 			
-			bool m_LabelScene_onClick(GdkEventButton *event);//, gpointer user_data);
 			bool m_LabelLibrary_onClick(GdkEventButton *event);//, gpointer user_data);
 		public:
 			KageStage _stage;
@@ -438,7 +438,7 @@
 			void Stop_onClick();
 			bool _isPlaying;
 			
-			void toolsButtonToggle(string p_toolTip);
+			void toolsButtonToggle(std::string p_toolTip);
 			
 			void ToolSelect_onClick();
 			
@@ -474,7 +474,7 @@
 			
 			bool isLayerLocked();
 			unsigned int getDocumentCurrentScene();
-			void setDocumentCurrentScene(unsigned int p_scene);
+			bool setDocumentCurrentScene(unsigned int p_scene);
 			unsigned int getDocumentSceneCurrentLayer();
 			void setDocumentSceneCurrentLayer(unsigned int p_layer, bool p_addSelected);
 			unsigned int getDocumentSceneLayerCurrentFrame();
@@ -488,7 +488,7 @@
 			void refreshUI();
 			void focusOnStage();
 
-			KageDocument _document;
+			KageProject _document;
 			KageDocument _documentCopyBuffer; ///will contain copied Scene/s, its Layer/s, it's Frames
 			std::vector<VectorData> g_copiedData;
 			std::vector<unsigned int> g_selectedItems;

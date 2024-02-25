@@ -27,7 +27,7 @@ XmlTagProperty::XmlTagProperty() {
 	setName("");
 }
 
-XmlTagProperty::XmlTagProperty(string p_name, string p_value) {
+XmlTagProperty::XmlTagProperty(std::string p_name, std::string p_value) {
 	setName(p_name);
 	setValue(p_value);
 }
@@ -57,18 +57,18 @@ std::string XmlTagProperty::toString() {
 	return l_ostringstream.str();
 }
 
-void XmlTagProperty::setName(string p_name) {
+void XmlTagProperty::setName(std::string p_name) {
 	_name = p_name;
 }
 
-void XmlTagProperty::setValue(string p_value) {
+void XmlTagProperty::setValue(std::string p_value) {
 	_value = p_value;
 }
 
-string XmlTagProperty::getName() {
+std::string XmlTagProperty::getName() {
 	return _name;
 }
 
-string XmlTagProperty::getValue() {
+std::string XmlTagProperty::getValue() {
 	return _value;
 }

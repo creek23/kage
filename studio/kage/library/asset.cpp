@@ -262,17 +262,17 @@ bool KageAsset::on_draw(const Cairo::RefPtr<Cairo::Context>& cr) {
  * \sa setFileName
  * @param p_assetHash 
  */
-void KageAsset::setAssetHash(string p_assetHash) {
+void KageAsset::setAssetHash(std::string p_assetHash) {
 	_assetHash = p_assetHash;
 }
-string KageAsset::getAssetHash() {
+std::string KageAsset::getAssetHash() {
 	return _assetHash;
 }
 
-void KageAsset::setFilePath(string p_filePath) {
+void KageAsset::setFilePath(std::string p_filePath) {
 	_filePath = p_filePath;
 }
-string KageAsset::getFilePath() {
+std::string KageAsset::getFilePath() {
 	return _filePath;
 }
 /**
@@ -280,18 +280,18 @@ string KageAsset::getFilePath() {
  * \sa setAssetHash
  * @param p_fileName the original File Name
  */
-void KageAsset::setFileName(string p_fileName) {
+void KageAsset::setFileName(std::string p_fileName) {
 	_fileName = p_fileName;
 }
-string KageAsset::getFileName() {
+std::string KageAsset::getFileName() {
 	return _fileName;
 }
 
-void KageAsset::setLabel(string p_label) {
+void KageAsset::setLabel(std::string p_label) {
 	_label = p_label;
 	invalidateToRender();
 }
-string KageAsset::getLabel() {
+std::string KageAsset::getLabel() {
 	return _label;
 }
 void KageAsset::setSelected(bool p_selected) {

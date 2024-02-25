@@ -23,7 +23,7 @@
 
 #include "stringhelper.h"
 	
-string StringHelper::toUpper(string p_str) {
+std::string StringHelper::toUpper(std::string p_str) {
 	unsigned int i;
 	
 	for(i = 0; i < p_str.length(); ++i) {
@@ -33,7 +33,7 @@ string StringHelper::toUpper(string p_str) {
 	return p_str;
 }
 
-string StringHelper::toLower(string p_str) {
+std::string StringHelper::toLower(std::string p_str) {
 	unsigned int i;
 	for(i = 0; i < p_str.length(); ++i) {
 		p_str[i] = tolower(p_str[i]);
@@ -41,57 +41,57 @@ string StringHelper::toLower(string p_str) {
 	return p_str;
 }
 
-string StringHelper::integerToString(int p_src) {
+std::string StringHelper::integerToString(int p_src) {
 	if (p_src == 0) {
 		return "0";
 	}
 	
-	ostringstream l_ostringstream;
+	std::ostringstream l_ostringstream;
 		l_ostringstream << p_src;
 	return l_ostringstream.str();
 }
 
-string StringHelper::unsignedIntegerToString(unsigned int p_src) {
+std::string StringHelper::unsignedIntegerToString(unsigned int p_src) {
 	if (p_src == 0) {
 		return "0";
 	}
 	
-	ostringstream l_ostringstream;
+	std::ostringstream l_ostringstream;
 		l_ostringstream << p_src;
 	return l_ostringstream.str();
 }
 
-string StringHelper::doubleToString(double p_src) {
+std::string StringHelper::doubleToString(double p_src) {
 	if (p_src == 0.0) {
 		return "0.0";
 	}
 	
-	ostringstream l_ostringstream;
+	std::ostringstream l_ostringstream;
 		l_ostringstream << p_src;
 	return l_ostringstream.str();
 }
 
-int StringHelper::toInteger(string p_src) {
+int StringHelper::toInteger(std::string p_src) {
 	//TODO: validate string to be numerics
 	return atoi(p_src.c_str());
 }
 
-unsigned int StringHelper::toUnsignedInteger(string p_src) {
+unsigned int StringHelper::toUnsignedInteger(std::string p_src) {
 	//TODO: validate string to be numerics
 	return (unsigned)atoi(p_src.c_str());
 }
 
-long StringHelper::toLong(string p_src) {
+long StringHelper::toLong(std::string p_src) {
 	//TODO: validate string to be numerics
 	return atol(p_src.c_str());
 }
 
-double StringHelper::toDouble(string p_src) {
+double StringHelper::toDouble(std::string p_src) {
 	//TODO: validate string to be numerics
 	return (double)atof(p_src.c_str());
 }
 
-bool StringHelper::toBoolean(string p_src) {
+bool StringHelper::toBoolean(std::string p_src) {
 	if (p_src == "1" || StringHelper::toLower(p_src) == "true") {
 		return true;
 	} else {
@@ -99,16 +99,16 @@ bool StringHelper::toBoolean(string p_src) {
 	}
 }
 
-vector<string> StringHelper::split(const string &p_source, const string &p_delimiter) {
-	std::vector<string> l_return;
+std::vector<std::string> StringHelper::split(const std::string &p_source, const std::string &p_delimiter) {
+	std::vector<std::string> l_return;
 	if (p_delimiter.empty()) {
 		l_return.push_back(p_source);
 		return l_return;
 	}
-	string::const_iterator substart = p_source.begin(), subend;
+	std::string::const_iterator substart = p_source.begin(), subend;
 	while (true) {
 		subend = search(substart, p_source.end(), p_delimiter.begin(), p_delimiter.end());
-		string l_temp(substart, subend);
+		std::string l_temp(substart, subend);
 		if (!l_temp.empty()) {
 			l_return.push_back(StringHelper::trim(l_temp));
 		}
@@ -120,8 +120,8 @@ vector<string> StringHelper::split(const string &p_source, const string &p_delim
 	return l_return;
 }
 
-string StringHelper::trim(string p_source) {
-	string l_source = "";
+std::string StringHelper::trim(std::string p_source) {
+	std::string l_source = "";
 	int i;
 	int l_len;
 	//remove "space" before
@@ -151,12 +151,12 @@ string StringHelper::trim(string p_source) {
 }
 
 #include <iostream>
-string StringHelper::kHash(string par, int p_len) {
+std::string StringHelper::kHash(std::string par, int p_len) {
 	unsigned int i = par.length();
 	char hArr[i - 1];
 	int hNum[16] = { 75, 114, 105, 120, 119, 97, 114, 101, 32, 83, 116, 117, 100, 105, 111, 115 };
 	int hVal = 10;
-	string sHash;
+	std::string sHash;
 
 	//delimit hash length
 	if (p_len < 8) { p_len = 8; }
@@ -194,14 +194,14 @@ string StringHelper::kHash(string par, int p_len) {
 	return sHash.substr(0, p_len);
 }
 
-string StringHelper::replace(std::string s, std::string const& p_find, std::string const& p_replace) {
+std::string StringHelper::replace(std::string s, std::string const& p_find, std::string const& p_replace) {
     std::size_t pos = s.find(p_find);
     if (pos == std::string::npos) return s;
     s.replace(pos, p_find.length(), p_replace);
 	return s;
 }
 
-string StringHelper::replaceAll(std::string s, std::string const& p_find, std::string const& p_replace) {
+std::string StringHelper::replaceAll(std::string s, std::string const& p_find, std::string const& p_replace) {
 	std::string temp;
 	do {
 		temp = s;

@@ -47,13 +47,13 @@ PropertyStage::PropertyStage(Kage* p_kage) :
             m_EntryStageWid.set_size_request(20, 24);
             m_EntryStageWid.set_width_chars(4);
             m_EntryStageWid.set_max_length(4);
-            setWidthText(_kage->_document.Project._width);
+            setWidthText(_kage->_document._width);
                 m_EntryStageWid.signal_activate().connect(
                     sigc::mem_fun(*this, &PropertyStage::EntryStageArea_onEnter) );
             m_EntryStageHgt.set_size_request(20, 24);
             m_EntryStageHgt.set_width_chars(4);
             m_EntryStageHgt.set_max_length(4);
-            setHeightText(_kage->_document.Project._height);
+            setHeightText(_kage->_document._height);
                 m_EntryStageHgt.signal_activate().connect(
                     sigc::mem_fun(*this, &PropertyStage::EntryStageArea_onEnter) );
             m_ColorButtonStage.set_size_request(32, 32);
@@ -64,7 +64,7 @@ PropertyStage::PropertyStage(Kage* p_kage) :
             m_EntryStageFPS.set_size_request(20, 24);
             m_EntryStageFPS.set_width_chars(3);
             m_EntryStageFPS.set_max_length(3);
-            setFPSText(_kage->_document.Project._fps);
+            setFPSText(_kage->_document._fps);
                 m_EntryStageFPS.signal_activate().connect(
                     sigc::mem_fun(*this, &PropertyStage::EntryStageFPS_onEnter) );
 }
@@ -74,20 +74,18 @@ PropertyStage::~PropertyStage() {
 }
 
 void PropertyStage::EntryStageArea_onEnter() {
-	string t = m_EntryStageWid.get_text();
-		_kage->_document.Project._width = StringHelper::toDouble(t);
-        setWidthText(_kage->_document.Project._width);
+	std::string t = m_EntryStageWid.get_text();
+		_kage->_document._width = StringHelper::toDouble(t);
+        setWidthText(_kage->_document._width);
 	t = m_EntryStageHgt.get_text();
-		_kage->_document.Project._height = StringHelper::toDouble(t);
-        setHeightText(_kage->_document.Project._height);
+		_kage->_document._height = StringHelper::toDouble(t);
+        setHeightText(_kage->_document._height);
 	_kage->_stage.invalidateToRender();
 }
 void PropertyStage::EntryStageFPS_onEnter() {
-	string t = m_EntryStageFPS.get_text();
-	std::cout << "_kage->_document.Project._fps " << _kage->_document.Project._fps << " t " << t << std::endl;
-	_kage->_document.Project._fps = StringHelper::toUnsignedInteger(t);
-	std::cout << "_kage->_document.Project._fps ..." << _kage->_document.Project._fps << " t " << t << std::endl;
-	setFPSText(_kage->_document.Project._fps);
+	std::string t = m_EntryStageFPS.get_text();
+	_kage->_document._fps = StringHelper::toUnsignedInteger(t);
+	setFPSText(_kage->_document._fps);
 }
 
 void PropertyStage::ColorButtonStage_onClick() {

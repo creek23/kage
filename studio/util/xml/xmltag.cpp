@@ -28,12 +28,12 @@ XmlTag::XmlTag() {
 	_xmlTagProperties.clear();
 }
 
-XmlTag::XmlTag(string p_name) {
+XmlTag::XmlTag(std::string p_name) {
 	setName(p_name);
 	_xmlTagProperties.clear();
 }
 
-XmlTag::XmlTag(string p_name, std::vector<XmlTagProperty> p_xmlTagProperties) {
+XmlTag::XmlTag(std::string p_name, std::vector<XmlTagProperty> p_xmlTagProperties) {
 	setName(p_name);
 	setProperties(p_xmlTagProperties);
 }
@@ -85,22 +85,22 @@ std::string XmlTag::toString() {
 	return l_ostringstream.str();
 }
 
-void XmlTag::setName(string p_name) {
+void XmlTag::setName(std::string p_name) {
 	_name = p_name;
 }
 
-void XmlTag::setProperties(vector<XmlTagProperty> p_xmlTagProperties) {
+void XmlTag::setProperties(std::vector<XmlTagProperty> p_xmlTagProperties) {
 	_xmlTagProperties.clear();
 	for (unsigned int i = 0; i < p_xmlTagProperties.size(); ++i) {
 		_xmlTagProperties.push_back(p_xmlTagProperties[i]);
 	}
 }
 
-string XmlTag::getName() {
+std::string XmlTag::getName() {
 	return _name;
 }
 
-vector<XmlTagProperty> XmlTag::getProperties() {
+std::vector<XmlTagProperty> XmlTag::getProperties() {
 	std::vector<XmlTagProperty> l_xmlTagProperties;
 	l_xmlTagProperties.clear();
 	for (unsigned int i = 0; i < _xmlTagProperties.size(); ++i) {

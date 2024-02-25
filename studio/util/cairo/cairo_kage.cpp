@@ -35,7 +35,7 @@ Cairo::ErrorStatus CairoKage::writeToPNGStream(const unsigned char* data, unsign
 	return CAIRO_STATUS_SUCCESS;
 }
 
-bool CairoKage::writeToPNG(string p_path, Cairo::RefPtr<Cairo::ImageSurface> p_surface) {
+bool CairoKage::writeToPNG(std::string p_path, Cairo::RefPtr<Cairo::ImageSurface> p_surface) {
 	CairoKage::pngFile.close();
 	
 	CairoKage::pngFile.open(p_path.c_str(), std::ofstream::binary);

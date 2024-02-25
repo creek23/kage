@@ -44,12 +44,12 @@ VectorData::type VectorData::getType() const {
 	return vectorType;
 }
 
-void VectorData::setPoints(vector<PointData> p_points) {
+void VectorData::setPoints(std::vector<PointData> p_points) {
 	points = p_points;
 	count = p_points.size();
 }
 
-vector<PointData> VectorData::getPoints() {
+std::vector<PointData> VectorData::getPoints() {
 	return points;
 }
 

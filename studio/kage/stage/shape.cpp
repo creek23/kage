@@ -25,11 +25,11 @@
 #include "../../kage.h"
 #include <cairomm/context.h>
 
-void KageStage::setSelectedShapes(vector<unsigned int> p_selectedShapes) {
+void KageStage::setSelectedShapes(std::vector<unsigned int> p_selectedShapes) {
 	selectedNodes = p_selectedShapes;
 	tryMultiSelectShapes_populateShapes();
 }
-vector<unsigned int> KageStage::getSelectedShapes() {
+std::vector<unsigned int> KageStage::getSelectedShapes() {
 	return selectedShapes;
 }
 
@@ -1441,7 +1441,7 @@ bool KageStage::deleteSelectedShapes() {
 	}
 	
 	std::vector<unsigned int> l_selectedShapesOld(selectedShapes);
-		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater  <unsigned int>());
+		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), std::greater  <unsigned int>());
 	
 	std::vector<VectorData> v = _kage->getFrameData().getVectorData();
 	

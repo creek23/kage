@@ -28,26 +28,24 @@
 	#include "../data/vectordata.h"
 	#include "../data/point.h"
 	
-	#include "kagedo.h"
+	#include "../document.h"
 	
-	using namespace std;
+	class Kage;//forward declaration
 	
 	class UnRe {
 		public:
 			UnRe();
 			virtual ~UnRe();
 			
-			void stackDo(unsigned int p_scene, unsigned int p_layer, unsigned int p_frame, std::vector<VectorData> p_data);
-			KageDo undo();
-			KageDo redo();
-			KageDo previewUndo();
+			void stackDocument(KageDocument p_document);
+			KageDocument undoDocument();
+			KageDocument redoDocument();
+			KageDocument previewUndoDocument();
 			
 			void clear();
 		protected:
 			unsigned int _stackIndex;
-			std::vector<KageDo> _undoStack;
-			
-			///for use of applyZoom
-			PointData applyZoomRatio(PointData p_zoomReference, double p_zoomRatio, PointData p_value);
+			KageDocument *_kageDocument;
+			std::vector<KageDocument*> _undoStack;
 	};
 #endif //GTKMM_KAGE_MANAGER_UNRE_UNRE_H

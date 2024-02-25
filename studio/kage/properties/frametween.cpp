@@ -81,9 +81,9 @@ void PropertyFrameTween::FrameTween_onChange() {
     std::cout << "FrameTween_onChange X = " << nameX << " Y = " << nameY << " l_tweenX " << (l_tweenX+l_tweenY) << std::endl;
 }
 
-void PropertyFrameTween::setTweenXText(string p_tween) {
+void PropertyFrameTween::setTweenXText(std::string p_tween) {
     m_ComboX.set_active_text(p_tween);
 }
-void PropertyFrameTween::setTweenYText(string p_tween) {
+void PropertyFrameTween::setTweenYText(std::string p_tween) {
     m_ComboY.set_active_text(p_tween);
 }

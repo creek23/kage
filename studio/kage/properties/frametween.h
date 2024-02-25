@@ -1,6 +1,6 @@
 /* 
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2023  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,8 +29,6 @@
 	
 	class Kage; //forward declaration
 
-	using namespace std;
-	
 	class PropertyFrameTween : public Gtk::HBox {
 		public:
 			PropertyFrameTween(Kage* p_kage);
@@ -48,7 +46,7 @@
 		public:
 				void FrameTween_onChange();
 				
-				void setTweenXText(string p_tween);
-				void setTweenYText(string p_tween);
+				void setTweenXText(std::string p_tween);
+				void setTweenYText(std::string p_tween);
 	};
 #endif //GTKMM_KAGE_PROP_FRAME_TWEEN_H

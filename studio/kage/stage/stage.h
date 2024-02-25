@@ -98,7 +98,7 @@
 			#define IMAGE_SCALEX_SCALEY 3 //p4 x/y == scaleX / scaleY
 			#define IMAGE_ROTATE_ALPHA  4 //p5 x/y == rotate / alpha
 			
-			void printVectors(vector<VectorData> p_vectorData);
+			void printVectors(std::vector<VectorData> p_vectorData);
 			void cleanSlate();
 			void invalidateToRender();
 			bool _invalidated;
@@ -107,7 +107,7 @@
 			Gdk::Color getFill();
 			void setStroke(Gdk::Color p_Color);
 			Gdk::Color getStroke();
-			double currentScale; /// for use with zoom; default value is _kage->_document.Project._width; can be changed as preferred
+			double currentScale; /// for use with zoom; default value is _kage->_document._width; can be changed as preferred
 			void clearScreen(Cairo::RefPtr<Cairo::Context> p_context);
 			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context, bool p_force = false);
 			void renderOnionFrame(Cairo::RefPtr<Cairo::Context> p_context, std::vector<VectorData> p_vectorData, double p_alpha);
@@ -192,8 +192,8 @@
 			std::vector<VectorData> _vectorDataZOrderBufferB;
 			std::vector<VectorData> _vectorDataZOrderBufferC;
 			
-			bool renderToPNG(string p_path, bool p_transparent);
-			bool renderToPNGOffset(string p_path, bool p_transparent, double p_offsetX = 0.0, double p_offsetY = 0.0);
+			bool renderToPNG(std::string p_path, bool p_transparent);
+			bool renderToPNGOffset(std::string p_path, bool p_transparent, double p_offsetX = 0.0, double p_offsetY = 0.0);
 			void renderFrameToPNG(Cairo::RefPtr<Cairo::Context> p_context);
 			void renderFrameToPNGOffset(Cairo::RefPtr<Cairo::Context> p_context, double p_offsetX = 0.0, double p_offsetY = 0.0);
 			
@@ -215,7 +215,7 @@
 			bool _rotateMode;
 			bool _rotateApply;
 			
-			void setSelectedShapes(vector<unsigned int> p_selectedShapes);
+			void setSelectedShapes(std::vector<unsigned int> p_selectedShapes);
 			std::vector<unsigned int> getSelectedShapes();
 
 			void unpressKeys();

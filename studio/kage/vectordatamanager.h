@@ -32,16 +32,14 @@
 	
 	class Kage; //forward declaration
 	
-	using namespace std;
-	
 	class VectorDataManager {
 		public:
 			static unsigned int idmaker;
 			VectorDataManager();
-			VectorDataManager(vector<VectorData> p_vectorData);
+			VectorDataManager(std::vector<VectorData> p_vectorData);
 			virtual ~VectorDataManager();
 			
-			void setVectorData(vector<VectorData> p_vectorData);
+			void setVectorData(std::vector<VectorData> p_vectorData);
 			std::vector<VectorData> getVectorData();
 			VectorDataManager clone();
 			
@@ -49,7 +47,7 @@
 			void addInit();
 			void addInit(PointData p_point);
 			void addFill(ColorData p_color);
-			void addFill(string p_gradientID);
+			void addFill(std::string p_gradientID);
 			void addEndFill();
 			void addClosePath();
 			void addCubic(PointData p_point1, PointData p_point2, PointData p_point3);
@@ -67,17 +65,17 @@
 			bool isEmpty();
 			
 			//for use on z-ordering~ish
-			std::vector<unsigned int> raiseSelectedShape(vector<unsigned int> p_selectedShapes);
-			std::vector<unsigned int> lowerSelectedShape(vector<unsigned int> p_selectedShapes);
-			std::vector<unsigned int> raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes);
-			std::vector<unsigned int> lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes);
-			std::vector<unsigned int> groupSelectedShapes(vector<unsigned int> p_selectedShapes);
-			std::vector<unsigned int> ungroupSelectedShapes(vector<unsigned int> p_selectedShapes);
-			std::vector<unsigned int> duplicateShapes(vector<unsigned int> p_selectedShapes);
-			bool flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes);
-			bool flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> raiseSelectedShape(std::vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> lowerSelectedShape(std::vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> raiseToTopSelectedShape(std::vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> lowerToBottomSelectedShape(std::vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> groupSelectedShapes(std::vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> ungroupSelectedShapes(std::vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> duplicateShapes(std::vector<unsigned int> p_selectedShapes);
+			bool flipHorizontalSelectedShape(std::vector<unsigned int> p_selectedShapes);
+			bool flipVerticalSelectedShape(std::vector<unsigned int> p_selectedShapes);
 			
-			bool recenterRotationPoint(vector<unsigned int> p_selectedShapes);
+			bool recenterRotationPoint(std::vector<unsigned int> p_selectedShapes);
 			
 			const unsigned int _NO_SELECTION = -1;
 			std::vector<unsigned int> _selectedNodes;
@@ -88,12 +86,12 @@
 			std::vector<unsigned int> tryMultiSelectShapes_populateShapes();
 			std::vector<unsigned int> selectAllShapes();
 			bool cutSelectedShapes();
-			std::vector<VectorData> copySelectedShapes(vector<unsigned int> p_selectedShapes);
-			std::vector<unsigned int> pasteSelectedShapes(vector<VectorData> p_vectorDataCopyBuffer);
-			bool deleteSelectedShapes(vector<unsigned int> p_selectedShapes);
-		protected:
+			std::vector<VectorData> copySelectedShapes(std::vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> pasteSelectedShapes(std::vector<VectorData> p_vectorDataCopyBuffer);
+			bool deleteSelectedShapes(std::vector<unsigned int> p_selectedShapes);
+			
 			void add(VectorData::type p_type, ColorData p_fill, StrokeColorData p_stroke);
-			void add(VectorData::type p_type, string p_fillGradientID, StrokeColorData p_stroke);
+			void add(VectorData::type p_type, std::string p_fillGradientID, StrokeColorData p_stroke);
 			
 			std::vector<VectorData> vectorData;
 			

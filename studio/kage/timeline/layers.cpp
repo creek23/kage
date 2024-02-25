@@ -119,7 +119,7 @@ bool KageLayersUI::on_event(GdkEvent *e) {
 				KageLayer *l_layer = _kage->_document.getScene()->Layers[l_index];
 				std::cout << "\te->button.x " << e->button.x << std::endl;
 				if (e->button.x > 36) {
-					string l_layerLabel = _kage->_document.getScene()->getLayerLabel();
+					std::string l_layerLabel = _kage->_document.getScene()->getLayerLabel();
 					LabelRenameDialog* pDialog = new LabelRenameDialog(*_kage, l_layerLabel);
 						pDialog->run();
 					_kage->_document.getScene()->setLayerLabel(pDialog->getLabel());
@@ -150,12 +150,15 @@ bool KageLayersUI::on_event(GdkEvent *e) {
 					l_layer->toggleVisibility();
 					invalidateToRender();
 					renderStage();
+					_kage->stackDo();
 				} else if (e->button.x < 36) {
 					l_layer->toggleLock();
 					invalidateToRender();
+					_kage->stackDo();
 				} else {
 					_kage->setDocumentSceneCurrentLayer(l_index+1, false);
 					_kage->setDocumentSceneLayerCurrentFrame(_kage->getDocumentSceneLayerCurrentFrame(), false);
+					_kage->stackDo();
 				}
 			} else {
 				std::cout << "_kage->_document.getActiveSceneID() " << _kage->_document.getActiveSceneID() << std::endl << std::endl;
@@ -188,15 +191,12 @@ void KageLayersUI::forceRender() {
 	if (KageScene::LOADING_MODE == true) {
 		return;
 	}
-	Kage::timestamp_IN(); std::cout << " KageLayersUI::forceRender()" << std::endl;
 	invalidateToRender();
-	Kage::timestamp_OUT();
 }
 bool KageLayersUI::invalidateToRender() {
 	if (KageScene::LOADING_MODE == true) {
 		return true;
 	}
-	Kage::timestamp_IN(); std::cout << " KageLayersUI::invalidateToRender()" << std::endl;
 	if (!window) {
 		window = get_window();
 	}

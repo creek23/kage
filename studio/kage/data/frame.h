@@ -29,13 +29,9 @@
 	
 	#include <gdkmm/color.h>
 	
-	using namespace std;
-
 	class KageLayer; //forward declaration
 
 	class KageFrame {
-		unsigned int ID;
-		//================================
 		public:
 			enum extension {
 				EXTENSION_NOT,
@@ -50,6 +46,7 @@
 			//Glib::RefPtr<Gdk::Window> window;
 			
 			KageFrame(KageLayer *p_layer, unsigned int p_frameID);
+			KageFrame operator=(const KageFrame &p_frame);
 			virtual ~KageFrame();
 			
 			bool isEmpty();
@@ -76,29 +73,29 @@
 			
 			static bool _gotFocus;
 			
-			std::vector<unsigned int> raiseSelectedShape(vector<unsigned int> p_selectedShapes);
-			std::vector<unsigned int> lowerSelectedShape(vector<unsigned int> p_selectedShapes);
-			std::vector<unsigned int> raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes);
-			std::vector<unsigned int> lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes);
-			std::vector<unsigned int> groupSelectedShapes(vector<unsigned int> p_selectedShapes);
-			std::vector<unsigned int> ungroupSelectedShapes(vector<unsigned int> p_selectedShapes);
-			std::vector<unsigned int> duplicateShapes(vector<unsigned int> p_selectedShapes);
-			bool flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes);
-			bool flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> raiseSelectedShape(std::vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> lowerSelectedShape(std::vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> raiseToTopSelectedShape(std::vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> lowerToBottomSelectedShape(std::vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> groupSelectedShapes(std::vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> ungroupSelectedShapes(std::vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> duplicateShapes(std::vector<unsigned int> p_selectedShapes);
+			bool flipHorizontalSelectedShape(std::vector<unsigned int> p_selectedShapes);
+			bool flipVerticalSelectedShape(std::vector<unsigned int> p_selectedShapes);
 			
-			bool recenterRotationPoint(vector<unsigned int> p_selectedShapes);
+			bool recenterRotationPoint(std::vector<unsigned int> p_selectedShapes);
 			
 			void addDataToFrame(VectorDataManager v);
-			std::vector<VectorData> copySelectedShapes(vector<unsigned int> p_selectedShapes);
-			std::vector<unsigned int> pasteSelectedShapes(vector<VectorData> p_copiedShapes);
-			bool deleteSelectedShapes(vector<unsigned int> p_selectedShapes);
-		protected:
+			std::vector<VectorData> copySelectedShapes(std::vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> pasteSelectedShapes(std::vector<VectorData> p_copiedShapes);
+			bool deleteSelectedShapes(std::vector<unsigned int> p_selectedShapes);
+
 			bool _null;
 			bool _selected;
 			bool _current;
 			unsigned int _tweenX;
 			unsigned int _tweenY;
-		public:
+			
 			KageFrame::extension _extension;
 			
 			KageLayer *_layer;

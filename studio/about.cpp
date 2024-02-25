@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2023  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,13 +21,13 @@
 
 #include "about.h"
 
-string KageAbout::app_title = "Kage Studio";
-string KageAbout::app_version = "0.7.240121";
-string KageAbout::app_author = "Mj Mendoza IV";
-string KageAbout::app_contact = "mj.mendoza.iv@gmail.com";
-string KageAbout::app_website = "https://kage.sourceforge.io";
-string KageAbout::app_copyright = "Copyleft 2011~2023";
-string KageAbout::app_comment = "A Simple Free and Open Source vector-based 2D Animation Software.";
+std::string KageAbout::app_title = "Kage Studio";
+std::string KageAbout::app_version = "0.8.240210";
+std::string KageAbout::app_author = "Mj Mendoza IV";
+std::string KageAbout::app_contact = "mj.mendoza.iv@gmail.com";
+std::string KageAbout::app_website = "https://kage.sourceforge.io";
+std::string KageAbout::app_copyright = "Copyleft 2011~2024";
+std::string KageAbout::app_comment = "A Simple Free and Open Source vector-based 2D Animation Software.";
 Glib::RefPtr<Gdk::Pixbuf> KageAbout::imageABOUT;
 
 KageAbout::KageAbout(Gtk::Window& parent)
@@ -37,7 +37,7 @@ KageAbout::KageAbout(Gtk::Window& parent)
 		m_Label1("", true),
 		m_Label2("", true),
 		m_Image(Gtk::Stock::DIALOG_INFO, Gtk::ICON_SIZE_DIALOG) {
-	string l_license = string("") +
+	std::string l_license = std::string("") +
 	"This program is free software: you can redistribute it and/or modify\n" +
 	"it under the terms of the GNU General Public License as published by\n" +
 	"the Free Software Foundation, either version 3 of the License, or\n" +

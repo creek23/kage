@@ -1,7 +1,7 @@
 /*
  * xmltagproperty.h
  * 
- * Copyright 2019 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
+ * Copyright 2019~2024 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,24 +26,23 @@
 	
 	#include <string>
 	#include <sstream>
-	using namespace std;
 	
 	class XmlTagProperty {
 		public:
 			XmlTagProperty();
-			XmlTagProperty(string p_name, string p_value);
+			XmlTagProperty(std::string p_name, std::string p_value);
 			virtual ~XmlTagProperty();
 			
-			void setName(string p_name);
-			void setValue(string p_value);
-			string getName();
-			string getValue();
+			void setName(std::string p_name);
+			void setValue(std::string p_value);
+			std::string getName();
+			std::string getValue();
 			XmlTagProperty clone();
 			std::string toString();
 			void copy(XmlTagProperty p_xmlTagProperty);
 			bool equalTo(XmlTagProperty p_xmlTagProperty);
 		protected:
-			string _name;
-			string _value;
+			std::string _name;
+			std::string _value;
 	};
 #endif //KAGE_UTIL_XMLTAGPROPERTY_H

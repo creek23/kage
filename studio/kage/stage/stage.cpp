@@ -725,7 +725,7 @@ Gdk::Color KageStage::getStroke() {
 	return l_c;
 }
 
-void KageStage::printVectors(vector<VectorData> p_vectorData) {
+void KageStage::printVectors(std::vector<VectorData> p_vectorData) {
 	Kage::timestamp_IN();
 	std::cout << " KageStage::printVectors <" << std::endl;
 	//vector<VectorData> v = _kage->getFrameData().getVectorData();
@@ -842,12 +842,12 @@ void KageStage::printVectors(vector<VectorData> p_vectorData) {
 void KageStage::cleanSlate() {
 	origin.x = 50;
 	origin.y = 50;
-	_kage->_document.Project._width = 960.0f;
-	_kage->_document.Project._height = 720.0f;
+	_kage->_document._width = 960.0f;
+	_kage->_document._height = 720.0f;
 	
-	currentScale = _kage->_document.Project._width;
+	currentScale = _kage->_document._width;
 	
-	_kage->_document.Project._fps = 12;
+	_kage->_document._fps = 12;
 	mouseDown = false;
 	stroke.setThickness(3.0);
 	drawCtr = 0;
@@ -870,8 +870,8 @@ void KageStage::cleanSlate() {
 	
 	_zoomValue = 1.0f;
 	_zoomRatio = 1.0f;
-	__stageArea.x = _kage->_document.Project._width;
-	__stageArea.y = _kage->_document.Project._height;
+	__stageArea.x = _kage->_document._width;
+	__stageArea.y = _kage->_document._height;
 
 	cairoPNG.clear();
 	
@@ -895,6 +895,13 @@ void KageStage::invalidateToRender() {
 //	Kage::timestamp_OUT();
 }
 
+/**
+ * @brief Called by Gtkmm when DrawingArea's display is invalidated
+ * 
+ * @param p_cr Cairo context object on which lines/shapes/image is applied to.
+ * @return true 
+ * @return false 
+ */
 bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
 //	Kage::timestamp_IN(); std::cout << " KageStage::on_draw" << std::endl;
 	if (!window) {
@@ -915,13 +922,13 @@ bool KageStage::on_draw(const Cairo::RefPtr<Cairo::Context>& p_cr) {
 		//kage/stage is being resized, try to re-center view
 		if (_registerWidth != get_width()) {
 			_registerWidth = get_width();
-			origin.x = (_registerWidth - _kage->_document.Project._width) / 2;
+			origin.x = (_registerWidth - _kage->_document._width) / 2;
 
 			_kage->registerPropertiesPane();
 		}
 		if (_registerHeight != get_height()) {
 			_registerHeight = get_height();
-			origin.y = (_registerHeight - _kage->_document.Project._height) / 2;
+			origin.y = (_registerHeight - _kage->_document._height) / 2;
 		}
 		
 		//draw user-drawn object
@@ -974,13 +981,12 @@ void KageStage::clearScreen(Cairo::RefPtr<Cairo::Context> p_context) {
 		
 		//draw viewable area
 		p_context->move_to(                                                 origin.x, origin.y                                                );
-		p_context->line_to((_kage->_document.Project._width * _zoomValue) + origin.x, origin.y                                                );
-		p_context->line_to((_kage->_document.Project._width * _zoomValue) + origin.x, origin.y + (_kage->_document.Project._height * _zoomValue));
-		p_context->line_to(                                                 origin.x, origin.y + (_kage->_document.Project._height * _zoomValue));
+		p_context->line_to((_kage->_document._width * _zoomValue) + origin.x, origin.y                                                );
+		p_context->line_to((_kage->_document._width * _zoomValue) + origin.x, origin.y + (_kage->_document._height * _zoomValue));
+		p_context->line_to(                                                 origin.x, origin.y + (_kage->_document._height * _zoomValue));
 		
 		p_context->close_path();
-			p_context->set_source_rgb((double)_kage->_document.Project._backgroundColor.getR()/255, (double)_kage->_document.Project._backgroundColor.getG()/255, (double)_kage->_document.Project._backgroundColor.getB()/255);
-	//		p_context->fill_preserve();
+			p_context->set_source_rgb((double)_kage->_document._backgroundColor.getR()/255, (double)_kage->_document._backgroundColor.getG()/255, (double)_kage->_document._backgroundColor.getB()/255);
 			p_context->fill();
 				p_context->set_line_width(0.2f);
 				p_context->set_source_rgb(0.0, 0.0, 0.0);
@@ -990,9 +996,9 @@ void KageStage::clearScreen(Cairo::RefPtr<Cairo::Context> p_context) {
 	}
 }
 
-bool KageStage::renderToPNG(string p_path, bool p_transparent) {
+bool KageStage::renderToPNG(std::string p_path, bool p_transparent) {
 	#ifdef CAIRO_HAS_PNG_FUNCTIONS
-		Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, _kage->_document.Project._width, _kage->_document.Project._height);
+		Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, _kage->_document._width, _kage->_document._height);
 		
 		Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
 		
@@ -1044,9 +1050,9 @@ void KageStage::renderFrame(Cairo::RefPtr<Cairo::Context> p_context, bool p_forc
 }
 
 
-bool KageStage::renderToPNGOffset(string p_path, bool p_transparent, double p_offsetX, double p_offsetY) {
+bool KageStage::renderToPNGOffset(std::string p_path, bool p_transparent, double p_offsetX, double p_offsetY) {
 	#ifdef CAIRO_HAS_PNG_FUNCTIONS
-		Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, _kage->_document.Project._width, _kage->_document.Project._height);
+		Cairo::RefPtr<Cairo::ImageSurface> surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, _kage->_document._width, _kage->_document._height);
 		
 		Cairo::RefPtr<Cairo::Context> l_context = Cairo::Context::create(surface);
 		

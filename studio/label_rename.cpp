@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2023  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 
 #include "label_rename.h"
 
-LabelRenameDialog::LabelRenameDialog(Gtk::Window& parent, string p_label)
+LabelRenameDialog::LabelRenameDialog(Gtk::Window& parent, std::string p_label)
 		: Gtk::Dialog("Rename " + p_label, parent, true),
 		m_HBox(false, 8),
 		_label("Label:", true) {
@@ -42,13 +42,13 @@ LabelRenameDialog::~LabelRenameDialog() {
 	//
 }
 
-string LabelRenameDialog::getLabel() {
+std::string LabelRenameDialog::getLabel() {
 	return _txtLabel.get_text();
 }
 
 void LabelRenameDialog::EntryLabel_onEnter() {
-	string l_newLabel = _txtLabel.get_text();
-	string l_satinized = "";
+	std::string l_newLabel = _txtLabel.get_text();
+	std::string l_satinized = "";
 	char l_char;
 		for (unsigned int i = 0; i < l_newLabel.length(); ++i) {
 			if (l_newLabel[i] >= 35 && l_newLabel[i] <= 126             //#$%&'()*+,-./ and 0~9 and :;<=>?@ and A~Z and []^_` and a~z and {|}~

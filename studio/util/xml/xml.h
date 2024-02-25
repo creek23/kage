@@ -33,21 +33,20 @@
 	#include "xmltagproperty.h"
 	#include "xmltoken.h"
 	#include "xmltag.h"
-	using namespace std;
 	
 	class BasicXml {
 		public:
-			BasicXml(string p_xmlContent);
+			BasicXml(std::string p_xmlContent);
 			BasicXml();
 			virtual ~BasicXml();
 			
-			void setContent(string p_xmlContent);
-			string getContent();
-			bool parse(string p_content);
+			void setContent(std::string p_xmlContent);
+			std::string getContent();
+			bool parse(std::string p_content);
 			bool parse();
 			
-			void setProperties(vector<XmlTagProperty> p_xmlTagProperties);
-			string getProperties();
+			void setProperties(std::vector<XmlTagProperty> p_xmlTagProperties);
+			std::string getProperties();
 			BasicXml clone();
 			std::string toString();
 			void copy(BasicXml p_xmlTag);
@@ -59,21 +58,21 @@
 			
 			void debugToken(unsigned int p_index);
 			void printXML();
-			string getXML();
-			bool setXML(string p_xmldata);
+			std::string getXML();
+			bool setXML(std::string p_xmldata);
 			
-			static string openXMLFile(string p_path);
-			static bool isNumeric(string p_value);
+			static std::string openXMLFile(std::string p_path);
+			static bool isNumeric(std::string p_value);
 		protected:
 			unsigned int createTag(unsigned int p_index, XmlTag &p_xmlTagParent);
 			unsigned int skipWhitespace(unsigned int p_index);
-			unsigned int expectFor(unsigned int p_index, string p_token);
-			unsigned int lookFor(unsigned int p_index, string p_token);
+			unsigned int expectFor(unsigned int p_index, std::string p_token);
+			unsigned int lookFor(unsigned int p_index, std::string p_token);
 			unsigned int getPreviousIndex(unsigned int p_index);
-			void listChildren(vector<XmlTag> p_tags, string p_tab);
-			string getXMLChildren(vector<XmlTag> p_children, string p_tab);
+			void listChildren(std::vector<XmlTag> p_tags, std::string p_tab);
+			std::string getXMLChildren(std::vector<XmlTag> p_children, std::string p_tab);
 			
-			string _xmlContent;
+			std::string _xmlContent;
 			std::vector<XmlTagProperty> _xmlTagProperties;
 			XmlTag _root;
 //			std::vector<XmlTag> _children;

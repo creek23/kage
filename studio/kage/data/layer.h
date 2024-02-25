@@ -32,16 +32,16 @@
 	#include <gdkmm/color.h>
 	class Kage; //forward declaration
 	
-	using namespace std;
-
 	class KageScene; //forward declaration
 
 	class KageLayer {
 		public:
-			unsigned int ID;
+			unsigned int layerID;
 			std::vector<KageFrame*> Frames;
+			KageFrame* _framePtr;
 
 			KageLayer(KageScene *p_scene, unsigned int p_layerID, unsigned int p_frameCount);
+			KageLayer operator=(const KageLayer &p_layer);
 			virtual ~KageLayer();
 			unsigned int getID();
 			bool selectAllFrame(bool p_selectAll);
@@ -62,25 +62,25 @@
 			
 			void setSelected(KageFrame *p_frame);
 			
-			std::vector<unsigned int> raiseSelectedShape(vector<unsigned int> p_selectedShapes);
-			std::vector<unsigned int> lowerSelectedShape(vector<unsigned int> p_selectedShapes);
-			std::vector<unsigned int> raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes);
-			std::vector<unsigned int> lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes);
-			std::vector<unsigned int> groupSelectedShapes(vector<unsigned int> p_selectedShapes);
-			std::vector<unsigned int> ungroupSelectedShapes(vector<unsigned int> p_selectedShapes);
-			std::vector<unsigned int> duplicateShapes(vector<unsigned int> p_selectedShapes);
-			bool flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes);
-			bool flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> raiseSelectedShape(std::vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> lowerSelectedShape(std::vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> raiseToTopSelectedShape(std::vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> lowerToBottomSelectedShape(std::vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> groupSelectedShapes(std::vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> ungroupSelectedShapes(std::vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> duplicateShapes(std::vector<unsigned int> p_selectedShapes);
+			bool flipHorizontalSelectedShape(std::vector<unsigned int> p_selectedShapes);
+			bool flipVerticalSelectedShape(std::vector<unsigned int> p_selectedShapes);
 				bool doFlipVerticalSelectedShapeOn(unsigned int p_frameIndex, std::vector<unsigned int> p_selectedShapes);
 				bool doFlipVerticalSelectedShapeOnExtendedFrame(unsigned int p_frameIndex, std::vector<unsigned int> p_selectedShapes);
 			
-			bool recenterRotationPoint(vector<unsigned int> p_selectedShapes);
+			bool recenterRotationPoint(std::vector<unsigned int> p_selectedShapes);
 			
 			bool addDataToFrame(VectorDataManager p_vectorsData);
 			bool setFrameData(VectorDataManager p_vectorsData);
 			VectorDataManager getFrameTweenData(unsigned int p_frameIndex);
 			VectorDataManager getFrameData();
-			VectorDataManager getFrameDataAt(unsigned int p_frame); ///NOTE: "Frame" -- NOT "frame ID"
+			VectorDataManager getFrameDataAt(unsigned int p_frame, bool p_frameOnion, bool p_layerOnion); ///NOTE: "Frame" -- NOT "frame ID"
 			VectorDataManager getPreviousFrameData(unsigned int p_frameID); ///Called by KageFrame if KageFrame is Extended
 			bool setFrameDataToPreviousFrame(VectorDataManager p_vectorsData, unsigned int p_frameID); ///Called by KageFrame if KageFrame is Extended
 			bool addDataToPreviousFrame(VectorDataManager v, unsigned int p_frameID); ///Called by KageFrame if KageFrame is Extended
@@ -100,12 +100,9 @@
 			
 			void setFrameExtension(KageFrame::extension p_extension);
 			unsigned int getActiveFrameID();
-		protected:
-//			unsigned int layerCtr;
+
 			unsigned int frameCtr;
-		protected:
-			unsigned int layerID;
-			
+
 			KageScene *_scene;
 			unsigned int _currentFrameID;
 			unsigned int _currentFrameIndex;
@@ -120,8 +117,8 @@
 			bool _selected;
 			bool _visible;
 			bool _lock;
-			string _label;
-		public:
+			std::string _label;
+
 			//GUI-related
 			void setSelected(bool p_selected);
 			bool isSelected();
@@ -134,7 +131,7 @@
 			bool isLocked();
 			void toggleLock();
 			
-			void setLabel(string p_label);
-			string getLabel();
+			void setLabel(std::string p_label);
+			std::string getLabel();
 	};
 #endif //GTKMM_KAGE_LAYER_H

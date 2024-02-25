@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2023  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,16 +48,16 @@
 			KageAsset(KageAssetManager *p_assetManager, unsigned p_assetID);
 			virtual ~KageAsset();
 			
-			void setAssetHash(string p_assetHash);
-			string getAssetHash();
+			void setAssetHash(std::string p_assetHash);
+			std::string getAssetHash();
 
-			void setFilePath(string p_filePath);
-			string getFilePath();
-			void setFileName(string p_fileName);
-			string getFileName();
+			void setFilePath(std::string p_filePath);
+			std::string getFilePath();
+			void setFileName(std::string p_fileName);
+			std::string getFileName();
 
-			void setLabel(string p_label);
-			string getLabel();
+			void setLabel(std::string p_label);
+			std::string getLabel();
 			void setSelected(bool p_selected);
 			bool isSelected();
 			void setFocus();
@@ -77,7 +77,7 @@
 			void render(unsigned int p_assetID);
 			void render();
 		protected:
-			string _assetHash;
+			std::string _assetHash;
 
 			//Override default signal handler:
 			virtual bool on_expose_event(GdkEventExpose *e);
@@ -88,11 +88,11 @@
 			bool on_draw(const Cairo::RefPtr<Cairo::Context>& cr) override;
 			bool _selected;
 			KageAsset::AssetType _assetType;
-			string _label;
+			std::string _label;
 			
 			KageAssetManager *_assetManager;
-			string _filePath;
-			string _fileName;
+			std::string _filePath;
+			std::string _fileName;
 			
 			unsigned int _renderAssetID;
 			bool _CTRL;

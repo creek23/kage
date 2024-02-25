@@ -25,11 +25,11 @@
 #include "kage.h"
 
 
-vector<string> g_argv;
-vector<string> argHandler(int &argc, char *argv[]) {
+std::vector<std::string> g_argv;
+std::vector<std::string> argHandler(int &argc, char *argv[]) {
 	int i;
-	std::vector<string> l_argv;
-	string l_tmp;
+	std::vector<std::string> l_argv;
+	std::string l_tmp;
 		for (i = 0; i < argc; ++i) {
 			l_argv.push_back(argv[i]);
 		}
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
 	g_argv = argHandler(argc, argv);
 	//App_Path = getFilePath(g_argv[0]);
 	//App_EXEName = getFileName(g_argv[0]);
-	string l_filePath = "";
+	std::string l_filePath = "";
 	std::cout << "KAGE g_argv " << g_argv.size() << std::endl;
 	if (g_argv.size() > 0) {
 		if (g_argv.size() > 1) {

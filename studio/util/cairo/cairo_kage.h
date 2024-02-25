@@ -1,7 +1,7 @@
 /*
  * cairo_kage.h
  * 
- * Copyright 2020 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
+ * Copyright 2020-2024 Mj Mendoza IV <mj.mendoza.iv@gmail.com>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,14 +28,12 @@
 	#include <cairomm/surface.h>
 	#include <fstream> //ofstream
 	
-	using namespace std;
-	
 	class CairoKage {
 		static std::ofstream pngFile;
-
+		
 		public:
 			static Cairo::ErrorStatus writeToPNGStream(const unsigned char* data, unsigned int length);
-			static bool writeToPNG(string p_path, Cairo::RefPtr<Cairo::ImageSurface> p_surface);
+			static bool writeToPNG(std::string p_path, Cairo::RefPtr<Cairo::ImageSurface> p_surface);
 	};
 	
 #endif //UTIL_CAIRO_KAGE_H

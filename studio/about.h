@@ -1,6 +1,6 @@
 /* 
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2022  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,19 +30,17 @@
 	#include <gtkmm/image.h>
 	#include <gtkmm/table.h>
 	
-	using namespace std;
-	
 	class KageAbout : public Gtk::Dialog {
 		public:
 			KageAbout(Gtk::Window& parent);
 			virtual ~KageAbout();
-			static string app_version;
-			static string app_title;
-			static string app_author;
-			static string app_contact;
-			static string app_website;
-			static string app_copyright;
-			static string app_comment;
+			static std::string app_version;
+			static std::string app_title;
+			static std::string app_author;
+			static std::string app_contact;
+			static std::string app_website;
+			static std::string app_copyright;
+			static std::string app_comment;
 			static Glib::RefPtr<Gdk::Pixbuf> imageABOUT;
 		
 		protected:

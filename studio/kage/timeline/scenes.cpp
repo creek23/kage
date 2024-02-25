@@ -111,16 +111,14 @@ bool KageScenesUI::on_event(GdkEvent *e) {
 		invalidateToRender();
 	} else if (e->type == GDK_DOUBLE_BUTTON_PRESS) {
 		//determine Y location to identify which scene to rename
-		int l_scenes= _kage->_document.Scenes.size();
-		double l_y = get_height() - (l_scenes * FRAME_HEIGHT);
-		int l_index = l_scenes - ((e->button.y - l_y) / FRAME_HEIGHT);
+		int l_index = (e->button.y / FRAME_HEIGHT);
 		std::cout << "\n double clicked on l_index " << l_index << " / " << _kage->_document.Scenes.size() << std::endl;
 		if (l_index < _kage->_document.Scenes.size()) {
 			KageScene *l_scene = _kage->_document.Scenes[l_index];
 			std::cout << "\te->button.x " << e->button.x << std::endl;
 			try {
 				if (e->button.x > 36) {
-					string l_sceneLabel = _kage->_document.getScene()->getLabel();
+					std::string l_sceneLabel = _kage->_document.getScene()->getLabel();
 					LabelRenameDialog* pDialog = new LabelRenameDialog(*_kage, l_sceneLabel);
 						pDialog->run();
 					_kage->_document.getScene()->setLabel(pDialog->getLabel());
@@ -139,15 +137,10 @@ bool KageScenesUI::on_event(GdkEvent *e) {
 		KageScenesUI::mouseIsDown = true;
 		//determine Y location to identify which scene to highlight
 		int l_scenes = _kage->_document.Scenes.size();
-		//double l_y = get_height() - (l_scenes * FRAME_HEIGHT);
-		//int l_index = l_scenes - ((e->button.y - l_y) / FRAME_HEIGHT);
 		int l_index = (e->button.y / FRAME_HEIGHT);
-		std::cout << "KageScenesUI::on_event clicked on l_index " << l_index << " / " << l_scenes << std::endl;
 		try {
 			if (l_index < l_scenes) {
 				_kage->setDocumentCurrentScene(l_index+1);
-			} else {
-				std::cout << "KageScenesUI::on_event\n\t_kage->_document.getActiveSceneID() " << _kage->_document.getActiveSceneID() << " ??? " << _kage->_document.getScene()->Layers.size() << std::endl << std::endl;
 			}
 		} catch (std::exception& e) {
 			std::cout << "KageScenesUI::on_event Exception : " << e.what() << std::endl;
@@ -171,15 +164,12 @@ void KageScenesUI::forceRender() {
 	if (KageScene::LOADING_MODE == true) {
 		return;
 	}
-	Kage::timestamp_IN(); std::cout << " KageScenesUI::forceRender()" << std::endl;
 	invalidateToRender();
-	Kage::timestamp_OUT();
 }
 bool KageScenesUI::invalidateToRender() {
 	if (KageScene::LOADING_MODE == true) {
 		return true;
 	}
-	Kage::timestamp_IN(); std::cout << " KageScenesUI::invalidateToRender()" << std::endl;
 	if (!window) {
 		window = get_window();
 	}
@@ -192,8 +182,6 @@ bool KageScenesUI::invalidateToRender() {
 	} catch (std::exception& e) {
 		std::cerr << "KageScenesUI::invalidateToRender Exception : " << e.what() << std::endl;
 	}
-	
-	Kage::timestamp_OUT();
 	
 	return true;
 }

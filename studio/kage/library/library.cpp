@@ -172,7 +172,6 @@ bool KageLibrary::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 		p_context->fill_preserve();
 
 		//TODO: check if _renderAssetID is IMAGE
-		std::cout << "_renderAssetID " << _renderAssetID << " " << UINT_MAX << std::endl;
 		if (_renderAssetID != UINT_MAX && _kage->_stage.cairoPNG[_renderAssetID]) {
 			try {
 				KageStage::cairoImageSurface = _kage->_stage.cairoPNG[_renderAssetID];
@@ -260,7 +259,7 @@ void KageLibrary::setFocus() {
 	grab_focus();
 }
 
-vector<unsigned int> KageLibrary::raiseSelectedShape(vector<unsigned int> p_selectedShapes) {
+std::vector<unsigned int> KageLibrary::raiseSelectedShape(std::vector<unsigned int> p_selectedShapes) {
 	std::vector<unsigned int> foo;
 	return foo;
 }

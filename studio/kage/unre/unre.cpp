@@ -22,6 +22,7 @@
 #include "unre.h"
 
 UnRe::UnRe() {
+	_kageDocument = NULL;
 	clear();
 }
 
@@ -30,86 +31,61 @@ UnRe::~UnRe() {
 }
 
 void UnRe::clear() {
-	_stackIndex = -1;
+	_stackIndex = UINT_MAX;
 	_undoStack.clear();
 }
 
-void UnRe::stackDo(unsigned int p_scene, unsigned int p_layer, unsigned int p_frame, std::vector<VectorData> p_data) {
-	KageDo p_kageDo(p_scene, p_layer, p_frame);
-		p_kageDo.setVectorData(p_data);
-	
+void UnRe::stackDocument(KageDocument p_document) {
 	unsigned int l_size = _undoStack.size();
-	if (_stackIndex < l_size - 1) {
-			_undoStack.erase(_undoStack.begin() + _stackIndex+1, _undoStack.end());
+	if (_stackIndex < l_size - 1) {// && _undoStack.size() > 0) {
+		_undoStack[_stackIndex+1]->removeAllScenes();
+		_undoStack.erase(_undoStack.begin() + _stackIndex+1, _undoStack.end());
 	}
 	
-	_undoStack.push_back(p_kageDo.clone());
+	_kageDocument = new KageDocument();
+	*_kageDocument = p_document;
+	_undoStack.push_back(_kageDocument);
 	std::cout << "UNDO SIZE: " << _undoStack.size() << std::endl;
 	
 	++_stackIndex;
 }
 
-KageDo UnRe::undo() {
-	KageDo l_kageDo;
-	
+KageDocument UnRe::undoDocument() {
 	if (_stackIndex > 0 && _stackIndex != -1) {
 		--_stackIndex;
-		l_kageDo = _undoStack[_stackIndex].clone();
+		return *(_undoStack[_stackIndex]);
 	}
 	
-	return l_kageDo;
+	return *(_undoStack[0]);
 }
 
-KageDo UnRe::redo() {
-	KageDo l_kageDo;
-	
+KageDocument UnRe::redoDocument() {
 	unsigned int l_size = _undoStack.size();
 	if (_stackIndex < l_size-1 && _stackIndex != -1) {
 		++_stackIndex;
-		l_kageDo = _undoStack[_stackIndex].clone();
+		return *(_undoStack[_stackIndex]);
 	} else if (_stackIndex == -1 && l_size > 0) {
 		++_stackIndex;
-		l_kageDo = _undoStack[_stackIndex].clone();
+		return *(_undoStack[_stackIndex]);
 	}
 	
-	return l_kageDo;
+	if (l_size > 0) {
+		return *(_undoStack[l_size-1]);
+	}
+	return *(_undoStack[0]);
 }
+
 
 /**
- * While undo() pops a KageDo from a stack, this just gives a preview
- * of the top KageDo on the stack.
+ * While undo() pops a KageDocument from a stack, this just gives a preview
+ * of the top KageDocument on the stack.
  * \return latest state pushed in the stack
- * \sa undo()
+ * \sa undoDocument()
  */
-KageDo UnRe::previewUndo() {
-	KageDo l_kageDo;
-	
+KageDocument UnRe::previewUndoDocument() {
 	if (_stackIndex > 0 && _stackIndex != -1) {
-		l_kageDo = _undoStack[_stackIndex].clone();
+		return *(_undoStack[_stackIndex]);
 	}
 	
-	return l_kageDo;
-}
-
-PointData UnRe::applyZoomRatio(PointData p_zoomReference, double p_zoomRatio, PointData p_value) {
-	if (p_zoomRatio == 0.0f) { return p_value; }
-	
-	double l_value;
-	
-	if (p_value.x < p_zoomReference.x) {
-		l_value = (p_zoomReference.x - p_value.x) * p_zoomRatio;
-		p_value.x = p_zoomReference.x - l_value;
-	} else if (p_value.x > p_zoomReference.x) {
-		l_value = (p_value.x - p_zoomReference.x) * p_zoomRatio;
-		p_value.x = p_zoomReference.x + l_value;
-	}
-	if (p_value.y < p_zoomReference.y) {
-		l_value = (p_zoomReference.y - p_value.y) * p_zoomRatio;
-		p_value.y = p_zoomReference.y - l_value;
-	} else if (p_value.y > p_zoomReference.y) {
-		l_value = (p_value.y - p_zoomReference.y) * p_zoomRatio;
-		p_value.y = p_zoomReference.y + l_value;
-	}
-	
-	return p_value.clone();
+	return *(_undoStack[0]);
 }

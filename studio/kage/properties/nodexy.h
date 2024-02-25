@@ -1,6 +1,6 @@
 /* 
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2023  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,8 +30,6 @@
 	
 	class Kage; //forward declaration
 
-	using namespace std;
-	
 	class PropertyNodeXY : public Gtk::HBox {
 		public:
 			PropertyNodeXY(Kage* p_kage);

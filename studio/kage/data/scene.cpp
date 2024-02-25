@@ -22,15 +22,55 @@
 #include "scene.h"
 #include "../../kage.h"
 
-KageScene::KageScene(KageDocument *p_document, unsigned int p_sceneID, string p_filepath) {
+KageScene::KageScene(KageDocument *p_document, unsigned int p_sceneID, std::string p_filepath) {
 	init(p_document, p_sceneID);
 	open(p_filepath);
+}
+
+KageScene KageScene::operator=(const KageScene &p_scene) {
+	if (this == &p_scene) {
+		return *this;
+	}
+	KageScene::LOADING_MODE = true;
+
+	this->sceneID           = p_scene.sceneID;
+	this->_selected         = p_scene._selected;
+	this->_saved            = p_scene._saved;
+	this->_activeLayerIndex = p_scene._activeLayerIndex;
+	this->_activeLayer      = p_scene._activeLayer;
+	this->_label            = p_scene._label;
+	this->layerCtr          = p_scene.layerCtr;
+	this->_activeLayerID    = p_scene._activeLayerID;
+	//TODO: Assets that are KSF should be included on _document but TAGged as ASSET
+	// ex: this->_asset     = p_scene._asset; //_asset is boolean
+
+		bool l_return;
+		for (unsigned int l_layerIndex = 0; l_layerIndex < this->Layers.size(); ++l_layerIndex) {
+			l_return = this->removeLayerAt(l_layerIndex);
+			if (l_return == false) {
+				break;
+			}
+		}
+		this->Layers.clear();
+
+		for (unsigned int l_layerIndex = 0; l_layerIndex < p_scene.Layers.size(); ++l_layerIndex) {
+			KageScene::LOADING_MODE = true;
+			this->addLayer(); //when will it (_activeLayerCount)++ if not on addLayer?!?
+			*(this->Layers[l_layerIndex]) = *(p_scene.Layers[l_layerIndex]);
+		}
+	
+	this->layerCtr          = p_scene.layerCtr;
+	this->_activeLayerID    = p_scene._activeLayerID;
+
+	KageScene::LOADING_MODE = false;
+	
+	return *this;
 }
 
 void KageScene::init(KageDocument *p_document, unsigned int p_sceneID) {
 	_document = p_document;
 	
-	ID = p_sceneID;
+	sceneID = p_sceneID;
 	setSelected(false);
 
 	layerCtr = 0;
@@ -44,10 +84,10 @@ void KageScene::init(KageDocument *p_document, unsigned int p_sceneID) {
 }
 
 unsigned int KageScene::getID() {
-	return ID;
+	return sceneID;
 }
 
-bool KageScene::open(string p_filepath) {
+bool KageScene::open(std::string p_filepath) {
 	//TODO: open KSF -- take it from kage.cpp
 	return true;
 }
@@ -79,8 +119,9 @@ KageScene::KageScene(KageDocument *p_document, unsigned int p_sceneID, KageScene
 }
 
 KageScene::~KageScene() {
-	Layers.clear();
-	_document = NULL;
+	//TODO: revisit
+	//Layers.clear();
+	//_document = NULL;
 }
 
 unsigned int KageScene::frameCount() {
@@ -94,9 +135,10 @@ unsigned int KageScene::frameCount() {
 void KageScene::addLayer() {
 	++layerCtr;
 	//TODO: add layer above currently selected Layer
-	Layers.push_back(new KageLayer(this, layerCtr, frameCount()));
+	_layerPtr = new KageLayer(this, layerCtr, frameCount());
+	Layers.push_back(_layerPtr);
 	if (_activeLayerID == UINT_MAX) {
-		setActiveLayerID(layerCtr);
+		_activeLayerID = layerCtr;
 	}
 }
 
@@ -130,10 +172,10 @@ bool KageScene::addLayerFrame() {
 	KageFrame *l_frame = Layers[l_currentLayer-1]->getFrameAt(getCurrentFrame());
 	if (l_frame) {
 		Layers[l_currentLayer-1]->setSelected(l_frame); //why duplicate frame then delete? why not just create empty frame via Layer->addFrame?
-		std::cout << "KageScene::addLayerFrame DELETED " << _document->_kage->doDeleteFrame() << std::endl;
+		return true;
 	}
 	
-	return true;
+	return false;
 }
 
 bool KageScene::duplicateLayerFrame() {
@@ -191,10 +233,6 @@ bool KageScene::removeAllFrames() {
 	return true;
 }
 
-void KageScene::setActiveLayerID(unsigned int p_layerID) {
-	_activeLayerID = p_layerID;
-}
-
 /** For use of Kage.  To keep track of active Layer in-check of all layers in Scene
  * \return index+1 of registered active layer
  * \sa setCurrentLayer()
@@ -202,7 +240,7 @@ void KageScene::setActiveLayerID(unsigned int p_layerID) {
 unsigned int KageScene::getCurrentLayer() {
 	if (_activeLayerIndex < Layers.size() && Layers[_activeLayerIndex]->getID() == _activeLayerID) {
 		_activeLayer = _activeLayerIndex+1;
-		return _activeLayerIndex+1;
+		return _activeLayer;
 	} else {
 		for (unsigned int i = 0; i < Layers.size(); ++i) {
 			if (Layers[i]->getID() == _activeLayerID) {
@@ -356,15 +394,10 @@ void KageScene::setCurrentFrameByID(unsigned int p_frameID) {
 			}
 		}
 		
-		_document->_kage->forceRenderFrames();
-		_document->_kage->_timeline.forceRender();
-		_document->_kage->refreshUI();
+//		_document->_kage->forceRenderFrames();
+//		_document->_kage->_timeline.forceRender();
+//		_document->_kage->refreshUI();
 	}
-}
-
-void KageScene::renderStage() {//who is calling renderStage?
-	_document->_kage->forceRenderFrames();
-	_document->_kage->refreshUI();
 }
 
 void KageScene::selectAllLayerFrame(bool p_selectAll) {
@@ -431,7 +464,7 @@ bool KageScene::moveToTop() {
 		--l_currentLayer; //layer now becomes Layer Index
 		if (l_currentLayer < Layers.size()-1) {
 			while (l_currentLayer < Layers.size()-1) {
-				swap(Layers[l_currentLayer], Layers[l_currentLayer+1]);
+				std::swap(Layers[l_currentLayer], Layers[l_currentLayer+1]);
 				l_currentLayer = l_currentLayer+1;
 			}
 			return true;
@@ -451,7 +484,7 @@ bool KageScene::moveUp() {
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
 		if (l_currentLayer < Layers.size()-1) {
-			swap(Layers[l_currentLayer], Layers[l_currentLayer+1]);
+			std::swap(Layers[l_currentLayer], Layers[l_currentLayer+1]);
 			return true;
 		}
 	}
@@ -469,7 +502,7 @@ bool KageScene::moveDown() {
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
 		if (l_currentLayer > 0) {
-			swap(Layers[l_currentLayer], Layers[l_currentLayer-1]);
+			std::swap(Layers[l_currentLayer], Layers[l_currentLayer-1]);
 			return true;
 		}
 	}
@@ -488,7 +521,7 @@ bool KageScene::moveToBottom() {
 		--l_currentLayer; //layer now becomes Layer Index
 		if (l_currentLayer > 0) {
 			while (l_currentLayer > 0) {
-				swap(Layers[l_currentLayer], Layers[l_currentLayer-1]);
+				std::swap(Layers[l_currentLayer], Layers[l_currentLayer-1]);
 				l_currentLayer = l_currentLayer-1;
 			}
 			return true;
@@ -497,7 +530,7 @@ bool KageScene::moveToBottom() {
 	return false;
 }
 
-vector<unsigned int> KageScene::raiseSelectedShape(vector<unsigned int> p_selectedShapes) {
+std::vector<unsigned int> KageScene::raiseSelectedShape(std::vector<unsigned int> p_selectedShapes) {
 	unsigned int l_currentLayer = getCurrentLayer();
 	if (l_currentLayer < 1 || l_currentLayer > Layers.size()) {
 		//
@@ -508,7 +541,7 @@ vector<unsigned int> KageScene::raiseSelectedShape(vector<unsigned int> p_select
 	std::vector<unsigned int> l_nullReturn;
 	return l_nullReturn;
 }
-vector<unsigned int> KageScene::lowerSelectedShape(vector<unsigned int> p_selectedShapes) {
+std::vector<unsigned int> KageScene::lowerSelectedShape(std::vector<unsigned int> p_selectedShapes) {
 	unsigned int l_currentLayer = getCurrentLayer();
 	if (l_currentLayer < 1 || l_currentLayer > Layers.size()) {
 		//
@@ -519,7 +552,7 @@ vector<unsigned int> KageScene::lowerSelectedShape(vector<unsigned int> p_select
 	std::vector<unsigned int> l_nullReturn;
 	return l_nullReturn;
 }
-vector<unsigned int> KageScene::raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes) {
+std::vector<unsigned int> KageScene::raiseToTopSelectedShape(std::vector<unsigned int> p_selectedShapes) {
 	unsigned int l_currentLayer = getCurrentLayer();
 	if (l_currentLayer < 1 || l_currentLayer > Layers.size()) {
 		//
@@ -530,7 +563,7 @@ vector<unsigned int> KageScene::raiseToTopSelectedShape(vector<unsigned int> p_s
 	std::vector<unsigned int> l_nullReturn;
 	return l_nullReturn;
 }
-vector<unsigned int> KageScene::lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes) {
+std::vector<unsigned int> KageScene::lowerToBottomSelectedShape(std::vector<unsigned int> p_selectedShapes) {
 	unsigned int l_currentLayer = getCurrentLayer();
 	if (l_currentLayer < 1 || l_currentLayer > Layers.size()) {
 		//
@@ -542,7 +575,7 @@ vector<unsigned int> KageScene::lowerToBottomSelectedShape(vector<unsigned int> 
 	return l_nullReturn;
 }
 
-vector<unsigned int> KageScene::groupSelectedShapes(vector<unsigned int> p_selectedShapes) {
+std::vector<unsigned int> KageScene::groupSelectedShapes(std::vector<unsigned int> p_selectedShapes) {
 	unsigned int l_currentLayer = getCurrentLayer();
 	if (l_currentLayer < 1 || l_currentLayer > Layers.size()) {
 		//
@@ -553,7 +586,7 @@ vector<unsigned int> KageScene::groupSelectedShapes(vector<unsigned int> p_selec
 	std::vector<unsigned int> l_nullReturn;
 	return l_nullReturn;
 }
-vector<unsigned int> KageScene::ungroupSelectedShapes(vector<unsigned int> p_selectedShapes) {
+std::vector<unsigned int> KageScene::ungroupSelectedShapes(std::vector<unsigned int> p_selectedShapes) {
 	unsigned int l_currentLayer = getCurrentLayer();
 	if (l_currentLayer < 1 || l_currentLayer > Layers.size()) {
 		//
@@ -565,7 +598,7 @@ vector<unsigned int> KageScene::ungroupSelectedShapes(vector<unsigned int> p_sel
 	return l_nullReturn;
 }
 
-vector<unsigned int> KageScene::duplicateShapes(vector<unsigned int> p_selectedShapes) {
+std::vector<unsigned int> KageScene::duplicateShapes(std::vector<unsigned int> p_selectedShapes) {
 	unsigned int l_currentLayer = getCurrentLayer();
 	if (l_currentLayer < 1 || l_currentLayer > Layers.size()) {
 		//
@@ -577,7 +610,7 @@ vector<unsigned int> KageScene::duplicateShapes(vector<unsigned int> p_selectedS
 	return l_nullReturn;
 }
 
-bool KageScene::flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes) {
+bool KageScene::flipHorizontalSelectedShape(std::vector<unsigned int> p_selectedShapes) {
 	unsigned int l_currentLayer = getCurrentLayer();
 	if (l_currentLayer < 1 || l_currentLayer > Layers.size()) {
 		//
@@ -588,7 +621,7 @@ bool KageScene::flipHorizontalSelectedShape(vector<unsigned int> p_selectedShape
 	
 	return false;
 }
-bool KageScene::flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes) {
+bool KageScene::flipVerticalSelectedShape(std::vector<unsigned int> p_selectedShapes) {
 	unsigned int l_currentLayer = getCurrentLayer();
 	if (l_currentLayer < 1 || l_currentLayer > Layers.size()) {
 		//
@@ -600,7 +633,7 @@ bool KageScene::flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes)
 	return false;
 }
 
-bool KageScene::recenterRotationPoint(vector<unsigned int> p_selectedShapes) {
+bool KageScene::recenterRotationPoint(std::vector<unsigned int> p_selectedShapes) {
 	unsigned int l_currentLayer = getCurrentLayer();
 	if (l_currentLayer < 1 || l_currentLayer > Layers.size()) {
 		//
@@ -634,7 +667,6 @@ bool KageScene::setFrameData(VectorDataManager p_vectorsData) {
 	return false;
 }
 VectorDataManager KageScene::getFrameData() {
-	
 	unsigned int l_currentLayer = getCurrentLayer();
 	if (l_currentLayer < 1 || l_currentLayer > Layers.size()) {
 		//
@@ -645,13 +677,13 @@ VectorDataManager KageScene::getFrameData() {
 	VectorDataManager l_nullReturn;
 	return l_nullReturn;
 }
-VectorDataManager KageScene::getFrameDataAt(unsigned int p_frame) {
+VectorDataManager KageScene::getFrameDataAt(unsigned int p_frame, bool p_frameOnion, bool p_layerOnion) {
 	unsigned int l_currentLayer = getCurrentLayer();
 	if (l_currentLayer < 1 || l_currentLayer > Layers.size()) {
 		//
 	} else {
 		--l_currentLayer; //layer now becomes Layer Index
-		return Layers[l_currentLayer]->getFrameDataAt(p_frame);
+		return Layers[l_currentLayer]->getFrameDataAt(p_frame, p_frameOnion, p_layerOnion);
 	}
 	VectorDataManager l_nullReturn;
 	return l_nullReturn;
@@ -830,10 +862,10 @@ unsigned int KageScene::getActiveLayerID() {
 	return _activeLayerID;
 }
 
-string KageScene::getLayerLabel() {
+std::string KageScene::getLayerLabel() {
 	return Layers[_activeLayerIndex]->getLabel();
 }
-void KageScene::setLayerLabel(string p_label) {
+void KageScene::setLayerLabel(std::string p_label) {
 	Layers[_activeLayerIndex]->setLabel(p_label);
 }
 
@@ -857,9 +889,9 @@ void KageScene::setLayerLocked(bool p_locked) {
 	Layers[_activeLayerIndex]->setLock(p_locked);
 }
 
-string KageScene::getLabel() {
+std::string KageScene::getLabel() {
 	return _label;
 }
-void KageScene::setLabel(string p_label) {
+void KageScene::setLabel(std::string p_label) {
 	_label = p_label;
 }

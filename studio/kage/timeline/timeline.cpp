@@ -253,7 +253,6 @@ bool KageTimeline::on_event(GdkEvent *e) {
 			}
 			unsigned int l_layerStartIndex = ((draw1.y - ((unsigned int)draw1.y % FRAME_HEIGHT)) / FRAME_HEIGHT) + 1;
 			unsigned int l_layerStopIndex  = ((draw2.y - ((unsigned int)draw2.y % FRAME_HEIGHT)) / FRAME_HEIGHT);
-			cout << "l_layerStartIndex " << l_layerStartIndex << " l_layerStopIndex " << l_layerStopIndex;
 			l_layerStartIndex = l_layerCount - l_layerStartIndex;
 			l_layerStopIndex  = l_layerCount - l_layerStopIndex;
 			if (l_layerStopIndex < l_layerStartIndex) {
@@ -261,7 +260,7 @@ bool KageTimeline::on_event(GdkEvent *e) {
 				l_layerStopIndex = l_layerStartIndex;
 				l_layerStartIndex = l_tmpLayerIndex;
 			}
-			cout << "\t " << l_layerStartIndex << " " << l_layerStopIndex << endl;
+			
 			//loop from start to stop to select frames in between
 			for (unsigned int l_layerIndex = 0; l_layerIndex < _kage->_document.getScene()->Layers.size(); ++l_layerIndex) {
 				if (l_layerIndex >= l_layerStartIndex && l_layerIndex < l_layerStopIndex) {
@@ -377,7 +376,7 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 			p_context->set_source_rgb(0.80f, 0.80f, 0.80f);
 			p_context->set_line_width(1.0f);
 			p_context->stroke();
-			l_x += (FRAME_WIDTH * _kage->_document.Project._fps);
+			l_x += (FRAME_WIDTH * _kage->_document._fps);
 		}
 		
 		unsigned int l_frames;
@@ -434,8 +433,8 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 				l_selected = l_frame->isSelected();
 				bool l_tween = (l_frame->getTween() > 0);
 				switch (l_frame->getExtension()) {
-					case KageFrame::EXTENSION_NOT:
-					case KageFrame::EXTENSION_END:
+					case KageFrame::extension::EXTENSION_NOT:
+					case KageFrame::extension::EXTENSION_END:
 						if (l_frame->isEmpty() == true) {
 							if (       l_current == true  && l_selected == false && l_tween == false) {
 								Gdk::Cairo::set_source_pixbuf(p_context, KageTimeline::imageBLANK_CUR, l_x, l_y);
@@ -480,8 +479,8 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 							}
 						}
 						break;
-					case KageFrame::EXTENSION_START:
-					case KageFrame::EXTENSION_MID:
+					case KageFrame::extension::EXTENSION_START:
+					case KageFrame::extension::EXTENSION_MID:
 						if (l_frame->isEmpty() == true) {
 							if (       l_current == true  && l_selected == false && l_tween == false) {
 								Gdk::Cairo::set_source_pixbuf(p_context, KageTimeline::imageBLANK_X_CUR, l_x, l_y);
@@ -567,7 +566,7 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 		}
 
 		Cairo::TextExtents extents;
-		string l_text;
+		std::string l_text;
 		//draw currently selected Layer/Frame
 		p_context->select_font_face ("Arial", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_BOLD);
 		p_context->set_font_size(16);
@@ -591,7 +590,7 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 		//p_context->set_source_rgb(0.34f, 0.34f, 0.34f);
 		p_context->set_source_rgb(0.5f, 0.5f, 0.5f);
 		while (l_x < get_width()) {
-			l_text = StringHelper::unsignedIntegerToString(_kage->_document.Project._fps * l_ctr);
+			l_text = StringHelper::unsignedIntegerToString(_kage->_document._fps * l_ctr);
 			p_context->get_text_extents(l_text, extents);
 				p_context->move_to( l_x-(extents.width/2), 16);
 				p_context->show_text(l_text);
@@ -600,7 +599,7 @@ bool KageTimeline::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 			p_context->get_text_extents(l_text, extents);
 				p_context->move_to( l_x-(extents.width/2), get_height()-2);
 				p_context->show_text(l_text);
-			l_x += (FRAME_WIDTH * _kage->_document.Project._fps);
+			l_x += (FRAME_WIDTH * _kage->_document._fps);
 			++l_ctr;
 		}
 		
@@ -649,7 +648,7 @@ void KageTimeline::setFocus() {
 	grab_focus();
 }
 
-vector<unsigned int> KageTimeline::raiseSelectedShape(vector<unsigned int> p_selectedShapes) {
+std::vector<unsigned int> KageTimeline::raiseSelectedShape(std::vector<unsigned int> p_selectedShapes) {
 	std::vector<unsigned int> foo;
 	return foo;
 }

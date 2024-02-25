@@ -65,24 +65,9 @@
 	#include "../util/string/stringhelper.h"
 	
 	#include <gdkmm/color.h>
-	class Kage; //forward declaration
 	
-	using namespace std;
-	class KageProject {
-		public:
-			string _name;
-			double _width; //made double for zoom
-			double _height; //ditto
-			ColorData _backgroundColor;
-			unsigned int _fps;
-			
-			KageProject();
-			virtual ~KageProject();
-			string toString();
-	};
-
 	class KageDocument {
-		protected:
+		public:
 			bool _saved;
 			unsigned int _activeSceneID;
 			unsigned int _activeSceneIndex;
@@ -90,22 +75,19 @@
 			unsigned int sceneCtr; ///will be used to create Unique sceneCtr IDs
 			
 			unsigned int _activeScene;
-		public:
-			KageProject Project;
-			Kage *_kage;
 
-			KageDocument(Kage *p_kage);
-			KageDocument(Kage *p_kage, KageProject p_project);
-			void init(Kage *p_kage);
+			KageDocument();
+			KageDocument(KageDocument &p_document);
+			KageDocument operator=(const KageDocument &p_document);
+			void init();
 			virtual ~KageDocument();
-			void setProjectInformation(KageProject p_project);
-			unsigned int openScene(string p_filepath);
+			unsigned int openScene(std::string p_filepath);
 			bool saveScene(unsigned int p_sceneID);
 			bool openProject();
 			bool saveProject();
 			bool isSaved();
 
-			unsigned int addScene(string p_sceneLabel);
+			unsigned int addScene(std::string p_sceneLabel);
 			bool removeAllScenes();
 			bool removeSceneAt(unsigned int p_sceneIndex);
 			
@@ -118,28 +100,27 @@
 			struct Asset {
 				unsigned int ID;
 				AssetType Type;
-				string Path;
-				string Name;
+				std::string Path;
+				std::string Name;
 			};
 			//TODO: each instance of asset will reference to this
 			std::vector<Asset> Assets;
 			
 			//TODO: each Scene will be saved as separate KSF file
 			std::vector<KageScene*> Scenes;
+			KageScene* _scenePtr;
 
 			KageScene *getScene();
 			unsigned int getCurrentScene(); ///returns index+1
 			void setCurrentScene(unsigned int p_scene); //p_scene-1 is index
 			unsigned int getActiveSceneID();
-			void setActiveSceneID(unsigned int p_activeSceneID);
 			unsigned int getActiveLayerID();
 			unsigned int getActiveFrameID();
 
 			unsigned int frameCount();
 			void setSceneLayerCurrentFrame(unsigned int p_frame);
-			void renameLayer();
-			string getLayerLabel();
-			void setLayerLabel(string p_label);
+			std::string getLayerLabel();
+			void setLayerLabel(std::string p_label);
 			void toggleLayerVisibility();
 			bool isLayerVisible();
 			void setLayerVisible(bool p_visible);
@@ -147,7 +128,6 @@
 			bool isLayerLocked();
 			void setLayerLocked(bool p_lock);
 			
-			void renameScene();
 			bool moveSceneUp();
 			bool moveSceneDown();
 			bool moveSceneToTop();

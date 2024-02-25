@@ -29,26 +29,25 @@
 	#include <vector>
 	#include <algorithm>
 	#include <cstring>
-	using namespace std;
 	
 	class StringHelper {
 		public:
-			static string toUpper(string p_str);
-			static string toLower(string p_str);
-			static string integerToString(int p_src);
-			static string unsignedIntegerToString(unsigned int p_src);
-			static string doubleToString(double p_src);
-			static int toInteger(string p_str);
-			static unsigned int toUnsignedInteger(string p_str);
-			static long toLong(string p_str);
-			static double toDouble(string p_str);
-			static bool toBoolean(string p_str);
-			static std::vector<string> split(const string &p_source, const string &p_delimiter);
-			static string trim(string p_source);
-			static string kHash(string par, int p_len = 8);
+			static std::string toUpper(std::string p_str);
+			static std::string toLower(std::string p_str);
+			static std::string integerToString(int p_src);
+			static std::string unsignedIntegerToString(unsigned int p_src);
+			static std::string doubleToString(double p_src);
+			static int toInteger(std::string p_str);
+			static unsigned int toUnsignedInteger(std::string p_str);
+			static long toLong(std::string p_str);
+			static double toDouble(std::string p_str);
+			static bool toBoolean(std::string p_str);
+			static std::vector<std::string> split(const std::string &p_source, const std::string &p_delimiter);
+			static std::string trim(std::string p_source);
+			static std::string kHash(std::string par, int p_len = 8);
 
-			static string replace(std::string s, std::string const& p_find, std::string const& p_replace);
-			static string replaceAll(std::string s, std::string const& p_find, std::string const& p_replace);
+			static std::string replace(std::string s, std::string const& p_find, std::string const& p_replace);
+			static std::string replaceAll(std::string s, std::string const& p_find, std::string const& p_replace);
 	};
 	
 #endif //UTIL_STRING_HELPER_H

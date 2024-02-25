@@ -26,21 +26,31 @@
 VectorDataManager::VectorDataManager() {
 //	init(KageStage::fillColor, KageStage::stroke);
 // ^ depracated: TYPE_INIT to be used as SHAPE identifier
+	_selectedNodes.clear();
+	_selectedShapes.clear();
+	vectorData.clear();
 }
 
-VectorDataManager::VectorDataManager(vector<VectorData> p_vectorData) {
+VectorDataManager::VectorDataManager(std::vector<VectorData> p_vectorData) {
+	_selectedNodes.clear();
+	_selectedShapes.clear();
+	vectorData.clear();
+	
 	setVectorData(p_vectorData);
 }
 
 VectorDataManager::~VectorDataManager() {
-	vectorData.clear();
+	//TODO: revisit
+	//_selectedNodes.clear();
+	//_selectedShapes.clear();
+	//vectorData.clear();
 }
 
-void VectorDataManager::setVectorData(vector<VectorData> p_vectorData) {
+void VectorDataManager::setVectorData(std::vector<VectorData> p_vectorData) {
 	vectorData = p_vectorData;
 }
 
-vector<VectorData> VectorDataManager::getVectorData() {
+std::vector<VectorData> VectorDataManager::getVectorData() {
 	return vectorData;
 }
 
@@ -67,7 +77,7 @@ void VectorDataManager::add(VectorData::type p_type, ColorData p_fill, StrokeCol
 	
 	vectorData.push_back(l_vectorData);
 }
-void VectorDataManager::add(VectorData::type p_type, string p_fillGradientID, StrokeColorData p_stroke) {
+void VectorDataManager::add(VectorData::type p_type, std::string p_fillGradientID, StrokeColorData p_stroke) {
 	VectorData l_vectorData;
 	
 		l_vectorData.vectorType = p_type;
@@ -98,13 +108,13 @@ void VectorDataManager::addInit(PointData p_point) {
 	vectorData[vectorData.size()-1].setPoints(ps);
 }
 
-bool VectorDataManager::recenterRotationPoint(vector<unsigned int> p_selectedShapes) {
+bool VectorDataManager::recenterRotationPoint(std::vector<unsigned int> p_selectedShapes) {
 	if (p_selectedShapes.size() == 0) {
 		return false;
 	}
 	
 	std::vector<unsigned int> l_selectedShapesOld(p_selectedShapes);
-		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater <unsigned int>());
+		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), std::greater <unsigned int>());
 	
 	std::vector<VectorData> v = getVectorData();
 	
@@ -210,7 +220,7 @@ void VectorDataManager::addFill(ColorData p_color) {
 	add(VectorData::TYPE_FILL, p_color, l_vectorData.stroke);
 }
 
-void VectorDataManager::addFill(string p_gradientID) {
+void VectorDataManager::addFill(std::string p_gradientID) {
 	VectorData l_vectorData;
 	if (vectorData.size() > 0) {
 		l_vectorData = vectorData[vectorData.size()-1];
@@ -415,7 +425,7 @@ void VectorDataManager::addSelectedShape(unsigned int p_index) {
 }
 
 
-vector<unsigned int> VectorDataManager::tryMultiSelectShapes_populateShapes() {
+std::vector<unsigned int> VectorDataManager::tryMultiSelectShapes_populateShapes() {
 	_selectedShapes.clear();
 	if (vectorData.size() == 0) {
 		return _selectedShapes;
@@ -426,14 +436,12 @@ vector<unsigned int> VectorDataManager::tryMultiSelectShapes_populateShapes() {
 	return _selectedShapes;
 }
 
-vector<unsigned int> VectorDataManager::selectAllShapes() {
+std::vector<unsigned int> VectorDataManager::selectAllShapes() {
 	std::vector<unsigned int> l_selectedShapes;
 	l_selectedShapes.clear();
-	std::cout << " KageStage::selectAllShapes " << l_selectedShapes.size() << std::endl;
 	
 	unsigned int vsize = vectorData.size();
 	if (vsize == 0) {
-		std::cout << " KageStage::selectAllShapes A " << std::endl;
 		return l_selectedShapes;
 	}
 	
@@ -445,7 +453,6 @@ vector<unsigned int> VectorDataManager::selectAllShapes() {
 	l_selectedShapes = tryMultiSelectShapes_populateShapes();
 	_selectedNodes.clear();
 	
-	std::cout << " KageStage::selectAllShapes B " << std::endl;
 	return l_selectedShapes;
 }
 
@@ -469,7 +476,7 @@ bool VectorDataManager::cutSelectedShapes() {
 	return false;
 }
 
-vector<VectorData> VectorDataManager::copySelectedShapes(vector<unsigned int> p_selectedShapes) {
+std::vector<VectorData> VectorDataManager::copySelectedShapes(std::vector<unsigned int> p_selectedShapes) {
 	std::vector<VectorData> l_vectorDataCopyBuffer;
 	l_vectorDataCopyBuffer.clear();
 	
@@ -498,7 +505,7 @@ vector<VectorData> VectorDataManager::copySelectedShapes(vector<unsigned int> p_
 	return l_vectorDataCopyBuffer;
 }
 
-vector<unsigned int> VectorDataManager::pasteSelectedShapes(vector<VectorData> p_vectorDataCopyBuffer) {
+std::vector<unsigned int> VectorDataManager::pasteSelectedShapes(std::vector<VectorData> p_vectorDataCopyBuffer) {
 	unsigned int l_vectorDataCopyBuffer_size = p_vectorDataCopyBuffer.size();
 	
 	_selectedNodes.clear();
@@ -506,7 +513,7 @@ vector<unsigned int> VectorDataManager::pasteSelectedShapes(vector<VectorData> p
 		std::cout << "VectorDataManager::pasteSelectedShapes FAIL" << std::endl;
 		return _selectedNodes;
 	}
-	std::cout << "VectorDataManager::pasteSelectedShapes PASS " + p_vectorDataCopyBuffer.size() << " " << vectorData.size() << std::endl;
+	
 	for (unsigned int i = 0; i < l_vectorDataCopyBuffer_size; ++i) {
 		vectorData.push_back(p_vectorDataCopyBuffer[i]);
 		_selectedNodes.push_back(vectorData.size()-1);
@@ -515,7 +522,7 @@ vector<unsigned int> VectorDataManager::pasteSelectedShapes(vector<VectorData> p
 	return _selectedNodes;
 }
 
-bool VectorDataManager::deleteSelectedShapes(vector<unsigned int> p_selectedShapes) {
+bool VectorDataManager::deleteSelectedShapes(std::vector<unsigned int> p_selectedShapes) {
 	unsigned int l_selectedShapes_size = p_selectedShapes.size();
 	
 	if (l_selectedShapes_size == 0) {
@@ -524,7 +531,7 @@ bool VectorDataManager::deleteSelectedShapes(vector<unsigned int> p_selectedShap
 	}
 	
 	std::vector<unsigned int> l_selectedShapesOld(p_selectedShapes);
-		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater  <unsigned int>());
+		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), std::greater  <unsigned int>());
 	
 	unsigned int vsize = vectorData.size();
 	if (vsize < l_selectedShapes_size) { //attempt to fix https://sourceforge.net/p/kage/tickets/15/
@@ -564,7 +571,7 @@ bool VectorDataManager::deleteSelectedShapes(vector<unsigned int> p_selectedShap
   \return True if it successfully lowered back selected Shape
   \sa lowerSelectedShape(), raiseToTopSelectedShape() and lowerToBottomSelectedShape()
 */
-vector<unsigned int> VectorDataManager::raiseSelectedShape(vector<unsigned int> p_selectedShapes) {
+std::vector<unsigned int> VectorDataManager::raiseSelectedShape(std::vector<unsigned int> p_selectedShapes) {
 	std::vector<unsigned int> l_selectedShapes;
 	l_selectedShapes.clear();
 	if (p_selectedShapes.size() == 0) {
@@ -572,7 +579,7 @@ vector<unsigned int> VectorDataManager::raiseSelectedShape(vector<unsigned int> 
 	}
 	
 	l_selectedShapes = p_selectedShapes;
-		sort(l_selectedShapes.begin(), l_selectedShapes.end(), greater <unsigned int>());
+		sort(l_selectedShapes.begin(), l_selectedShapes.end(), std::greater <unsigned int>());
 	std::vector<unsigned int> l_selectedShapesNew;
 		l_selectedShapesNew.clear();
 	
@@ -655,7 +662,7 @@ vector<unsigned int> VectorDataManager::raiseSelectedShape(vector<unsigned int> 
   \return True if it successfully lowered back selected Shape
   \sa raiseSelectedShape(), raiseToTopSelectedShape() and lowerToBottomSelectedShape()
 */
-vector<unsigned int> VectorDataManager::lowerSelectedShape(vector<unsigned int> p_selectedShapes) {
+std::vector<unsigned int> VectorDataManager::lowerSelectedShape(std::vector<unsigned int> p_selectedShapes) {
 	std::vector<unsigned int> l_selectedShapes;
 	l_selectedShapes.clear();
 	if (p_selectedShapes.size() == 0) {
@@ -663,7 +670,7 @@ vector<unsigned int> VectorDataManager::lowerSelectedShape(vector<unsigned int> 
 	}
 	
 	l_selectedShapes = p_selectedShapes;
-		sort(l_selectedShapes.begin(), l_selectedShapes.end(), greater <unsigned int>());
+		sort(l_selectedShapes.begin(), l_selectedShapes.end(), std::greater <unsigned int>());
 	std::vector<unsigned int> l_selectedShapesNew;
 		l_selectedShapesNew.clear();
 	
@@ -744,7 +751,7 @@ vector<unsigned int> VectorDataManager::lowerSelectedShape(vector<unsigned int> 
  *  \return True if it successfully raised selected Shape on top of z-ordering
  *  \sa raiseSelectedShape(), lowerSelectedShape() and lowerToBottomSelectedShape()
  */
-vector<unsigned int> VectorDataManager::raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes) {
+std::vector<unsigned int> VectorDataManager::raiseToTopSelectedShape(std::vector<unsigned int> p_selectedShapes) {
 	std::vector<unsigned int> l_selectedShapes;
 	l_selectedShapes.clear();
 	if (p_selectedShapes.size() == 0) {
@@ -773,7 +780,7 @@ vector<unsigned int> VectorDataManager::raiseToTopSelectedShape(vector<unsigned 
  *  \return True if it successfully lowered selected Shape to bottom of z-ordering
  *  \sa raiseSelectedShape(), lowerSelectedShape() and raiseToTopSelectedShape()
  */
-vector<unsigned int> VectorDataManager::lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes) {
+std::vector<unsigned int> VectorDataManager::lowerToBottomSelectedShape(std::vector<unsigned int> p_selectedShapes) {
 	std::vector<unsigned int> l_selectedShapes;
 	l_selectedShapes.clear();
 	if (p_selectedShapes.size() == 0) {
@@ -805,7 +812,7 @@ vector<unsigned int> VectorDataManager::lowerToBottomSelectedShape(vector<unsign
 	return l_selectedShapes;
 }
 
-vector<unsigned int> VectorDataManager::groupSelectedShapes(vector<unsigned int> p_selectedShapes) {
+std::vector<unsigned int> VectorDataManager::groupSelectedShapes(std::vector<unsigned int> p_selectedShapes) {
 	std::vector<unsigned int> l_selectedShapes;
 	l_selectedShapes.clear();
 	if (p_selectedShapes.size() == 0) {
@@ -831,7 +838,7 @@ vector<unsigned int> VectorDataManager::groupSelectedShapes(vector<unsigned int>
 	l_selectedShapes.clear();
 	return l_selectedShapes;
 }
-vector<unsigned int> VectorDataManager::ungroupSelectedShapes(vector<unsigned int> p_selectedShapes) {
+std::vector<unsigned int> VectorDataManager::ungroupSelectedShapes(std::vector<unsigned int> p_selectedShapes) {
 	std::vector<unsigned int> l_selectedShapes;
 	l_selectedShapes.clear();
 	if (p_selectedShapes.size() == 0) {
@@ -874,7 +881,7 @@ vector<unsigned int> VectorDataManager::ungroupSelectedShapes(vector<unsigned in
 	return l_selectedShapes;
 }
 
-vector<unsigned int> VectorDataManager::duplicateShapes(vector<unsigned int> p_selectedShapes) {
+std::vector<unsigned int> VectorDataManager::duplicateShapes(std::vector<unsigned int> p_selectedShapes) {
 	std::vector<unsigned int> l_selectedShapes;
 	l_selectedShapes.clear();
 	if (p_selectedShapes.size() == 0) {
@@ -891,13 +898,13 @@ vector<unsigned int> VectorDataManager::duplicateShapes(vector<unsigned int> p_s
 	l_selectedShapes.clear();
 	return l_selectedShapes;
 }
-bool VectorDataManager::flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes) {
+bool VectorDataManager::flipHorizontalSelectedShape(std::vector<unsigned int> p_selectedShapes) {
 	if (p_selectedShapes.size() == 0) {
 		return false;
 	}
 	
 	std::vector<unsigned int> l_selectedShapesOld(p_selectedShapes);
-		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater <unsigned int>());
+		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), std::greater <unsigned int>());
 	
 	double l_leftPoint = DBL_MAX;
 	double l_rightPoint = DBL_MIN;
@@ -974,13 +981,13 @@ bool VectorDataManager::flipHorizontalSelectedShape(vector<unsigned int> p_selec
 	
 	return true;
 }
-bool VectorDataManager::flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes) {
+bool VectorDataManager::flipVerticalSelectedShape(std::vector<unsigned int> p_selectedShapes) {
 	if (p_selectedShapes.size() == 0) {
 		return false;
 	}
 	
 	std::vector<unsigned int> l_selectedShapesOld(p_selectedShapes);
-		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), greater <unsigned int>());
+		sort(l_selectedShapesOld.begin(), l_selectedShapesOld.end(), std::greater <unsigned int>());
 	
 	double l_upperPoint = DBL_MAX;
 	double l_lowerPoint = DBL_MIN;

@@ -13,7 +13,6 @@ SOURCES = \
 	./kage/timeline/layers.cpp \
 	./kage/timeline/scenes.cpp \
 	./kage/timeline/timeline.cpp \
-	./kage/unre/kagedo.cpp \
 	./kage/unre/unre.cpp \
 	./kage/stage/stage.cpp \
 	./kage/stage/node.cpp \
@@ -36,6 +35,7 @@ SOURCES = \
 	./kage/data/layer.cpp \
 	./kage/data/scene.cpp \
 	./kage/document.cpp \
+	./kage/project.cpp \
 	./util/xml/xmltoken.cpp \
 	./util/xml/xmltagproperty.cpp \
 	./util/xml/xmltag.cpp \

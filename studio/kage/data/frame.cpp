@@ -31,11 +31,46 @@ KageFrame::KageFrame(KageLayer *p_layer, unsigned int p_frameID) :
 	setCurrent(false);
 	forceSetTween(false);
 	setNull(false);
-	setExtension(KageFrame::EXTENSION_NOT);
+	setExtension(KageFrame::extension::EXTENSION_NOT);
+}
+
+KageFrame KageFrame::operator=(const KageFrame &p_frame) {
+	if (this == &p_frame) {
+		return *this;
+	}
+	KageScene::LOADING_MODE = true;
+
+	this->data       = p_frame.data;
+	this->frameID    = p_frame.frameID;
+	this->_null      = p_frame._null;
+	this->_selected  = p_frame._selected;
+	this->_current   = p_frame._current;
+	this->_tweenX    = p_frame._tweenX;
+	this->_tweenY    = p_frame._tweenY;
+	this->_extension = p_frame._extension;
+	
+	this->vectorsData._selectedNodes.clear();
+	this->vectorsData._selectedNodes = p_frame.vectorsData._selectedNodes;
+
+	this->vectorsData._selectedShapes.clear();
+	this->vectorsData._selectedShapes = p_frame.vectorsData._selectedShapes;
+	this->vectorsData.vectorData.clear();
+	//std::cout << "\t\t\t\tKageFrame KageFrame::operator= vectorData || " << p_frame.vectorsData.vectorData.size() << std::endl;
+	for (unsigned int l_vectorIndex = 0; l_vectorIndex < p_frame.vectorsData.vectorData.size(); ++l_vectorIndex) {
+		this->vectorsData.vectorData.push_back(
+				p_frame.vectorsData.vectorData[l_vectorIndex]
+			);
+		//TODO: make sure X/Y of all vector data are copied over
+		//std::cout << "\t\t\t\tKageFrame KageFrame::operator= vectorData || " << this->vectorsData.vectorData.size() << std::endl;
+	}
+	KageScene::LOADING_MODE = false;
+	//std::cout << "\t\t\tKageFrame KageFrame::operator= >> " << this << "\t" << this->frameID << std::endl;
+	return *this;
 }
 
 KageFrame::~KageFrame() {
-	vectorsData.clear();
+	//TODO: revisit
+//	vectorsData.clear();
 }
 
 void KageFrame::setSelected(bool p_selected) {
@@ -68,9 +103,9 @@ void KageFrame::setTween(unsigned int p_tween) {
 		return;
 	}
 	std::cout << " KageFrame::setTween() @ " << frameID << " " << p_tween << std::endl;
-	if (       _extension == KageFrame::EXTENSION_NOT) {
+	if (       _extension == KageFrame::extension::EXTENSION_NOT) {
 		forceSetTween(p_tween);
-	} else if (_extension == KageFrame::EXTENSION_START) {
+	} else if (_extension == KageFrame::extension::EXTENSION_START) {
 		forceSetTween(p_tween);
 		_layer->setExtendedFrameTween(frameID, p_tween);
 	} else {
@@ -91,12 +126,12 @@ bool KageFrame::isCurrent() {
 
 VectorDataManager KageFrame::getFrameData() {
 	if (_null == true) {
-		std::cout << "KageFrame::getFrameData is returning empty" << std::endl;
 		VectorDataManager l_nullReturn;
 		return l_nullReturn;
 	}
-	if (       _extension == KageFrame::EXTENSION_NOT
-			|| _extension == KageFrame::EXTENSION_START) {
+	
+	if (       _extension == KageFrame::extension::EXTENSION_NOT
+			|| _extension == KageFrame::extension::EXTENSION_START) {
 		return vectorsData;
 	} else {
 		return _layer->getPreviousFrameData(frameID);
@@ -106,8 +141,8 @@ void KageFrame::setFrameData(VectorDataManager p_vectorsData) {
 	if (_null == true) {
 		setNull(false);
 	}
-	if (       _extension == KageFrame::EXTENSION_NOT
-			|| _extension == KageFrame::EXTENSION_START) {
+	if (       _extension == KageFrame::extension::EXTENSION_NOT
+			|| _extension == KageFrame::extension::EXTENSION_START) {
 		vectorsData.setVectorData(p_vectorsData.getVectorData());
 	} else {
 		_layer->setFrameDataToPreviousFrame(p_vectorsData, frameID);
@@ -115,17 +150,17 @@ void KageFrame::setFrameData(VectorDataManager p_vectorsData) {
 }
 
 bool KageFrame::isEmpty() {
-	if (       _extension == KageFrame::EXTENSION_NOT
-			|| _extension == KageFrame::EXTENSION_START) {
+	if (       _extension == KageFrame::extension::EXTENSION_NOT
+			|| _extension == KageFrame::extension::EXTENSION_START) {
 		return (vectorsData.getVectorData().size() == 0);
 	} else {
 		return (_layer->getPreviousFrameData(frameID).getVectorData().size() <= 1);
 	}
 }
 
-vector<unsigned int> KageFrame::raiseSelectedShape(vector<unsigned int> p_selectedShapes) {
-	if (       _extension == KageFrame::EXTENSION_NOT
-			|| _extension == KageFrame::EXTENSION_START) {
+std::vector<unsigned int> KageFrame::raiseSelectedShape(std::vector<unsigned int> p_selectedShapes) {
+	if (       _extension == KageFrame::extension::EXTENSION_NOT
+			|| _extension == KageFrame::extension::EXTENSION_START) {
 		return vectorsData.raiseSelectedShape(p_selectedShapes);
 	} else {
 		VectorDataManager l_vectorData = _layer->getPreviousFrameData(frameID);
@@ -134,9 +169,9 @@ vector<unsigned int> KageFrame::raiseSelectedShape(vector<unsigned int> p_select
 		return l_selectedShapes;
 	}
 }
-vector<unsigned int> KageFrame::lowerSelectedShape(vector<unsigned int> p_selectedShapes) {
-	if (       _extension == KageFrame::EXTENSION_NOT
-			|| _extension == KageFrame::EXTENSION_START) {
+std::vector<unsigned int> KageFrame::lowerSelectedShape(std::vector<unsigned int> p_selectedShapes) {
+	if (       _extension == KageFrame::extension::EXTENSION_NOT
+			|| _extension == KageFrame::extension::EXTENSION_START) {
 		return vectorsData.lowerSelectedShape(p_selectedShapes);
 	} else {
 		VectorDataManager l_vectorData = _layer->getPreviousFrameData(frameID);
@@ -145,9 +180,9 @@ vector<unsigned int> KageFrame::lowerSelectedShape(vector<unsigned int> p_select
 		return l_selectedShapes;
 	}
 }
-vector<unsigned int> KageFrame::raiseToTopSelectedShape(vector<unsigned int> p_selectedShapes) {
-	if (       _extension == KageFrame::EXTENSION_NOT
-			|| _extension == KageFrame::EXTENSION_START) {
+std::vector<unsigned int> KageFrame::raiseToTopSelectedShape(std::vector<unsigned int> p_selectedShapes) {
+	if (       _extension == KageFrame::extension::EXTENSION_NOT
+			|| _extension == KageFrame::extension::EXTENSION_START) {
 		return vectorsData.raiseToTopSelectedShape(p_selectedShapes);
 	} else {
 		VectorDataManager l_vectorData = _layer->getPreviousFrameData(frameID);
@@ -156,9 +191,9 @@ vector<unsigned int> KageFrame::raiseToTopSelectedShape(vector<unsigned int> p_s
 		return l_selectedShapes;
 	}
 }
-vector<unsigned int> KageFrame::lowerToBottomSelectedShape(vector<unsigned int> p_selectedShapes) {
-	if (       _extension == KageFrame::EXTENSION_NOT
-			|| _extension == KageFrame::EXTENSION_START) {
+std::vector<unsigned int> KageFrame::lowerToBottomSelectedShape(std::vector<unsigned int> p_selectedShapes) {
+	if (       _extension == KageFrame::extension::EXTENSION_NOT
+			|| _extension == KageFrame::extension::EXTENSION_START) {
 		return vectorsData.lowerToBottomSelectedShape(p_selectedShapes);
 	} else {
 		VectorDataManager l_vectorData = _layer->getPreviousFrameData(frameID);
@@ -168,9 +203,9 @@ vector<unsigned int> KageFrame::lowerToBottomSelectedShape(vector<unsigned int> 
 	}
 }
 
-vector<unsigned int> KageFrame::groupSelectedShapes(vector<unsigned int> p_selectedShapes) {
-	if (       _extension == KageFrame::EXTENSION_NOT
-			|| _extension == KageFrame::EXTENSION_START) {
+std::vector<unsigned int> KageFrame::groupSelectedShapes(std::vector<unsigned int> p_selectedShapes) {
+	if (       _extension == KageFrame::extension::EXTENSION_NOT
+			|| _extension == KageFrame::extension::EXTENSION_START) {
 		return vectorsData.groupSelectedShapes(p_selectedShapes);
 	} else {
 		VectorDataManager l_vectorData = _layer->getPreviousFrameData(frameID);
@@ -179,9 +214,9 @@ vector<unsigned int> KageFrame::groupSelectedShapes(vector<unsigned int> p_selec
 		return l_selectedShapes;
 	}
 }
-vector<unsigned int> KageFrame::ungroupSelectedShapes(vector<unsigned int> p_selectedShapes) {
-	if (       _extension == KageFrame::EXTENSION_NOT
-			|| _extension == KageFrame::EXTENSION_START) {
+std::vector<unsigned int> KageFrame::ungroupSelectedShapes(std::vector<unsigned int> p_selectedShapes) {
+	if (       _extension == KageFrame::extension::EXTENSION_NOT
+			|| _extension == KageFrame::extension::EXTENSION_START) {
 		return vectorsData.ungroupSelectedShapes(p_selectedShapes);
 	} else {
 		VectorDataManager l_vectorData = _layer->getPreviousFrameData(frameID);
@@ -191,9 +226,9 @@ vector<unsigned int> KageFrame::ungroupSelectedShapes(vector<unsigned int> p_sel
 	}
 }
 
-vector<unsigned int> KageFrame::duplicateShapes(vector<unsigned int> p_selectedShapes) {
-	if (       _extension == KageFrame::EXTENSION_NOT
-			|| _extension == KageFrame::EXTENSION_START) {
+std::vector<unsigned int> KageFrame::duplicateShapes(std::vector<unsigned int> p_selectedShapes) {
+	if (       _extension == KageFrame::extension::EXTENSION_NOT
+			|| _extension == KageFrame::extension::EXTENSION_START) {
 		return vectorsData.duplicateShapes(p_selectedShapes);
 	} else {
 		VectorDataManager l_vectorData = _layer->getPreviousFrameData(frameID);
@@ -203,9 +238,9 @@ vector<unsigned int> KageFrame::duplicateShapes(vector<unsigned int> p_selectedS
 	}
 }
 
-bool KageFrame::flipHorizontalSelectedShape(vector<unsigned int> p_selectedShapes) {
-	if (       _extension == KageFrame::EXTENSION_NOT
-			|| _extension == KageFrame::EXTENSION_START) {
+bool KageFrame::flipHorizontalSelectedShape(std::vector<unsigned int> p_selectedShapes) {
+	if (       _extension == KageFrame::extension::EXTENSION_NOT
+			|| _extension == KageFrame::extension::EXTENSION_START) {
 		return vectorsData.flipHorizontalSelectedShape(p_selectedShapes);
 	} else {
 		VectorDataManager l_vectorData = _layer->getPreviousFrameData(frameID);
@@ -214,9 +249,9 @@ bool KageFrame::flipHorizontalSelectedShape(vector<unsigned int> p_selectedShape
 		return l_selectedShapes;
 	}
 }
-bool KageFrame::flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes) {
-	if (       _extension == KageFrame::EXTENSION_NOT
-			|| _extension == KageFrame::EXTENSION_START) {
+bool KageFrame::flipVerticalSelectedShape(std::vector<unsigned int> p_selectedShapes) {
+	if (       _extension == KageFrame::extension::EXTENSION_NOT
+			|| _extension == KageFrame::extension::EXTENSION_START) {
 		return vectorsData.flipVerticalSelectedShape(p_selectedShapes);
 	} else {
 		VectorDataManager l_vectorData = _layer->getPreviousFrameData(frameID);
@@ -225,9 +260,9 @@ bool KageFrame::flipVerticalSelectedShape(vector<unsigned int> p_selectedShapes)
 		return l_selectedShapes;
 	}
 }
-bool KageFrame::recenterRotationPoint(vector<unsigned int> p_selectedShapes) {
-	if (       _extension == KageFrame::EXTENSION_NOT
-			|| _extension == KageFrame::EXTENSION_START) {
+bool KageFrame::recenterRotationPoint(std::vector<unsigned int> p_selectedShapes) {
+	if (       _extension == KageFrame::extension::EXTENSION_NOT
+			|| _extension == KageFrame::extension::EXTENSION_START) {
 		return vectorsData.recenterRotationPoint(p_selectedShapes);
 	} else {
 		VectorDataManager l_vectorData = _layer->getPreviousFrameData(frameID);
@@ -237,8 +272,8 @@ bool KageFrame::recenterRotationPoint(vector<unsigned int> p_selectedShapes) {
 	}
 }
 void KageFrame::addDataToFrame(VectorDataManager v) {
-	if (       _extension == KageFrame::EXTENSION_NOT
-			|| _extension == KageFrame::EXTENSION_START) {
+	if (       _extension == KageFrame::extension::EXTENSION_NOT
+			|| _extension == KageFrame::extension::EXTENSION_START) {
 		if (_null == true) {
 			setNull(false);
 		}
@@ -248,14 +283,14 @@ void KageFrame::addDataToFrame(VectorDataManager v) {
 	}
 }
 
-vector<VectorData> KageFrame::copySelectedShapes(vector<unsigned int> p_selectedShapes) {
+std::vector<VectorData> KageFrame::copySelectedShapes(std::vector<unsigned int> p_selectedShapes) {
 	return vectorsData.copySelectedShapes(p_selectedShapes);
 }
 
-vector<unsigned int> KageFrame::pasteSelectedShapes(vector<VectorData> p_copiedShapes) {
+std::vector<unsigned int> KageFrame::pasteSelectedShapes(std::vector<VectorData> p_copiedShapes) {
 	return vectorsData.pasteSelectedShapes(p_copiedShapes);
 }
 
-bool KageFrame::deleteSelectedShapes(vector<unsigned int> p_selectedShapes) {
+bool KageFrame::deleteSelectedShapes(std::vector<unsigned int> p_selectedShapes) {
 	return vectorsData.deleteSelectedShapes(p_selectedShapes);
 }

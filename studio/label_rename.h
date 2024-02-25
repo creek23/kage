@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2023  Mj Mendoza IV
+ * Copyright (C) 2011~2024  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,15 +29,13 @@
 	#include <gtkmm/entry.h>
 	#include <iostream>
 	
-	using namespace std;
-
 	class LabelRenameDialog : public Gtk::Dialog {
 		public:
-			LabelRenameDialog(Gtk::Window& parent, string p_label);
+			LabelRenameDialog(Gtk::Window& parent, std::string p_label);
 			virtual ~LabelRenameDialog();
 			
 			void EntryLabel_onEnter();
-			string getLabel();
+			std::string getLabel();
 		protected:
 			//Member widgets:
 			Gtk::HBox m_HBox;

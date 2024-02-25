@@ -1051,7 +1051,7 @@ bool KageStage::deleteSelectedNodes() {
 	Kage::timestamp_IN();
 	std::cout << " KageStage::deleteSelectedNodes " << selectedNodes.size() << std::endl;
 	
-	sort(selectedNodes.begin(), selectedNodes.end(), greater <unsigned int>());
+	sort(selectedNodes.begin(), selectedNodes.end(), std::greater <unsigned int>());
 	
 	for (unsigned int l_selectedNode = 0; l_selectedNode < selectedNodes.size(); ++l_selectedNode) {
 		Kage::timestamp_IN();

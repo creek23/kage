@@ -88,7 +88,7 @@
 			
 			static bool _gotFocus;
 			
-			std::vector<unsigned int> raiseSelectedShape(vector<unsigned int> p_selectedShapes);
+			std::vector<unsigned int> raiseSelectedShape(std::vector<unsigned int> p_selectedShapes);
 			
 			void addDataToFrame(VectorDataManager v);
 		protected:

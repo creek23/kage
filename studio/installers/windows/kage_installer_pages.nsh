@@ -117,7 +117,7 @@ Section "Gtkmm (53.4 MB)" SEC03
 SectionEnd
 
 
-Section "Plugins (63.4 MB)" SEC04
+Section "Plugins (77.3 MB)" SEC04
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
 

@@ -2874,7 +2874,7 @@ void Kage::doOpenKSF() {
 	set_title(kagePath + " - " + KageAbout::app_title);
 }
 
-void Kage::doSaveDialog(string p_title) {
+void Kage::doSaveDialog(std::string p_title) {
 	Gtk::FileChooserDialog dialog(p_title, Gtk::FILE_CHOOSER_ACTION_SAVE);
 	dialog.set_transient_for( *this);
 		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -4836,8 +4836,8 @@ void Kage::parseKSF(std::string p_content) {
 	}
 }
 
-bool Kage::runExternal(string p_cmd, string p_param) {
-	string l_cmd = p_cmd + " " + p_param;
+bool Kage::runExternal(std::string p_cmd, std::string p_param) {
+	std::string l_cmd = p_cmd + " " + p_param;
 	
 	if (system(NULL)) {
 		int i = system(l_cmd.c_str());

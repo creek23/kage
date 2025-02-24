@@ -63,7 +63,7 @@ void KageStage::addSelectedNode(unsigned int p_index) {
 void KageStage::updateNodeX(double p_value, bool p_stackDo) {
 	Kage::timestamp_IN();
 	std::cout << " KageStage::updateNodeX " << selectedNodes.size() << " " << p_value << std::endl;
-	p_value = p_value / KageStage::currentScale;
+	
 	if (selectedNodes.size() == 0) {
 		Kage::timestamp_OUT();
 		return;
@@ -121,7 +121,7 @@ void KageStage::updateNodeX(double p_value, bool p_stackDo) {
 void KageStage::updateNodeY(double p_value, bool p_stackDo) {
 	Kage::timestamp_IN();
 	std::cout << " KageStage::updateNodeY " << selectedNodes.size() << " " << p_value << std::endl;
-	p_value = p_value / KageStage::currentScale;
+	
 	if (selectedNodes.size() == 0) {
 		Kage::timestamp_OUT();
 		return;

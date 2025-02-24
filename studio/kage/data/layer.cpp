@@ -211,20 +211,21 @@ void KageLayer::duplicateFrame() {
 bool KageLayer::removeFrame() {
 	unsigned int l_currentFrame = getCurrentFrame();
 	unsigned int l_currentFrameIndex = l_currentFrame-1;
+	unsigned int l_frameCount = Frames.size();
 	if (Frames[l_currentFrameIndex]->isNull() == true
-			|| (l_currentFrame == Frames.size() && l_currentFrame > 1)) {
-		if (Frames.size() > 1) {
-			Frames.erase (Frames.begin()+Frames.size()-1);
+			|| (l_currentFrame == l_frameCount && l_currentFrame > 1)) {
+		if (l_frameCount > 1) {
+			Frames.erase (Frames.begin()+l_frameCount-1);
 			setCurrentFrame(--l_currentFrame, false);
 			return true;
 		} else {
 			std::cout << "last frame? do nothing" << std::endl;
 		}
-	} else if (Frames.size() > 1) {
+	} else if (l_frameCount > 1) {
 		KageFrame::extension l_extensionPrevious;
 		KageFrame::extension l_extensionNext;
 		VectorDataManager l_frameData;
-		for (unsigned int i = l_currentFrameIndex; i < Frames.size()-1; ++i) {
+		for (unsigned int i = l_currentFrameIndex; i < l_frameCount-1; ++i) {
 			if (Frames[i]->isNull() == false) {
 				unsigned int l_tween = Frames[i+1]->getTween();
 				if (i > 0) {
@@ -236,10 +237,10 @@ bool KageLayer::removeFrame() {
 					if (l_extensionPrevious == KageFrame::extension::EXTENSION_NOT) {
 						//keep Previous
 						if (       l_extensionNext == KageFrame::extension::EXTENSION_START
-								&& l_extensionNext == KageFrame::extension::EXTENSION_MID) {
+								|| l_extensionNext == KageFrame::extension::EXTENSION_MID) {
 							Frames[i  ]->setExtension(KageFrame::extension::EXTENSION_START);
 						} else if (l_extensionNext == KageFrame::extension::EXTENSION_END
-								&& l_extensionNext == KageFrame::extension::EXTENSION_NOT) {
+								|| l_extensionNext == KageFrame::extension::EXTENSION_NOT) {
 							Frames[i  ]->setExtension(KageFrame::extension::EXTENSION_NOT);
 						}
 					} else if (l_extensionPrevious == KageFrame::extension::EXTENSION_START) {
@@ -290,7 +291,7 @@ bool KageLayer::removeFrame() {
 				
 				//loop to the rest of the frameset
 				KageFrame::extension l_extension;
-				for (unsigned int j = i+1; j < Frames.size()-1; ++j) {
+				for (unsigned int j = i+1; j < l_frameCount-1; ++j) {
 					l_tween     = Frames[j+1]->getTween();
 					l_extension = Frames[j+1]->getExtension();
 					Frames[j  ]->setExtension(l_extension);
@@ -312,11 +313,11 @@ bool KageLayer::removeFrame() {
 				break;
 			}
 		}
-		Frames[Frames.size()-1]->forceSetTween(false);
-		Frames[Frames.size()-1]->setNull(true);
-		Frames[Frames.size()-1]->setExtension(KageFrame::extension::EXTENSION_NOT); //see issue #120 -- https://sourceforge.net/p/kage/tickets/120/
+		Frames[l_frameCount-1]->forceSetTween(false);
+		Frames[l_frameCount-1]->setNull(true);
+		Frames[l_frameCount-1]->setExtension(KageFrame::extension::EXTENSION_NOT); //see issue #120 -- https://sourceforge.net/p/kage/tickets/120/
 		setCurrentFrame(l_currentFrame, false);
-	} else if (Frames.size() == 1) {
+	} else if (l_frameCount == 1) {
 		VectorDataManager l_frameData;
 		setFrameData(l_frameData);
 	}

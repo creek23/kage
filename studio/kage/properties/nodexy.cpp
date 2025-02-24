@@ -70,14 +70,14 @@ void PropertyNodeXY::EntryNodeX_onEnter() {
 	double l_dbl = StringHelper::toDouble(m_EntryNodeX.get_text());
 	
 	m_EntryNodeX.set_text(StringHelper::doubleToString(l_dbl));
-	_kage->_stage.updateNodeX(l_dbl);
+	_kage->_stage.updateNodeX(l_dbl / _kage->_stage.currentScale);
 }
 
 void PropertyNodeXY::EntryNodeY_onEnter() {
 	double l_dbl = StringHelper::toDouble(m_EntryNodeY.get_text());
 	
 	m_EntryNodeY.set_text(StringHelper::doubleToString(l_dbl));
-	_kage->_stage.updateNodeY(l_dbl);
+	_kage->_stage.updateNodeY(l_dbl / _kage->_stage.currentScale);
 }
 
 void PropertyNodeXY::ToggleLine_onClick() {

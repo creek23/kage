@@ -100,6 +100,8 @@
 			
 			KageLayer *_layer;
 			VectorDataManager vectorsData;
+			
+			static unsigned int _mouseLocationShapeIndex;
 	};
 
 #endif //GTKMM_KAGE_FRAME_H

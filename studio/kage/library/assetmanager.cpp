@@ -49,14 +49,17 @@ unsigned int KageAssetManager::addAsset(std::string p_name) {
 	 */
 	
 	std::string l_hash = StringHelper::kHash(p_name, 24);
+	KageAsset::AssetType l_assetType;
 	int l_len = strlen(p_name.c_str()) - 4;
+	unsigned int l_assetID = assetCtr;
 	if (p_name == "") {
 		//p_name = Glib::ustring::compose("Asset %1", assetCtr);
-		std::cout << "NOTE: creating Kage Asset will have no existing file unless User save the Project";
+		std::cout << "NOTE: creating Kage Asset will have no existing file until User saved the Project";
 		//TODO: make this create Asset for KSF
 		return UINT_MAX;
 	} else if (StringHelper::toLower(p_name).substr(l_len, 4) == ".ksf") {
 		//TODO: use Kage to read KSF then add to _document.Scenes 
+		l_assetType = KageAsset::AssetType::ASSET_KAGE;
 	} else if (StringHelper::toLower(p_name).substr(l_len, 4) == ".png") {
 		/**
 		 * TODO:
@@ -107,12 +110,13 @@ unsigned int KageAssetManager::addAsset(std::string p_name) {
 			std::filesystem::current_path(l_currentPath);
 			
 			p_name = l_fileName;
+			l_assetType = KageAsset::AssetType::ASSET_IMAGE;
 		} else {
 			return UINT_MAX;
 		} 
 	}
 	
-	assets.push_back(Gtk::manage(new KageAsset(this, assetCtr)));
+	assets.push_back(Gtk::manage(new KageAsset(this, l_assetID)));
 		pack_end(*assets.back(), Gtk::PACK_SHRINK);
 			(*assets.back()).setLabel(p_name);
 			(*assets.back()).set_size_request(100, 23);
@@ -120,6 +124,7 @@ unsigned int KageAssetManager::addAsset(std::string p_name) {
 			(*assets.back()).setFilePath(l_filePath); //is it still relevant if we have the hash version?
 			(*assets.back()).setFileName(l_fileName);
 			(*assets.back()).setAssetHash(l_hash);
+			(*assets.back()).setAssetType(l_assetType);
 	
 	_currentAssetID = (*assets.back()).assetID;
 	_currentAssetIndex = assets.size()-1;
@@ -273,13 +278,21 @@ void KageAssetManager::render(unsigned int p_renderID) {
 	if (_currentAssetIndex < assetCount() && assets[_currentAssetIndex]->assetID == _currentAssetID) {
 		assets[_currentAssetIndex]->render(p_renderID);
 	} else {
-		for (unsigned int i = 0; i < assetCount(); ++i) {
-			if (assets[i]->assetID == _currentAssetID) {
+		unsigned int i = 0;
+		for (KageAsset* l_asset :  assets) {
+			if (l_asset->assetID == _currentAssetID) {
 				_currentAssetIndex = i;
-				assets[i]->render(p_renderID);
+				l_asset->render(p_renderID);
 				break;
 			}
+			++i;
 		}
+	}
+}
+
+void KageAssetManager::forceRender() {
+	for (KageAsset* l_asset :  assets) {
+		l_asset->forceRender();
 	}
 }
 
@@ -288,6 +301,7 @@ void KageAssetManager::render(unsigned int p_renderID) {
  * 
  */
 void KageAssetManager::renderLibrary(unsigned int p_ID) {
+	_selectedAssetID = p_ID;
 	_kage->_library.render(p_ID);
 }
 bool KageAssetManager::removeAllAssets() {

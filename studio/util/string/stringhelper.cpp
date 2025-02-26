@@ -72,23 +72,45 @@ std::string StringHelper::doubleToString(double p_src) {
 }
 
 int StringHelper::toInteger(std::string p_src) {
-	//TODO: validate string to be numerics
-	return atoi(p_src.c_str());
+	if (StringHelper::isNumeric(p_src) == true) {
+		return atoi(p_src.c_str());
+	}
+	return INT_MAX;
 }
 
 unsigned int StringHelper::toUnsignedInteger(std::string p_src) {
-	//TODO: validate string to be numerics
-	return (unsigned)atoi(p_src.c_str());
+	if (StringHelper::isNumeric(p_src) == true) {
+		return (unsigned)atoi(p_src.c_str());
+	}
+	return UINT_MAX;
 }
 
 long StringHelper::toLong(std::string p_src) {
-	//TODO: validate string to be numerics
-	return atol(p_src.c_str());
+	if (StringHelper::isNumeric(p_src) == true) {
+		return atol(p_src.c_str());
+	}
+	return 0.0f;
 }
 
 double StringHelper::toDouble(std::string p_src) {
-	//TODO: validate string to be numerics
-	return (double)atof(p_src.c_str());
+	if (StringHelper::isScientificNotation(p_src) == true) {
+		bool l_negate = false;
+		if (p_src[0] == '-') {
+			l_negate = true;
+			p_src = p_src.substr(1);
+		}
+		std::istringstream os(p_src);
+		double l_value;
+			os >> l_value;
+		if (l_negate) {
+			l_value *= -1.0f;
+		}
+		std::cout << "StringHelper::toDouble isScientificNotation\t" << p_src << "\t" << l_value << std::endl;
+		return l_value;
+	} else if (StringHelper::isNumeric(p_src) == true) {
+		return (double)atof(p_src.c_str());
+	}
+	return 0.0f;
 }
 
 bool StringHelper::toBoolean(std::string p_src) {
@@ -203,9 +225,112 @@ std::string StringHelper::replace(std::string s, std::string const& p_find, std:
 
 std::string StringHelper::replaceAll(std::string s, std::string const& p_find, std::string const& p_replace) {
 	std::string temp;
+	std::size_t pos = s.find(p_find);
+//	std::cout << "s " << s << "\np_find `" << p_find << "`\tp_replace `" << p_replace << "`" << std::endl;
 	do {
-		temp = s;
-		s = StringHelper::replace(s, p_find, p_replace);
-	} while (temp != s);
+	    if (pos == std::string::npos) {
+			if (temp == "") {
+				temp = s;
+			} else {
+				temp += s;
+			}
+//			std::cout << "EXITING temp " << temp << "` pos `" << pos << "` npos `" << std::string::npos << "`" << std::endl;
+			break;
+		} else {
+			temp += s.substr(0, pos);
+			temp += p_replace;
+			s = s.substr(pos + p_find.length());
+//			std::cout << "?temp " << temp << "\ts " << s << "\tpos `" << pos << "` npos `" << std::string::npos << "`" << std::endl;
+		}
+		pos = s.find(p_find);
+	} while (true);
 	return temp;
+}
+
+
+bool StringHelper::isScientificNotation(std::string p_value) {
+	bool l_gotDOT = false;
+	bool l_scientificNotation = false;
+	
+	if (StringHelper::isNumeric(p_value) == false) {
+		return false;
+	}
+	
+	for (unsigned int i = 0; i < p_value.length(); ++i) {
+		switch (p_value[i]) {
+			case 'e': //notation
+				l_scientificNotation = true;
+				//okay
+				break;
+			case '+':
+				//-1.2e+3 or -1200.0
+				if (l_scientificNotation == false && i > 0) {
+					return false;
+				}
+				//okay
+			case '-':
+				//-1.2e-3 or -0.0012
+				if (l_scientificNotation == false && (i > 0 || p_value.length() == 1)) {
+					return false;
+				}
+				break;
+			case '.':
+				if (l_gotDOT == false) {
+					l_gotDOT = true;
+				} else {
+					//can't have a value of "1.2.3"
+					return false;
+				}
+				break;
+		}
+	}
+	
+	return l_scientificNotation;
+}
+
+bool StringHelper::isNumeric(std::string p_value) {
+	bool l_gotDOT = false;
+	bool l_scientificNotation = false;
+	
+	for (unsigned int i = 0; i < p_value.length(); ++i) {
+		switch (p_value[i]) {
+			case '0': case '1': case '2':
+			case '3': case '4': case '5':
+			case '6': case '7': case '8':
+			case '9':
+				//okay
+				break;
+			case 'e': //notation
+				l_scientificNotation = true;
+				std::cout << "\n\n\t\t\t\t\tl_scientificNotation\n\n" << std::endl;
+				//okay
+				break;
+			case '+':
+				//-1.2e+3 or -1200.0
+				if (l_scientificNotation == false && i > 0) {
+					std::cout << "\n\n\t\t\t\t\t+@i " << i << "\n\n" << std::endl;
+					return false;
+				}
+				//okay
+			case '-':
+				//-1.2e-3 or -0.0012
+				if (l_scientificNotation == false && (i > 0 || p_value.length() == 1)) {
+					std::cout << "\n\n\t\t\t\t\t-@i " << i << "\n\n" << std::endl;
+					return false;
+				}
+				break;
+			case '.':
+				if (l_gotDOT == false) {
+					l_gotDOT = true;
+				} else {
+					//can't have a value of "1.2.3"
+					return false;
+				}
+				break;
+			default:
+				return false;
+		}
+	}
+	
+	return true;
 }

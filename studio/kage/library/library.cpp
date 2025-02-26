@@ -172,9 +172,9 @@ bool KageLibrary::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 		p_context->fill_preserve();
 
 		//TODO: check if _renderAssetID is IMAGE
-		if (_renderAssetID != UINT_MAX && _kage->_stage.cairoPNG[_renderAssetID]) {
+		if (_renderAssetID != UINT_MAX && KageStage::cairoPNG[_renderAssetID]) {
 			try {
-				KageStage::cairoImageSurface = _kage->_stage.cairoPNG[_renderAssetID];
+				KageStage::cairoImageSurface = KageStage::cairoPNG[_renderAssetID];
 				
 				double imageWidth = KageStage::cairoImageSurface->get_width();
 				double imageHeight = KageStage::cairoImageSurface->get_height();

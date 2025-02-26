@@ -55,7 +55,8 @@
 			void setAssetType(KageAsset::AssetType p_assetType);
 			
 			void render(unsigned int p_renderID);
-
+			void forceRender();
+			
 			void renameAsset(KageAsset *p_asset);
 			void renameAsset();
 			void setLabel(std::string p_label);
@@ -87,6 +88,8 @@
 			void renderLibrary(unsigned int p_ID);
 			
 			Kage *_kage;
+
+			unsigned int _selectedAssetID;
 		protected:
 			unsigned int assetCtr;
 			std::vector<Gtk::Button*> labels;

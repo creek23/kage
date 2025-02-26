@@ -90,7 +90,7 @@
 			double nodeY = 0;
 			unsigned int nodeIndexX = 0;
 			unsigned int nodeIndexY = 0;
-			float propAlpha = 1.0f;
+			static float propAlpha; //= 1.0f;
 
 			#define IMAGE_ID_BUFF       0 //p1 x/y == ID / imageBuff
 			#define IMAGE_X_Y           1 //p2 x/y == x / y
@@ -107,7 +107,7 @@
 			Gdk::Color getFill();
 			void setStroke(Gdk::Color p_Color);
 			Gdk::Color getStroke();
-			double currentScale; /// for use with zoom; default value is _kage->_document._width; can be changed as preferred
+			static double currentScale; /// for use with zoom; default value is _kage->_document._width; can be changed as preferred
 			void clearScreen(Cairo::RefPtr<Cairo::Context> p_context);
 			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context, bool p_force = false);
 			void renderOnionFrame(Cairo::RefPtr<Cairo::Context> p_context, std::vector<VectorData> p_vectorData, double p_alpha);
@@ -198,12 +198,12 @@
 			void renderFrameToPNGOffset(Cairo::RefPtr<Cairo::Context> p_context, double p_offsetX = 0.0, double p_offsetY = 0.0);
 			
 			Cairo::RefPtr<Cairo::Context> cr;
-			PointData origin;
+			static PointData origin;
 			
 			bool _isModifyingShape;
 			
 			double _zoomRatio;
-			double _zoomValue;
+			static double _zoomValue;
 			PointData _zoomReference;
 			PointData __origin;
 			PointData __stageArea;
@@ -220,7 +220,7 @@
 
 			void unpressKeys();
 
-			std::vector<Cairo::RefPtr<Cairo::ImageSurface>> cairoPNG;
+			static std::vector<Cairo::RefPtr<Cairo::ImageSurface>> cairoPNG;
 			static Cairo::RefPtr<Cairo::ImageSurface> cairoImageSurface;
 		protected:
 			ToolMode prevTool; //used by Hand-tool shortcut [spacebar]

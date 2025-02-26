@@ -29,6 +29,7 @@
 	#include <vector>
 	#include <algorithm>
 	#include <cstring>
+	#include <iostream>
 	
 	class StringHelper {
 		public:
@@ -48,6 +49,9 @@
 
 			static std::string replace(std::string s, std::string const& p_find, std::string const& p_replace);
 			static std::string replaceAll(std::string s, std::string const& p_find, std::string const& p_replace);
+			
+			static bool isScientificNotation(std::string p_value);
+			static bool isNumeric(std::string p_value);
 	};
 	
 #endif //UTIL_STRING_HELPER_H

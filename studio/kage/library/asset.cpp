@@ -126,7 +126,13 @@ bool KageAsset::on_event(GdkEvent *e) {
 	} else if (e->type == GDK_DOUBLE_BUTTON_PRESS) {
 		if (e->button.x > 36) {
 			if (_CTRL) {
-				_assetManager->_kage->_stage.addImage(assetID);
+				
+				if (_assetType == AssetType::ASSET_IMAGE) {
+					_assetManager->_kage->_stage.addImage(assetID);
+				} else if (_assetType == AssetType::ASSET_KAGE) {
+					//TODO: check for cyclical dependency
+					//TODO: implement KageStage::addKSF
+				}
 			} else {
 				_assetManager->renameAsset(this);
 			}
@@ -136,7 +142,11 @@ bool KageAsset::on_event(GdkEvent *e) {
 		KageAsset::mouseIsDown = false;
 		grab_focus();
 
-		_assetManager->render(_renderAssetID);
+		if (_assetType == AssetType::ASSET_IMAGE) {
+			_assetManager->render(_renderAssetID);
+		} else if (_assetType == AssetType::ASSET_KAGE) {
+			//TODO: render KSF logo on Library
+		}
 
 		invalidateToRender();
 	} else if (e->type == GDK_BUTTON_PRESS) {

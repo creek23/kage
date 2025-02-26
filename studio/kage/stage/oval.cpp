@@ -94,7 +94,7 @@ void KageStage::handleOval() {
 	cr->close_path();
 		cr->set_source_rgba((double)KageStage::fillColor.getR()/255, (double)KageStage::fillColor.getG()/255, (double)KageStage::fillColor.getB()/255, (double)KageStage::fillColor.getA()/255);
 		cr->fill_preserve();
-			cr->set_line_width(stroke.getThickness() * _zoomValue);
+			cr->set_line_width(stroke.getThickness() * KageStage::_zoomValue);
 			cr->set_source_rgba((double)KageStage::stroke.getR()/255, (double)KageStage::stroke.getG()/255, (double)KageStage::stroke.getB()/255, (double)KageStage::stroke.getA()/255);
 			cr->stroke();
 }

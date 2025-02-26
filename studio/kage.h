@@ -171,6 +171,8 @@
 			void RemoveTweenFrame_onClick();
 //			void New_onClick();
 			void OpenKAGE_onClick();
+			std::string svgPath;
+			void ImportSVG_onClick();
 			void ExportKS_onClick();
 			void ExportHTML5_onClick();
 			void ExportSVG_onClick();
@@ -189,6 +191,7 @@
 			
 			void doOpenKAGE();
 			void doOpenKSF();
+			void doImportSVG();
 			void doSaveProjectDialog(std::string p_title);
 			void doSaveProject(std::string p_filename);
 			void doSaveDialog(std::string p_title);
@@ -385,8 +388,12 @@
 			std::vector<int> parseColorString(std::string p_color);
 			void parseKAGE_Children(std::vector<XmlTag> p_children);
 			void parseKAGE(std::string p_content);
-			void parseKSF_Children(std::vector<XmlTag> p_children);
-			void parseKSF(std::string p_content);
+			bool parseKSF_Children(std::vector<XmlTag> p_children);
+			bool parseKSF(std::string p_content);
+			void parseSVG_ChildrenPathStyle(ColorData &p_pathColor, StrokeColorData &p_pathStrokeColor, XmlTagProperty &p_graphProperty);
+			void parseSVG_ChildrenPath(double p_centerX, double p_centerY, ColorData &p_pathColor, StrokeColorData &p_pathStrokeColor, XmlTag &p_graphTag);
+			void parseSVG_Children(std::vector<XmlTag> p_children);
+			void parseSVG(std::string p_content);
 			std::string runExternalGetResult(std::string p_cmd, std::string p_param);
 			bool runExternal(std::string p_cmd, std::string p_param);
 			

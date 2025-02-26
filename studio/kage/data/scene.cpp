@@ -41,6 +41,7 @@ KageScene KageScene::operator=(const KageScene &p_scene) {
 	this->_label            = p_scene._label;
 	this->layerCtr          = p_scene.layerCtr;
 	this->_activeLayerID    = p_scene._activeLayerID;
+	this->_isAsset          = p_scene._isAsset;
 	//TODO: Assets that are KSF should be included on _document but TAGged as ASSET
 	// ex: this->_asset     = p_scene._asset; //_asset is boolean
 
@@ -81,6 +82,7 @@ void KageScene::init(KageDocument *p_document, unsigned int p_sceneID) {
 	_activeLayerIndex = 0;
 	_activeLayerID = Layers[_activeLayerIndex]->getID();
 	_activeLayer = _activeLayerIndex; + 1;
+	_isAsset = false;
 }
 
 unsigned int KageScene::getID() {
@@ -109,6 +111,7 @@ bool KageScene::isSaved() {
 }
 
 bool KageScene::LOADING_MODE = false;
+std::vector<unsigned int> KageScene::sceneStack = {}; //TODO: implementation is too ugly; refactor ASAP!
 
 KageScene::KageScene(KageDocument *p_document, unsigned int p_sceneID) {
 	init(p_document, p_sceneID);

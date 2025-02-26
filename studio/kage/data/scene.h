@@ -144,6 +144,7 @@
 
 			std::string getLabel();
 			void setLabel(std::string p_label);
-			
+			bool _isAsset;
+			static std::vector<unsigned int> sceneStack;///For use of Stage when user viewed KSF-asset, current Scene ID will be stacked as "previous" View
 	};
 #endif //GTKMM_KAGE_SCENE_H

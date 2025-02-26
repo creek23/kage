@@ -40,7 +40,8 @@
 				TYPE_CURVE_QUADRATIC, //draws a curve from p0 with kink to p1 before ending at p2 then; p1 and p2 is to be stored
 				TYPE_CURVE_CUBIC,     //draws a curve from p0 with kink to p1 before ending at p2 and another from p2 with kink to p3 then ends at p4
 				TYPE_TEXT,            //TODO: handle string content
-				TYPE_IMAGE            //TODO: think of how to handle blits from imageB to imageA
+				TYPE_IMAGE,           //holds 5coords for ID and bufferIndex, x/y, width/height, scaleX/scaleY, rotate/alpha			
+				TYPE_KSF              //TODO: 5coords for ID and bufferIndex, x/y, width/height, scaleX/scaleY, rotate/alpha
 			};
 			
 			VectorData();

@@ -30,8 +30,8 @@ void KageStage::handleDrawPencilMouseDown(PointData p_point) {
 	
 	_polyVectors.clear();
 	
-	polyXhead = (p_point.x - origin.x) / KageStage::currentScale / _zoomValue;
-	polyYhead = (p_point.y - origin.y) / KageStage::currentScale / _zoomValue;
+	polyXhead = (p_point.x - origin.x) / KageStage::currentScale / KageStage::_zoomValue;
+	polyYhead = (p_point.y - origin.y) / KageStage::currentScale / KageStage::_zoomValue;
 	
 	drawFree1.x = polyXhead;
 	drawFree1.y = polyYhead;
@@ -60,12 +60,12 @@ void KageStage::handleDrawPencilMouseMove(PointData p_point) {
 			
 			drawCtr = 0;
 			
-				drawFree2.x = (drawFree2.x - origin.x) / KageStage::currentScale / _zoomValue;
-				drawFree3.x = (drawFree3.x - origin.x) / KageStage::currentScale / _zoomValue;
-				drawFree4.x = (drawFree4.x - origin.x) / KageStage::currentScale / _zoomValue;
-				drawFree2.y = (drawFree2.y - origin.y) / KageStage::currentScale / _zoomValue;
-				drawFree3.y = (drawFree3.y - origin.y) / KageStage::currentScale / _zoomValue;
-				drawFree4.y = (drawFree4.y - origin.y) / KageStage::currentScale / _zoomValue;
+				drawFree2.x = (drawFree2.x - origin.x) / KageStage::currentScale / KageStage::_zoomValue;
+				drawFree3.x = (drawFree3.x - origin.x) / KageStage::currentScale / KageStage::_zoomValue;
+				drawFree4.x = (drawFree4.x - origin.x) / KageStage::currentScale / KageStage::_zoomValue;
+				drawFree2.y = (drawFree2.y - origin.y) / KageStage::currentScale / KageStage::_zoomValue;
+				drawFree3.y = (drawFree3.y - origin.y) / KageStage::currentScale / KageStage::_zoomValue;
+				drawFree4.y = (drawFree4.y - origin.y) / KageStage::currentScale / KageStage::_zoomValue;
 				_polyVectors.addCubic(PointData(drawFree2), PointData(drawFree3), PointData(drawFree4));
 			
 			polyXtail = drawFree4.x;
@@ -118,22 +118,22 @@ void KageStage::handlePencil() {
 	}
 	if (_polyVectors.getVectorData().size() < 5) return;
 	
-	cr->move_to((drawFree4.x*KageStage::currentScale*_zoomValue)+origin.x,
-				(drawFree4.y*KageStage::currentScale*_zoomValue)+origin.y);
+	cr->move_to((drawFree4.x*KageStage::currentScale*KageStage::_zoomValue)+origin.x,
+				(drawFree4.y*KageStage::currentScale*KageStage::_zoomValue)+origin.y);
 	cr->line_to(draw2.x, draw2.y);
-		cr->set_line_width(KageStage::pencilStroke.getThickness() / 2 * _zoomValue);
+		cr->set_line_width(KageStage::pencilStroke.getThickness() / 2 * KageStage::_zoomValue);
 		cr->set_source_rgba(0.533, 0.541, 0.522, 1.0);
 		cr->stroke();
 	if (KageStage::toolMode == KageStage::ToolMode::MODE_DRAW_PENCIL) {
 		return;
 	}
 	//draw point-of-origin box
-	if (       draw2.x-5 <= (polyXhead*KageStage::currentScale*_zoomValue)+origin.x && draw2.x+5 >= (polyXhead*KageStage::currentScale*_zoomValue)+origin.x
-			&& draw2.y-5 <= (polyYhead*KageStage::currentScale*_zoomValue)+origin.y && draw2.y+5 >= (polyYhead*KageStage::currentScale*_zoomValue)+origin.y) {
-		cr->move_to(    (polyXhead*KageStage::currentScale*_zoomValue)-5 + origin.x, (polyYhead*KageStage::currentScale*_zoomValue)-5 + origin.y);
-			cr->line_to((polyXhead*KageStage::currentScale*_zoomValue)+5 + origin.x, (polyYhead*KageStage::currentScale*_zoomValue)-5 + origin.y);
-			cr->line_to((polyXhead*KageStage::currentScale*_zoomValue)+5 + origin.x, (polyYhead*KageStage::currentScale*_zoomValue)+5 + origin.y);
-			cr->line_to((polyXhead*KageStage::currentScale*_zoomValue)-5 + origin.x, (polyYhead*KageStage::currentScale*_zoomValue)+5 + origin.y);
+	if (       draw2.x-5 <= (polyXhead*KageStage::currentScale*KageStage::_zoomValue)+origin.x && draw2.x+5 >= (polyXhead*KageStage::currentScale*KageStage::_zoomValue)+origin.x
+			&& draw2.y-5 <= (polyYhead*KageStage::currentScale*KageStage::_zoomValue)+origin.y && draw2.y+5 >= (polyYhead*KageStage::currentScale*KageStage::_zoomValue)+origin.y) {
+		cr->move_to(    (polyXhead*KageStage::currentScale*KageStage::_zoomValue)-5 + origin.x, (polyYhead*KageStage::currentScale*KageStage::_zoomValue)-5 + origin.y);
+			cr->line_to((polyXhead*KageStage::currentScale*KageStage::_zoomValue)+5 + origin.x, (polyYhead*KageStage::currentScale*KageStage::_zoomValue)-5 + origin.y);
+			cr->line_to((polyXhead*KageStage::currentScale*KageStage::_zoomValue)+5 + origin.x, (polyYhead*KageStage::currentScale*KageStage::_zoomValue)+5 + origin.y);
+			cr->line_to((polyXhead*KageStage::currentScale*KageStage::_zoomValue)-5 + origin.x, (polyYhead*KageStage::currentScale*KageStage::_zoomValue)+5 + origin.y);
 		cr->close_path();
 			cr->set_source_rgb(1.0, 0.0, 0.0);
 			cr->fill_preserve();
@@ -141,10 +141,10 @@ void KageStage::handlePencil() {
 				cr->set_source_rgb(0.0, 0.0, 0.0);
 				cr->stroke();
 	} else {
-		cr->move_to(    (polyXhead*KageStage::currentScale*_zoomValue)-3 + origin.x, (polyYhead*KageStage::currentScale*_zoomValue)-3 + origin.y);
-			cr->line_to((polyXhead*KageStage::currentScale*_zoomValue)+3 + origin.x, (polyYhead*KageStage::currentScale*_zoomValue)-3 + origin.y);
-			cr->line_to((polyXhead*KageStage::currentScale*_zoomValue)+3 + origin.x, (polyYhead*KageStage::currentScale*_zoomValue)+3 + origin.y);
-			cr->line_to((polyXhead*KageStage::currentScale*_zoomValue)-3 + origin.x, (polyYhead*KageStage::currentScale*_zoomValue)+3 + origin.y);
+		cr->move_to(    (polyXhead*KageStage::currentScale*KageStage::_zoomValue)-3 + origin.x, (polyYhead*KageStage::currentScale*KageStage::_zoomValue)-3 + origin.y);
+			cr->line_to((polyXhead*KageStage::currentScale*KageStage::_zoomValue)+3 + origin.x, (polyYhead*KageStage::currentScale*KageStage::_zoomValue)-3 + origin.y);
+			cr->line_to((polyXhead*KageStage::currentScale*KageStage::_zoomValue)+3 + origin.x, (polyYhead*KageStage::currentScale*KageStage::_zoomValue)+3 + origin.y);
+			cr->line_to((polyXhead*KageStage::currentScale*KageStage::_zoomValue)-3 + origin.x, (polyYhead*KageStage::currentScale*KageStage::_zoomValue)+3 + origin.y);
 		cr->close_path();
 			cr->set_source_rgb(1.0, 1.0, 1.0);
 			cr->fill_preserve();

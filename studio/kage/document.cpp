@@ -152,16 +152,15 @@ bool  KageDocument::isSaved() {
 	return _saved;
 }
 KageScene *KageDocument::getScene() {
-	int l_sceneCount = Scenes.size();
-	for (int i = 0; i < l_sceneCount; ++i) {
-		if (Scenes[i]->getID() == _activeSceneID) {
-			return Scenes[i];
+	for (KageScene* l_scene : Scenes) {
+		if (l_scene->getID() == _activeSceneID) {
+			return l_scene;
 		}
 	}
 	return Scenes[0]; //harder to handle NULL but needs to be reviewed why _activeSceneID is not matching the only Scene's ID
 }
 /**
- * @brief  returns activeSceneIndex+1
+ * @brief  returns activeSceneIndex+1; to get the actual (pointer to) Scene object, use getScene instead
  * 
  * @return unsigned int activeSceneIndex+1
  * @sa setActiveScene
@@ -178,9 +177,9 @@ unsigned int KageDocument::getCurrentScene() {
 /**
  * @brief Used by KageSceneUI
  * 
- * @param p_currentScene p_currentScene-1 is index
+ * @param p_newScene p_newScene-1 is index
  */
-void KageDocument::setCurrentScene(unsigned int p_currentScene) {
+void KageDocument::setCurrentScene(unsigned int p_newScene) {
 	int l_sceneCount = Scenes.size();
 	//unselect previously selected Scene
 	if (_activeSceneIndex < l_sceneCount && Scenes[_activeSceneIndex]->getID() == _activeSceneID) {
@@ -195,18 +194,46 @@ void KageDocument::setCurrentScene(unsigned int p_currentScene) {
 	}
 	
 	//select new scene
-	if (p_currentScene > l_sceneCount) {
-		p_currentScene = l_sceneCount;
+	if (p_newScene > l_sceneCount) {
+		p_newScene = l_sceneCount;
 	}
-	if (p_currentScene < 1) {
-		p_currentScene = 1;
+	if (p_newScene < 1) {
+		p_newScene = 1;
 	}
-	_activeSceneIndex = p_currentScene-1;
+	_activeSceneIndex = p_newScene-1;
 	_activeSceneID = Scenes[_activeSceneIndex]->getID();
-	_activeScene      = p_currentScene;
+	_activeScene      = p_newScene;
 	Scenes[_activeSceneIndex]->setSelected(true);
 }
-			
+void KageDocument::setCurrentSceneByID(unsigned int p_newSceneID) {
+	if (_activeSceneID == p_newSceneID) {
+		return;
+	}
+	int l_sceneCount = Scenes.size();
+	//unselect previously selected Scene
+	if (_activeSceneIndex < l_sceneCount && Scenes[_activeSceneIndex]->getID() == _activeSceneID) {
+		Scenes[_activeSceneIndex]->setSelected(false);
+	} else {
+		for (unsigned int i = 0; i < l_sceneCount; ++i) {
+			if (Scenes[i]->getID() == _activeSceneID) {
+				Scenes[i]->setSelected(false);
+				break;
+			}
+		}
+	}
+	
+	//select new scene
+	for (unsigned int i = 0; i < l_sceneCount; ++i) {
+		//make sure p_newSceneID is valid Scene ID
+		if (Scenes[i]->getID() == p_newSceneID) {
+			_activeSceneIndex = i;
+			_activeSceneID    = p_newSceneID;
+			_activeScene      = _activeSceneIndex+1; //is this correct? is _activeScene even in use?
+			Scenes[_activeSceneIndex]->setSelected(true);
+			break;
+		}
+	}
+}
 unsigned int KageDocument::getActiveSceneID() {
 	return _activeSceneID;
 }
@@ -232,10 +259,11 @@ unsigned int KageDocument::getActiveFrameID() {
  * 
  * @return Scene ID of newly created Scene
  */
-unsigned int KageDocument::addScene(std::string p_sceneLabel) {
+unsigned int KageDocument::addScene(std::string p_sceneLabel, bool p_asset) {
 	++sceneCtr;
 	//TODO: add scene above(or below) currently selected Scene
 	_scenePtr = new KageScene(this, sceneCtr);
+	_scenePtr->_isAsset = p_asset;
 	Scenes.push_back(_scenePtr);
 	if (_activeSceneID == UINT_MAX) {
 		_activeSceneID = sceneCtr;
@@ -472,4 +500,31 @@ bool KageDocument::moveSceneToBottom() {
 		}
 	}
 	return false;
+}
+
+/**
+ * @brief For use by Kage when Play is triggered
+ * 
+ * @return true 
+ * @return false 
+ */
+bool KageDocument::gotoNextScene() {
+	if (KageDocument::ASSET_MODE == false) {
+		if (Scenes.size() > 1) {
+			if (getCurrentScene() < Scenes.size()) {
+				setCurrentScene(getCurrentScene()+1); //go to Next Scene
+				
+				if (getScene()->_isAsset == true) {
+					gotoNextScene();
+				}
+			} else {
+				setCurrentScene(1); //go to First Scene
+			}
+			return true;
+		}
+		//frameCounter = 1;
+		return false;
+	} else {
+		return true;
+	}
 }

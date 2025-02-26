@@ -22,7 +22,7 @@
 #include "about.h"
 
 std::string KageAbout::app_title = "Kage Studio";
-std::string KageAbout::app_version = "0.8.240224";
+std::string KageAbout::app_version = "0.8.240824";
 std::string KageAbout::app_author = "Mj Mendoza IV";
 std::string KageAbout::app_contact = "mj.mendoza.iv@gmail.com";
 std::string KageAbout::app_website = "https://kage.sourceforge.io";
@@ -47,7 +47,7 @@ KageAbout::KageAbout(Gtk::Window& parent)
 	"but WITHOUT ANY WARRANTY; without even the implied warranty of\n" +
 	"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n" +
 	"GNU General Public License for more details.";
-	m_Label1.set_label(KageAbout::app_title + " v" + KageAbout::app_version);
+	m_Label1.set_label(KageAbout::app_title + " v" + KageAbout::app_version + " (Emcee)");
 	m_Label2.set_label(KageAbout::app_comment + "\n\n" + KageAbout::app_website + "\n" + KageAbout::app_copyright + " " + KageAbout::app_author + " <" + KageAbout::app_contact + ">\nAll Rights Reversed\n\n" + l_license);
 	
 	add_button(Gtk::Stock::OK, Gtk::RESPONSE_OK);

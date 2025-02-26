@@ -1,6 +1,6 @@
 /*
  * Kage Studio - a simple free and open source vector-based 2D animation software
- * Copyright (C) 2011~2024  Mj Mendoza IV
+ * Copyright (C) 2011~2022  Mj Mendoza IV
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,12 +22,10 @@
 #include "kagedo.h"
 
 KageDo::KageDo() {
-	_scene = UINT_MAX;
-	_layer = UINT_MAX;
-	_frame = UINT_MAX;
+	_layer = -1;
+	_frame = -1;
 }
-KageDo::KageDo(unsigned int p_scene, unsigned int p_layer, unsigned int p_frame) {
-	_scene = p_scene;
+KageDo::KageDo(unsigned int p_layer, unsigned int p_frame) {
 	_layer = p_layer;
 	_frame = p_frame;
 }
@@ -49,7 +47,7 @@ void KageDo::clear() {
 }
 
 void KageDo::push(KageDo p_vectorsData) {
-	std::vector<VectorData> l_v = p_vectorsData.getVectorData();
+	vector<VectorData> l_v = p_vectorsData.getVectorData();
 	int isrc = l_v.size();
 	
 	for (int i = 0; i < isrc; ++i) {
@@ -68,12 +66,12 @@ void KageDo::add(VectorData::type p_type, ColorData p_fill, StrokeColorData p_st
 }
 
 KageDo KageDo::clone() {
-	std::vector<VectorData> l_vectorData;
+	vector<VectorData> l_vectorData;
 	unsigned int count = _vectorData.size();
 		for (unsigned int i = 0; i < count; ++i) {
 			l_vectorData.push_back(_vectorData[i].clone());
 		}
-	KageDo l_kageDo(_scene, _layer, _frame);
+	KageDo l_kageDo(_layer, _frame);
 	l_kageDo.setVectorData(l_vectorData);
 	
 	return l_kageDo;

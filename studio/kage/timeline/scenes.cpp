@@ -137,10 +137,27 @@ bool KageScenesUI::on_event(GdkEvent *e) {
 		KageScenesUI::mouseIsDown = true;
 		//determine Y location to identify which scene to highlight
 		int l_scenes = _kage->_document.Scenes.size();
+		std::vector<unsigned int> l_sceneIDs = {};
+		unsigned int l_sceneCounter = 0;
+		//create list of Scenes (don't count KSF-asset) to be referenced against user-click
+		for (KageScene* l_scene :  _kage->_document.Scenes) {
+			if (l_scene->_isAsset == false) {
+				l_sceneIDs.push_back(l_sceneCounter);
+			}
+			++l_sceneCounter;
+		}
+		//double l_y = get_height() - (l_scenes * FRAME_HEIGHT);
+		//int l_index = l_scenes - ((e->button.y - l_y) / FRAME_HEIGHT);
+		
 		int l_index = (e->button.y / FRAME_HEIGHT);
 		try {
 			if (l_index < l_scenes) {
-				_kage->setDocumentCurrentScene(l_index+1);
+				KageScene::sceneStack.clear();
+				KageDocument::ASSET_MODE = false;
+				unsigned int l_currentScene = _kage->getDocumentCurrentScene();
+				std::cout << std::endl << std::endl << "SCENES-AAA _document...->Scenes.size() " << (int)_kage->_document.Scenes.size() << " _activeSceneID " << _kage->_document._activeSceneID << " " << _kage->_document.Scenes[0]->sceneID << "\t" << _kage->_document.Scenes[0] << "\tl_currentScene " << l_currentScene << std::endl;
+				_kage->setDocumentCurrentScene(l_sceneIDs[l_index]);
+				std::cout << "SCENES-BBB _document...->Scenes.size() " << (int)_kage->_document.Scenes.size() << " _activeSceneID " << _kage->_document._activeSceneID << " " << _kage->_document.Scenes[0]->sceneID << "\t" << _kage->_document.Scenes[0] << "\tl_index+1 " << l_index+1 << std::endl << std::endl << std::endl;
 			}
 		} catch (std::exception& e) {
 			std::cout << "KageScenesUI::on_event Exception : " << e.what() << std::endl;
@@ -221,7 +238,10 @@ bool KageScenesUI::on_draw(const Cairo::RefPtr<Cairo::Context>& p_context) {
 		KageScene *l_scene;
 		for (unsigned int i = 0; i < l_scenes; ++i) {
 			l_scene = _kage->_document.Scenes[i];
-	        //draw background
+			if (l_scene->_isAsset == true) {
+				continue;
+			}
+			//draw background
 	        
 				p_context->move_to(              0, l_y               );
 					p_context->line_to(get_width(), l_y               );

@@ -24,8 +24,16 @@
 unsigned int PointData::debug_pts;
 
 bool KageFrame::_gotFocus;
+unsigned int KageFrame::_mouseLocationShapeIndex;
 
 unsigned int VectorDataManager::idmaker;
+
+GdkPoint KageDocument::_mouseLocation;
+bool KageDocument::_displayObjectIsShape;
+bool KageDocument::ASSET_MODE = false;
+double KageStage::_zoomValue;
+double KageStage::currentScale;
+PointData KageStage::origin;
 
 unsigned int Kage::TAB_COUNT = 0;
 
@@ -92,6 +100,10 @@ Kage::Kage(std::string p_filePath) :
 	m_refActionGroup->add(
 		Gtk::Action::create("SaveProjectAs", "Save _As", "Save Project As"),
 		sigc::mem_fun(*this, &Kage::ProjectSaveAs_onClick)
+	);
+	m_refActionGroup->add(
+		Gtk::Action::create("ImportSVG", "_Import SVG", "Import SVG file"),
+		sigc::mem_fun(*this, &Kage::ImportSVG_onClick)
 	);
 	m_refActionGroup->add(
 		Gtk::Action::create("ExportKS", "Export KonsolScript", "Export to KS"),
@@ -519,6 +531,8 @@ Kage::Kage(std::string p_filePath) :
 		"			<separator/>"
 		"			<menuitem action='SaveProject'/>"
 		"			<menuitem action='SaveProjectAs'/>"
+		"			<separator/>"
+		"			<menuitem action='ImportSVG'/>"
 		"			<separator/>"
 		"			<menu action='ExportMenu'>"
 		"				<menuitem action='ExportVideo'/>"
@@ -1154,6 +1168,12 @@ Kage::Kage(std::string p_filePath) :
 				//asset manager
 				m_PropertyBox.pack_start(_assetManager, Gtk::PACK_SHRINK);
 	
+	auto display = Gdk::Display::get_default();
+	auto cursor = Gdk::Cursor::create(display, Gdk::CursorType::ARROW);
+	auto window =  get_window();
+	if (window) {
+		window->set_cursor(cursor);
+	}
 	New_onClick();
 	ToggleLoop_onClick();
 
@@ -1201,7 +1221,7 @@ Kage::~Kage() {
 }
 
 void Kage::displayMouseXY(double p_x, double p_y) {
-	_labelStatusMouseXY.set_text("X: " + StringHelper::doubleToString(p_x) + " Y: " + StringHelper::doubleToString(p_y) + "\t" + StringHelper::doubleToString((int)(_stage._zoomValue*100.0f)));
+	_labelStatusMouseXY.set_text("X: " + StringHelper::doubleToString(p_x) + " Y: " + StringHelper::doubleToString(p_y) + "\t" + StringHelper::doubleToString((int)(KageStage::_zoomValue*100.0f)));
 }
 void Kage::updateStatus(Glib::ustring status_msg) {
 	m_Statusbar.push(status_msg, m_ContextId);
@@ -1217,6 +1237,10 @@ void Kage::Undo_onClick() {
 		_timeline.forceRender();
 		_layers.forceRender();
 		_scenes.forceRender();
+		
+		//due to KSF-asset, let's refresh lib/asset UIs
+		_assetManager.forceRender();
+		//_library.forceRender();
 	} else {
 		setDocumentSceneCurrentLayer(getDocumentSceneCurrentLayer(), false);
 		setDocumentSceneLayerCurrentFrame(getDocumentSceneLayerCurrentFrame(), false);
@@ -1230,6 +1254,10 @@ void Kage::Redo_onClick() {
 		_timeline.forceRender();
 		_layers.forceRender();
 		_scenes.forceRender();
+		
+		//due to KSF-asset, let's refresh lib/asset UIs
+		_assetManager.forceRender();
+		//_library.forceRender();
 	} else {
 		setDocumentSceneCurrentLayer(getDocumentSceneCurrentLayer(), false);
 		setDocumentSceneLayerCurrentFrame(getDocumentSceneLayerCurrentFrame(), false);
@@ -1251,7 +1279,7 @@ void Kage::Cut_onClick() {
 void Kage::Copy_onClick() {
 	Kage::timestamp_IN(); std::cout << " Kage::Copy_onClick " << KageFrame::_gotFocus << std::endl;
 	try {
-		g_copiedData = _document.getScene()->getLayer()->getFrame()->copySelectedShapes(_stage.selectedShapes);
+		g_copiedData = _document.getScene()->getLayer()->getFrame()->copySelectedShapes(_stage.getSelectedShapes());
 		if (g_copiedData.size() > 0) {
 		//if ( _stage.copySelectedShapes() == true) {
 			//forceRenderFrames(); //why re-render the frames?
@@ -2197,6 +2225,8 @@ void Kage::toolsButtonToggle(std::string p_toolTip) {
 
 void Kage::ToolButtons_onClick(Gtk::ToggleButton *p_sourceButton) {
 	if (p_sourceButton->get_active() == 1) {
+		auto display = Gdk::Display::get_default();
+		auto cursor = Gdk::Cursor::create(display, Gdk::CursorType::ARROW);
 		if (currentTool->get_tooltip_text() == "Poly Tool") {
 			_stage.cancelDrawingPoly();
 		}
@@ -2213,6 +2243,7 @@ void Kage::ToolButtons_onClick(Gtk::ToggleButton *p_sourceButton) {
 		} else if (p_sourceButton->get_tooltip_text() == "Rectangle Tool") {
 			ToolRectangle_onClick();
 		} else if (p_sourceButton->get_tooltip_text() == "Pencil Tool") {
+			cursor = Gdk::Cursor::create(display, Gdk::CursorType::PENCIL);
 			ToolPencil_onClick();
 		} else if (p_sourceButton->get_tooltip_text() == "Stroke Tool") {
 			ToolStroke_onClick();
@@ -2226,6 +2257,11 @@ void Kage::ToolButtons_onClick(Gtk::ToggleButton *p_sourceButton) {
 //			KageStage::toolMode = KageStage::MODE_MOVE_STAGE;
 		} else {
 			std::cout << p_sourceButton->get_tooltip_text() << ".active " << p_sourceButton->get_active() << " Button clicked." << std::endl;
+		}
+		
+		auto window =  get_window();
+		if (window) {
+			window->set_cursor(cursor);
 		}
 	}
 }
@@ -2362,11 +2398,11 @@ void Kage::propFillStrokeSetVisible(bool p_visible) {
 }
 
 void Kage::propDisplayObjectPropertiesSetVisible(bool p_visible) {
-	std::cout << std::endl << std::endl << std::endl << std::endl << "_displayObjectIsShape " << _displayObjectIsShape << " p_visible " << p_visible << " propAlpha " << _stage.propAlpha << std::endl << std::endl << std::endl << std::endl;
+	std::cout << std::endl << std::endl << std::endl << std::endl << "KageDocument::_displayObjectIsShape " << KageDocument::_displayObjectIsShape << " p_visible " << p_visible << " propAlpha " << _stage.propAlpha << std::endl << std::endl << std::endl << std::endl;
 	propShapePropertiesSetVisible(false);
 	propAssetPropertiesSetVisible(false);
 	if (p_visible == true) {
-		if (_displayObjectIsShape == true) {
+		if (KageDocument::_displayObjectIsShape == true) {
 			propShapePropertiesSetVisible(true);
 		} else {
 			propAssetPropertiesSetVisible(true);
@@ -2809,6 +2845,11 @@ void Kage::OpenKAGE_onClick() {
 		filter_kage->add_mime_type("application/kage+xml");
 		filter_kage->add_pattern("*.kage");
 			dialog.add_filter(filter_kage);
+	auto filter_ksf = Gtk::FileFilter::create();
+		filter_ksf->set_name(KageAbout::app_title + " Scene Files");
+		filter_ksf->add_mime_type("text/x-kage");
+		filter_ksf->add_pattern("*.ksf");
+			dialog.add_filter(filter_ksf);
 	//Show the dialog and wait for a user response:
 	int result = dialog.run();
 	
@@ -2872,6 +2913,47 @@ void Kage::doOpenKSF() {
 	propDisplayObjectPropertiesSetVisible(false);
 	propNodeXYSetVisible(false);
 	set_title(kagePath + " - " + KageAbout::app_title);
+}
+
+
+void Kage::ImportSVG_onClick() {
+	Gtk::FileChooserDialog dialog("Import SVG", Gtk::FILE_CHOOSER_ACTION_OPEN);
+	dialog.set_transient_for( * this);
+		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+		dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
+		dialog.set_default_size(800, 600);
+	
+	auto filter_svg = Gtk::FileFilter::create();
+		filter_svg->set_name("Scalable Vector Graphics Files");
+		filter_svg->add_mime_type("text/x-svg");
+		filter_svg->add_pattern("*.svg");
+			dialog.add_filter(filter_svg);
+	//Show the dialog and wait for a user response:
+	int result = dialog.run();
+	
+	//Handle the response:
+	switch (result) {
+		case Gtk::RESPONSE_OK:
+			svgPath = dialog.get_filename();
+			std::cout << "uri:" << dialog.get_uri() << std::endl;
+			
+			doImportSVG();
+			break;
+//		default:
+//			std::cout << "clicked " << result << std::endl;
+	}
+}
+void Kage::doImportSVG() {
+	int l_len = strlen(svgPath.c_str()) - 4;
+	if (StringHelper::toLower(svgPath).substr(l_len, 4) != ".svg") {
+		svgPath = svgPath + ".svg";
+	}
+	
+	std::string l_ksfContent = BasicXml::openXMLFile(svgPath);
+	
+	//cout << "Loaded... \n" << l_ksfContent << std::endl;
+	parseSVG(l_ksfContent);
+	stackDo();
 }
 
 void Kage::doSaveDialog(std::string p_title) {
@@ -3128,8 +3210,7 @@ void Kage::ExportSVG_onClick() {
 			
 			exportSvg(expPath, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>");
 			exportSvg(expPath, "<!-- Created with " + KageAbout::app_title + " v" + KageAbout::app_version + " (" + KageAbout::app_website + ") -->\n");
-			exportSvg(expPath, "<svg width=\"" + StringHelper::doubleToString(_document._width) + "\" height=\"" + StringHelper::doubleToString(_document._height) + "\" version=\"1.1\">");
-
+			exportSvg(expPath, "<svg\n   width=\"" + StringHelper::doubleToString(_document._width) + "\"\n   height=\"" + StringHelper::doubleToString(_document._height) + "\"\n   version=\"1.1\"\n   xmlns:inkscape=\"http://www.inkscape.org/namespaces/inkscape\"\n   xmlns=\"http://www.w3.org/2000/svg\">");
 				t = getDocumentSceneCurrentLayer();
 				std::string l_layerToSVG = "";
 				std::string l_frameToSVG = "";
@@ -3140,11 +3221,16 @@ void Kage::ExportSVG_onClick() {
 						for (i = 1; i <= l_lMax; i++) {
 							_document.getScene()->setCurrentLayer(i, false);
 							
-							l_layerToSVG =  "<g\n\tinkscape:label=\"" + _document.getLayerLabel() + "\"\n" +
-											"\tinkscape:groupmode=\"layer\"\n" +
-											"\tid=\"layer" + StringHelper::unsignedIntegerToString(i) + "\">\n";
-							l_frameToSVG = "\t\t\n" + dumpFrameToSvg();
-							exportSvg(expPath, l_layerToSVG + l_frameToSVG + "\n</g>");
+							l_layerToSVG =  "  <g"
+											"\n     inkscape:label=\"" + _document.getLayerLabel() + "\"" +
+											"\n     inkscape:groupmode=\"layer\"" +
+											"\n     id=\"layer" + StringHelper::unsignedIntegerToString(i) + "\"";
+							if (_document.isLayerVisible() == false) {
+								l_layerToSVG += "\n     style=\"display:none\"";
+							}
+							l_layerToSVG += ">\n";
+							l_frameToSVG = dumpFrameToSvg();
+							exportSvg(expPath, l_layerToSVG + l_frameToSVG + "\n  </g>");
 						}
 					} catch (std::exception& e) {
 						std::cout << "Kage::ExportSVG_onClick Exception : " << e.what() << std::endl;
@@ -3251,8 +3337,8 @@ void Kage::ExportPNGSpritesheet_onClick() {
 				
 				_stage.origin.x = 0;
 				_stage.origin.y = 0;
-				double l_zoomValue = _stage._zoomValue;
-				_stage._zoomValue = 1.0f;
+				double l_zoomValue = KageStage::_zoomValue;
+				KageStage::_zoomValue = 1.0f;
 				
 				t = getDocumentSceneCurrentLayer();
 				f = getDocumentSceneLayerCurrentFrame();
@@ -3278,7 +3364,7 @@ void Kage::ExportPNGSpritesheet_onClick() {
 
 				_stage.origin.x = l_tempOrigin.x;
 				_stage.origin.y = l_tempOrigin.y;
-				_stage._zoomValue = l_zoomValue;
+				KageStage::_zoomValue = l_zoomValue;
 			
 			updateStatus("Exported to " + l_pngPath);
 			break;
@@ -3327,8 +3413,8 @@ void Kage::ExportPNGSequence_onClick() {
 				
 				_stage.origin.x = 0;
 				_stage.origin.y = 0;
-				double l_zoomValue = _stage._zoomValue;
-				_stage._zoomValue = 1.0f;
+				double l_zoomValue = KageStage::_zoomValue;
+				KageStage::_zoomValue = 1.0f;
 				
 				t = getDocumentSceneCurrentLayer();
 				f = getDocumentSceneLayerCurrentFrame();
@@ -3366,7 +3452,7 @@ void Kage::ExportPNGSequence_onClick() {
 
 				_stage.origin.x = l_tempOrigin.x;
 				_stage.origin.y = l_tempOrigin.y;
-				_stage._zoomValue = l_zoomValue;
+				KageStage::_zoomValue = l_zoomValue;
 			
 			updateStatus("Exported to " + l_pngSequencePath);
 			break;
@@ -3484,16 +3570,16 @@ void Kage::ExportVideo_onClick() {
 		filter_mkv->add_mime_type("video/x-matroska");
 		filter_mkv->add_pattern("*.mkv");
 			dialog.add_filter(filter_mkv);
-	auto filter_ogv = Gtk::FileFilter::create();
-		filter_ogv->set_name("Ogg files");
-		filter_ogv->add_mime_type("video/ogg");
-		filter_ogv->add_pattern("*.ogv");
-			dialog.add_filter(filter_ogv);
 	auto filter_mp4 = Gtk::FileFilter::create();
 		filter_mp4->set_name("MPEG Part 14 files");
 		filter_mp4->add_mime_type("video/mp4");
 		filter_mp4->add_pattern("*.mp4");
 			dialog.add_filter(filter_mp4);
+	auto filter_ogv = Gtk::FileFilter::create();
+		filter_ogv->set_name("Ogg files");
+		filter_ogv->add_mime_type("video/ogg");
+		filter_ogv->add_pattern("*.ogv");
+			dialog.add_filter(filter_ogv);
 	auto filter_mov = Gtk::FileFilter::create();
 		filter_mov->set_name("QuickTime File Format files");
 		filter_mov->add_mime_type("video/quicktime");
@@ -3562,8 +3648,8 @@ void Kage::ExportVideo_onClick() {
 				l_currentLayer = getDocumentSceneCurrentLayer();
 				l_currentFrame = getDocumentSceneLayerCurrentFrame();
 					
-					double l_zoomValue = _stage._zoomValue;
-					_stage._zoomValue = 1.0f;
+					double l_zoomValue = KageStage::_zoomValue;
+					KageStage::_zoomValue = 1.0f;
 					int l_width = _document._width;
 					if (l_width % 2 == 1) {
 						++l_width;
@@ -3651,7 +3737,7 @@ void Kage::ExportVideo_onClick() {
 							std::cout << "Kage::ExportVideo_onClick Exception : " << e.what() << std::endl;
 						}
 					}
-					_stage._zoomValue = l_zoomValue;
+					KageStage::_zoomValue = l_zoomValue;
 					//end of workaround
 				setDocumentCurrentScene(l_currentScene);
 				setDocumentSceneCurrentLayer(l_currentLayer, false);
@@ -3747,7 +3833,7 @@ void Kage::doSaveProject(std::string p_filename) {
 		}
 		
 		saveKageStudio(p_filename, _assetManager.saveAssetsTo(l_ksfPath + l_directory));
-
+		
 		l_currentScene = _document.getCurrentScene();
 			std::string l_sceneName;
 			bool l_saved = false;
@@ -3846,12 +3932,7 @@ bool Kage::on_tick(const Glib::RefPtr<Gdk::FrameClock>& frame_clock) {
 		if (frameCounter > _document.frameCount()) {
 			frameCounter = _document.frameCount();
 			if (_btnTimelineLoop.get_active()) {
-				if (_document.Scenes.size() > 1) {
-					if (_document.getCurrentScene() < _document.Scenes.size()) {
-						_document.setCurrentScene(_document.getCurrentScene()+1); //go to Next Scene
-					} else {
-						_document.setCurrentScene(1); //go to First Scene
-					}
+				if (_document.gotoNextScene() == true) {
 					_scenes.forceRender();
 				}
 				frameCounter = 1;
@@ -4255,46 +4336,104 @@ std::string Kage::dumpFrameToSvg() {
 	bool l_initPrevSColor = false;
 	bool l_donePrevLine = false;
 	bool l_initFlag = false;
+	bool l_closePathFlag = false;
+	std::ostringstream l_ostreamStyleProp;
+	std::ostringstream l_ostreamStyle;
 	for (unsigned int i = 0; i < vsize; ++i) {
 		switch (v[i].vectorType) {
-			case VectorData::TYPE_CLOSE_PATH:
-				l_ostringstream << "\"";
-				if (fillCtr > 0) {
-					l_ostringstream << " fill=\"#" << int255ToHex(fcolor.getR()) << int255ToHex(fcolor.getG()) << int255ToHex(fcolor.getB()) << "\"";
+			case VectorData::TYPE_CLOSE_PATH: {
+				l_closePathFlag = false;
 
+				l_ostringstream << "\"";
+				unsigned int l_alpha = 0;
+				l_ostreamStyle.str("");
+				l_ostreamStyle.clear();
+				l_ostreamStyleProp.str("");
+				l_ostreamStyleProp.clear();
+				if (fillCtr > 0) {
+					l_alpha = fcolor.getA();
+					if (l_alpha == 0) {
+						l_ostreamStyle << "fill-opacity:0;";
+					} else {
+						l_ostreamStyleProp << "\n         fill=\"#" << int255ToHex(fcolor.getR()) << int255ToHex(fcolor.getG()) << int255ToHex(fcolor.getB()) << "\"";
+						if (l_alpha == 255) {
+							l_ostreamStyle << "fill-opacity:1;";
+						} else {
+							//l_ostreamStyleProp << "\n         fill=\"#" << int255ToHex(fcolor.getR()) << int255ToHex(fcolor.getG()) << int255ToHex(fcolor.getB()) << int255ToHex(l_alpha) << "\"";
+							l_ostreamStyle << "fill:#" << int255ToHex(fcolor.getR()) << int255ToHex(fcolor.getG()) << int255ToHex(fcolor.getB()) << ";";
+							l_ostreamStyle << "fill-opacity:" << StringHelper::doubleToString((double)((l_alpha * 392156.862745098f) / 100000000.0f)) << ";"; // 392156.862745098f ==> 100000000 / 255
+						}
+					}
 					fcolorPrev = fcolor.clone();
 				}
-					if (scolor.getThickness() > 0) {
-						l_ostringstream << " stroke=\"#" << int255ToHex(scolor.getR()) << int255ToHex(scolor.getG()) << int255ToHex(scolor.getB()) << "\"";
-						l_ostringstream << " stroke-width=\"" << scolor.getThickness() << "\"";
+					//stroke:#000000;stroke-opacity:0.12;stroke-width:5;stroke-miterlimit:4;stroke-dasharray:none
+					l_alpha = scolor.getA();
+					if (l_alpha == 0 || scolor.getThickness() == 0) {
+						l_ostreamStyle << "stroke:none;";
+					} else if (l_alpha > 0 && scolor.getThickness() > 0) {
+						l_ostreamStyleProp << "\n         stroke=\"#" << int255ToHex(scolor.getR()) << int255ToHex(scolor.getG()) << int255ToHex(scolor.getB()) << "\"";// << int255ToHex(l_alpha) << "\"";
+						l_ostreamStyleProp << "\n         stroke-width=\"" << scolor.getThickness() << "\"";
+						l_ostreamStyle << "stroke:#" << int255ToHex(scolor.getR()) << int255ToHex(scolor.getG()) << int255ToHex(scolor.getB()) << ";";// << int255ToHex(l_alpha) << "\"";
+						l_ostreamStyle << "stroke-opacity:" << StringHelper::doubleToString((double)((l_alpha * 392156.862745098f) / 100000000.0f)) << ";"; // 392156.862745098f ==> 100000000 / 255
+						l_ostreamStyle << "stroke-width:" << scolor.getThickness() << ";";
+						//l_ostreamStyle << "stroke-miterlimit:4;"; //should support soon
+						l_ostreamStyle << "stroke-dasharray:none;"; //should support soon
 						
 						scolorPrev = scolor.clone();
 					}
+				if (l_ostreamStyleProp.str().length() > 0) {
+					l_ostringstream << l_ostreamStyleProp.str();
+				}
+				if (l_ostreamStyle.str().length() > 0) {
+					l_ostringstream << "\n         style=\"" << l_ostreamStyle.str() << "\"";
+				}
 				if (fillCtr > 0) {
 					fillCtr--;
 				}
 				l_ostringstream << " />\n";
-				
 				break;
+			}
 			case VectorData::TYPE_INIT:
+				if (l_closePathFlag == true) {
+					l_ostringstream << "\"";
+					if (l_ostreamStyleProp.str().length() > 0) {
+						l_ostringstream << l_ostreamStyleProp.str();
+					}
+					if (l_ostreamStyle.str().length() > 0) {
+						l_ostringstream << "\n         style=\"" << l_ostreamStyle.str() << "\"";
+					}
+					l_ostringstream << " />\n";
+					l_closePathFlag = false;
+				}
 				if (l_initFlag == true) {
-					l_ostringstream << "\t</g>\n";
+					l_ostringstream << "    </g>\n";
 					l_initFlag = false;
 				}
 				
 				l_initFlag = true;
 				if (v[i].points.size() == 1) {
-					l_ostringstream << "\t<g inkscape:transform-center-x=\"" << StringHelper::doubleToString(v[i].points[0].x*_stage.currentScale) << "\" " <<
-						                     "inkscape:transform-center-y=\"" << StringHelper::doubleToString(v[i].points[0].y*_stage.currentScale) << "\">\n";
+					l_ostringstream << "    <g\n       inkscape:transform-center-x=\"" << StringHelper::doubleToString(v[i].points[0].x*_stage.currentScale) << "\"" <<
+						                     "\n       inkscape:transform-center-y=\"" << StringHelper::doubleToString(v[i].points[0].y*_stage.currentScale) << "\">\n";
 				} else {
-					l_ostringstream << "\t<g>\n";
+					l_ostringstream << "    <g>\n";
 				}
 				break;
 			case VectorData::TYPE_TEXT: break;
 			case VectorData::TYPE_FILL:
 				fcolor = v[i].fillColor;
-				l_ostringstream << "\t\t<path d=\"";
-				
+				if (l_closePathFlag == true) {
+					l_ostringstream << "\"";
+					if (l_ostreamStyleProp.str().length() > 0) {
+						l_ostringstream << l_ostreamStyleProp.str();
+					}
+					if (l_ostreamStyle.str().length() > 0) {
+						l_ostringstream << "\n         style=\"" << l_ostreamStyle.str() << "\"";
+					}
+					l_ostringstream << " />\n";
+					l_closePathFlag = false;
+				}
+				l_ostringstream << "      <path\n         d=\"";
+				l_closePathFlag = true;
 				l_donePrevFColor = false;
 				fillCtr++;
 				break;
@@ -4327,7 +4466,7 @@ std::string Kage::dumpFrameToSvg() {
 				p.y = v[i].points[1].y;
 				break;
 			case VectorData::TYPE_CURVE_CUBIC:
-				l_ostringstream << "C " << v[i].points[0].x*_stage.currentScale << " " << v[i].points[0].y*_stage.currentScale << " " << v[i].points[1].x*_stage.currentScale << " " << v[i].points[1].y*_stage.currentScale << " " << v[i].points[2].x*_stage.currentScale << " " << v[i].points[2].y*_stage.currentScale;
+				l_ostringstream << " C " << v[i].points[0].x*_stage.currentScale << " " << v[i].points[0].y*_stage.currentScale << " " << v[i].points[1].x*_stage.currentScale << " " << v[i].points[1].y*_stage.currentScale << " " << v[i].points[2].x*_stage.currentScale << " " << v[i].points[2].y*_stage.currentScale;
 				
 				break;
 			case VectorData::TYPE_IMAGE:
@@ -4340,8 +4479,18 @@ std::string Kage::dumpFrameToSvg() {
 		}
 	}
 	
+	if (l_closePathFlag == true) {
+		l_ostringstream << "\"";
+		if (l_ostreamStyleProp.str().length() > 0) {
+			l_ostringstream << l_ostreamStyleProp.str();
+		}
+		if (l_ostreamStyle.str().length() > 0) {
+			l_ostringstream << "\n         style=\"" << l_ostreamStyle.str() << "\"";
+		}
+		l_ostringstream << " />\n";
+	}
 	if (l_initFlag == true) {
-		l_ostringstream << "\t</g>";
+		l_ostringstream << "    </g>";
 	}
 	return l_ostringstream.str();
 }
@@ -4375,10 +4524,11 @@ unsigned int Kage::hexToInt255(std::string p) {
 	if (p.length() == 1) {
 		r  = p;
 	}
-	std::cout << "\n\t A " << rr << "\t" << r << std::endl;
+	//std::cout << "hexToInt255 " << p << " " << rr[0] << " " << r[0] << std::endl;
 	l_A = hexToInt15(rr[0]) * 16;
 	l_B = hexToInt15(r[0]);
-	std::cout << "\t B " << l_A << "\t" << l_B << "\t" << (l_A + l_B) << std::endl;
+	//std::cout << "        --> " << p << " " << l_A << " " << l_B << std::endl;
+	
 	return l_A + l_B;
 }
 
@@ -4406,17 +4556,17 @@ char Kage::int15ToHex(unsigned int p) {
 }
 
 unsigned int Kage::hexToInt15(char p) {
-	if (p == 'F') {
+	if (p == 'F' || p == 'f') {
 		return 15;
-	} else if (p == 'E') {
+	} else if (p == 'E' || p == 'e') {
 		return 14;
-	} else if (p == 'D') {
+	} else if (p == 'D' || p == 'd') {
 		return 13;
-	} else if (p == 'C') {
+	} else if (p == 'C' || p == 'c') {
 		return 12;
-	} else if (p == 'B') {
+	} else if (p == 'B' || p == 'b') {
 		return 11;
-	} else if (p == 'A') {
+	} else if (p == 'A' || p == 'a') {
 		return 10;
 	} else if (p > 48 && p <= 57) {
 		return p-48; //change ASCII 1 to 48-48
@@ -4456,8 +4606,36 @@ std::vector<int> Kage::parseColorString(std::string p_color) {
 		l_colors.push_back(StringHelper::toInteger(l_rgb[0]));
 		l_colors.push_back(StringHelper::toInteger(l_rgb[1]));
 		l_colors.push_back(StringHelper::toInteger(StringHelper::split(l_rgb[2], ")")[0]));
+		l_colors.push_back(255); //add alpha as opaque
+	} else if (p_color.length() > 0 && p_color.substr(0, 1) == "#") {
+		//loop and take 2 chars each
+		std::string l_color = p_color;
+		int l_colorR = 0;
+		int l_colorG = 0;
+		int l_colorB = 0;
+		int l_colorA = 255; //make alpha as opaque
+		if (p_color.length() >= 2) {
+			l_color = p_color.substr(1, 2);
+			l_colorR = hexToInt255(l_color);
+		}
+		if (p_color.length() >= 4) {
+			l_color = p_color.substr(3, 2);
+			l_colorG = hexToInt255(l_color);
+		}
+		if (p_color.length() >= 6) {
+			l_color = p_color.substr(5, 2);
+			l_colorB = hexToInt255(l_color);
+		}
+		if (p_color.length() >= 8) {
+			l_color = p_color.substr(7, 2);
+			l_colorA = hexToInt255(l_color);
+		}
+		l_colors.push_back(l_colorR);
+		l_colors.push_back(l_colorG);
+		l_colors.push_back(l_colorB);
+		l_colors.push_back(l_colorA);
 	} else {
-		std::cout << "?!?" << p_color << "\n";
+		std::cout << "parseColorString ?!? " << p_color << "\n";
 	}
 	return l_colors;
 }
@@ -4523,14 +4701,14 @@ void Kage::parseKAGE_Children(std::vector<XmlTag> p_children) {
 						std::cout << " " << _assetManager.getImagePathByID(l_image);
 						//unsigned int l_cairoIndex = _stage.addImage(l_image); //DO NOT ADD to Stage, just add to AssetManager
 						Cairo::RefPtr<Cairo::ImageSurface> l_tmp;
-							_stage.cairoPNG.push_back(l_tmp);
+							KageStage::cairoPNG.push_back(l_tmp);
 						//std::cout << "l_cairoIndex " << l_cairoIndex << std::endl;
 						_assetManager.setLabel(l_assetLabel);
 						//TODO: should we add previous info of asset; is it cross-platform proof?
 						_assetManager.setFilePathAt(_assetManager.assetCount()-1, std::filesystem::path(l_originalFileName).remove_filename().u8string()); //TODO: remove last slash
 						_assetManager.setFileNameAt(_assetManager.assetCount()-1, std::filesystem::path(l_originalFileName).filename().u8string());
 						_assetManager.setHashAt(_assetManager.assetCount()-1, l_hash);
-						_assetManager.render(_stage.cairoPNG.size()-1);
+						_assetManager.render(KageStage::cairoPNG.size()-1);
 					} else {
 						std::cout << "Failed to import " << l_assetFilePath << std::endl;
 					}
@@ -4597,14 +4775,14 @@ void Kage::parseKAGE(std::string p_content) {
 			}
 		} else {
 			//unable to tokenize KSF
-			updateStatus("Loading Error 1: Unabe to load " + kagePath);
+			updateStatus("Loading Error 1: Unable to load " + kagePath);
 		}
 	} else {
 		//unable to parse KSF
-		updateStatus("Loading Error 2: Unabe to load " + kagePath);
+		updateStatus("Loading Error 2: Unable to load " + kagePath);
 	}
 }
-void Kage::parseKSF_Children(std::vector<XmlTag> p_children) {
+bool Kage::parseKSF_Children(std::vector<XmlTag> p_children) {
 	unsigned int l_layerCount = UINT_MAX;
 	unsigned int l_frameCount = UINT_MAX;
 	unsigned int l_frameCounter = UINT_MAX;
@@ -4803,8 +4981,9 @@ void Kage::parseKSF_Children(std::vector<XmlTag> p_children) {
 	_layers.forceRender();
 	_scenes.forceRender();
 	refreshUI();
+	return true;
 }
-void Kage::parseKSF(std::string p_content) {
+bool Kage::parseKSF(std::string p_content) {
 	BasicXml _xml;
 	std::cout << "parsing... " << p_content.length() << std::endl;
 	if (_xml.parse(p_content)) {
@@ -4821,18 +5000,704 @@ void Kage::parseKSF(std::string p_content) {
 						)
 					) {
 					KageScene::LOADING_MODE = true;
-						parseKSF_Children(l_root._children);
+						bool l_loaded = parseKSF_Children(l_root._children);
 						updateStatus("Loaded " + ksfPath);
 					KageScene::LOADING_MODE = false;
+
+					return l_loaded;
 				}
 			}
 		} else {
 			//unable to tokenize KSF
-			updateStatus("Loading Error 1: Unabe to load " + ksfPath);
+			updateStatus("Loading Error 1: Unable to load " + ksfPath);
 		}
 	} else {
 		//unable to parse KSF
-		updateStatus("Loading Error 2: Unabe to load " + ksfPath);
+		updateStatus("Loading Error 2: Unable to load " + ksfPath);
+	}
+	return false;
+}
+
+void Kage::parseSVG_ChildrenPathStyle(ColorData &p_pathColor, StrokeColorData &p_pathStrokeColor, XmlTagProperty &p_graphProperty) {
+	//style="stroke:none;"
+	std::cout << "l_graphPropertyName style ?" << p_graphProperty.getValue() << std::endl;
+	std::vector <std::string> l_styleStrings = StringHelper::split(p_graphProperty.getValue(), ";");
+	for (std::string l_styles : l_styleStrings) {
+		if (l_styles == "") {
+			continue;
+		}
+		std::vector <std::string> l_style = StringHelper::split(l_styles, ":");
+		if (l_style.size() == 1) {
+			l_style = StringHelper::split(l_styles, "=");
+			if (l_style.size() == 1) {
+				std::cout << "warning: unable to parse style: " << l_styles << std::endl;
+				continue;
+			}
+		}
+		l_style[0] = StringHelper::toLower(StringHelper::trim(l_style[0]));
+		l_style[1] = StringHelper::toLower(StringHelper::trim(l_style[1]));
+		std::cout << "l_style[0] `" << l_style[0] << "`\tl_style[1] `" << l_style[1] << "`" << std::endl;
+		if (l_style[0] == "stroke") {
+			if (l_style[1] == "none" || l_style[1] == "transparent") {
+				p_pathStrokeColor.setA(0);
+			} else if (l_style[1] == "black") {
+				p_pathColor.setR(0);
+				p_pathColor.setG(0);
+				p_pathColor.setB(0);
+			} else if (l_style[1] == "red") {
+				p_pathColor.setR(255);
+				p_pathColor.setG(0);
+				p_pathColor.setB(0);
+			} else if (l_style[1] == "green") {
+				p_pathColor.setR(0);
+				p_pathColor.setG(255);
+				p_pathColor.setB(0);
+			} else if (l_style[1] == "blue") {
+				p_pathColor.setR(0);
+				p_pathColor.setG(0);
+				p_pathColor.setB(255);
+			} else if (l_style[1] == "white") {
+				p_pathColor.setR(255);
+				p_pathColor.setG(255);
+				p_pathColor.setB(255);
+			} else {//if (l_style[1] != "none") {
+				std::vector<int> l_colors = parseColorString(l_style[1]); //color
+				p_pathStrokeColor = StrokeColorData(l_colors[0], l_colors[1], l_colors[2], l_colors[3]);
+			}
+		} else if (l_style[0] == "stroke-opacity") {
+			double l_alpha = StringHelper::toDouble(l_style[1]);
+			if (l_alpha > 1) { l_alpha = 1; }
+			if (l_alpha < 0) { l_alpha = 0; }
+			p_pathStrokeColor.setA(l_alpha*255);
+		} else if (l_style[0] == "stroke-width") {
+			l_style[1] = StringHelper::replace(l_style[1],"px","");
+			p_pathStrokeColor.setThickness(StringHelper::toDouble(l_style[1]));
+		} else if (l_style[0] == "fill") {
+			if (l_style[1].find("url(") != std::string::npos) {
+				//url(#radialGradient5139-0)
+				std::cout << "process potential gradient " << l_style[1] << std::endl;
+			} else if (l_style[1] == "none" || l_style[1] == "transparent") {
+				p_pathColor.setA(0);
+			} else if (l_style[1] == "black") {
+				p_pathColor.setR(0);
+				p_pathColor.setG(0);
+				p_pathColor.setB(0);
+			} else if (l_style[1] == "red") {
+				p_pathColor.setR(255);
+				p_pathColor.setG(0);
+				p_pathColor.setB(0);
+			} else if (l_style[1] == "green") {
+				p_pathColor.setR(0);
+				p_pathColor.setG(255);
+				p_pathColor.setB(0);
+			} else if (l_style[1] == "blue") {
+				p_pathColor.setR(0);
+				p_pathColor.setG(0);
+				p_pathColor.setB(255);
+			} else if (l_style[1] == "white") {
+				p_pathColor.setR(255);
+				p_pathColor.setG(255);
+				p_pathColor.setB(255);
+			} else {//if (l_style[1] != "none") {
+				std::vector<int> l_colors = parseColorString(l_style[1]); //color
+				p_pathColor = StrokeColorData(l_colors[0], l_colors[1], l_colors[2], l_colors[3]);
+			}
+		} else if (l_style[0] == "fill-opacity") {
+			double l_alpha = StringHelper::toDouble(l_style[1]);
+			if (l_alpha > 1) { l_alpha = 1; }
+			if (l_alpha < 0) { l_alpha = 0; }
+			p_pathColor.setA(l_alpha*255);
+		}
+	}
+}
+
+//double previousX = 0;
+//double previousY = 0;
+void Kage::parseSVG_ChildrenPath(double p_centerX, double p_centerY, ColorData &p_pathColor, StrokeColorData &p_pathStrokeColor, XmlTag &p_graphTag) {
+	std::string l_graphPropertName = "";
+	//ColorData p_pathColor;
+	//StrokeColorData p_pathStrokeColor;
+	VectorDataManager l_pathData;
+	PointData l_pathCenterData = PointData(p_centerX / _stage.currentScale, p_centerY / _stage.currentScale);
+	std::cout << "p_centerX " << p_centerX << " p_centerY " << p_centerY << std::endl;
+	std::cout << "l_pathCenterData " << l_pathCenterData.x << ",  " << l_pathCenterData.y << std::endl;
+	double previousX = 0;
+	double previousY = 0;
+	bool l_addClosePath = true;
+	for (XmlTagProperty l_graphProperty : p_graphTag.getProperties()) {
+		l_graphPropertName = StringHelper::toLower(l_graphProperty.getName());
+		if (l_graphPropertName == "d") {
+			//data
+			//d=" M 20.3 198.32C 20.3 90.97 94.33 20.25 205.9 20.25C 317.37 20.25 392 90.97 392 198.32C 392 305.58 317.37 378.42 205.9 378.42C 94.33 378.42 20.3 305.58 20.3 198.32"
+			std::string l_data = StringHelper::trim(l_graphProperty.getValue());
+			//std::cout << "d " << l_data << std::endl;
+			l_data = StringHelper::replaceAll(l_data, "\t", " ");
+			l_data = StringHelper::replaceAll(l_data, "M", " M ");
+			l_data = StringHelper::replaceAll(l_data, "m", " m ");
+			l_data = StringHelper::replaceAll(l_data, "L", " L ");
+			l_data = StringHelper::replaceAll(l_data, "l", " l ");
+			l_data = StringHelper::replaceAll(l_data, "C", " C ");
+			l_data = StringHelper::replaceAll(l_data, "c", " c ");
+			l_data = StringHelper::replaceAll(l_data, "Z", " Z ");
+			l_data = StringHelper::replaceAll(l_data, "z", " z ");
+			l_data = StringHelper::replaceAll(l_data, ",", " ");
+			l_data = StringHelper::replaceAll(l_data, "  ", " ");
+			std::vector <std::string> l_dataStrings = StringHelper::split(l_data, " ");
+			std::string l_explicit = "";
+			for (int dataIndex = 0; dataIndex < l_dataStrings.size(); ++dataIndex) {
+				std::string l_dataString = l_dataStrings[dataIndex];
+				//std::cout << "glayer path " << l_dataString << std::endl;
+				//see: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#path_commands
+				if (l_dataString == "M") {
+					l_explicit = "M";
+					//move absolute to X/Y
+					double l_moveX = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_moveX = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					double l_moveY = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_moveY = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					previousX = l_moveX;
+					previousY = l_moveY;
+					std::cout << "\tabsolute move to " << l_moveX << "," << l_moveY << std::endl;
+					l_pathData.addMove(PointData(previousX/_stage.currentScale, previousY/_stage.currentScale));
+				} else if (l_dataString == "m") {
+					l_explicit = "m";
+					//move relative to previous X/Y
+					double l_moveX = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_moveX = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					double l_moveY = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_moveY = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					previousX += l_moveX;
+					previousY += l_moveY;
+					std::cout << "\trelative move to " << l_moveX << "," << l_moveY << std::endl;
+					l_pathData.addMove(PointData(previousX/_stage.currentScale, previousY/_stage.currentScale));
+				} else if (l_dataString == "C"
+						|| (StringHelper::isNumeric(l_dataString) == true && l_explicit == "C")) {
+					if (l_dataString == "C") {
+						l_explicit = "C";
+					} else {
+						--dataIndex; //revert back to first coordinate
+					}
+					//cubic bezier curve absolute to X/Y
+					double l_cX1 = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_cX1 = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					double l_cY1 = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_cY1 = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					double l_cX2 = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_cX2 = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					double l_cY2 = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_cY2 = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					double l_cX3 = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_cX3 = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					double l_cY3 = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_cY3 = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					
+					std::cout << "\tabsolute curve to  " << l_cX1 << "," << l_cY1 << "\t" << l_cX2 << "," << l_cY2 << "\t" << l_cX3 << "," << l_cY3 << std::endl;
+					l_pathData.addCubic(
+						PointData(l_cX1/_stage.currentScale, l_cY1/_stage.currentScale),
+						PointData(l_cX2/_stage.currentScale, l_cY2/_stage.currentScale),
+						PointData(l_cX3/_stage.currentScale, l_cY3/_stage.currentScale));
+					
+					if (l_explicit == "C") {
+						previousX = l_cX3;
+						previousY = l_cY3;
+					}
+					l_addClosePath = true;
+				} else if (l_dataString == "c"
+						|| (StringHelper::isNumeric(l_dataString) == true && l_explicit == "c")) {
+					if (l_dataString == "c") {
+						l_explicit = "c";
+					} else {
+						--dataIndex; //revert back to first coordinate
+					}
+					double l_cX1 = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_cX1 = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					double l_cY1 = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_cY1 = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					
+					double l_cX2 = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_cX2 = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					double l_cY2 = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_cY2 = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					
+					double l_cX3 = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_cX3 = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					double l_cY3 = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_cY3 = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					
+					std::cout << "\trelative curve to  " << l_cX1 << "," << l_cY1 << "\t" << l_cX2 << "," << l_cY2 << "\t" << l_cX3 << "," << l_cY3 << std::endl;
+					l_pathData.addCubic(
+						PointData((l_cX1+previousX)/_stage.currentScale, (l_cY1+previousY)/_stage.currentScale),
+						PointData((l_cX2+previousX)/_stage.currentScale, (l_cY2+previousY)/_stage.currentScale),
+						PointData((l_cX3+previousX)/_stage.currentScale, (l_cY3+previousY)/_stage.currentScale));
+					
+					if (l_explicit == "c") {
+						previousX += l_cX3;
+						previousY += l_cY3;
+					}
+					l_addClosePath = true;
+				} else if (StringHelper::toLower(l_dataString) == "z") {
+					l_pathData.addClosePath();
+					l_addClosePath = false;
+				} else if (l_dataString == "L"
+						|| (StringHelper::isNumeric(l_dataString) == true && l_explicit == "L")
+						|| (StringHelper::isNumeric(l_dataString) == true && l_explicit == "M")) {
+					if (l_dataString == "L") {
+						l_explicit = "L";
+					} else {
+						--dataIndex; //revert back to first coordinate
+					}
+					double l_lX1 = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_lX1 = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					double l_lY1 = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_lY1 = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					previousX = l_lX1;
+					previousY = l_lY1;
+					
+					std::cout << "\tabsolute line to  " << l_lX1 << "," << l_lY1 << std::endl;
+					l_pathData.addLine(PointData(previousX/_stage.currentScale, previousY/_stage.currentScale));
+				} else if (l_dataString == "l"
+						|| (StringHelper::isNumeric(l_dataString) == true && l_explicit == "l")
+						|| (StringHelper::isNumeric(l_dataString) == true && l_explicit == "m")) {
+					if (l_dataString == "l") {
+						l_explicit = "l";
+					} else {
+						--dataIndex; //revert back to first coordinate
+					}
+					double l_lX1 = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_lX1 = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					double l_lY1 = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_lY1 = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					previousX += l_lX1;
+					previousY += l_lY1;
+					
+					std::cout << "\trelative line to  " << l_lX1 << "," << l_lY1 << std::endl;
+					l_pathData.addLine(PointData(previousX/_stage.currentScale, previousY/_stage.currentScale));
+				} else if (l_dataString == "H"
+						|| (StringHelper::isNumeric(l_dataString) == true && l_explicit == "H")) {
+					if (l_dataString == "H") {
+						l_explicit = "H";
+					} else {
+						--dataIndex; //revert back to first coordinate
+					}
+					double l_lY1 = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_lY1 = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					previousY = l_lY1;
+					
+					std::cout << "\tabsolute horizontal to  " << previousX << "," << l_lY1 << std::endl;
+					l_pathData.addLine(PointData(previousX/_stage.currentScale, previousY/_stage.currentScale));
+				} else if (l_dataString == "h"
+						|| (StringHelper::isNumeric(l_dataString) == true && l_explicit == "h")) {
+					if (l_dataString == "h") {
+						l_explicit = "h";
+					} else {
+						--dataIndex; //revert back to first coordinate
+					}
+					double l_lY1 = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_lY1 = StringHelper::toDouble(l_dataStrings[dataIndex]);
+					}
+					previousY += l_lY1;
+					
+					std::cout << "\trelative horizontal to  " << previousX << "," << l_lY1 << std::endl;
+					l_pathData.addLine(PointData(previousX/_stage.currentScale, previousY/_stage.currentScale));
+				} else if (l_dataString == "V"
+						|| (StringHelper::isNumeric(l_dataString) == true && l_explicit == "V")) {
+					if (l_dataString == "V") {
+						l_explicit = "V";
+					} else {
+						--dataIndex; //revert back to first coordinate
+					}
+					double l_lX1 = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_lX1 = previousX;
+					}
+					previousX = l_lX1;
+					
+					std::cout << "\tabsolute vertical to  " << l_lX1 << "," << previousY << std::endl;
+					l_pathData.addLine(PointData(previousX/_stage.currentScale, previousY/_stage.currentScale));
+				} else if (l_dataString == "v"
+						|| (StringHelper::isNumeric(l_dataString) == true && l_explicit == "v")) {
+					if (l_dataString == "v") {
+						l_explicit = "v";
+					} else {
+						--dataIndex; //revert back to first coordinate
+					}
+					double l_lX1 = 0.0f;
+					++dataIndex;
+					if (dataIndex < l_dataStrings.size()) {
+						l_lX1 = previousX;
+					}
+					previousX += l_lX1;
+					
+					std::cout << "\trelative vertical to  " << l_lX1 << "," << previousY << std::endl;
+					l_pathData.addLine(PointData(previousX/_stage.currentScale, previousY/_stage.currentScale));
+				} else if (l_dataString == "S") {
+					l_explicit = "S";
+					std::cout << "SVG Path TODO: implement S Smooth CurveTo " << std::endl;
+				} else {
+					std::cout << "SVG Path WARNING: unknown " << l_dataString << std::endl;
+				}
+			}
+		} else if (l_graphPropertName == "fill") {
+			std::cout << "l_graphPropertName fill ? " << l_graphProperty.getValue() << std::endl;
+			std::vector<int> l_colors = parseColorString(l_graphProperty.getValue());
+				p_pathColor = ColorData(l_colors[0], l_colors[1], l_colors[2], l_colors[3]);
+				//possible gradient ID
+				//v.addFill(l_color);
+			//addDataToFrame(v, true);
+		} else if (l_graphPropertName == "stroke") {
+			//stroke="#FF0000"
+			std::cout << "l_graphPropertName == stroke ? " << l_graphProperty.getValue() << std::endl;
+			std::vector<int> l_colors = parseColorString(l_graphProperty.getValue()); //color
+			p_pathStrokeColor = StrokeColorData(l_colors[0], l_colors[1], l_colors[2], l_colors[3]);
+			p_pathStrokeColor.setThickness(1);//thickness
+		} else if (l_graphProperty.getName() == "stroke-width") {
+			//stroke-width="3"
+			p_pathStrokeColor.setThickness(StringHelper::toDouble(l_graphProperty.getValue()));
+		} else if (l_graphProperty.getName() == "id") {
+			//id="path828"
+			//std::cout << "id " << l_graphProperty.getValue() << std::endl;
+		} else if (l_graphProperty.getName() == "style") {
+			parseSVG_ChildrenPathStyle(p_pathColor, p_pathStrokeColor, l_graphProperty);
+		} else if (l_graphProperty.getName() == "sodipodi:nodetypes") {
+			//sodipodi:nodetypes="ccccccc"
+			//std::cout << "sodipodi:nodetypes " << l_graphProperty.getValue() << std::endl;
+		} else if (l_graphProperty.getName() == "inkscape:connector-curvature") {
+			//inkscape:connector-curvature="0"
+			//std::cout << "inkscape:connector-curvature " << l_graphProperty.getValue() << std::endl;
+		} else if (l_graphProperty.getName() == "inkscape:export-filename") {
+			//std::cout << "inkscape:export-filename " << l_graphProperty.getValue() << std::endl;
+		} else if (l_graphProperty.getName() == "inkscape:export-xdpi") {
+			//std::cout << "inkscape:export-xdpi " << l_graphProperty.getValue() << std::endl;
+		} else if (l_graphProperty.getName() == "inkscape:export-ydpi") {
+			//std::cout << "inkscape:export-ydpi " << l_graphProperty.getValue() << std::endl;
+		} else {
+			std::cout << "l_graphProperty.getName() " << l_graphProperty.getName() << std::endl;
+		}
+	}
+	VectorDataManager l_vectorDataManager;
+		std::cout << "l_vectorDataManager l_pathCenterData " << l_pathCenterData.x << ",  " << l_pathCenterData.y << std::endl;
+		l_vectorDataManager.addInit(l_pathCenterData);
+		l_vectorDataManager.addFill(p_pathColor.clone());
+		l_vectorDataManager.addLineStyle(p_pathStrokeColor.clone());
+			l_vectorDataManager.push(l_pathData);
+		if (l_addClosePath == true) {
+			//l_vectorDataManager.addClosePath();
+		}
+		l_vectorDataManager.addEndFill();
+	addDataToFrame(l_vectorDataManager, true);
+}
+void Kage::parseSVG_Children(std::vector<XmlTag> p_children) {
+	try {
+		//for (unsigned int i = 0; i < p_children.size(); ++i) {
+		for (XmlTag l_svgChildTag : p_children) {
+			std::string l_tagname = l_svgChildTag.getName();
+			std::cout << l_tagname << " " << std::endl;
+			std::vector<XmlTagProperty> l_properties = l_svgChildTag.getProperties();
+			std::string l_layerName = "Layer";
+			std::string l_layerID = "Layer";
+			bool l_isLayer = false;
+			for (XmlTagProperty l_property : l_properties) {
+				if (l_property.getName() == "inkscape:groupmode" && l_property.getValue() == "layer") {
+					//inkscape:groupmode="layer"
+					l_isLayer = true;
+				} else if (l_property.getName() == "inkscape:label") {
+					//inkscape:label="Layer 1"
+					l_layerName = l_property.getValue();
+				} else if (l_property.getName() == "id") {
+					//id
+					l_layerID = l_property.getValue();
+				} else {
+					std::cout << "l_property.getName() " << l_property.getName() << std::endl;
+				}
+			}
+			if (l_tagname == "g" && l_isLayer == true) {
+				unsigned int l_layer = 0;
+				//StringHelper::toUnsignedInteger(l_tagname.substr(5));
+				std::cout << "inkscape:label " << l_layerName << std::endl;
+				//std::vector<XmlTag> l_properties = l_svgChildTag.getProperties();
+				ColorData l_pathColor;
+				StrokeColorData l_pathStrokeColor;
+				for (XmlTag l_xmlTag : l_svgChildTag._children) {
+					if (l_xmlTag.getName() == "g") {
+						//grouped paths -- aka reusable Asset; as of current we're loading it directly into stage instead of Library
+						double l_centerX = -0.121314;
+						double l_centerY = -0.121314;
+						for (XmlTagProperty l_layerProperty : l_xmlTag.getProperties()) {
+							if (l_layerProperty.getName() == "inkscape:transform-center-x") {
+								//inkscape:transform-center-x="204.45"
+								l_centerX = StringHelper::toDouble(l_layerProperty.getValue());
+								//std::cout << "glayer center x " << l_centerX << std::endl;
+							} else if (l_layerProperty.getName() == "inkscape:transform-center-y") {
+								//inkscape:transform-center-y="204.83"
+								l_centerY = StringHelper::toDouble(l_layerProperty.getValue());
+								//std::cout << "glayer center y " << l_centerY << std::endl;
+							} else if (l_layerProperty.getName() == "id") {
+								//handle id?
+								//std::cout << "glayer id " << l_layerProperty.getValue() << std::endl;
+							} else if (l_layerProperty.getName() == "style") {
+								//handle style
+								//std::cout << "glayer style " << l_layerProperty.getValue() << std::endl;
+								parseSVG_ChildrenPathStyle(l_pathColor, l_pathStrokeColor, l_layerProperty);
+							} else if (l_layerProperty.getName() == "inkscape:export-xdpi") {
+								//handle inkscape:export-xdpi?
+								//std::cout << "glayer inkscape:export-xdpi " << l_layerProperty.getValue() << std::endl;
+							} else if (l_layerProperty.getName() == "inkscape:export-ydpi") {
+								//handle inkscape:export-ydpi?
+								//std::cout << "glayer inkscape:export-ydpi " << l_layerProperty.getValue() << std::endl;
+							} else if (l_layerProperty.getName() == "inkscape:export-filename") {
+								//handle inkscape:export-filename?
+								//std::cout << "glayer inkscape:export-filename " << l_layerProperty.getValue() << std::endl;
+							} else if (l_layerProperty.getName() == "transform") {
+								//handle transform?
+								std::cout << "glayer transform " << l_layerProperty.getValue() << std::endl;
+							} else {
+								std::cout << "glayer l_layerProperty.getName() " << l_layerProperty.getName() << std::endl;
+							}
+						}
+						if (l_centerX == -0.121314 && l_centerY == -0.121314) {
+							l_centerX = 0;
+							l_centerY = 0;
+						}
+						
+						if (l_centerX != -0.121314 || l_centerY != -0.121314) {//what was the reason we were preventing earlier?
+							for (XmlTag l_graphTag : l_xmlTag._children) {
+								if (l_graphTag.getName() == "path") {
+									parseSVG_ChildrenPath(l_centerX, l_centerY, l_pathColor, l_pathStrokeColor, l_graphTag);
+								}
+							}
+							l_isLayer = false;
+						} else {
+							std::cout << "l_centerX " << l_centerX << " || l_centerY " << l_centerY << std::endl;
+						}
+					} else if (l_xmlTag.getName() == "rect") {
+						//ungrouped paths
+						//double l_centerX = -0.121314;
+						//double l_centerY = -0.121314;
+						double l_x = 0;
+						double l_y = 0;
+						double l_width = 0;
+						double l_height = 0;
+						for (XmlTagProperty l_layerProperty : l_xmlTag.getProperties()) {
+							if (l_layerProperty.getName() == "inkscape:transform-center-x") {
+								//inkscape:transform-center-x="204.45"
+								//l_centerX = StringHelper::toDouble(l_layerProperty.getValue());
+								//std::cout << "grect center x " << l_centerX << std::endl;
+							} else if (l_layerProperty.getName() == "inkscape:transform-center-y") {
+								//inkscape:transform-center-y="204.83"
+								//l_centerY = StringHelper::toDouble(l_layerProperty.getValue());
+								//std::cout << "grect center y " << l_centerY << std::endl;
+							} else if (l_layerProperty.getName() == "id") {
+								//handle id?
+								//std::cout << "grect id " << l_layerProperty.getValue() << std::endl;
+							} else if (l_layerProperty.getName() == "style") {
+								//handle style
+								std::cout << "grect style " << l_layerProperty.getValue() << std::endl;
+								//opacity:0;color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate
+								parseSVG_ChildrenPathStyle(l_pathColor, l_pathStrokeColor, l_layerProperty);
+							} else if (l_layerProperty.getName() == "inkscape:export-xdpi") {
+								//handle inkscape:export-xdpi?
+								//std::cout << "grect inkscape:export-xdpi " << l_layerProperty.getValue() << std::endl;
+							} else if (l_layerProperty.getName() == "inkscape:export-ydpi") {
+								//handle inkscape:export-ydpi?
+								//std::cout << "grect inkscape:export-ydpi " << l_layerProperty.getValue() << std::endl;
+							} else if (l_layerProperty.getName() == "inkscape:export-filename") {
+								//handle inkscape:export-filename?
+								//std::cout << "grect inkscape:export-filename " << l_layerProperty.getValue() << std::endl;
+							} else if (l_layerProperty.getName() == "x") {
+								//handle x
+								l_x = StringHelper::toDouble(l_layerProperty.getValue());
+								//std::cout << "grect x " << l_layerProperty.getValue() << std::endl;
+							} else if (l_layerProperty.getName() == "y") {
+								//handle y
+								l_y = StringHelper::toDouble(l_layerProperty.getValue());
+								//std::cout << "grect y " << l_layerProperty.getValue() << std::endl;
+							} else if (l_layerProperty.getName() == "width") {
+								//handle width
+								l_width = StringHelper::toDouble(l_layerProperty.getValue());
+								//std::cout << "grect width " << l_layerProperty.getValue() << std::endl;
+							} else if (l_layerProperty.getName() == "height") {
+								//handle height
+								l_height = StringHelper::toDouble(l_layerProperty.getValue());
+								//std::cout << "grect height " << l_layerProperty.getValue() << std::endl;
+							} else {
+								std::cout << "grect l_layerProperty.getName() " << l_layerProperty.getName() << std::endl;
+							}
+						}
+						VectorDataManager l_pathData;
+							l_pathData.addMove(PointData( l_x         /_stage.currentScale,  l_y          /_stage.currentScale));
+							l_pathData.addLine(PointData((l_x+l_width)/_stage.currentScale,  l_y          /_stage.currentScale));
+							l_pathData.addLine(PointData((l_x+l_width)/_stage.currentScale, (l_y+l_height)/_stage.currentScale));
+							l_pathData.addLine(PointData( l_x         /_stage.currentScale, (l_y+l_height)/_stage.currentScale));
+							l_pathData.addLine(PointData( l_x         /_stage.currentScale,  l_y          /_stage.currentScale));
+							l_pathData.addClosePath();
+						VectorDataManager l_vectorDataManager;
+							//std::cout << "l_vectorDataManager l_pathCenterData " << l_pathCenterData.x << ",  " << l_pathCenterData.y << std::endl;
+							l_vectorDataManager.addInit();//l_pathCenterData);
+							l_vectorDataManager.addFill(l_pathColor);
+							l_vectorDataManager.addLineStyle(l_pathStrokeColor);
+								l_vectorDataManager.push(l_pathData);
+							l_vectorDataManager.addClosePath();
+							l_vectorDataManager.addEndFill();
+						addDataToFrame(l_vectorDataManager, true);
+					} else if (l_xmlTag.getName() == "path") {
+						//ungrouped paths
+						double l_centerX = -0.121314;
+						double l_centerY = -0.121314;
+						for (XmlTagProperty l_layerProperty : l_xmlTag.getProperties()) {
+							if (l_layerProperty.getName() == "inkscape:transform-center-x") {
+								//inkscape:transform-center-x="204.45"
+								l_centerX = StringHelper::toDouble(l_layerProperty.getValue());
+							} else if (l_layerProperty.getName() == "inkscape:transform-center-y") {
+								//inkscape:transform-center-y="204.83"
+								l_centerY = StringHelper::toDouble(l_layerProperty.getValue());
+							} else if (l_layerProperty.getName() == "id") {
+								//handle id?
+								//std::cout << "gpath id " << l_layerProperty.getValue() << std::endl;
+							} else if (l_layerProperty.getName() == "style") {
+								//handle style
+								std::cout << "gpath style " << l_layerProperty.getValue() << std::endl;
+								parseSVG_ChildrenPathStyle(l_pathColor, l_pathStrokeColor, l_layerProperty);
+							} else if (l_layerProperty.getName() == "inkscape:export-xdpi") {
+								//handle inkscape:export-xdpi?
+								//std::cout << "gpath inkscape:export-xdpi " << l_layerProperty.getValue() << std::endl;
+							} else if (l_layerProperty.getName() == "inkscape:export-ydpi") {
+								//handle inkscape:export-ydpi?
+								//std::cout << "gpath inkscape:export-ydpi " << l_layerProperty.getValue() << std::endl;
+							} else if (l_layerProperty.getName() == "inkscape:export-filename") {
+								//handle inkscape:export-filename?
+								//std::cout << "gpath inkscape:export-filename " << l_layerProperty.getValue() << std::endl;
+							} else if (l_layerProperty.getName() == "inkscape:connector-curvature") {
+								//handle inkscape:connector-curvature?
+								//std::cout << "gpath inkscape:connector-curvature " << l_layerProperty.getValue() << std::endl;
+							} else if (l_layerProperty.getName() == "sodipodi:nodetypes") {
+								//handle sodipodi:nodetypes?
+								//std::cout << "gpath sodipodi:nodetypes " << l_layerProperty.getValue() << std::endl;
+							} else {
+								std::cout << "gpath l_layerProperty.getName() " << l_layerProperty.getName() << std::endl;
+							}
+						}
+						if (l_centerX == -0.121314 && l_centerY == -0.121314) {
+							l_centerX = 0;
+							l_centerY = 0;
+						}
+						parseSVG_ChildrenPath(l_centerX, l_centerY, l_pathColor, l_pathStrokeColor, l_xmlTag);
+					}
+				}
+				//parse content of layer
+			} else {
+				//
+			}
+		}
+	} catch (std::exception& e) {
+		std::cout << "Kage::parseSVG_Children Exception : " << e.what() << std::endl;
+	}
+	_stage.invalidateToRender();
+	_timeline.forceRender();
+	_layers.forceRender();
+	_scenes.forceRender();
+	refreshUI();
+}
+void Kage::parseSVG(std::string p_content) {
+	BasicXml _xml;
+	std::cout << "parsing... " << p_content.length() << std::endl;
+	if (_xml.parse(p_content)) {
+		if (_xml.tokenize()) {
+			XmlTag l_root = _xml.getRoot();
+			if (l_root.getName() == "svg") {
+				bool l_correctVersion = false;
+				std::vector<XmlTagProperty> l_xmlTagProperties = l_root.getProperties();
+				for (XmlTagProperty l_xmlTagProperty : l_xmlTagProperties) {
+					if (l_xmlTagProperty.getName() == "version" && l_xmlTagProperty.getValue() == "1.1") {
+						l_correctVersion = true;
+					} else if (l_xmlTagProperty.getName() == "width") {
+						//_document._width = StringHelper::toUnsignedInteger(l_xmlTagProperty.getValue());
+						//m_PropStage.setWidthText(_document._width);
+					} else if (l_xmlTagProperty.getName() == "height") {
+						//_document._height = StringHelper::toUnsignedInteger(l_xmlTagProperty.getValue());
+						//m_PropStage.setHeightText(_document._height);
+					}
+				}
+				if (l_correctVersion == true) {
+					KageScene::LOADING_MODE = true;
+						parseSVG_Children(l_root._children);
+						updateStatus("Imported SVG " + ksfPath);
+					KageScene::LOADING_MODE = false;
+				}
+			}
+		} else {
+			std::cout << _xml.getXML();
+			//unable to tokenize SVG
+			updateStatus("Importing Error 1: Unable to import " + ksfPath);
+		}
+	} else {
+		//unable to parse SVG
+		updateStatus("Importing Error 2: Cannot parse " + ksfPath);
 	}
 }
 

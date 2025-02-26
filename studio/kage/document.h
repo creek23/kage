@@ -87,7 +87,7 @@
 			bool saveProject();
 			bool isSaved();
 
-			unsigned int addScene(std::string p_sceneLabel);
+			unsigned int addScene(std::string p_sceneLabel, bool p_asset = false);
 			bool removeAllScenes();
 			bool removeSceneAt(unsigned int p_sceneIndex);
 			
@@ -112,7 +112,8 @@
 
 			KageScene *getScene();
 			unsigned int getCurrentScene(); ///returns index+1
-			void setCurrentScene(unsigned int p_scene); //p_scene-1 is index
+			void setCurrentScene(unsigned int p_newScene); //p_scene-1 is index
+			void setCurrentSceneByID(unsigned int p_newSceneID);
 			unsigned int getActiveSceneID();
 			unsigned int getActiveLayerID();
 			unsigned int getActiveFrameID();
@@ -132,5 +133,11 @@
 			bool moveSceneDown();
 			bool moveSceneToTop();
 			bool moveSceneToBottom();
+
+			bool gotoNextScene();
+			
+			static GdkPoint _mouseLocation;
+			static bool _displayObjectIsShape;
+			static bool ASSET_MODE;
 	};
 #endif //GTKMM_KAGE_DOCUMENT_H

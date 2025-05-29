@@ -1174,16 +1174,12 @@ Kage::Kage(std::string p_filePath) :
 	if (window) {
 		window->set_cursor(cursor);
 	}
-	New_onClick();
+	cleanupInterface();
 	ToggleLoop_onClick();
 
 	registerPropertiesPane();
 	m_HPane_DrawingArea.property_position() = _area_properties_pane2;
 	
-	if (p_filePath != "") {
-		kagePath = p_filePath;
-		doOpenKAGE();
-	}
 	_UPDATE_SHAPE_COLORS = false;
 		m_propFillStroke.setFillColorData(KageStage::fillColor);
 		m_propFillStroke.setStrokeColorData(KageStage::stroke);
@@ -1195,6 +1191,14 @@ Kage::Kage(std::string p_filePath) :
 	
 	signal_key_press_event().connect( sigc::mem_fun(*this, &Kage::on_key_press_event) );
 	signal_key_release_event().connect( sigc::mem_fun(*this, &Kage::on_key_release_event) );
+	
+	if (p_filePath != "") {
+		kagePath = p_filePath;
+		doOpenKAGE();
+	} else {
+		btnAbout_onClick();
+		New_onClick();
+	}
 }
 
 bool Kage::m_LabelLibrary_onClick(GdkEventButton *event) {//}, gpointer user_data) {
@@ -2770,10 +2774,27 @@ bool gotWidth = false;
 bool gotHeight = false;
 
 void Kage::New_onClick() {
-	if (continueNewFileWithUnsavedWork() == false) {
-		return;
-	}
+	handleUnsavedWork();
+
+	cleanupInterface();
 	
+	try {
+		FormNewDialog* l_formNewDialog = new FormNewDialog(*this);
+		if (l_formNewDialog->run() == Gtk::ResponseType::RESPONSE_OK) {
+			_document._fps = l_formNewDialog->getFPS();
+			_document._width = l_formNewDialog->getWidth();
+			_document._height = l_formNewDialog->getHeight();
+			
+			m_PropStage.setWidthText(_document._width);
+			m_PropStage.setHeightText(_document._height);
+			m_PropStage.setFPSText(_document._fps);
+		}
+		delete l_formNewDialog;
+	} catch (std::exception& e) {
+		std::cout << "Kage::New_onClick Exception : " << e.what() << std::endl;
+	}
+}
+void Kage::cleanupInterface() {
 	_library.resetAssetID();
 	_assetManager.removeAllAssets();
 	
@@ -2785,7 +2806,7 @@ void Kage::New_onClick() {
 		_document.getScene()->setCurrentLayer(1, false);
 		_document.getScene()->setLayerCurrentFrame(1, false);
 	} catch (std::exception& e) {
-		std::cout << "Kage::New_onClick Exception : " << e.what() << std::endl;
+		std::cout << "Kage::cleanupInterface Exception : " << e.what() << std::endl;
 	}
 	
 	stackDo();
@@ -2817,23 +2838,24 @@ void Kage::New_onClick() {
 	gotHeight = false;
 }
 
-bool Kage::continueNewFileWithUnsavedWork() {
-	if (get_title()[0] != '*') {
-		return true;
-	}
-	
-	Gtk::MessageDialog l_prompt = Gtk::MessageDialog("File is not saved. Do you want to discard unsaved content?", false, Gtk::MessageType::MESSAGE_QUESTION, Gtk::ButtonsType::BUTTONS_YES_NO, true);
-		l_prompt.set_position(Gtk::WIN_POS_CENTER);
-		int l_response = l_prompt.run();
-	
-	if (l_response == Gtk::ResponseType::RESPONSE_YES) {
-		return true;
+bool Kage::handleUnsavedWork() {
+	Gtk::MessageDialog l_prompt = Gtk::MessageDialog("You have unsaved changes. Do you want to save before continuing?", false, Gtk::MessageType::MESSAGE_INFO, Gtk::ButtonsType::BUTTONS_YES_NO, true);
+	l_prompt.set_position(Gtk::WIN_POS_CENTER);
+
+	while (get_title()[0] == '*') {
+		if (l_prompt.run() == Gtk::ResponseType::RESPONSE_YES) {
+			ProjectSave_onClick();
+		} else {
+			return true;
+		}
 	}
 
-	return false;
+	return true;
 }
 
 void Kage::OpenKAGE_onClick() {
+	handleUnsavedWork();
+
 	Gtk::FileChooserDialog dialog("Open Kage Studio File", Gtk::FILE_CHOOSER_ACTION_OPEN);
 	dialog.set_transient_for( * this);
 		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -2856,13 +2878,13 @@ void Kage::OpenKAGE_onClick() {
 	//Handle the response:
 	switch (result) {
 		case Gtk::RESPONSE_OK:
-			New_onClick();
+			cleanupInterface();
 			kagePath = dialog.get_filename();
 			std::cout << "uri:" << dialog.get_uri() << std::endl;
 			
 			int l_len = strlen(kagePath.c_str()) - 5;
 			if (StringHelper::toLower(kagePath).substr(l_len, 5) == ".kage") {
-				_document.removeSceneAt(0); //clear added scene by New_onClick
+				_document.removeSceneAt(0); //clear added scene by cleanupInterface
 				doOpenKAGE();
 			} else {
 				l_len = strlen(kagePath.c_str()) - 4;

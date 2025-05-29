@@ -68,6 +68,8 @@
 	
 	#include <gdkmm/cursor.h>
 	#include <gdkmm/frameclock.h>
+
+	#include "form_new.h"
 	
 	class Kage : public Gtk::Window {
 		public:
@@ -422,7 +424,7 @@
 			
 			std::vector<VectorData> _undoBase;
 			
-			bool continueNewFileWithUnsavedWork();
+			bool handleUnsavedWork();
 			
 			int _area_timeline_pane;
 			int _area_properties_pane1;
@@ -477,6 +479,7 @@
 			void stackDo();
 			
 			void New_onClick();
+			void cleanupInterface();
 			bool doDeleteFrame();
 			
 			bool isLayerLocked();

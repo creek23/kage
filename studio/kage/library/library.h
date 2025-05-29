@@ -53,8 +53,6 @@
 			bool isSelected();
 			VectorDataManager getFrameData();
 			void setFrameData(VectorDataManager p_vectorsData);
-			void setCode(bool p_newCode);
-			bool getCode();
 			void setFocus();
 			
 			void setExtension(KageLibrary::extension p_extension);
@@ -74,6 +72,8 @@
 			void render(unsigned int p_assetID);
 
 			void resetAssetID();
+
+			unsigned int _renderAssetID;
 		protected:
 			//Override default signal handler:
 			virtual bool on_expose_event(GdkEventExpose *e);
@@ -90,7 +90,5 @@
 			bool _current;
 			
 			VectorDataManager vectorsData;
-
-			unsigned int _renderAssetID;
 	};
 #endif // GTKMM_KAGE_LIBRARY_H

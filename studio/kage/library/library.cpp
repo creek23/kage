@@ -43,11 +43,11 @@ KageLibrary::KageLibrary(Kage* p_kage) :
 	setSelected(false);
 	setExtension(KageLibrary::EXTENSION_NOT);
 //	add_events(Gdk::KEY_PRESS_MASK    | Gdk::KEY_RELEASE_MASK);
-	add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
-	add_events(Gdk::ENTER_NOTIFY_MASK | Gdk::LEAVE_NOTIFY_MASK);
-	add_events(Gdk::FOCUS_CHANGE_MASK);
+	//add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
+	//add_events(Gdk::ENTER_NOTIFY_MASK | Gdk::LEAVE_NOTIFY_MASK);
+	//add_events(Gdk::FOCUS_CHANGE_MASK);
 //	add_events(Gdk::POINTER_MOTION_MASK);
-
+	
 	resetAssetID();
 }
 
@@ -87,7 +87,6 @@ bool KageLibrary::on_event(GdkEvent *e) {
 //		invalidateToRender();
 	} else if (e->type == GDK_BUTTON_PRESS) {
 		KageLibrary::mouseIsDown = true;
-		//
 	} else if (e->type == GDK_DOUBLE_BUTTON_PRESS) {
 		_kage->_stage.addImage(_renderAssetID);
 	} else if (e->type == GDK_EXPOSE) {
@@ -107,8 +106,10 @@ bool KageLibrary::on_event(GdkEvent *e) {
 		//filter out from echos
 	} else if (e->type == GDK_CONFIGURE) {
 		//filter out from echos 
+	} else {
+		std::cout << "KageLibrary::on_event e->type " << e->type << std::endl;
 	}
-	return true;
+	return false;
 }
 
 

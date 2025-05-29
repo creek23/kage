@@ -1199,6 +1199,36 @@ Kage::Kage(std::string p_filePath) :
 		btnAbout_onClick();
 		New_onClick();
 	}
+	
+	std::vector<Gtk::TargetEntry> l_targets;
+	l_targets.push_back( Gtk::TargetEntry("STRING") );
+	l_targets.push_back( Gtk::TargetEntry("text/plain") );
+	_library.drag_source_set(l_targets);
+		_library.signal_drag_data_get().connect(sigc::mem_fun(*this, &Kage::Library_onDragStart));
+	
+	_stage.drag_dest_set(l_targets);
+		_stage.signal_drag_data_received().connect(sigc::mem_fun(*this, &Kage::Stage_onDragStop));
+}
+
+void Kage::Library_onDragStart(const Glib::RefPtr<Gdk::DragContext>&context, Gtk::SelectionData& selection_data, guint p_guintA, guint p_guintB) {
+	std::cout << "Kage::Library_onDragStart p_guintA " << p_guintA << "\tp_guintB " << p_guintB << std::endl;
+	selection_data.set(selection_data.get_target(), 8, (const guchar*)"KageLibrary", 11);
+}
+
+void Kage::Stage_onDragStop(const Glib::RefPtr<Gdk::DragContext>& context, int p_destX, int p_destY, const Gtk::SelectionData& selection_data, guint p_guint, guint time) {
+	std::cout << "Kage::Stage_onDragStop p_destX " << p_destX << "\tp_destY " << p_destY << "\tp_guint " << p_guint << "\ttime " << time << std::endl;
+	const int length = selection_data.get_length();
+	if((length >= 0) && (selection_data.get_format() == 8)) {
+		std::string l_data = selection_data.get_data_as_string();
+		if (l_data == "KageLibrary") {
+			if (_library._renderAssetID != UINT_MAX) {
+				_stage.addImage(_library._renderAssetID, (double) p_destX, (double) p_destY);
+			}
+		} else {
+			std::cout << "got \"" << l_data << "\" " << std::endl;
+		}
+	}
+	context->drag_finish(false, false, time);
 }
 
 bool Kage::m_LabelLibrary_onClick(GdkEventButton *event) {//}, gpointer user_data) {
@@ -2855,7 +2885,7 @@ bool Kage::handleUnsavedWork() {
 
 void Kage::OpenKAGE_onClick() {
 	handleUnsavedWork();
-
+	
 	Gtk::FileChooserDialog dialog("Open Kage Studio File", Gtk::FILE_CHOOSER_ACTION_OPEN);
 	dialog.set_transient_for( * this);
 		dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
@@ -4641,6 +4671,7 @@ std::vector<int> Kage::parseColorString(std::string p_color) {
 	} else {
 		std::cout << "parseColorString ?!? " << p_color << "\n";
 	}
+	
 	return l_colors;
 }
 

@@ -386,6 +386,7 @@ void VectorDataManager::addImage(PointData p_IDandBuff, PointData p_xy, PointDat
 		ps.push_back(p_rotateAlpha);
 	vectorData[vectorData.size()-1].setPoints(ps);
 }
+
 bool VectorDataManager::isEmpty() {
 	return (vectorData.size() == 0);
 }

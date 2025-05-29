@@ -714,7 +714,7 @@ std::string KageAssetManager::getImagePathByID(unsigned int p_index) {
 //	std::string l_tempPath;
 //	stream_tempPath >> l_tempPath;
 	std::string l_tempPath { path_tempPath.u8string() };
-	std::cout << "      ? " << l_tempPath << _KageStudioAsset << "\\" << assets[p_index]->getAssetHash() << std::endl;
+//	std::cout << "      ? " << l_tempPath << _KageStudioAsset << "\\" << assets[p_index]->getAssetHash() << std::endl;
 	if (p_index < assetCount() && assets[p_index]->getAssetHash() != "") {
 	#ifdef __linux__
 		return l_tempPath + _KageStudioAsset + "/" + assets[p_index]->getAssetHash();

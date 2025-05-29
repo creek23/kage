@@ -65,7 +65,6 @@ void KageLayersUI::addEventsListener() {
 	add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK);
 	add_events(Gdk::ENTER_NOTIFY_MASK | Gdk::LEAVE_NOTIFY_MASK);
 	add_events(Gdk::FOCUS_CHANGE_MASK);
-	
 	//*window = NULL;
 }
 
@@ -182,6 +181,18 @@ bool KageLayersUI::on_event(GdkEvent *e) {
 		on_key_release_event((GdkEventKey*) e);
 	} else if (e->type == GDK_CONFIGURE) {
 		//filter out from echos 
+	} else if (e->type == GDK_DRAG_ENTER) {
+		std::cout << "KageLibrary::GDK_DRAG_ENTER" << std::endl;
+	} else if (e->type == GDK_DRAG_LEAVE) {
+		std::cout << "KageLibrary::GDK_DRAG_LEAVE" << std::endl;
+	} else if (e->type == GDK_DRAG_MOTION) {
+		std::cout << "KageLibrary::GDK_DRAG_MOTION" << std::endl;
+	} else if (e->type == GDK_DRAG_STATUS) {
+		std::cout << "KageLibrary::GDK_DRAG_STATUS" << std::endl;
+	} else if (e->type == GDK_DROP_START) {
+		std::cout << "KageLibrary::GDK_DROP_START" << std::endl;
+	} else if (e->type == GDK_DROP_FINISHED) {
+		std::cout << "KageLibrary::GDK_DROP_FINISHED" << std::endl;
 	}
 	return true;
 }

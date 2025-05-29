@@ -70,7 +70,6 @@
 	#include <gdkmm/frameclock.h>
 
 	#include "form_new.h"
-	
 	class Kage : public Gtk::Window {
 		public:
 			Kage(std::string p_filePath);
@@ -432,6 +431,9 @@
 			
 			bool m_LabelLibrary_onClick(GdkEventButton *event);//, gpointer user_data);
 		public:
+			void Library_onDragStart(const Glib::RefPtr<Gdk::DragContext>&context, Gtk::SelectionData& selection_data, guint p_info, guint time);
+			void Stage_onDragStop(const Glib::RefPtr<Gdk::DragContext>& context, int p_destX, int p_destY, const Gtk::SelectionData& selection_data, guint p_info, guint time);
+			
 			KageStage _stage;
 				bool _UPDATE_SHAPE_COLORS;
 				bool _propFillVisible = false;

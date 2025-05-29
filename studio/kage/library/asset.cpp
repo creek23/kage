@@ -126,7 +126,6 @@ bool KageAsset::on_event(GdkEvent *e) {
 	} else if (e->type == GDK_DOUBLE_BUTTON_PRESS) {
 		if (e->button.x > 36) {
 			if (_CTRL) {
-				
 				if (_assetType == AssetType::ASSET_IMAGE) {
 					_assetManager->_kage->_stage.addImage(assetID);
 				} else if (_assetType == AssetType::ASSET_KAGE) {

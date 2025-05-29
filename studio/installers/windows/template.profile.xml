@@ -1,0 +1,45 @@
+<template profile="Kage Studio" version="0.8 (Emcee)">
+	<profile name="Apple TV HD 720p" fps="30" width="1280" height="720" />
+	<profile name="Blu-ray/AVCHD FullHD 1080i" fps="30" width="1920" height="1080" />
+	<profile name="Blu-ray/AVCHD FullHD PAL" fps="25" width="1920" height="1080" />
+	<profile name="DVD NSTC 480i" fps="30" width="655" height="480" />
+	<profile name="DVD NSTC 480i Wide" fps="30" width="873" height="480" />
+	<profile name="DVD PAL 576i" fps="30" width="788" height="576" />
+	<profile name="DVD PAL 576i Wide" fps="30" width="1050" height="576" />
+	<profile name="Flicker HD 720p 25fps" fps="25" width="1280" height="720" />
+	<profile name="Flicker FHD 1080p 30fps" fps="30" width="1920" height="1080" />
+	<profile name="Instagram HD 720p 25fps" fps="25" width="1280" height="720" />
+	<profile name="Instagram HD 720p 30fps" fps="30" width="1280" height="720" />
+	<profile name="Instagram FHD 1080p 30fps" fps="30" width="1920" height="1080" />
+	<profile name="Instagram FHD Vert 1080p 25fps" fps="25" width="1080" height="1920" />
+	<profile name="Instagram FHD Vert 1080p 30fps" fps="30" width="1080" height="1920" />
+	<profile name="Twitter/X HD 720p 25fps" fps="25" width="1280" height="720" />
+	<profile name="Twitter/X HD 720p 30fps" fps="30" width="1280" height="720" />
+	<profile name="Twitter/X HD Vert 720p 25fps" fps="25" width="720" height="1280" />
+	<profile name="Twitter/X HD Vert 720p 30fps" fps="30" width="720" height="1280" />
+	<profile name="Twitter/X FHD 1080p 30fps" fps="30" width="1920" height="1080" />
+	<profile name="Twitter/X FHD Vert 1080p 25fps" fps="25" width="1080" height="1920" />
+	<profile name="Twitter/X FHD Vert 1080p 30fps" fps="30" width="1080" height="1920" />
+	<profile name="Vimeo HD 720p 24fps" fps="24" width="1280" height="720" />
+	<profile name="Vimeo FHD 1080p 60fps" fps="60" width="1920" height="1080" />
+	<profile name="Vimeo Wide HD 720p 24fps" fps="24" width="1366" height="720" />
+	<profile name="Vimeo Wide FHD 1080p 60fps" fps="60" width="2048" height="1080" />
+	<profile name="YouTube HD 720p 24fps" fps="24" width="1280" height="720" />
+	<profile name="YouTube HD 720p 25fps" fps="25" width="1280" height="720" />
+	<profile name="YouTube HD 720p 30fps" fps="30" width="1280" height="720" />
+	<profile name="YouTube HD 720p 60fps" fps="60" width="1280" height="720" />
+	<profile name="YouTube HD Vert 720p 24fps" fps="24" width="720" height="1280" />
+	<profile name="YouTube HD Vert 720p 25fps" fps="25" width="720" height="1280" />
+	<profile name="YouTube HD Vert 720p 30fps" fps="30" width="720" height="1280" />
+	<profile name="YouTube HD Vert 720p 60fps" fps="60" width="720" height="1280" />
+	<profile name="YouTube FHD 1080p 24fps" fps="24" width="1920" height="1080" />
+	<profile name="YouTube FHD 1080p 25fps" fps="25" width="1920" height="1080" />
+	<profile name="YouTube FHD 1080p 30fps" fps="30" width="1920" height="1080" />
+	<profile name="YouTube FHD 1080p 50fps" fps="50" width="1920" height="1080" />
+	<profile name="YouTube FHD 1080p 60fps" fps="60" width="1920" height="1080" />
+	<profile name="YouTube FHD Vert 1080p 24fps" fps="24" width="1080" height="1920" />
+	<profile name="YouTube FHD Vert 1080p 25fps" fps="25" width="1080" height="1920" />
+	<profile name="YouTube FHD Vert 1080p 30fps" fps="30" width="1080" height="1920" />
+	<profile name="YouTube FHD Vert 1080p 50fps" fps="50" width="1080" height="1920" />
+	<profile name="YouTube FHD Vert 1080p 60fps" fps="60" width="1080" height="1920" />
+</template>

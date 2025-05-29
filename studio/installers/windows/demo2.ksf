@@ -1,0 +1,3554 @@
+<KageStudio version="2023.06.26">
+<stage layers="4" frames="55" />
+<layer1 label="bg" visible="true" locked="false">
+<frame1 extend="start" tween="11">
+<init>396 311</init>
+<fill color="rgba(98, 160, 234, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>-17 627</move>
+	<curve>396.5 627 396.5 627 810 627</curve>
+	<curve>810 311.5 810 311.5 810 -4</curve>
+	<curve>396.5 -4 396.5 -4 -17 -4</curve>
+	<curve>-17 311.5 -17 311.5 -17 627</curve>
+	<closepath/>
+</fill>
+<init>216.01 522.5</init>
+<fill color="rgba(119, 118, 123, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>180.01 408.5</move>
+	<curve>216.01 408.5 216.01 408.5 252.01 408.5</curve>
+	<curve>252.01 523 252.01 523 252.01 637.5</curve>
+	<curve>216.01 637.5 216.01 637.5 180.01 637.5</curve>
+	<curve>180.01 523 180.01 523 180.01 408.5</curve>
+	<closepath/>
+</fill>
+<init>540.51 505</init>
+<fill color="rgba(119, 118, 123, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>515.51 384</move>
+	<curve>541.01 384 541.01 384 566.51 384</curve>
+	<curve>566.51 505.5 566.51 505.5 566.51 627</curve>
+	<curve>541.01 627 541.01 627 515.51 627</curve>
+	<curve>515.51 505.5 515.51 505.5 515.51 384</curve>
+	<closepath/>
+</fill>
+<init>707.01 532</init>
+<fill color="rgba(119, 118, 123, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>674.01 425</move>
+	<curve>707.01 425 707.01 425 740.01 425</curve>
+	<curve>740.01 532 740.01 532 740.01 639</curve>
+	<curve>707.01 639 707.01 639 674.01 639</curve>
+	<curve>674.01 532 674.01 532 674.01 425</curve>
+	<closepath/>
+</fill>
+<init>349.51 552.5</init>
+<fill color="rgba(119, 118, 123, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>309.51 467.5</move>
+	<curve>350.01 467.5 350.01 467.5 390.51 467.5</curve>
+	<curve>390.51 553 390.51 553 390.51 638.5</curve>
+	<curve>350.01 638.5 350.01 638.5 309.51 638.5</curve>
+	<curve>309.51 553 309.51 553 309.51 467.5</curve>
+	<closepath/>
+</fill>
+<init>127.01 525.5</init>
+<fill color="rgba(26, 95, 180, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>74 420.5</move>
+	<curve>127.01 420.5 127.01 420.5 180.01 420.5</curve>
+	<curve>180.01 526 180.01 526 180.01 631.5</curve>
+	<curve>127.01 631.5 127.01 631.5 74 631.5</curve>
+	<curve>74 526 74 526 74 420.5</curve>
+	<closepath/>
+</fill>
+<init>479.51 535</init>
+<fill color="rgba(26, 95, 180, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>451.51 435</move>
+	<curve>480.01 435 480.01 435 508.51 435</curve>
+	<curve>508.51 535 508.51 535 508.51 635</curve>
+	<curve>480.01 635 480.01 635 451.51 635</curve>
+	<curve>451.51 535 451.51 535 451.51 435</curve>
+	<closepath/>
+</fill>
+<init>673.51 539.5</init>
+<fill color="rgba(26, 95, 180, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>621.51 430.5</move>
+	<curve>674.01 430.5 674.01 430.5 726.51 430.5</curve>
+	<curve>726.51 540 726.51 540 726.51 649.5</curve>
+	<curve>674.01 649.5 674.01 649.5 621.51 649.5</curve>
+	<curve>621.51 540 621.51 540 621.51 430.5</curve>
+	<closepath/>
+</fill>
+<init>872 541</init>
+<fill color="rgba(26, 95, 180, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>828 437</move>
+	<curve>872.5 437 872.5 437 917 437</curve>
+	<curve>917 541.5 917 541.5 917 646</curve>
+	<curve>872.5 646 872.5 646 828 646</curve>
+	<curve>828 541.5 828 541.5 828 437</curve>
+	<closepath/>
+</fill>
+<init>256 547</init>
+<fill color="rgba(61, 56, 70, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>202 455</move>
+	<curve>256 455 256 455 310 455</curve>
+	<curve>310 547.5 310 547.5 310 640</curve>
+	<curve>256 640 256 640 202 640</curve>
+	<curve>202 547.5 202 547.5 202 455</curve>
+	<closepath/>
+</fill>
+<init>543.96 575.5</init>
+<fill color="rgba(61, 56, 70, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>447 512</move>
+	<curve>543.96 512 543.96 512 641.01 512</curve>
+	<curve>641.01 575.5 641.01 575.5 641.01 639</curve>
+	<curve>543.96 639 543.96 639 447 639</curve>
+	<curve>447 575.5 447 575.5 447 512</curve>
+	<closepath/>
+</fill>
+<init>809 557</init>
+<fill color="rgba(61, 56, 70, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>852 465</move>
+	<curve>809 465 809 465 766 465</curve>
+	<curve>766 557.5 766 557.5 766 650</curve>
+	<curve>809 650 809 650 852 650</curve>
+	<curve>852 557.5 852 557.5 852 465</curve>
+	<closepath/>
+</fill>
+<init>346 526</init>
+<fill color="rgba(61, 56, 70, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>325 411</move>
+	<curve>346 411 346 411 367 411</curve>
+	<curve>367 526 367 526 367 641</curve>
+	<curve>346 641 346 641 325 641</curve>
+	<curve>325 526 325 526 325 411</curve>
+	<closepath/>
+</fill>
+<init>392 714</init>
+<fill color="rgba(222, 221, 218, 255)">
+	<stroke color="rgba(154, 153, 150, 255)" thickness="3"/>
+	<move>-72 615</move>
+	<curve>392 615 392 615 856 615</curve>
+	<curve>856 714 856 714 856 813</curve>
+	<curve>392 813 392 813 -72 813</curve>
+	<curve>-72 714 -72 714 -72 615</curve>
+	<closepath/>
+</fill>
+</frame1>
+<frame2 extend="mid" tween="11" />
+<frame3 extend="mid" tween="11" />
+<frame4 extend="mid" tween="11" />
+<frame5 extend="mid" tween="11" />
+<frame6 extend="mid" tween="11" />
+<frame7 extend="mid" tween="11" />
+<frame8 extend="mid" tween="11" />
+<frame9 extend="mid" tween="11" />
+<frame10 extend="mid" tween="11" />
+<frame11 extend="mid" tween="11" />
+<frame12 extend="mid" tween="11" />
+<frame13 extend="mid" tween="11" />
+<frame14 extend="mid" tween="11" />
+<frame15 extend="mid" tween="11" />
+<frame16 extend="mid" tween="11" />
+<frame17 extend="mid" tween="11" />
+<frame18 extend="mid" tween="11" />
+<frame19 extend="mid" tween="11" />
+<frame20 extend="mid" tween="11" />
+<frame21 extend="mid" tween="11" />
+<frame22 extend="mid" tween="11" />
+<frame23 extend="mid" tween="11" />
+<frame24 extend="mid" tween="11" />
+<frame25 extend="mid" tween="11" />
+<frame26 extend="mid" tween="11" />
+<frame27 extend="end" tween="11" />
+<frame28>
+<init>396 311</init>
+<fill color="rgba(98, 160, 234, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>-17 627</move>
+	<curve>396.5 627 396.5 627 810 627</curve>
+	<curve>810 311.5 810 311.5 810 -4</curve>
+	<curve>396.5 -4 396.5 -4 -17 -4</curve>
+	<curve>-17 311.5 -17 311.5 -17 627</curve>
+	<closepath/>
+</fill>
+<init>186.01 522.5</init>
+<fill color="rgba(119, 118, 123, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>150.01 408.5</move>
+	<curve>186.01 408.5 186.01 408.5 222.01 408.5</curve>
+	<curve>222.01 523 222.01 523 222.01 637.5</curve>
+	<curve>186.01 637.5 186.01 637.5 150.01 637.5</curve>
+	<curve>150.01 523 150.01 523 150.01 408.5</curve>
+	<closepath/>
+</fill>
+<init>510.51 505</init>
+<fill color="rgba(119, 118, 123, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>485.51 384</move>
+	<curve>511.01 384 511.01 384 536.51 384</curve>
+	<curve>536.51 505.5 536.51 505.5 536.51 627</curve>
+	<curve>511.01 627 511.01 627 485.51 627</curve>
+	<curve>485.51 505.5 485.51 505.5 485.51 384</curve>
+	<closepath/>
+</fill>
+<init>677.01 532</init>
+<fill color="rgba(119, 118, 123, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>644.01 425</move>
+	<curve>677.01 425 677.01 425 710.01 425</curve>
+	<curve>710.01 532 710.01 532 710.01 639</curve>
+	<curve>677.01 639 677.01 639 644.01 639</curve>
+	<curve>644.01 532 644.01 532 644.01 425</curve>
+	<closepath/>
+</fill>
+<init>319.51 552.5</init>
+<fill color="rgba(119, 118, 123, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>279.51 467.5</move>
+	<curve>320.01 467.5 320.01 467.5 360.51 467.5</curve>
+	<curve>360.51 553 360.51 553 360.51 638.5</curve>
+	<curve>320.01 638.5 320.01 638.5 279.51 638.5</curve>
+	<curve>279.51 553 279.51 553 279.51 467.5</curve>
+	<closepath/>
+</fill>
+<init>67.01 525.5</init>
+<fill color="rgba(26, 95, 180, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>14 420.5</move>
+	<curve>67.01 420.5 67.01 420.5 120.01 420.5</curve>
+	<curve>120.01 526 120.01 526 120.01 631.5</curve>
+	<curve>67.01 631.5 67.01 631.5 14 631.5</curve>
+	<curve>14 526 14 526 14 420.5</curve>
+	<closepath/>
+</fill>
+<init>419.51 535</init>
+<fill color="rgba(26, 95, 180, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>391.51 435</move>
+	<curve>420.01 435 420.01 435 448.51 435</curve>
+	<curve>448.51 535 448.51 535 448.51 635</curve>
+	<curve>420.01 635 420.01 635 391.51 635</curve>
+	<curve>391.51 535 391.51 535 391.51 435</curve>
+	<closepath/>
+</fill>
+<init>613.51 539.5</init>
+<fill color="rgba(26, 95, 180, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>561.51 430.5</move>
+	<curve>614.01 430.5 614.01 430.5 666.51 430.5</curve>
+	<curve>666.51 540 666.51 540 666.51 649.5</curve>
+	<curve>614.01 649.5 614.01 649.5 561.51 649.5</curve>
+	<curve>561.51 540 561.51 540 561.51 430.5</curve>
+	<closepath/>
+</fill>
+<init>812 541</init>
+<fill color="rgba(26, 95, 180, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>768 437</move>
+	<curve>812.5 437 812.5 437 857 437</curve>
+	<curve>857 541.5 857 541.5 857 646</curve>
+	<curve>812.5 646 812.5 646 768 646</curve>
+	<curve>768 541.5 768 541.5 768 437</curve>
+	<closepath/>
+</fill>
+<init>166 547</init>
+<fill color="rgba(61, 56, 70, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>112 455</move>
+	<curve>166 455 166 455 220 455</curve>
+	<curve>220 547.5 220 547.5 220 640</curve>
+	<curve>166 640 166 640 112 640</curve>
+	<curve>112 547.5 112 547.5 112 455</curve>
+	<closepath/>
+</fill>
+<init>453.96 575.5</init>
+<fill color="rgba(61, 56, 70, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>357 512</move>
+	<curve>453.96 512 453.96 512 551.01 512</curve>
+	<curve>551.01 575.5 551.01 575.5 551.01 639</curve>
+	<curve>453.96 639 453.96 639 357 639</curve>
+	<curve>357 575.5 357 575.5 357 512</curve>
+	<closepath/>
+</fill>
+<init>719 557</init>
+<fill color="rgba(61, 56, 70, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>762 465</move>
+	<curve>719 465 719 465 676 465</curve>
+	<curve>676 557.5 676 557.5 676 650</curve>
+	<curve>719 650 719 650 762 650</curve>
+	<curve>762 557.5 762 557.5 762 465</curve>
+	<closepath/>
+</fill>
+<init>256 526</init>
+<fill color="rgba(61, 56, 70, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>235 411</move>
+	<curve>256 411 256 411 277 411</curve>
+	<curve>277 526 277 526 277 641</curve>
+	<curve>256 641 256 641 235 641</curve>
+	<curve>235 526 235 526 235 411</curve>
+	<closepath/>
+</fill>
+<init>392 714</init>
+<fill color="rgba(222, 221, 218, 255)">
+	<stroke color="rgba(154, 153, 150, 255)" thickness="3"/>
+	<move>-72 615</move>
+	<curve>392 615 392 615 856 615</curve>
+	<curve>856 714 856 714 856 813</curve>
+	<curve>392 813 392 813 -72 813</curve>
+	<curve>-72 714 -72 714 -72 615</curve>
+	<closepath/>
+</fill>
+</frame28>
+<frame29>
+<init>396 311</init>
+<fill color="rgba(98, 160, 234, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>-17 627</move>
+	<curve>396.5 627 396.5 627 810 627</curve>
+	<curve>810 311.5 810 311.5 810 -4</curve>
+	<curve>396.5 -4 396.5 -4 -17 -4</curve>
+	<curve>-17 311.5 -17 311.5 -17 627</curve>
+	<closepath/>
+</fill>
+<init>186.01 522.5</init>
+<fill color="rgba(119, 118, 123, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>150.01 408.5</move>
+	<curve>186.01 408.5 186.01 408.5 222.01 408.5</curve>
+	<curve>222.01 523 222.01 523 222.01 637.5</curve>
+	<curve>186.01 637.5 186.01 637.5 150.01 637.5</curve>
+	<curve>150.01 523 150.01 523 150.01 408.5</curve>
+	<closepath/>
+</fill>
+<init>510.51 505</init>
+<fill color="rgba(119, 118, 123, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>485.51 384</move>
+	<curve>511.01 384 511.01 384 536.51 384</curve>
+	<curve>536.51 505.5 536.51 505.5 536.51 627</curve>
+	<curve>511.01 627 511.01 627 485.51 627</curve>
+	<curve>485.51 505.5 485.51 505.5 485.51 384</curve>
+	<closepath/>
+</fill>
+<init>677.01 532</init>
+<fill color="rgba(119, 118, 123, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>644.01 425</move>
+	<curve>677.01 425 677.01 425 710.01 425</curve>
+	<curve>710.01 532 710.01 532 710.01 639</curve>
+	<curve>677.01 639 677.01 639 644.01 639</curve>
+	<curve>644.01 532 644.01 532 644.01 425</curve>
+	<closepath/>
+</fill>
+<init>319.51 552.5</init>
+<fill color="rgba(119, 118, 123, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>279.51 467.5</move>
+	<curve>320.01 467.5 320.01 467.5 360.51 467.5</curve>
+	<curve>360.51 553 360.51 553 360.51 638.5</curve>
+	<curve>320.01 638.5 320.01 638.5 279.51 638.5</curve>
+	<curve>279.51 553 279.51 553 279.51 467.5</curve>
+	<closepath/>
+</fill>
+<init>67.01 525.5</init>
+<fill color="rgba(26, 95, 180, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>14 420.5</move>
+	<curve>67.01 420.5 67.01 420.5 120.01 420.5</curve>
+	<curve>120.01 526 120.01 526 120.01 631.5</curve>
+	<curve>67.01 631.5 67.01 631.5 14 631.5</curve>
+	<curve>14 526 14 526 14 420.5</curve>
+	<closepath/>
+</fill>
+<init>419.51 535</init>
+<fill color="rgba(26, 95, 180, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>391.51 435</move>
+	<curve>420.01 435 420.01 435 448.51 435</curve>
+	<curve>448.51 535 448.51 535 448.51 635</curve>
+	<curve>420.01 635 420.01 635 391.51 635</curve>
+	<curve>391.51 535 391.51 535 391.51 435</curve>
+	<closepath/>
+</fill>
+<init>613.51 539.5</init>
+<fill color="rgba(26, 95, 180, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>561.51 430.5</move>
+	<curve>614.01 430.5 614.01 430.5 666.51 430.5</curve>
+	<curve>666.51 540 666.51 540 666.51 649.5</curve>
+	<curve>614.01 649.5 614.01 649.5 561.51 649.5</curve>
+	<curve>561.51 540 561.51 540 561.51 430.5</curve>
+	<closepath/>
+</fill>
+<init>812 541</init>
+<fill color="rgba(26, 95, 180, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>768 437</move>
+	<curve>812.5 437 812.5 437 857 437</curve>
+	<curve>857 541.5 857 541.5 857 646</curve>
+	<curve>812.5 646 812.5 646 768 646</curve>
+	<curve>768 541.5 768 541.5 768 437</curve>
+	<closepath/>
+</fill>
+<init>166 547</init>
+<fill color="rgba(61, 56, 70, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>112 455</move>
+	<curve>166 455 166 455 220 455</curve>
+	<curve>220 547.5 220 547.5 220 640</curve>
+	<curve>166 640 166 640 112 640</curve>
+	<curve>112 547.5 112 547.5 112 455</curve>
+	<closepath/>
+</fill>
+<init>453.96 575.5</init>
+<fill color="rgba(61, 56, 70, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>357 512</move>
+	<curve>453.96 512 453.96 512 551.01 512</curve>
+	<curve>551.01 575.5 551.01 575.5 551.01 639</curve>
+	<curve>453.96 639 453.96 639 357 639</curve>
+	<curve>357 575.5 357 575.5 357 512</curve>
+	<closepath/>
+</fill>
+<init>719 557</init>
+<fill color="rgba(61, 56, 70, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>762 465</move>
+	<curve>719 465 719 465 676 465</curve>
+	<curve>676 557.5 676 557.5 676 650</curve>
+	<curve>719 650 719 650 762 650</curve>
+	<curve>762 557.5 762 557.5 762 465</curve>
+	<closepath/>
+</fill>
+<init>256 526</init>
+<fill color="rgba(61, 56, 70, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>235 411</move>
+	<curve>256 411 256 411 277 411</curve>
+	<curve>277 526 277 526 277 641</curve>
+	<curve>256 641 256 641 235 641</curve>
+	<curve>235 526 235 526 235 411</curve>
+	<closepath/>
+</fill>
+<init>392 714</init>
+<fill color="rgba(222, 221, 218, 255)">
+	<stroke color="rgba(154, 153, 150, 255)" thickness="3"/>
+	<move>-72 615</move>
+	<curve>392 615 392 615 856 615</curve>
+	<curve>856 714 856 714 856 813</curve>
+	<curve>392 813 392 813 -72 813</curve>
+	<curve>-72 714 -72 714 -72 615</curve>
+	<closepath/>
+</fill>
+</frame29>
+<frame30 extend="start">
+<init>396 311</init>
+<fill color="rgba(98, 160, 234, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>-17 627</move>
+	<curve>396.5 627 396.5 627 810 627</curve>
+	<curve>810 311.5 810 311.5 810 -4</curve>
+	<curve>396.5 -4 396.5 -4 -17 -4</curve>
+	<curve>-17 311.5 -17 311.5 -17 627</curve>
+	<closepath/>
+</fill>
+<init>186.01 522.5</init>
+<fill color="rgba(119, 118, 123, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>150.01 408.5</move>
+	<curve>186.01 408.5 186.01 408.5 222.01 408.5</curve>
+	<curve>222.01 523 222.01 523 222.01 637.5</curve>
+	<curve>186.01 637.5 186.01 637.5 150.01 637.5</curve>
+	<curve>150.01 523 150.01 523 150.01 408.5</curve>
+	<closepath/>
+</fill>
+<init>510.51 505</init>
+<fill color="rgba(119, 118, 123, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>485.51 384</move>
+	<curve>511.01 384 511.01 384 536.51 384</curve>
+	<curve>536.51 505.5 536.51 505.5 536.51 627</curve>
+	<curve>511.01 627 511.01 627 485.51 627</curve>
+	<curve>485.51 505.5 485.51 505.5 485.51 384</curve>
+	<closepath/>
+</fill>
+<init>677.01 532</init>
+<fill color="rgba(119, 118, 123, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>644.01 425</move>
+	<curve>677.01 425 677.01 425 710.01 425</curve>
+	<curve>710.01 532 710.01 532 710.01 639</curve>
+	<curve>677.01 639 677.01 639 644.01 639</curve>
+	<curve>644.01 532 644.01 532 644.01 425</curve>
+	<closepath/>
+</fill>
+<init>319.51 552.5</init>
+<fill color="rgba(119, 118, 123, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>279.51 467.5</move>
+	<curve>320.01 467.5 320.01 467.5 360.51 467.5</curve>
+	<curve>360.51 553 360.51 553 360.51 638.5</curve>
+	<curve>320.01 638.5 320.01 638.5 279.51 638.5</curve>
+	<curve>279.51 553 279.51 553 279.51 467.5</curve>
+	<closepath/>
+</fill>
+<init>67.01 525.5</init>
+<fill color="rgba(26, 95, 180, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>14 420.5</move>
+	<curve>67.01 420.5 67.01 420.5 120.01 420.5</curve>
+	<curve>120.01 526 120.01 526 120.01 631.5</curve>
+	<curve>67.01 631.5 67.01 631.5 14 631.5</curve>
+	<curve>14 526 14 526 14 420.5</curve>
+	<closepath/>
+</fill>
+<init>419.51 535</init>
+<fill color="rgba(26, 95, 180, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>391.51 435</move>
+	<curve>420.01 435 420.01 435 448.51 435</curve>
+	<curve>448.51 535 448.51 535 448.51 635</curve>
+	<curve>420.01 635 420.01 635 391.51 635</curve>
+	<curve>391.51 535 391.51 535 391.51 435</curve>
+	<closepath/>
+</fill>
+<init>613.51 539.5</init>
+<fill color="rgba(26, 95, 180, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>561.51 430.5</move>
+	<curve>614.01 430.5 614.01 430.5 666.51 430.5</curve>
+	<curve>666.51 540 666.51 540 666.51 649.5</curve>
+	<curve>614.01 649.5 614.01 649.5 561.51 649.5</curve>
+	<curve>561.51 540 561.51 540 561.51 430.5</curve>
+	<closepath/>
+</fill>
+<init>812 541</init>
+<fill color="rgba(26, 95, 180, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>768 437</move>
+	<curve>812.5 437 812.5 437 857 437</curve>
+	<curve>857 541.5 857 541.5 857 646</curve>
+	<curve>812.5 646 812.5 646 768 646</curve>
+	<curve>768 541.5 768 541.5 768 437</curve>
+	<closepath/>
+</fill>
+<init>166 547</init>
+<fill color="rgba(61, 56, 70, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>112 455</move>
+	<curve>166 455 166 455 220 455</curve>
+	<curve>220 547.5 220 547.5 220 640</curve>
+	<curve>166 640 166 640 112 640</curve>
+	<curve>112 547.5 112 547.5 112 455</curve>
+	<closepath/>
+</fill>
+<init>453.96 575.5</init>
+<fill color="rgba(61, 56, 70, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>357 512</move>
+	<curve>453.96 512 453.96 512 551.01 512</curve>
+	<curve>551.01 575.5 551.01 575.5 551.01 639</curve>
+	<curve>453.96 639 453.96 639 357 639</curve>
+	<curve>357 575.5 357 575.5 357 512</curve>
+	<closepath/>
+</fill>
+<init>719 557</init>
+<fill color="rgba(61, 56, 70, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>762 465</move>
+	<curve>719 465 719 465 676 465</curve>
+	<curve>676 557.5 676 557.5 676 650</curve>
+	<curve>719 650 719 650 762 650</curve>
+	<curve>762 557.5 762 557.5 762 465</curve>
+	<closepath/>
+</fill>
+<init>256 526</init>
+<fill color="rgba(61, 56, 70, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>235 411</move>
+	<curve>256 411 256 411 277 411</curve>
+	<curve>277 526 277 526 277 641</curve>
+	<curve>256 641 256 641 235 641</curve>
+	<curve>235 526 235 526 235 411</curve>
+	<closepath/>
+</fill>
+<init>392 714</init>
+<fill color="rgba(222, 221, 218, 255)">
+	<stroke color="rgba(154, 153, 150, 255)" thickness="3"/>
+	<move>-72 615</move>
+	<curve>392 615 392 615 856 615</curve>
+	<curve>856 714 856 714 856 813</curve>
+	<curve>392 813 392 813 -72 813</curve>
+	<curve>-72 714 -72 714 -72 615</curve>
+	<closepath/>
+</fill>
+</frame30>
+<frame31 extend="mid" />
+<frame32 extend="mid" />
+<frame33 extend="mid" />
+<frame34 extend="mid" />
+<frame35 extend="mid" />
+<frame36 extend="mid" />
+<frame37 extend="mid" />
+<frame38 extend="mid" />
+<frame39 extend="mid" />
+<frame40 extend="mid" />
+<frame41 extend="mid" />
+<frame42 extend="mid" />
+<frame43 extend="end" />
+<frame44 extend="start">
+<init>396 311</init>
+<fill color="rgba(98, 160, 234, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>-17 627</move>
+	<curve>396.5 627 396.5 627 810 627</curve>
+	<curve>810 311.5 810 311.5 810 -4</curve>
+	<curve>396.5 -4 396.5 -4 -17 -4</curve>
+	<curve>-17 311.5 -17 311.5 -17 627</curve>
+	<closepath/>
+</fill>
+<init>186.01 522.5</init>
+<fill color="rgba(119, 118, 123, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>150.01 408.5</move>
+	<curve>186.01 408.5 186.01 408.5 222.01 408.5</curve>
+	<curve>222.01 523 222.01 523 222.01 637.5</curve>
+	<curve>186.01 637.5 186.01 637.5 150.01 637.5</curve>
+	<curve>150.01 523 150.01 523 150.01 408.5</curve>
+	<closepath/>
+</fill>
+<init>510.51 505</init>
+<fill color="rgba(119, 118, 123, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>485.51 384</move>
+	<curve>511.01 384 511.01 384 536.51 384</curve>
+	<curve>536.51 505.5 536.51 505.5 536.51 627</curve>
+	<curve>511.01 627 511.01 627 485.51 627</curve>
+	<curve>485.51 505.5 485.51 505.5 485.51 384</curve>
+	<closepath/>
+</fill>
+<init>677.01 532</init>
+<fill color="rgba(119, 118, 123, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>644.01 425</move>
+	<curve>677.01 425 677.01 425 710.01 425</curve>
+	<curve>710.01 532 710.01 532 710.01 639</curve>
+	<curve>677.01 639 677.01 639 644.01 639</curve>
+	<curve>644.01 532 644.01 532 644.01 425</curve>
+	<closepath/>
+</fill>
+<init>319.51 552.5</init>
+<fill color="rgba(119, 118, 123, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>279.51 467.5</move>
+	<curve>320.01 467.5 320.01 467.5 360.51 467.5</curve>
+	<curve>360.51 553 360.51 553 360.51 638.5</curve>
+	<curve>320.01 638.5 320.01 638.5 279.51 638.5</curve>
+	<curve>279.51 553 279.51 553 279.51 467.5</curve>
+	<closepath/>
+</fill>
+<init>67.01 525.5</init>
+<fill color="rgba(26, 95, 180, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>14 420.5</move>
+	<curve>67.01 420.5 67.01 420.5 120.01 420.5</curve>
+	<curve>120.01 526 120.01 526 120.01 631.5</curve>
+	<curve>67.01 631.5 67.01 631.5 14 631.5</curve>
+	<curve>14 526 14 526 14 420.5</curve>
+	<closepath/>
+</fill>
+<init>419.51 535</init>
+<fill color="rgba(26, 95, 180, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>391.51 435</move>
+	<curve>420.01 435 420.01 435 448.51 435</curve>
+	<curve>448.51 535 448.51 535 448.51 635</curve>
+	<curve>420.01 635 420.01 635 391.51 635</curve>
+	<curve>391.51 535 391.51 535 391.51 435</curve>
+	<closepath/>
+</fill>
+<init>613.51 539.5</init>
+<fill color="rgba(26, 95, 180, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>561.51 430.5</move>
+	<curve>614.01 430.5 614.01 430.5 666.51 430.5</curve>
+	<curve>666.51 540 666.51 540 666.51 649.5</curve>
+	<curve>614.01 649.5 614.01 649.5 561.51 649.5</curve>
+	<curve>561.51 540 561.51 540 561.51 430.5</curve>
+	<closepath/>
+</fill>
+<init>812 541</init>
+<fill color="rgba(26, 95, 180, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>768 437</move>
+	<curve>812.5 437 812.5 437 857 437</curve>
+	<curve>857 541.5 857 541.5 857 646</curve>
+	<curve>812.5 646 812.5 646 768 646</curve>
+	<curve>768 541.5 768 541.5 768 437</curve>
+	<closepath/>
+</fill>
+<init>166 547</init>
+<fill color="rgba(61, 56, 70, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>112 455</move>
+	<curve>166 455 166 455 220 455</curve>
+	<curve>220 547.5 220 547.5 220 640</curve>
+	<curve>166 640 166 640 112 640</curve>
+	<curve>112 547.5 112 547.5 112 455</curve>
+	<closepath/>
+</fill>
+<init>453.96 575.5</init>
+<fill color="rgba(61, 56, 70, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>357 512</move>
+	<curve>453.96 512 453.96 512 551.01 512</curve>
+	<curve>551.01 575.5 551.01 575.5 551.01 639</curve>
+	<curve>453.96 639 453.96 639 357 639</curve>
+	<curve>357 575.5 357 575.5 357 512</curve>
+	<closepath/>
+</fill>
+<init>719 557</init>
+<fill color="rgba(61, 56, 70, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>762 465</move>
+	<curve>719 465 719 465 676 465</curve>
+	<curve>676 557.5 676 557.5 676 650</curve>
+	<curve>719 650 719 650 762 650</curve>
+	<curve>762 557.5 762 557.5 762 465</curve>
+	<closepath/>
+</fill>
+<init>256 526</init>
+<fill color="rgba(61, 56, 70, 255)">
+	<stroke color="rgba(0, 0, 0, 0)" thickness="3"/>
+	<move>235 411</move>
+	<curve>256 411 256 411 277 411</curve>
+	<curve>277 526 277 526 277 641</curve>
+	<curve>256 641 256 641 235 641</curve>
+	<curve>235 526 235 526 235 411</curve>
+	<closepath/>
+</fill>
+<init>392 714</init>
+<fill color="rgba(222, 221, 218, 255)">
+	<stroke color="rgba(154, 153, 150, 255)" thickness="3"/>
+	<move>-72 615</move>
+	<curve>392 615 392 615 856 615</curve>
+	<curve>856 714 856 714 856 813</curve>
+	<curve>392 813 392 813 -72 813</curve>
+	<curve>-72 714 -72 714 -72 615</curve>
+	<closepath/>
+</fill>
+</frame44>
+<frame45 extend="mid" />
+<frame46 extend="mid" />
+<frame47 extend="mid" />
+<frame48 extend="mid" />
+<frame49 extend="mid" />
+<frame50 extend="mid" />
+<frame51 extend="mid" />
+<frame52 extend="mid" />
+<frame53 extend="mid" />
+<frame54 extend="mid" />
+<frame55 extend="end" />
+</layer1>
+<layer2 label="neo" visible="true" locked="false">
+<frame1 extend="start" tween="11">
+<init>501.75 531.91</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>461.87 299.45</move>
+	<curve>501.31 309.7 501.31 309.7 540.7 319.73</curve>
+	<curve>525.54 332.26 525.54 332.26 510.54 344.69</curve>
+	<curve>520.08 432.14 520.08 432.14 529.66 519.51</curve>
+	<curve>574.19 642.01 574.19 642.01 618.71 764.42</curve>
+	<curve>501.75 749.65 501.75 749.65 384.8 734.87</curve>
+	<curve>423.29 517.14 423.29 517.14 461.87 299.45</curve>
+	<closepath/>
+</fill>
+<init>549.01 786.6</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>506.88 764.42</move>
+	<curve>560.91 764.42 603.1 786.6 603.1 807.85</curve>
+	<curve>559.04 822.64 549.01 807.85 494.91 807.85</curve>
+	<curve>494.91 786.6 493.03 780.13 506.88 764.42</curve>
+	<closepath/>
+</fill>
+<init>374.76 802.77</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>332.52 780.58</move>
+	<curve>386.6 780.58 428.86 802.77 428.86 824.05</curve>
+	<curve>384.82 839 374.76 824.05 320.56 824.05</curve>
+	<curve>320.56 802.77 318.75 796.3 332.52 780.58</curve>
+	<closepath/>
+</fill>
+<init>537.16 530.08</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>506.96 505.49</move>
+	<curve>476.13 485.32 461.58 499.53 453.13 517.76</curve>
+	<curve>474.52 606.24 485.37 687.12 528.64 686.58</curve>
+	<curve>565.88 679.05 528.29 593.91 506.96 505.49</curve>
+	<closepath/>
+</fill>
+<init>500.05 650.71</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>541.4 634.97</move>
+	<curve>513.94 636 518.27 644.77 490.81 646.12</curve>
+	<curve>497.64 720.99 485.37 707.53 492.38 782.39</curve>
+	<curve>510.48 790.29 553.02 786.38 562.72 775.01</curve>
+	<curve>555.97 700.2 548.23 709.8 541.4 634.97</curve>
+	<closepath/>
+</fill>
+<init>436.88 542.72</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>463.1 532.29</move>
+	<curve>443.77 500.78 424.62 507.32 409.17 520.28</curve>
+	<curve>390.99 609.5 366.53 687.3 405.79 705.45</curve>
+	<curve>442.76 714.67 444.88 621.57 463.1 532.29</curve>
+	<closepath/>
+</fill>
+<init>399.79 663.29</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>439.29 664.21</move>
+	<curve>413.9 653.46 414.23 663.16 388.79 652.48</curve>
+	<curve>363.22 723.23 357.87 705.68 332.27 776.35</curve>
+	<curve>345.37 791.39 385.51 806.12 399.14 800.05</curve>
+	<curve>424.74 729.54 413.75 734.81 439.29 664.21</curve>
+	<closepath/>
+</fill>
+<init>541.45 566.58</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>587.37 572.99</move>
+	<curve>577.57 559.94 579.45 544.41 592 534.13</curve>
+	<curve>604.49 524.08 619.39 526.04 629.04 539.09</curve>
+	<curve>639.01 552.15 637.41 568.29 624.82 578.5</curve>
+	<curve>612.4 588.71 597.07 586.04 587.37 572.99</curve>
+	<closepath/>
+</fill>
+<init>581.49 340.17</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>482.28 348.37</move>
+	<curve>501.9 339.79 501.9 339.79 521.73 331.25</curve>
+	<curve>549.28 400.51 580.02 459.67 552.58 479.78</curve>
+	<curve>525.54 492.57 509.87 417.75 482.28 348.37</curve>
+	<closepath/>
+</fill>
+<init>552.7 439.87</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>520.61 451.39</move>
+	<curve>538.41 439.05 539.65 447.03 557.54 434.87</curve>
+	<curve>587.91 488.21 589.41 473.36 619.89 526.79</curve>
+	<curve>612.08 540.62 583.54 558.12 572.13 555.16</curve>
+	<curve>541.7 501.92 551.12 504.62 520.61 451.39</curve>
+	<closepath/>
+</fill>
+<init>457.18 472.82</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>402.1 429.34</move>
+	<curve>436.24 385.86 466.28 400.65 509.29 415.46</curve>
+	<curve>515.99 459.01 515.29 481.99 509.29 503.3</curve>
+	<curve>499.8 520.02 453.54 529.16 409.29 516.22</curve>
+	<curve>400.44 481.99 402.1 473.16 402.1 429.34</curve>
+	<closepath/>
+</fill>
+<init>451.39 393.72</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>373.58 350.38</move>
+	<curve>421.78 306.83 464.11 321.62 525 336.45</curve>
+	<curve>534.29 379.89 533.41 402.99 525 424.29</curve>
+	<curve>511.36 440.89 446.26 450.17 383.71 437.19</curve>
+	<curve>371.08 402.99 373.58 394.21 373.58 350.38</curve>
+	<closepath/>
+</fill>
+<init>497.61 259.7</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>458.2 298.52</move>
+	<curve>461.87 215.25 459.97 193.17 516.91 202.37</curve>
+	<curve>524.25 249.47 537.03 281.94 531.58 326.24</curve>
+	<curve>498.54 326.24 491.22 298.52 458.2 298.52</curve>
+	<closepath/>
+</fill>
+<init>497.61 259.7</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>503.2 202.37</move>
+	<curve>518.71 211.69 523.29 238.46 515.99 249.47</curve>
+	<curve>532.53 280.06 512.29 293.89 484.83 341.05</curve>
+	<curve>436.19 341.05 453.62 293.89 404.94 293.89</curve>
+	<curve>404.94 213.51 462.83 201.6 503.2 202.37</curve>
+	<closepath/>
+</fill>
+<init>468.73 271.32</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>447.18 295.8</move>
+	<curve>474.29 304.22 492.19 285.26 519.27 293.77</curve>
+	<curve>509.2 326.42 493.03 330.79 482.02 345.66</curve>
+	<curve>454.89 337.2 459.15 341.05 444.49 325.32</curve>
+	<curve>459.95 289.04 437.16 328.43 447.18 295.8</curve>
+	<closepath/>
+</fill>
+<init>478.21 315.45</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>468.28 310.48</move>
+	<curve>468.28 308.92 472.69 307.8 479.29 307.8</curve>
+	<curve>485.88 307.8 490.3 308.92 490.3 310.48</curve>
+	<curve>490.3 312.24 485.88 314.26 479.29 314.26</curve>
+	<curve>472.69 314.26 468.28 312.24 468.28 310.48</curve>
+	<closepath/>
+</fill>
+<init>479.29 311.02</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>456.49 235.58</move>
+	<curve>474.25 241.54 474.25 241.54 491.87 247.39</curve>
+	<curve>490.81 250.51 490.81 250.51 489.85 253.74</curve>
+	<curve>472.19 247.89 472.19 247.89 454.54 242.1</curve>
+	<curve>455.53 238.84 455.53 238.84 456.49 235.58</curve>
+	<closepath/>
+</fill>
+<init>473.2 244.66</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>502.2 247.43</move>
+	<curve>512.75 244.16 512.75 244.16 523.35 240.83</curve>
+	<curve>524.25 243.65 524.25 243.65 525.21 246.56</curve>
+	<curve>514.54 249.82 514.54 249.82 503.9 253.22</curve>
+	<curve>503.1 250.28 503.1 250.28 502.2 247.43</curve>
+	<closepath/>
+</fill>
+<init>513.7 247.02</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>476.54 261.61</move>
+	<curve>476.54 257.11 477.97 254.17 480.22 254.17</curve>
+	<curve>482.41 254.17 484.83 257.11 484.83 261.61</curve>
+	<curve>484.83 266 482.41 269.81 480.22 269.81</curve>
+	<curve>477.97 269.81 476.54 266 476.54 261.61</curve>
+	<closepath/>
+</fill>
+<init>480.68 261.99</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>504.53 262.11</move>
+	<curve>504.53 257.58 505.99 254.67 508.2 254.67</curve>
+	<curve>510.45 254.67 512.75 257.58 512.75 262.11</curve>
+	<curve>512.75 266.47 510.45 270.32 508.2 270.32</curve>
+	<curve>505.99 270.32 504.53 266.47 504.53 262.11</curve>
+	<closepath/>
+</fill>
+<init>508.64 262.49</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>487.56 283.05</move>
+	<curve>487.56 277.83 492 274.27 498.55 274.27</curve>
+	<curve>505.18 274.27 509.58 277.83 509.58 283.05</curve>
+	<curve>509.58 288.52 505.18 295.08 498.55 295.08</curve>
+	<curve>492 295.08 487.56 288.52 487.56 283.05</curve>
+	<closepath/>
+</fill>
+<init>498.57 284.67</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>417.83 190.36</move>
+	<curve>434.3 160.97 540.73 166.37 515.04 190.36</curve>
+	<curve>531.61 220.94 485.67 182.96 458.2 230.12</curve>
+	<curve>442.6 323.58 468.29 354.04 389.44 340.13</curve>
+	<curve>355.43 321.62 396.78 176.55 417.83 190.36</curve>
+	<closepath/>
+</fill>
+<init>359.12 533.83</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>403.16 355.85</move>
+	<curve>400.44 443.66 400.44 443.66 397.6 531.5</curve>
+	<curve>335.22 652.08 335.22 652.08 273.01 772.73</curve>
+	<curve>359.12 764.42 359.12 764.42 445.29 756.11</curve>
+	<curve>445.29 535.6 445.29 535.6 445.29 315.16</curve>
+	<curve>404.11 304.99 404.11 304.99 362.79 294.82</curve>
+	<curve>382.92 325.32 382.92 325.32 403.16 355.85</curve>
+	<closepath/>
+</fill>
+<init>347.21 621.16</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>315.95 621.16</move>
+	<curve>315.95 602.16 328.45 589.69 347.21 589.69</curve>
+	<curve>365.92 589.69 378.42 602.16 378.42 621.16</curve>
+	<curve>378.42 640 365.92 653.46 347.21 653.46</curve>
+	<curve>328.45 653.46 315.95 640 315.95 621.16</curve>
+	<closepath/>
+</fill>
+<init>394.45 363.57</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>373.56 342.47</move>
+	<curve>402.28 324.36 415.13 338.26 422.24 355.8</curve>
+	<curve>399.96 438.37 387.58 513.83 348.1 512.09</curve>
+	<curve>314.12 503.75 351.27 425.08 373.56 342.47</curve>
+	<closepath/>
+</fill>
+<init>360.63 477</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>338.03 463.08</move>
+	<curve>363.13 465.17 358.81 473.03 383.92 475.18</curve>
+	<curve>375.47 545.36 386.91 533.13 378.43 603.25</curve>
+	<curve>361.51 610.04 322.7 605.01 314.12 594.11</curve>
+	<curve>322.67 523.96 329.48 533.22 338.03 463.08</curve>
+	<closepath/>
+</fill>
+</frame1>
+<frame2 extend="mid" tween="11" />
+<frame3 extend="mid" tween="11" />
+<frame4 extend="mid" tween="11" />
+<frame5 extend="mid" tween="11" />
+<frame6 extend="mid" tween="11" />
+<frame7 extend="mid" tween="11" />
+<frame8 extend="mid" tween="11" />
+<frame9 extend="mid" tween="11" />
+<frame10 extend="mid" tween="11" />
+<frame11 extend="mid" tween="11" />
+<frame12 extend="mid" tween="11" />
+<frame13 extend="mid" tween="11" />
+<frame14 extend="mid" tween="11" />
+<frame15 extend="mid" tween="11" />
+<frame16 extend="mid" tween="11" />
+<frame17 extend="mid" tween="11" />
+<frame18 extend="mid" tween="11" />
+<frame19 extend="mid" tween="11" />
+<frame20 extend="mid" tween="11" />
+<frame21 extend="mid" tween="11" />
+<frame22 extend="mid" tween="11" />
+<frame23 extend="mid" tween="11" />
+<frame24 extend="mid" tween="11" />
+<frame25 extend="mid" tween="11" />
+<frame26 extend="mid" tween="11" />
+<frame27 extend="end" tween="11" />
+<frame28 extend="start">
+<init>353.5 525.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>310 274</move>
+	<curve>353 285 353 285 396 296</curve>
+	<curve>379.5 309.5 379.5 309.5 363 323</curve>
+	<curve>373.5 417.5 373.5 417.5 384 512</curve>
+	<curve>432.5 644.5 432.5 644.5 481 777</curve>
+	<curve>353.5 761 353.5 761 226 745</curve>
+	<curve>268 509.5 268 509.5 310 274</curve>
+	<closepath/>
+</fill>
+<init>405.01 801</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>359.01 777</move>
+	<curve>418.01 777 464.01 801 464.01 824</curve>
+	<curve>416.02 840 405.01 824 346.01 824</curve>
+	<curve>346.01 801 344.01 794 359.01 777</curve>
+	<closepath/>
+</fill>
+<init>215.01 818.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>169.01 794.5</move>
+	<curve>228.01 794.5 274.01 818.5 274.01 841.5</curve>
+	<curve>226.02 857.5 215.01 841.5 156.01 841.5</curve>
+	<curve>156.01 818.5 154.01 811.5 169.01 794.5</curve>
+	<closepath/>
+</fill>
+<init>392.16 523.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>359.11 496.85</move>
+	<curve>325.56 475.03 309.73 490.35 300.48 510.13</curve>
+	<curve>323.86 605.91 335.7 693.37 382.8 692.82</curve>
+	<curve>423.53 684.65 382.41 592.54 359.11 496.85</curve>
+	<closepath/>
+</fill>
+<init>351.73 654.02</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>396.75 636.9</move>
+	<curve>366.74 638.21 371.59 647.62 341.58 649.04</curve>
+	<curve>349 730.02 335.7 715.44 343.18 796.43</curve>
+	<curve>362.94 804.96 409.41 800.78 419.98 788.47</curve>
+	<curve>412.6 707.55 404.19 717.82 396.75 636.9</curve>
+	<closepath/>
+</fill>
+<init>282.74 537.16</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>311.26 525.91</move>
+	<curve>290.26 491.83 269.39 498.93 252.57 512.85</curve>
+	<curve>232.74 609.44 206.07 693.55 248.87 713.19</curve>
+	<curve>289.17 723.21 291.39 622.4 311.26 525.91</curve>
+	<closepath/>
+</fill>
+<init>242.31 667.66</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>285.39 668.6</move>
+	<curve>257.7 656.98 258.06 667.53 230.34 655.98</curve>
+	<curve>202.43 732.36 196.65 713.5 168.75 789.9</curve>
+	<curve>182.98 806.07 226.75 822.16 241.58 815.56</curve>
+	<curve>269.5 739.24 257.52 744.94 285.39 668.6</curve>
+	<closepath/>
+</fill>
+<init>396.79 562.95</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>446.8 569.9</move>
+	<curve>436.19 555.78 438.25 539 451.89 528</curve>
+	<curve>465.57 517.03 481.73 519.12 492.31 533.26</curve>
+	<curve>503.01 547.41 501.41 564.91 487.72 575.89</curve>
+	<curve>474.1 587 457.4 584.07 446.8 569.9</curve>
+	<closepath/>
+</fill>
+<init>440.44 318.08</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>332.27 326.91</move>
+	<curve>353.65 317.64 353.65 317.64 375.22 308.45</curve>
+	<curve>405.33 383.35 438.77 447.4 408.96 469.18</curve>
+	<curve>379.49 482.84 362.32 401.92 332.27 326.91</curve>
+	<closepath/>
+</fill>
+<init>409.04 425.94</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>374.03 438.32</move>
+	<curve>393.5 425.12 394.84 433.67 414.33 420.49</curve>
+	<curve>447.55 478.19 449.09 462.19 482.27 519.83</curve>
+	<curve>473.79 534.89 442.64 553.83 430.22 550.69</curve>
+	<curve>397.09 493.02 407.21 495.95 374.03 438.32</curve>
+	<closepath/>
+</fill>
+<init>304.88 461.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>244.86 414.5</move>
+	<curve>282.06 367.5 314.79 383.5 361.71 399.5</curve>
+	<curve>369.01 446.5 368.26 471.5 361.71 494.5</curve>
+	<curve>351.27 512.5 300.95 522.5 252.69 508.5</curve>
+	<curve>243.01 471.5 244.86 462 244.86 414.5</curve>
+	<closepath/>
+</fill>
+<init>298.56 376</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>213.72 329</move>
+	<curve>266.27 282 312.45 298 378.8 314</curve>
+	<curve>389.01 361 388.05 386 378.81 409</curve>
+	<curve>364.01 427 293.01 437 224.8 423</curve>
+	<curve>211.01 386 213.72 376.5 213.72 329</curve>
+	<closepath/>
+</fill>
+<init>349 231</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>306 273</move>
+	<curve>310 183 308 159 370 169</curve>
+	<curve>378 220 392.01 255 386 303</curve>
+	<curve>350 303 342 273 306 273</curve>
+	<closepath/>
+</fill>
+<init>349 231</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>355.01 169</move>
+	<curve>372.01 179 377.01 208 369.01 220</curve>
+	<curve>387.02 253 365.01 268 335.01 319</curve>
+	<curve>282.01 319 301.01 268 248.01 268</curve>
+	<curve>248.01 181 311.01 168 355.01 169</curve>
+	<closepath/>
+</fill>
+<init>317.51 243.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>294.01 270</move>
+	<curve>323.62 279.2 343 258.66 372.6 267.87</curve>
+	<curve>361.61 303.2 344.01 308 332.01 324</curve>
+	<curve>302.39 314.8 307.01 319 291.01 302</curve>
+	<curve>307.98 262.67 283.02 305.33 294.01 270</curve>
+	<closepath/>
+</fill>
+<init>327.81 291.33</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>317 286</move>
+	<curve>317 284.2 321.8 283 329 283</curve>
+	<curve>336.2 283 341 284.2 341 286</curve>
+	<curve>341 287.8 336.2 290 329 290</curve>
+	<curve>321.8 290 317 287.8 317 286</curve>
+	<closepath/>
+</fill>
+<init>329 286.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>304.17 205</move>
+	<curve>323.41 211.28 323.41 211.28 342.68 217.66</curve>
+	<curve>341.58 221.06 341.58 221.06 340.51 224.54</curve>
+	<curve>321.26 218.16 321.26 218.16 302.01 211.83</curve>
+	<curve>303.04 208.38 303.04 208.38 304.17 205</curve>
+	<closepath/>
+</fill>
+<init>322.33 214.77</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>353.97 217.7</move>
+	<curve>365.51 214.16 365.51 214.16 377.04 210.54</curve>
+	<curve>378.01 213.64 378.01 213.64 379.01 216.73</curve>
+	<curve>367.45 220.34 367.45 220.34 355.89 223.95</curve>
+	<curve>354.92 220.82 354.92 220.82 353.97 217.7</curve>
+	<closepath/>
+</fill>
+<init>366.49 217.24</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>326 233</move>
+	<curve>326 228.2 327.6 225 330 225</curve>
+	<curve>332.4 225 335 228.2 335 233</curve>
+	<curve>335 237.8 332.4 242 330 242</curve>
+	<curve>327.6 242 326 237.8 326 233</curve>
+	<closepath/>
+</fill>
+<init>330.5 233.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>356.51 233.5</move>
+	<curve>356.51 228.7 358.11 225.5 360.51 225.5</curve>
+	<curve>362.91 225.5 365.51 228.7 365.51 233.5</curve>
+	<curve>365.51 238.3 362.91 242.5 360.51 242.5</curve>
+	<curve>358.11 242.5 356.51 238.3 356.51 233.5</curve>
+	<closepath/>
+</fill>
+<init>361.01 234</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>338.01 256.35</move>
+	<curve>338.01 250.59 342.81 246.75 350.01 246.75</curve>
+	<curve>357.21 246.75 362.01 250.59 362.01 256.35</curve>
+	<curve>362.01 262.14 357.21 269.25 350.01 269.25</curve>
+	<curve>342.81 269.25 338.01 262.14 338.01 256.35</curve>
+	<closepath/>
+</fill>
+<init>350.01 258</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>262 156</move>
+	<curve>280.01 124 396.01 130 368 156</curve>
+	<curve>386.01 189 336.01 148 306.01 199</curve>
+	<curve>289.01 300 317.01 333 231.01 318</curve>
+	<curve>194.01 298 239.01 141 262 156</curve>
+	<closepath/>
+</fill>
+<init>198 527.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>246 335</move>
+	<curve>243 430 243 430 240 525</curve>
+	<curve>172 655.5 172 655.5 104 786</curve>
+	<curve>198 777 198 777 292 768</curve>
+	<curve>292 529.5 292 529.5 292 291</curve>
+	<curve>247 280 247 280 202 269</curve>
+	<curve>224 302 224 302 246 335</curve>
+	<closepath/>
+</fill>
+<init>185 622</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>151 622</move>
+	<curve>151 601.6 164.6 588 185 588</curve>
+	<curve>205.4 588 219 601.6 219 622</curve>
+	<curve>219 642.4 205.4 657 185 657</curve>
+	<curve>164.6 657 151 642.4 151 622</curve>
+	<closepath/>
+</fill>
+<init>236.54 343.3</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>213.7 320.52</move>
+	<curve>245.01 301 259.01 316 266.77 334.93</curve>
+	<curve>242.54 424.19 229.01 506 186.01 504</curve>
+	<curve>149.01 495 189.46 409.79 213.7 320.52</curve>
+	<closepath/>
+</fill>
+<init>199.55 466.04</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>175.01 451</move>
+	<curve>202.36 453.22 197.65 461.87 225.01 464.13</curve>
+	<curve>215.71 540.04 228.32 526.76 219.01 602.65</curve>
+	<curve>200.63 610 158.36 604.63 149.01 592.74</curve>
+	<curve>158.33 516.89 165.7 526.83 175.01 451</curve>
+	<closepath/>
+</fill>
+</frame28>
+<frame29 extend="mid" />
+<frame30 extend="mid" />
+<frame31 extend="mid" />
+<frame32 extend="end" />
+<frame33 extend="start">
+<init>353.5 525.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>263 259</move>
+	<curve>306 270 306 270 349 281</curve>
+	<curve>332.5 294.5 332.5 294.5 316 308</curve>
+	<curve>326.5 402.5 373.5 417.5 384 512</curve>
+	<curve>470 569 506.5 516.5 555 649</curve>
+	<curve>534 711 353.5 761 226 745</curve>
+	<curve>268 509.5 221 494.5 263 259</curve>
+	<closepath/>
+</fill>
+<init>405.01 801</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>359.01 777</move>
+	<curve>418.01 777 464.01 801 464.01 824</curve>
+	<curve>416.02 840 405.01 824 346.01 824</curve>
+	<curve>346.01 801 344.01 794 359.01 777</curve>
+	<closepath/>
+</fill>
+<init>215.01 818.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>169.01 794.5</move>
+	<curve>228.01 794.5 274.01 818.5 274.01 841.5</curve>
+	<curve>226.02 857.5 215.01 841.5 156.01 841.5</curve>
+	<curve>156.01 818.5 154.01 811.5 169.01 794.5</curve>
+	<closepath/>
+</fill>
+<init>392.16 523.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>359.11 496.85</move>
+	<curve>325.56 475.03 309.73 490.35 300.48 510.13</curve>
+	<curve>323.86 605.91 335.7 693.37 382.8 692.82</curve>
+	<curve>423.53 684.65 382.41 592.54 359.11 496.85</curve>
+	<closepath/>
+</fill>
+<init>351.73 654.02</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>396.75 636.9</move>
+	<curve>366.74 638.21 371.59 647.62 341.58 649.04</curve>
+	<curve>349 730.02 335.7 715.44 343.18 796.43</curve>
+	<curve>362.94 804.96 409.41 800.78 419.98 788.47</curve>
+	<curve>412.6 707.55 404.19 717.82 396.75 636.9</curve>
+	<closepath/>
+</fill>
+<init>282.74 537.16</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>311.26 525.91</move>
+	<curve>290.26 491.83 269.39 498.93 252.57 512.85</curve>
+	<curve>232.74 609.44 206.07 693.55 248.87 713.19</curve>
+	<curve>289.17 723.21 291.39 622.4 311.26 525.91</curve>
+	<closepath/>
+</fill>
+<init>242.31 667.66</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>285.39 668.6</move>
+	<curve>257.7 656.98 258.06 667.53 230.34 655.98</curve>
+	<curve>202.43 732.36 196.65 713.5 168.75 789.9</curve>
+	<curve>182.98 806.07 226.75 822.16 241.58 815.56</curve>
+	<curve>269.5 739.24 257.52 744.94 285.39 668.6</curve>
+	<closepath/>
+</fill>
+<init>441.31 439.3</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>379.54 182.27</move>
+	<curve>391.26 195.48 390.56 212.39 377.84 224.44</curve>
+	<curve>365.11 236.48 348.83 235.69 337.17 222.46</curve>
+	<curve>325.32 209.22 325.51 191.65 338.28 179.6</curve>
+	<curve>350.97 167.43 367.84 168.99 379.54 182.27</curve>
+	<closepath/>
+</fill>
+<init>330.3 334.09</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>310.26 355.52</move>
+	<curve>304.99 332.83 304.99 332.83 299.85 309.94</curve>
+	<curve>378.95 293.83 447.96 272.47 464.02 305.73</curve>
+	<curve>472.14 337.19 389.46 339.47 310.26 355.52</curve>
+	<closepath/>
+</fill>
+<init>453.56 302.29</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>462.67 307.56</move>
+	<curve>444.33 322.27 442.31 313.87 423.95 328.57</curve>
+	<curve>386.16 273.73 385.93 289.81 348.24 235.04</curve>
+	<curve>355.47 219.34 384.99 197.94 397.62 200.08</curve>
+	<curve>435.28 254.89 424.96 252.79 462.67 307.56</curve>
+	<closepath/>
+</fill>
+<init>305 486</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>230.95 429.02</move>
+	<curve>257.23 375.15 292.63 383.77 341.89 389.36</curve>
+	<curve>359.07 433.71 363.69 458.3 362.21 482.17</curve>
+	<curve>355.86 501.98 308.85 522.52 258.7 519.16</curve>
+	<curve>241.34 485.09 241.11 475.42 230.95 429.02</curve>
+	<closepath/>
+</fill>
+<init>284.58 377.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>204 356.05</move>
+	<curve>235.79 296.25 277.44 298.72 335.52 295.56</curve>
+	<curve>355.07 337.84 360.27 362.12 358.15 386.78</curve>
+	<curve>350.31 408.2 294.58 437.62 235.4 443.22</curve>
+	<curve>215.32 411.54 215.27 401.66 204 356.05</curve>
+	<closepath/>
+</fill>
+<init>215.32 237.93</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>239.33 276.95</move>
+	<curve>215.73 190.02 206.51 167.77 268.61 158.4</curve>
+	<curve>291.77 204.54 315.77 233.6 324.68 281.14</curve>
+	<curve>290.39 292.12 273.63 265.99 239.33 276.95</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>254.33 162.97</move>
+	<curve>273.57 167.31 287.17 193.41 283.2 207.28</curve>
+	<curve>310.41 233.22 294.02 254.2 280.99 311.93</curve>
+	<curve>230.51 328.08 233.07 273.72 182.59 289.87</curve>
+	<curve>156.08 207.01 212.12 175.43 254.33 162.97</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>227.01 277.76</move>
+	<curve>258.01 277.49 270.2 252.01 301.2 251.78</curve>
+	<curve>301.51 288.77 286.2 298.7 279.66 317.61</curve>
+	<curve>248.64 317.87 254.32 320.45 233.89 309.14</curve>
+	<curve>238.07 266.49 227.31 314.75 227.01 277.76</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>253.77 285.99</move>
+	<curve>253.23 284.27 257.44 281.67 264.3 279.47</curve>
+	<curve>271.14 277.27 276.08 276.95 276.64 278.67</curve>
+	<curve>277.19 280.39 273.29 283.95 266.43 286.14</curve>
+	<curve>259.57 288.33 254.33 287.7 253.77 285.99</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>216.88 212.75</move>
+	<curve>237.11 212.87 237.11 212.87 257.39 213.07</curve>
+	<curve>257.39 216.65 257.39 216.65 257.44 220.29</curve>
+	<curve>237.17 220.08 237.17 220.08 216.9 219.91</curve>
+	<curve>216.82 216.32 216.82 216.32 216.88 212.75</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>268.16 209.67</move>
+	<curve>278.08 202.78 278.08 202.78 287.95 195.82</curve>
+	<curve>289.83 198.48 289.83 198.48 291.73 201.12</curve>
+	<curve>281.82 208.08 281.82 208.08 271.91 215.04</curve>
+	<curve>270.02 212.35 270.02 212.35 268.16 209.67</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>246.2 232.77</move>
+	<curve>244.74 228.2 245.27 224.66 247.57 223.93</curve>
+	<curve>249.86 223.2 253.31 225.45 254.77 230.02</curve>
+	<curve>256.24 234.6 255.02 239.39 252.75 240.12</curve>
+	<curve>250.45 240.85 247.66 237.34 246.2 232.77</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>275.41 223.95</move>
+	<curve>273.95 219.37 274.5 215.84 276.79 215.11</curve>
+	<curve>279.06 214.38 282.52 216.63 283.99 221.2</curve>
+	<curve>285.45 225.77 284.24 230.57 281.97 231.3</curve>
+	<curve>279.68 232.03 276.88 228.52 275.41 223.95</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>264.76 251.35</move>
+	<curve>263 245.85 266.39 240.74 273.26 238.55</curve>
+	<curve>280.12 236.35 285.86 238.54 287.62 244.03</curve>
+	<curve>289.38 249.55 286.97 257.77 280.12 259.98</curve>
+	<curve>273.26 262.16 266.52 256.86 264.76 251.35</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>161.78 178.93</move>
+	<curve>169.18 142.97 281.49 113.33 262.74 146.63</curve>
+	<curve>289.95 172.57 229.83 148.76 216.8 206.48</curve>
+	<curve>231.39 307.85 268.11 330.75 181.63 342.67</curve>
+	<curve>140.3 334.9 135.31 171.65 161.78 178.93</curve>
+	<closepath/>
+</fill>
+<init>198 527.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>197 335</move>
+	<curve>194 430 243 430 240 525</curve>
+	<curve>183 590 144 570.5 76 701</curve>
+	<curve>159 727 209 731 303 722</curve>
+	<curve>303 483.5 361 501 243 291</curve>
+	<curve>203 302 203 302 163 313</curve>
+	<curve>180 324 180 324 197 335</curve>
+	<closepath/>
+</fill>
+<init>205.67 622.38</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>308.48 129.35</move>
+	<curve>321.44 145.09 319.58 164.25 303.83 177.19</curve>
+	<curve>288.06 190.16 268.92 188.3 255.95 172.54</curve>
+	<curve>243 156.79 244.24 136.86 259.99 123.91</curve>
+	<curve>275.76 110.95 295.52 113.59 308.48 129.35</curve>
+	<closepath/>
+</fill>
+<init>236.54 343.3</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>240.22 372.7</move>
+	<curve>204.41 363.82 205.42 343.33 213.6 324.57</curve>
+	<curve>294.54 279.81 362.67 232.54 391.18 264.8</curve>
+	<curve>410.49 297.62 321.17 327.93 240.22 372.7</curve>
+	<closepath/>
+</fill>
+<init>220.22 466.42</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>398.55 276.68</move>
+	<curve>376.03 292.33 374.15 282.66 351.59 298.29</curve>
+	<curve>310.56 233.75 309.25 252.03 268.25 187.48</curve>
+	<curve>277.77 170.13 313.83 147.44 328.61 150.68</curve>
+	<curve>369.6 215.18 357.58 212.19 398.55 276.68</curve>
+	<closepath/>
+</fill>
+</frame33>
+<frame34 extend="end" />
+<frame35 extend="start">
+<init>353.5 525.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>254 261</move>
+	<curve>297 272 297 272 340 283</curve>
+	<curve>323.5 296.5 323.5 296.5 307 310</curve>
+	<curve>317.5 404.5 364.5 419.5 375 514</curve>
+	<curve>461 571 490 523 563 628</curve>
+	<curve>561 700 353.5 761 226 745</curve>
+	<curve>268 509.5 212 496.5 254 261</curve>
+	<closepath/>
+</fill>
+<init>405.01 801</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>359.01 777</move>
+	<curve>418.01 777 464.01 801 464.01 824</curve>
+	<curve>416.02 840 405.01 824 346.01 824</curve>
+	<curve>346.01 801 344.01 794 359.01 777</curve>
+	<closepath/>
+</fill>
+<init>215.01 818.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>169.01 794.5</move>
+	<curve>228.01 794.5 274.01 818.5 274.01 841.5</curve>
+	<curve>226.02 857.5 215.01 841.5 156.01 841.5</curve>
+	<curve>156.01 818.5 154.01 811.5 169.01 794.5</curve>
+	<closepath/>
+</fill>
+<init>392.16 523.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>359.11 496.85</move>
+	<curve>325.56 475.03 309.73 490.35 300.48 510.13</curve>
+	<curve>323.86 605.91 335.7 693.37 382.8 692.82</curve>
+	<curve>423.53 684.65 382.41 592.54 359.11 496.85</curve>
+	<closepath/>
+</fill>
+<init>351.73 654.02</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>396.75 636.9</move>
+	<curve>366.74 638.21 371.59 647.62 341.58 649.04</curve>
+	<curve>349 730.02 335.7 715.44 343.18 796.43</curve>
+	<curve>362.94 804.96 409.41 800.78 419.98 788.47</curve>
+	<curve>412.6 707.55 404.19 717.82 396.75 636.9</curve>
+	<closepath/>
+</fill>
+<init>282.74 537.16</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>311.26 525.91</move>
+	<curve>290.26 491.83 269.39 498.93 252.57 512.85</curve>
+	<curve>232.74 609.44 206.07 693.55 248.87 713.19</curve>
+	<curve>289.17 723.21 291.39 622.4 311.26 525.91</curve>
+	<closepath/>
+</fill>
+<init>242.31 667.66</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>285.39 668.6</move>
+	<curve>257.7 656.98 258.06 667.53 230.34 655.98</curve>
+	<curve>202.43 732.36 196.65 713.5 168.75 789.9</curve>
+	<curve>182.98 806.07 226.75 822.16 241.58 815.56</curve>
+	<curve>269.5 739.24 257.52 744.94 285.39 668.6</curve>
+	<closepath/>
+</fill>
+<init>400.19 425.69</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>329.62 171.23</move>
+	<curve>343.02 182.72 344.63 199.57 333.66 213.24</curve>
+	<curve>322.69 226.9 306.45 228.33 293.1 216.8</curve>
+	<curve>279.56 205.3 277.36 187.86 288.37 174.19</curve>
+	<curve>299.3 160.41 316.2 159.66 329.62 171.23</curve>
+	<closepath/>
+</fill>
+<init>330.3 334.09</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>318.45 360.93</move>
+	<curve>305.99 341.26 305.99 341.26 293.58 321.35</curve>
+	<curve>362.92 280.02 421 237.06 447.14 263.14</curve>
+	<curve>465.2 290.16 387.91 319.62 318.45 360.93</curve>
+	<closepath/>
+</fill>
+<init>433.8 268.49</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>448.24 259.14</move>
+	<curve>437.87 280.26 432.48 273.5 422.08 294.6</curve>
+	<curve>364.6 260.95 371.21 275.62 313.83 242</curve>
+	<curve>313.75 224.72 331.41 192.81 343.75 189.4</curve>
+	<curve>401.1 223.07 390.86 225.54 448.24 259.14</curve>
+	<closepath/>
+</fill>
+<init>305 486</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>224.46 438.62</move>
+	<curve>243.87 381.91 280.06 386.08 329.63 385.53</curve>
+	<curve>352.17 427.41 359.8 451.24 361.29 475.11</curve>
+	<curve>357.44 495.55 313.33 521.76 263.16 524.63</curve>
+	<curve>241.71 492.97 240.29 483.41 224.46 438.62</curve>
+	<closepath/>
+</fill>
+<init>273.93 379.07</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>190.54 378.72</move>
+	<curve>206.15 312.82 247.07 304.66 302.45 286.89</curve>
+	<curve>332.07 322.85 343.25 345.02 347.45 369.41</curve>
+	<curve>345.29 392.12 298.82 434.69 242.99 455.1</curve>
+	<curve>215.54 429.54 212.99 419.99 190.54 378.72</curve>
+	<closepath/>
+</fill>
+<init>210.58 243.63</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>241.06 277.83</move>
+	<curve>202.58 196.39 189.6 176.1 249.09 155.97</curve>
+	<curve>279.98 197.33 308.7 221.73 325.82 266.97</curve>
+	<curve>293.99 283.81 272.89 261.02 241.06 277.83</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>235.83 162.97</move>
+	<curve>255.52 163.88 273.5 187.19 272.02 201.54</curve>
+	<curve>303.36 222.31 290.89 245.83 288.2 304.95</curve>
+	<curve>241.34 329.7 234.33 275.75 187.45 300.5</curve>
+	<curve>146.82 223.57 196.45 182.66 235.83 162.97</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>229.07 280.77</move>
+	<curve>259.52 275.08 267.07 247.86 297.55 242.2</curve>
+	<curve>304.33 278.56 291.01 291.02 287.89 310.77</curve>
+	<curve>257.39 316.47 263.44 318.02 241.35 310.45</curve>
+	<curve>237.98 267.75 235.85 317.14 229.07 280.77</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>256.86 284.2</move>
+	<curve>256.02 282.58 259.7 279.3 266.08 275.93</curve>
+	<curve>272.43 272.56 277.24 271.38 278.08 272.97</curve>
+	<curve>278.93 274.58 275.7 278.76 269.33 282.12</curve>
+	<curve>262.98 285.47 257.7 285.77 256.86 284.2</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>207.69 218.56</move>
+	<curve>227.63 215.13 227.63 215.13 247.63 211.77</curve>
+	<curve>248.26 215.3 248.26 215.3 248.95 218.86</curve>
+	<curve>228.95 222.22 228.95 222.22 208.97 225.61</curve>
+	<curve>208.26 222.08 208.26 222.08 207.69 218.56</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>257.64 206.54</move>
+	<curve>266.2 198.01 266.2 198.01 274.69 189.42</curve>
+	<curve>277.01 191.72 277.01 191.72 279.33 193.98</curve>
+	<curve>270.81 202.57 270.81 202.57 262.27 211.16</curve>
+	<curve>259.94 208.85 259.94 208.85 257.64 206.54</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>240.07 233.13</move>
+	<curve>237.83 228.89 237.73 225.31 239.87 224.19</curve>
+	<curve>242 223.07 245.79 224.67 248.03 228.92</curve>
+	<curve>250.28 233.17 249.92 238.1 247.81 239.22</curve>
+	<curve>245.67 240.33 242.31 237.36 240.07 233.13</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>267.27 219.32</move>
+	<curve>265.02 215.07 264.95 211.5 267.08 210.38</curve>
+	<curve>269.2 209.26 273 210.86 275.25 215.11</curve>
+	<curve>277.49 219.35 277.14 224.29 275.02 225.41</curve>
+	<curve>272.89 226.53 269.52 223.56 267.27 219.32</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>261.58 248.17</move>
+	<curve>258.89 243.06 261.33 237.42 267.73 234.07</curve>
+	<curve>274.08 230.7 280.13 231.85 282.82 236.95</curve>
+	<curve>285.52 242.08 284.58 250.58 278.24 253.97</curve>
+	<curve>271.87 257.32 264.3 253.28 261.58 248.17</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>147.51 194.92</move>
+	<curve>148.47 158.22 253.87 109.35 241.25 145.41</curve>
+	<curve>272.58 166.19 209.22 153.29 206.52 212.39</curve>
+	<curve>238.66 309.64 278.83 325.75 195.78 352.65</curve>
+	<curve>153.72 352.25 120.18 192.41 147.51 194.92</curve>
+	<closepath/>
+</fill>
+<init>198 527.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>189 353</move>
+	<curve>186 448 225 435 240 525</curve>
+	<curve>193 594 159 566 98 716</curve>
+	<curve>181 742 240 745 313 722</curve>
+	<curve>304 521 353 519 235 309</curve>
+	<curve>195 320 195 320 155 331</curve>
+	<curve>172 342 172 342 189 353</curve>
+	<closepath/>
+</fill>
+<init>194.53 658.66</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>266.2 157.82</move>
+	<curve>281.32 171.51 282.26 190.73 268.56 205.83</curve>
+	<curve>254.83 220.95 235.62 221.89 220.51 208.17</curve>
+	<curve>205.41 194.47 203.74 174.57 217.44 159.47</curve>
+	<curve>231.15 144.37 251.09 144.1 266.2 157.82</curve>
+	<closepath/>
+</fill>
+<init>229.94 360.28</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>238.56 389.19</move>
+	<curve>201.84 385.61 199.87 365.2 205.24 345.45</curve>
+	<curve>278.81 289.39 339.35 232.73 372.25 260.52</curve>
+	<curve>396.12 290.17 312.16 333.14 238.56 389.19</curve>
+	<closepath/>
+</fill>
+<init>369 287</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>379.06 269.7</move>
+	<curve>361.72 290.95 357.24 282.17 339.86 303.39</curve>
+	<curve>282.64 252.66 286.39 270.58 229.22 219.84</curve>
+	<curve>233.61 200.54 262.02 168.78 277.11 167.83</curve>
+	<curve>334.29 218.55 321.91 218.99 379.06 269.7</curve>
+	<closepath/>
+</fill>
+</frame35>
+<frame36 extend="mid" />
+<frame37 extend="end" />
+<frame38 extend="start">
+<init>353.5 525.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>310 274</move>
+	<curve>353 285 353 285 396 296</curve>
+	<curve>379.5 309.5 379.5 309.5 363 323</curve>
+	<curve>373.5 417.5 373.5 417.5 384 512</curve>
+	<curve>432.5 644.5 432.5 644.5 481 777</curve>
+	<curve>353.5 761 353.5 761 226 745</curve>
+	<curve>268 509.5 268 509.5 310 274</curve>
+	<closepath/>
+</fill>
+<init>405.01 801</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>359.01 777</move>
+	<curve>418.01 777 464.01 801 464.01 824</curve>
+	<curve>416.02 840 405.01 824 346.01 824</curve>
+	<curve>346.01 801 344.01 794 359.01 777</curve>
+	<closepath/>
+</fill>
+<init>215.01 818.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>169.01 794.5</move>
+	<curve>228.01 794.5 274.01 818.5 274.01 841.5</curve>
+	<curve>226.02 857.5 215.01 841.5 156.01 841.5</curve>
+	<curve>156.01 818.5 154.01 811.5 169.01 794.5</curve>
+	<closepath/>
+</fill>
+<init>392.16 523.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>359.11 496.85</move>
+	<curve>325.56 475.03 309.73 490.35 300.48 510.13</curve>
+	<curve>323.86 605.91 335.7 693.37 382.8 692.82</curve>
+	<curve>423.53 684.65 382.41 592.54 359.11 496.85</curve>
+	<closepath/>
+</fill>
+<init>351.73 654.02</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>396.75 636.9</move>
+	<curve>366.74 638.21 371.59 647.62 341.58 649.04</curve>
+	<curve>349 730.02 335.7 715.44 343.18 796.43</curve>
+	<curve>362.94 804.96 409.41 800.78 419.98 788.47</curve>
+	<curve>412.6 707.55 404.19 717.82 396.75 636.9</curve>
+	<closepath/>
+</fill>
+<init>282.74 537.16</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>311.26 525.91</move>
+	<curve>290.26 491.83 269.39 498.93 252.57 512.85</curve>
+	<curve>232.74 609.44 206.07 693.55 248.87 713.19</curve>
+	<curve>289.17 723.21 291.39 622.4 311.26 525.91</curve>
+	<closepath/>
+</fill>
+<init>242.31 667.66</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>285.39 668.6</move>
+	<curve>257.7 656.98 258.06 667.53 230.34 655.98</curve>
+	<curve>202.43 732.36 196.65 713.5 168.75 789.9</curve>
+	<curve>182.98 806.07 226.75 822.16 241.58 815.56</curve>
+	<curve>269.5 739.24 257.52 744.94 285.39 668.6</curve>
+	<closepath/>
+</fill>
+<init>396.79 562.95</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>499.75 536.62</move>
+	<curve>483.89 528.86 478.1 512.97 485.26 496.98</curve>
+	<curve>492.47 480.99 507.81 475.52 523.66 483.31</curve>
+	<curve>539.62 491.06 546.14 507.38 538.91 523.38</curve>
+	<curve>531.84 539.46 515.63 544.41 499.75 536.62</curve>
+	<closepath/>
+</fill>
+<init>440.44 318.08</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>332.27 326.91</move>
+	<curve>353.65 317.64 353.65 317.64 375.22 308.45</curve>
+	<curve>405.33 383.35 438.77 447.4 408.96 469.18</curve>
+	<curve>379.49 482.84 362.32 401.92 332.27 326.91</curve>
+	<closepath/>
+</fill>
+<init>409.04 425.94</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>375.17 452.43</move>
+	<curve>386.52 431.83 391.6 438.84 402.98 418.25</curve>
+	<curve>458.78 454.57 452.88 439.62 508.62 475.9</curve>
+	<curve>507.9 493.17 488.75 524.19 476.26 527.03</curve>
+	<curve>420.55 490.7 430.9 488.71 375.17 452.43</curve>
+	<closepath/>
+</fill>
+<init>304.88 461.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>244.86 414.5</move>
+	<curve>282.06 367.5 314.79 383.5 361.71 399.5</curve>
+	<curve>369.01 446.5 368.26 471.5 361.71 494.5</curve>
+	<curve>351.27 512.5 300.95 522.5 252.69 508.5</curve>
+	<curve>243.01 471.5 244.86 462 244.86 414.5</curve>
+	<closepath/>
+</fill>
+<init>298.56 376</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>213.72 329</move>
+	<curve>266.27 282 312.45 298 378.8 314</curve>
+	<curve>389.01 361 388.05 386 378.81 409</curve>
+	<curve>364.01 427 293.01 437 224.8 423</curve>
+	<curve>211.01 386 213.72 376.5 213.72 329</curve>
+	<closepath/>
+</fill>
+<init>314 227</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>303.01 271.5</move>
+	<curve>299.01 181.5 301.01 157.5 239.01 167.5</curve>
+	<curve>231.01 218.5 217 253.5 223.01 301.5</curve>
+	<curve>259.01 301.5 267.01 271.5 303.01 271.5</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>254 167.5</move>
+	<curve>237 177.5 232 206.5 240 218.5</curve>
+	<curve>221.99 251.5 244 266.5 274 317.5</curve>
+	<curve>327 317.5 308 266.5 361 266.5</curve>
+	<curve>361 179.5 298 166.5 254 167.5</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>315 268.5</move>
+	<curve>285.39 277.7 266.01 257.14 236.39 266.37</curve>
+	<curve>247.39 301.7 265 306.5 277 322.5</curve>
+	<curve>306.62 313.3 302 317.5 318 300.5</curve>
+	<curve>301.02 261.16 325.99 303.83 315 268.5</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>292.01 284.5</move>
+	<curve>292.01 282.7 287.2 281.5 280.01 281.5</curve>
+	<curve>272.81 281.5 268.01 282.7 268.01 284.5</curve>
+	<curve>268.01 286.3 272.81 288.5 280.01 288.5</curve>
+	<curve>287.2 288.5 292.01 286.3 292.01 284.5</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>304.83 203.5</move>
+	<curve>285.58 209.78 285.58 209.78 266.33 216.16</curve>
+	<curve>267.43 219.56 267.43 219.56 268.5 223.04</curve>
+	<curve>287.75 216.66 287.75 216.66 307 210.33</curve>
+	<curve>305.95 206.88 305.95 206.88 304.83 203.5</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>255.02 216.2</move>
+	<curve>243.5 212.66 243.5 212.66 231.95 209.04</curve>
+	<curve>231 212.14 231 212.14 230 215.23</curve>
+	<curve>241.56 218.84 241.56 218.84 253.12 222.45</curve>
+	<curve>254.08 219.32 254.08 219.32 255.02 216.2</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>283.01 231.5</move>
+	<curve>283.01 226.7 281.39 223.5 279.01 223.5</curve>
+	<curve>276.61 223.5 274.01 226.7 274.01 231.5</curve>
+	<curve>274.01 236.3 276.61 240.5 279.01 240.5</curve>
+	<curve>281.39 240.5 283.01 236.3 283.01 231.5</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>252.5 232</move>
+	<curve>252.5 227.2 250.89 224 248.5 224</curve>
+	<curve>246.08 224 243.5 227.2 243.5 232</curve>
+	<curve>243.5 236.8 246.08 241 248.5 241</curve>
+	<curve>250.89 241 252.5 236.8 252.5 232</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>271 254.85</move>
+	<curve>271 249.09 266.2 245.25 259 245.25</curve>
+	<curve>251.8 245.25 247 249.09 247 254.85</curve>
+	<curve>247 260.64 251.8 267.75 259 267.75</curve>
+	<curve>266.2 267.75 271 260.64 271 254.85</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>347.01 154.5</move>
+	<curve>329 122.5 213 128.5 241.01 154.5</curve>
+	<curve>223 187.5 273 146.5 303 197.5</curve>
+	<curve>320 298.5 292 331.5 378 316.5</curve>
+	<curve>415 296.5 370 139.5 347.01 154.5</curve>
+	<closepath/>
+</fill>
+<init>198 527.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>246 335</move>
+	<curve>243 430 243 430 240 525</curve>
+	<curve>172 655.5 172 655.5 104 786</curve>
+	<curve>198 777 198 777 292 768</curve>
+	<curve>292 529.5 292 529.5 292 291</curve>
+	<curve>247 280 247 280 202 269</curve>
+	<curve>224 302 224 302 246 335</curve>
+	<closepath/>
+</fill>
+<init>169.87 634.19</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>336.98 553.08</move>
+	<curve>316.77 550.28 305.17 534.94 307.97 514.74</curve>
+	<curve>310.77 494.53 326.1 482.93 346.31 485.72</curve>
+	<curve>366.52 488.52 379.11 504 376.31 524.21</curve>
+	<curve>373.51 544.41 357.19 555.88 336.98 553.08</curve>
+	<closepath/>
+</fill>
+<init>236.54 343.3</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>213.7 320.52</move>
+	<curve>245.01 301 259.01 316 266.77 334.93</curve>
+	<curve>242.54 424.19 229.01 506 186.01 504</curve>
+	<curve>149.01 495 189.46 409.79 213.7 320.52</curve>
+	<closepath/>
+</fill>
+<init>184.42 478.23</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>170.89 505.83</move>
+	<curve>176.84 479.05 184.77 484.9 190.76 458.11</curve>
+	<curve>264.67 477.74 253.25 463.42 327.14 483.06</curve>
+	<curve>331.9 502.27 320.77 543.41 307.72 551.04</curve>
+	<curve>233.87 531.4 244.73 525.46 170.89 505.83</curve>
+	<closepath/>
+</fill>
+</frame38>
+<frame39 extend="end" />
+<frame40 extend="start">
+<init>353.5 525.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>310 274</move>
+	<curve>353 285 353 285 396 296</curve>
+	<curve>379.5 309.5 379.5 309.5 363 323</curve>
+	<curve>373.5 417.5 373.5 417.5 384 512</curve>
+	<curve>432.5 644.5 432.5 644.5 481 777</curve>
+	<curve>353.5 761 353.5 761 226 745</curve>
+	<curve>268 509.5 268 509.5 310 274</curve>
+	<closepath/>
+</fill>
+<init>440.44 318.08</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>332.27 326.91</move>
+	<curve>353.65 317.64 353.65 317.64 375.22 308.45</curve>
+	<curve>405.33 383.35 438.77 447.4 408.96 469.18</curve>
+	<curve>379.49 482.84 362.32 401.92 332.27 326.91</curve>
+	<closepath/>
+</fill>
+<init>392.16 523.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>359.11 496.85</move>
+	<curve>325.56 475.03 309.73 490.35 300.48 510.13</curve>
+	<curve>323.86 605.91 335.7 693.37 382.8 692.82</curve>
+	<curve>423.53 684.65 382.41 592.54 359.11 496.85</curve>
+	<closepath/>
+</fill>
+<init>282.74 537.16</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>311.26 525.91</move>
+	<curve>290.26 491.83 269.39 498.93 252.57 512.85</curve>
+	<curve>232.74 609.44 206.07 693.55 248.87 713.19</curve>
+	<curve>289.17 723.21 291.39 622.4 311.26 525.91</curve>
+	<closepath/>
+</fill>
+<init>304.88 461.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>244.86 414.5</move>
+	<curve>282.06 367.5 314.79 383.5 361.71 399.5</curve>
+	<curve>369.01 446.5 368.26 471.5 361.71 494.5</curve>
+	<curve>351.27 512.5 300.95 522.5 252.69 508.5</curve>
+	<curve>243.01 471.5 244.86 462 244.86 414.5</curve>
+	<closepath/>
+</fill>
+<init>298.56 376</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>213.72 329</move>
+	<curve>266.27 282 312.45 298 378.8 314</curve>
+	<curve>389.01 361 388.05 386 378.81 409</curve>
+	<curve>364.01 427 293.01 437 224.8 423</curve>
+	<curve>211.01 386 213.72 376.5 213.72 329</curve>
+	<closepath/>
+</fill>
+<init>314 227</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>303.01 271.5</move>
+	<curve>299.01 181.5 301.01 157.5 239.01 167.5</curve>
+	<curve>231.01 218.5 217 253.5 223.01 301.5</curve>
+	<curve>259.01 301.5 267.01 271.5 303.01 271.5</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>254 167.5</move>
+	<curve>237 177.5 232 206.5 240 218.5</curve>
+	<curve>221.99 251.5 244 266.5 274 317.5</curve>
+	<curve>327 317.5 308 266.5 361 266.5</curve>
+	<curve>361 179.5 298 166.5 254 167.5</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>315 268.5</move>
+	<curve>285.39 277.7 266.01 257.14 236.39 266.37</curve>
+	<curve>247.39 301.7 265 306.5 277 322.5</curve>
+	<curve>306.62 313.3 302 317.5 318 300.5</curve>
+	<curve>301.02 261.16 325.99 303.83 315 268.5</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>292.01 284.5</move>
+	<curve>292.01 282.7 287.2 281.5 280.01 281.5</curve>
+	<curve>272.81 281.5 268.01 282.7 268.01 284.5</curve>
+	<curve>268.01 286.3 272.81 288.5 280.01 288.5</curve>
+	<curve>287.2 288.5 292.01 286.3 292.01 284.5</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>304.83 203.5</move>
+	<curve>285.58 209.78 285.58 209.78 266.33 216.16</curve>
+	<curve>267.43 219.56 267.43 219.56 268.5 223.04</curve>
+	<curve>287.75 216.66 287.75 216.66 307 210.33</curve>
+	<curve>305.95 206.88 305.95 206.88 304.83 203.5</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>255.02 216.2</move>
+	<curve>243.5 212.66 243.5 212.66 231.95 209.04</curve>
+	<curve>231 212.14 231 212.14 230 215.23</curve>
+	<curve>241.56 218.84 241.56 218.84 253.12 222.45</curve>
+	<curve>254.08 219.32 254.08 219.32 255.02 216.2</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>283.01 231.5</move>
+	<curve>283.01 226.7 281.39 223.5 279.01 223.5</curve>
+	<curve>276.61 223.5 274.01 226.7 274.01 231.5</curve>
+	<curve>274.01 236.3 276.61 240.5 279.01 240.5</curve>
+	<curve>281.39 240.5 283.01 236.3 283.01 231.5</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>252.5 232</move>
+	<curve>252.5 227.2 250.89 224 248.5 224</curve>
+	<curve>246.08 224 243.5 227.2 243.5 232</curve>
+	<curve>243.5 236.8 246.08 241 248.5 241</curve>
+	<curve>250.89 241 252.5 236.8 252.5 232</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>271 254.85</move>
+	<curve>271 249.09 266.2 245.25 259 245.25</curve>
+	<curve>251.8 245.25 247 249.09 247 254.85</curve>
+	<curve>247 260.64 251.8 267.75 259 267.75</curve>
+	<curve>266.2 267.75 271 260.64 271 254.85</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>347.01 154.5</move>
+	<curve>329 122.5 213 128.5 241.01 154.5</curve>
+	<curve>223 187.5 273 146.5 303 197.5</curve>
+	<curve>320 298.5 292 331.5 378 316.5</curve>
+	<curve>415 296.5 370 139.5 347.01 154.5</curve>
+	<closepath/>
+</fill>
+<init>405.01 801</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>359.01 777</move>
+	<curve>418.01 777 464.01 801 464.01 824</curve>
+	<curve>416.02 840 405.01 824 346.01 824</curve>
+	<curve>346.01 801 344.01 794 359.01 777</curve>
+	<closepath/>
+</fill>
+<init>215.01 818.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>169.01 794.5</move>
+	<curve>228.01 794.5 274.01 818.5 274.01 841.5</curve>
+	<curve>226.02 857.5 215.01 841.5 156.01 841.5</curve>
+	<curve>156.01 818.5 154.01 811.5 169.01 794.5</curve>
+	<closepath/>
+</fill>
+<init>351.73 654.02</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>396.75 636.9</move>
+	<curve>366.74 638.21 371.59 647.62 341.58 649.04</curve>
+	<curve>349 730.02 335.7 715.44 343.18 796.43</curve>
+	<curve>362.94 804.96 409.41 800.78 419.98 788.47</curve>
+	<curve>412.6 707.55 404.19 717.82 396.75 636.9</curve>
+	<closepath/>
+</fill>
+<init>242.31 667.66</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>285.39 668.6</move>
+	<curve>257.7 656.98 258.06 667.53 230.34 655.98</curve>
+	<curve>202.43 732.36 196.65 713.5 168.75 789.9</curve>
+	<curve>182.98 806.07 226.75 822.16 241.58 815.56</curve>
+	<curve>269.5 739.24 257.52 744.94 285.39 668.6</curve>
+	<closepath/>
+</fill>
+<init>396.79 562.95</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>446.8 569.9</move>
+	<curve>436.19 555.78 438.25 539 451.89 528</curve>
+	<curve>465.57 517.03 481.73 519.12 492.31 533.26</curve>
+	<curve>503.01 547.41 501.41 564.91 487.72 575.89</curve>
+	<curve>474.1 587 457.4 584.07 446.8 569.9</curve>
+	<closepath/>
+</fill>
+<init>409.04 425.94</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>374.03 438.32</move>
+	<curve>393.5 425.12 394.84 433.67 414.33 420.49</curve>
+	<curve>447.55 478.19 449.09 462.19 482.27 519.83</curve>
+	<curve>473.79 534.89 442.64 553.83 430.22 550.69</curve>
+	<curve>397.09 493.02 407.21 495.95 374.03 438.32</curve>
+	<closepath/>
+</fill>
+<init>198 527.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>246 335</move>
+	<curve>243 430 243 430 240 525</curve>
+	<curve>172 655.5 172 655.5 104 786</curve>
+	<curve>198 777 198 777 292 768</curve>
+	<curve>292 529.5 292 529.5 292 291</curve>
+	<curve>247 280 247 280 202 269</curve>
+	<curve>224 302 224 302 246 335</curve>
+	<closepath/>
+</fill>
+<init>185 622</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>151 622</move>
+	<curve>151 601.6 164.6 588 185 588</curve>
+	<curve>205.4 588 219 601.6 219 622</curve>
+	<curve>219 642.4 205.4 657 185 657</curve>
+	<curve>164.6 657 151 642.4 151 622</curve>
+	<closepath/>
+</fill>
+<init>236.54 343.3</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>213.7 320.52</move>
+	<curve>245.01 301 259.01 316 266.77 334.93</curve>
+	<curve>242.54 424.19 229.01 506 186.01 504</curve>
+	<curve>149.01 495 189.46 409.79 213.7 320.52</curve>
+	<closepath/>
+</fill>
+<init>199.55 466.04</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>175.01 451</move>
+	<curve>202.36 453.22 197.65 461.87 225.01 464.13</curve>
+	<curve>215.71 540.04 228.32 526.76 219.01 602.65</curve>
+	<curve>200.63 610 158.36 604.63 149.01 592.74</curve>
+	<curve>158.33 516.89 165.7 526.83 175.01 451</curve>
+	<closepath/>
+</fill>
+</frame40>
+<frame41 extend="end" />
+<frame42 extend="start">
+<init>353.5 525.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>310 274</move>
+	<curve>353 285 353 285 396 296</curve>
+	<curve>379.5 309.5 379.5 309.5 363 323</curve>
+	<curve>373.5 417.5 373.5 417.5 384 512</curve>
+	<curve>432.5 644.5 432.5 644.5 481 777</curve>
+	<curve>353.5 761 353.5 761 226 745</curve>
+	<curve>268 509.5 268 509.5 310 274</curve>
+	<closepath/>
+</fill>
+<init>405.01 801</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>359.01 777</move>
+	<curve>418.01 777 464.01 801 464.01 824</curve>
+	<curve>416.02 840 405.01 824 346.01 824</curve>
+	<curve>346.01 801 344.01 794 359.01 777</curve>
+	<closepath/>
+</fill>
+<init>215.01 818.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>169.01 794.5</move>
+	<curve>228.01 794.5 274.01 818.5 274.01 841.5</curve>
+	<curve>226.02 857.5 215.01 841.5 156.01 841.5</curve>
+	<curve>156.01 818.5 154.01 811.5 169.01 794.5</curve>
+	<closepath/>
+</fill>
+<init>392.16 523.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>359.11 496.85</move>
+	<curve>325.56 475.03 309.73 490.35 300.48 510.13</curve>
+	<curve>323.86 605.91 335.7 693.37 382.8 692.82</curve>
+	<curve>423.53 684.65 382.41 592.54 359.11 496.85</curve>
+	<closepath/>
+</fill>
+<init>351.73 654.02</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>396.75 636.9</move>
+	<curve>366.74 638.21 371.59 647.62 341.58 649.04</curve>
+	<curve>349 730.02 335.7 715.44 343.18 796.43</curve>
+	<curve>362.94 804.96 409.41 800.78 419.98 788.47</curve>
+	<curve>412.6 707.55 404.19 717.82 396.75 636.9</curve>
+	<closepath/>
+</fill>
+<init>282.74 537.16</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>311.26 525.91</move>
+	<curve>290.26 491.83 269.39 498.93 252.57 512.85</curve>
+	<curve>232.74 609.44 206.07 693.55 248.87 713.19</curve>
+	<curve>289.17 723.21 291.39 622.4 311.26 525.91</curve>
+	<closepath/>
+</fill>
+<init>242.31 667.66</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>285.39 668.6</move>
+	<curve>257.7 656.98 258.06 667.53 230.34 655.98</curve>
+	<curve>202.43 732.36 196.65 713.5 168.75 789.9</curve>
+	<curve>182.98 806.07 226.75 822.16 241.58 815.56</curve>
+	<curve>269.5 739.24 257.52 744.94 285.39 668.6</curve>
+	<closepath/>
+</fill>
+<init>396.79 562.95</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>446.8 569.9</move>
+	<curve>436.19 555.78 438.25 539 451.89 528</curve>
+	<curve>465.57 517.03 481.73 519.12 492.31 533.26</curve>
+	<curve>503.01 547.41 501.41 564.91 487.72 575.89</curve>
+	<curve>474.1 587 457.4 584.07 446.8 569.9</curve>
+	<closepath/>
+</fill>
+<init>440.44 318.08</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>332.27 326.91</move>
+	<curve>353.65 317.64 353.65 317.64 375.22 308.45</curve>
+	<curve>405.33 383.35 438.77 447.4 408.96 469.18</curve>
+	<curve>379.49 482.84 362.32 401.92 332.27 326.91</curve>
+	<closepath/>
+</fill>
+<init>409.04 425.94</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>374.03 438.32</move>
+	<curve>393.5 425.12 394.84 433.67 414.33 420.49</curve>
+	<curve>447.55 478.19 449.09 462.19 482.27 519.83</curve>
+	<curve>473.79 534.89 442.64 553.83 430.22 550.69</curve>
+	<curve>397.09 493.02 407.21 495.95 374.03 438.32</curve>
+	<closepath/>
+</fill>
+<init>304.88 461.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>244.86 414.5</move>
+	<curve>282.06 367.5 314.79 383.5 361.71 399.5</curve>
+	<curve>369.01 446.5 368.26 471.5 361.71 494.5</curve>
+	<curve>351.27 512.5 300.95 522.5 252.69 508.5</curve>
+	<curve>243.01 471.5 244.86 462 244.86 414.5</curve>
+	<closepath/>
+</fill>
+<init>298.56 376</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>213.72 329</move>
+	<curve>266.27 282 312.45 298 378.8 314</curve>
+	<curve>389.01 361 388.05 386 378.81 409</curve>
+	<curve>364.01 427 293.01 437 224.8 423</curve>
+	<curve>211.01 386 213.72 376.5 213.72 329</curve>
+	<closepath/>
+</fill>
+<init>295.01 228.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>306 273</move>
+	<curve>310 183 308 159 370 169</curve>
+	<curve>378 220 392.01 255 386 303</curve>
+	<curve>350 303 342 273 306 273</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>355.01 169</move>
+	<curve>372.01 179 377.01 208 369.01 220</curve>
+	<curve>387.02 253 365.01 268 335.01 319</curve>
+	<curve>282.01 319 301.01 268 248.01 268</curve>
+	<curve>248.01 181 311.01 168 355.01 169</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>294.01 270</move>
+	<curve>323.62 279.2 343 258.66 372.6 267.87</curve>
+	<curve>361.61 303.2 344.01 308 332.01 324</curve>
+	<curve>302.39 314.8 307.01 319 291.01 302</curve>
+	<curve>307.98 262.67 283.02 305.33 294.01 270</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>317 286</move>
+	<curve>317 284.2 321.8 283 329 283</curve>
+	<curve>336.2 283 341 284.2 341 286</curve>
+	<curve>341 287.8 336.2 290 329 290</curve>
+	<curve>321.8 290 317 287.8 317 286</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>304.17 205</move>
+	<curve>323.41 211.28 323.41 211.28 342.68 217.66</curve>
+	<curve>341.58 221.06 341.58 221.06 340.51 224.54</curve>
+	<curve>321.26 218.16 321.26 218.16 302.01 211.83</curve>
+	<curve>303.04 208.38 303.04 208.38 304.17 205</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>353.97 217.7</move>
+	<curve>365.51 214.16 365.51 214.16 377.04 210.54</curve>
+	<curve>378.01 213.64 378.01 213.64 379.01 216.73</curve>
+	<curve>367.45 220.34 367.45 220.34 355.89 223.95</curve>
+	<curve>354.92 220.82 354.92 220.82 353.97 217.7</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>326 233</move>
+	<curve>326 228.2 327.6 225 330 225</curve>
+	<curve>332.4 225 335 228.2 335 233</curve>
+	<curve>335 237.8 332.4 242 330 242</curve>
+	<curve>327.6 242 326 237.8 326 233</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>356.51 233.5</move>
+	<curve>356.51 228.7 358.11 225.5 360.51 225.5</curve>
+	<curve>362.91 225.5 365.51 228.7 365.51 233.5</curve>
+	<curve>365.51 238.3 362.91 242.5 360.51 242.5</curve>
+	<curve>358.11 242.5 356.51 238.3 356.51 233.5</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>338.01 256.35</move>
+	<curve>338.01 250.59 342.81 246.75 350.01 246.75</curve>
+	<curve>357.21 246.75 362.01 250.59 362.01 256.35</curve>
+	<curve>362.01 262.14 357.21 269.25 350.01 269.25</curve>
+	<curve>342.81 269.25 338.01 262.14 338.01 256.35</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>262 156</move>
+	<curve>280.01 124 396.01 130 368 156</curve>
+	<curve>386.01 189 336.01 148 306.01 199</curve>
+	<curve>289.01 300 317.01 333 231.01 318</curve>
+	<curve>194.01 298 239.01 141 262 156</curve>
+	<closepath/>
+</fill>
+<init>198 527.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>246 335</move>
+	<curve>243 430 243 430 240 525</curve>
+	<curve>172 655.5 172 655.5 104 786</curve>
+	<curve>198 777 198 777 292 768</curve>
+	<curve>292 529.5 292 529.5 292 291</curve>
+	<curve>247 280 247 280 202 269</curve>
+	<curve>224 302 224 302 246 335</curve>
+	<closepath/>
+</fill>
+<init>185 622</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>151 622</move>
+	<curve>151 601.6 164.6 588 185 588</curve>
+	<curve>205.4 588 219 601.6 219 622</curve>
+	<curve>219 642.4 205.4 657 185 657</curve>
+	<curve>164.6 657 151 642.4 151 622</curve>
+	<closepath/>
+</fill>
+<init>236.54 343.3</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>213.7 320.52</move>
+	<curve>245.01 301 259.01 316 266.77 334.93</curve>
+	<curve>242.54 424.19 229.01 506 186.01 504</curve>
+	<curve>149.01 495 189.46 409.79 213.7 320.52</curve>
+	<closepath/>
+</fill>
+<init>199.55 466.04</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>175.01 451</move>
+	<curve>202.36 453.22 197.65 461.87 225.01 464.13</curve>
+	<curve>215.71 540.04 228.32 526.76 219.01 602.65</curve>
+	<curve>200.63 610 158.36 604.63 149.01 592.74</curve>
+	<curve>158.33 516.89 165.7 526.83 175.01 451</curve>
+	<closepath/>
+</fill>
+</frame42>
+<frame43 extend="end" />
+<frame44 extend="start">
+<init>353.5 525.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>310 274</move>
+	<curve>353 285 353 285 396 296</curve>
+	<curve>379.5 309.5 379.5 309.5 363 323</curve>
+	<curve>373.5 417.5 373.5 417.5 384 512</curve>
+	<curve>432.5 644.5 432.5 644.5 481 777</curve>
+	<curve>353.5 761 353.5 761 226 745</curve>
+	<curve>268 509.5 268 509.5 310 274</curve>
+	<closepath/>
+</fill>
+<init>405.01 801</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>359.01 777</move>
+	<curve>418.01 777 464.01 801 464.01 824</curve>
+	<curve>416.02 840 405.01 824 346.01 824</curve>
+	<curve>346.01 801 344.01 794 359.01 777</curve>
+	<closepath/>
+</fill>
+<init>215.01 818.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>169.01 794.5</move>
+	<curve>228.01 794.5 274.01 818.5 274.01 841.5</curve>
+	<curve>226.02 857.5 215.01 841.5 156.01 841.5</curve>
+	<curve>156.01 818.5 154.01 811.5 169.01 794.5</curve>
+	<closepath/>
+</fill>
+<init>392.16 523.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>359.11 496.85</move>
+	<curve>325.56 475.03 309.73 490.35 300.48 510.13</curve>
+	<curve>323.86 605.91 335.7 693.37 382.8 692.82</curve>
+	<curve>423.53 684.65 382.41 592.54 359.11 496.85</curve>
+	<closepath/>
+</fill>
+<init>351.73 654.02</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>396.75 636.9</move>
+	<curve>366.74 638.21 371.59 647.62 341.58 649.04</curve>
+	<curve>349 730.02 335.7 715.44 343.18 796.43</curve>
+	<curve>362.94 804.96 409.41 800.78 419.98 788.47</curve>
+	<curve>412.6 707.55 404.19 717.82 396.75 636.9</curve>
+	<closepath/>
+</fill>
+<init>282.74 537.16</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>311.26 525.91</move>
+	<curve>290.26 491.83 269.39 498.93 252.57 512.85</curve>
+	<curve>232.74 609.44 206.07 693.55 248.87 713.19</curve>
+	<curve>289.17 723.21 291.39 622.4 311.26 525.91</curve>
+	<closepath/>
+</fill>
+<init>242.31 667.66</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>285.39 668.6</move>
+	<curve>257.7 656.98 258.06 667.53 230.34 655.98</curve>
+	<curve>202.43 732.36 196.65 713.5 168.75 789.9</curve>
+	<curve>182.98 806.07 226.75 822.16 241.58 815.56</curve>
+	<curve>269.5 739.24 257.52 744.94 285.39 668.6</curve>
+	<closepath/>
+</fill>
+<init>396.79 562.95</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>446.8 569.9</move>
+	<curve>436.19 555.78 438.25 539 451.89 528</curve>
+	<curve>465.57 517.03 481.73 519.12 492.31 533.26</curve>
+	<curve>503.01 547.41 501.41 564.91 487.72 575.89</curve>
+	<curve>474.1 587 457.4 584.07 446.8 569.9</curve>
+	<closepath/>
+</fill>
+<init>440.44 318.08</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>332.27 326.91</move>
+	<curve>353.65 317.64 353.65 317.64 375.22 308.45</curve>
+	<curve>405.33 383.35 438.77 447.4 408.96 469.18</curve>
+	<curve>379.49 482.84 362.32 401.92 332.27 326.91</curve>
+	<closepath/>
+</fill>
+<init>409.04 425.94</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>374.03 438.32</move>
+	<curve>393.5 425.12 394.84 433.67 414.33 420.49</curve>
+	<curve>447.55 478.19 449.09 462.19 482.27 519.83</curve>
+	<curve>473.79 534.89 442.64 553.83 430.22 550.69</curve>
+	<curve>397.09 493.02 407.21 495.95 374.03 438.32</curve>
+	<closepath/>
+</fill>
+<init>304.88 461.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>244.86 414.5</move>
+	<curve>282.06 367.5 314.79 383.5 361.71 399.5</curve>
+	<curve>369.01 446.5 368.26 471.5 361.71 494.5</curve>
+	<curve>351.27 512.5 300.95 522.5 252.69 508.5</curve>
+	<curve>243.01 471.5 244.86 462 244.86 414.5</curve>
+	<closepath/>
+</fill>
+<init>298.56 376</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>213.72 329</move>
+	<curve>266.27 282 312.45 298 378.8 314</curve>
+	<curve>389.01 361 388.05 386 378.81 409</curve>
+	<curve>364.01 427 293.01 437 224.8 423</curve>
+	<curve>211.01 386 213.72 376.5 213.72 329</curve>
+	<closepath/>
+</fill>
+<init>295.01 228.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>306 273</move>
+	<curve>310 183 308 159 370 169</curve>
+	<curve>378 220 392.01 255 386 303</curve>
+	<curve>350 303 342 273 306 273</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>355.01 169</move>
+	<curve>372.01 179 377.01 208 369.01 220</curve>
+	<curve>387.02 253 365.01 268 335.01 319</curve>
+	<curve>282.01 319 301.01 268 248.01 268</curve>
+	<curve>248.01 181 311.01 168 355.01 169</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>294.01 270</move>
+	<curve>323.62 279.2 343 258.66 372.6 267.87</curve>
+	<curve>361.61 303.2 344.01 308 332.01 324</curve>
+	<curve>302.39 314.8 307.01 319 291.01 302</curve>
+	<curve>307.98 262.67 283.02 305.33 294.01 270</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>317 286</move>
+	<curve>317 284.2 321.8 283 329 283</curve>
+	<curve>336.2 283 341 284.2 341 286</curve>
+	<curve>341 287.8 336.2 290 329 290</curve>
+	<curve>321.8 290 317 287.8 317 286</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>304.17 205</move>
+	<curve>323.41 211.28 323.41 211.28 342.68 217.66</curve>
+	<curve>341.58 221.06 341.58 221.06 340.51 224.54</curve>
+	<curve>321.26 218.16 321.26 218.16 302.01 211.83</curve>
+	<curve>303.04 208.38 303.04 208.38 304.17 205</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>353.97 217.7</move>
+	<curve>365.51 214.16 365.51 214.16 377.04 210.54</curve>
+	<curve>378.01 213.64 378.01 213.64 379.01 216.73</curve>
+	<curve>367.45 220.34 367.45 220.34 355.89 223.95</curve>
+	<curve>354.92 220.82 354.92 220.82 353.97 217.7</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>326 233</move>
+	<curve>326 228.2 327.6 225 330 225</curve>
+	<curve>332.4 225 335 228.2 335 233</curve>
+	<curve>335 237.8 332.4 242 330 242</curve>
+	<curve>327.6 242 326 237.8 326 233</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>356.51 233.5</move>
+	<curve>356.51 228.7 358.11 225.5 360.51 225.5</curve>
+	<curve>362.91 225.5 365.51 228.7 365.51 233.5</curve>
+	<curve>365.51 238.3 362.91 242.5 360.51 242.5</curve>
+	<curve>358.11 242.5 356.51 238.3 356.51 233.5</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>338.01 256.35</move>
+	<curve>338.01 250.59 342.81 246.75 350.01 246.75</curve>
+	<curve>357.21 246.75 362.01 250.59 362.01 256.35</curve>
+	<curve>362.01 262.14 357.21 269.25 350.01 269.25</curve>
+	<curve>342.81 269.25 338.01 262.14 338.01 256.35</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>262 156</move>
+	<curve>280.01 124 396.01 130 368 156</curve>
+	<curve>386.01 189 336.01 148 306.01 199</curve>
+	<curve>289.01 300 317.01 333 231.01 318</curve>
+	<curve>194.01 298 239.01 141 262 156</curve>
+	<closepath/>
+</fill>
+<init>198 527.5</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>246 335</move>
+	<curve>243 430 243 430 240 525</curve>
+	<curve>172 655.5 172 655.5 104 786</curve>
+	<curve>198 777 198 777 292 768</curve>
+	<curve>292 529.5 292 529.5 292 291</curve>
+	<curve>247 280 247 280 202 269</curve>
+	<curve>224 302 224 302 246 335</curve>
+	<closepath/>
+</fill>
+<init>185 622</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>151 622</move>
+	<curve>151 601.6 164.6 588 185 588</curve>
+	<curve>205.4 588 219 601.6 219 622</curve>
+	<curve>219 642.4 205.4 657 185 657</curve>
+	<curve>164.6 657 151 642.4 151 622</curve>
+	<closepath/>
+</fill>
+<init>236.54 343.3</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>213.7 320.52</move>
+	<curve>245.01 301 259.01 316 266.77 334.93</curve>
+	<curve>242.54 424.19 229.01 506 186.01 504</curve>
+	<curve>149.01 495 189.46 409.79 213.7 320.52</curve>
+	<closepath/>
+</fill>
+<init>199.55 466.04</init>
+<fill color="rgba(36, 31, 49, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="3"/>
+	<move>175.01 451</move>
+	<curve>202.36 453.22 197.65 461.87 225.01 464.13</curve>
+	<curve>215.71 540.04 228.32 526.76 219.01 602.65</curve>
+	<curve>200.63 610 158.36 604.63 149.01 592.74</curve>
+	<curve>158.33 516.89 165.7 526.83 175.01 451</curve>
+	<closepath/>
+</fill>
+</frame44>
+<frame45 extend="mid" />
+<frame46 extend="mid" />
+<frame47 extend="mid" />
+<frame48 extend="mid" />
+<frame49 extend="mid" />
+<frame50 extend="mid" />
+<frame51 extend="mid" />
+<frame52 extend="mid" />
+<frame53 extend="mid" />
+<frame54 extend="mid" />
+<frame55 extend="end" />
+</layer2>
+<layer3 label="spidey" visible="true" locked="false">
+<frame1 extend="start">
+</frame1>
+<frame2 extend="mid" />
+<frame3 extend="mid" />
+<frame4 extend="mid" />
+<frame5 extend="mid" />
+<frame6 extend="mid" />
+<frame7 extend="mid" />
+<frame8 extend="mid" />
+<frame9 extend="mid" />
+<frame10 extend="mid" />
+<frame11 extend="mid" />
+<frame12 extend="mid" />
+<frame13 extend="mid" />
+<frame14 extend="mid" />
+<frame15 extend="mid" />
+<frame16 extend="mid" />
+<frame17 extend="mid" />
+<frame18 extend="mid" />
+<frame19 extend="mid" />
+<frame20 extend="mid" />
+<frame21 extend="mid" />
+<frame22 extend="mid" />
+<frame23 extend="mid" />
+<frame24 extend="mid" />
+<frame25 extend="mid" />
+<frame26 extend="mid" />
+<frame27 extend="end" />
+<frame28 extend="start" tween="11">
+<init>979.15 171.97</init>
+<fill color="rgba(53, 132, 228, 255)">
+	<stroke color="rgba(26, 95, 180, 255)" thickness="3"/>
+	<move>1043.78 176.56</move>
+	<curve>1057.83 203.77 1026.94 215.81 995.53 203.65</curve>
+	<curve>928.03 180.94 967.13 196.42 899.67 173.78</curve>
+	<curve>904.16 152.63 904.16 152.63 908.79 131.32</curve>
+	<curve>943.23 148.69 963.87 159.47 1043.78 176.56</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>1048.72 175.63</move>
+	<curve>1058.55 190.9 1050.08 195.65 1043.01 201.78</curve>
+	<curve>992.45 199.07 1009.07 167.28 901.89 154.34</curve>
+	<curve>904.72 141.28 904.72 141.28 907.55 128.32</curve>
+	<curve>936.51 134.53 1039.03 163.91 1048.72 175.63</curve>
+	<closepath/>
+</fill>
+<init>1185.05 580.49</init>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>844.56 277.32</move>
+	<curve>845.8 187.88 823.96 165.69 799.36 164.94</curve>
+	<curve>788.15 212.25 800.04 230.15 797.99 285.49</curve>
+	<curve>822.53 286.27 827.99 282.67 844.56 277.32</curve>
+	<closepath/>
+</fill>
+<init>1024.03 245.76</init>
+<fill color="rgba(53, 132, 228, 255)">
+	<stroke color="rgba(26, 95, 180, 255)" thickness="3"/>
+	<move>1147.24 194.39</move>
+	<curve>1091.78 152.63 1052.4 156.33 990.79 185.99</curve>
+	<curve>990.79 258.32 1011.97 264.83 1020.98 334.2</curve>
+	<curve>1043.26 360.2 1101.9 351.87 1125.08 337.95</curve>
+	<curve>1125.08 265.7 1147.24 266.69 1147.24 194.39</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>1146.33 156.33</move>
+	<curve>1101.9 135.03 1028.08 131.32 997.92 155.38</curve>
+	<curve>954.47 177.65 1035.17 203.65 1030.15 347.23</curve>
+	<curve>1052.4 357.39 1076.69 356.49 1095.75 347.23</curve>
+	<curve>1076.69 174.88 1183.83 216.62 1146.33 156.33</curve>
+	<closepath/>
+</fill>
+<init>1052.53 364.69</init>
+<fill color="rgba(53, 132, 228, 255)">
+	<stroke color="rgba(26, 95, 180, 255)" thickness="3"/>
+	<move>1040.83 393.67</move>
+	<curve>1082.52 412.22 1098.74 389.95 1084.58 354.02</curve>
+	<curve>1062.42 315.42 1022.76 277.98 991.01 248.07</curve>
+	<curve>969.62 253.7 952.29 268.2 941.2 292.99</curve>
+	<curve>973.21 332.07 991.03 346.12 1040.83 393.67</curve>
+	<closepath/>
+</fill>
+<init>1135.71 447.28</init>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>977.22 309.64</move>
+	<curve>980.16 287.63 980.16 277.83 983.09 246.15</curve>
+	<curve>907.88 235.51 906.33 243.08 831.16 232.46</curve>
+	<curve>828.3 264.39 829.89 246.95 826.78 278.82</curve>
+	<curve>902.01 289.33 902 299.11 977.22 309.64</curve>
+	<closepath/>
+</fill>
+<init>1033.69 94.23</init>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>1135.21 67.42</move>
+	<curve>1135.21 25.61 1106.03 8.36 1066.58 8.36</curve>
+	<curve>1027.17 8.36 984.64 47.9 1002.9 91.41</curve>
+	<curve>980.59 121.2 1020.98 180.45 1069.66 161.03</curve>
+	<curve>1092.82 147.94 1138.2 125.7 1135.21 67.42</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 255, 255, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="7"/>
+	<move>1081.51 71.14</move>
+	<curve>1072.42 58.01 1023.58 85.95 1032.57 99.22</curve>
+	<curve>1041.71 112.42 1058.15 115.23 1072.49 106.95</curve>
+	<curve>1086.91 98.62 1090.47 84.41 1081.51 71.14</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 255, 255, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="6"/>
+	<move>1018.01 96.8</move>
+	<curve>1023.52 85.77 1000.69 54.24 995.03 65.14</curve>
+	<curve>989.24 76.27 990.51 90.31 997.22 99.56</curve>
+	<curve>1004.04 109.06 1012.29 107.97 1018.01 96.8</curve>
+	<closepath/>
+</fill>
+<init>940.11 381.47</init>
+<fill color="rgba(53, 132, 228, 255)">
+	<stroke color="rgba(26, 95, 180, 255)" thickness="3"/>
+	<move>1088.24 395.21</move>
+	<curve>1105.71 414.63 1153.26 389.95 1125.4 343.73</curve>
+	<curve>1088.44 316.36 1026.77 296.27 983.9 280.2</curve>
+	<curve>965.21 292.99 953.81 312.44 952.4 338.77</curve>
+	<curve>999 363.12 1020.82 369.58 1088.24 395.21</curve>
+	<closepath/>
+</fill>
+<init>941.72 472.86</init>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>1001.1 343.2</move>
+	<curve>996.37 321.42 992.92 312.19 984.78 281.23</curve>
+	<curve>903.31 302.42 904.33 310.25 822.78 331.55</curve>
+	<curve>830.96 362.5 826.49 345.61 834.72 376.56</curve>
+	<curve>916.25 355.32 919.65 364.62 1001.1 343.2</curve>
+	<closepath/>
+</fill>
+<init>947.64 613.09</init>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>852.22 375.04</move>
+	<curve>843.06 286.2 818.79 266.61 794.3 268.45</curve>
+	<curve>788.43 316.55 802.46 333.01 806.91 388.35</curve>
+	<curve>831.32 386.53 836.38 382.22 852.22 375.04</curve>
+	<closepath/>
+</fill>
+<init>1142.01 415.34</init>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>817.09 119.7</move>
+	<curve>833.2 130.62 851.74 129.19 863.05 116.42</curve>
+	<curve>874.53 103.64 872.15 87.34 855.99 76.53</curve>
+	<curve>839.86 65.39 820.11 67.31 808.53 79.94</curve>
+	<curve>796.86 92.64 800.87 109.01 817.09 119.7</curve>
+	<closepath/>
+</fill>
+<init>1096.73 265.06</init>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>924.94 189.92</move>
+	<curve>960.3 194 953.23 171.19 954.49 149.44</curve>
+	<curve>927.68 109.52 899.47 129.47 861.22 79.04</curve>
+	<curve>843.81 86.34 833.6 104.23 832.27 118.82</curve>
+	<curve>878.55 139.16 879.42 162.12 924.94 189.92</curve>
+	<closepath/>
+</fill>
+<init>902.84 219.21</init>
+<fill color="rgba(53, 132, 228, 255)">
+	<stroke color="rgba(26, 95, 180, 255)" thickness="3"/>
+	<move>1135.02 197.43</move>
+	<curve>1160.65 176.81 1137.68 147.44 1103.08 142.94</curve>
+	<curve>1030.43 129.44 1073.58 134.8 1000.98 121.32</curve>
+	<curve>995.38 145.84 995.38 145.84 989.65 170.47</curve>
+	<curve>1029.47 171.28 1053.49 171.44 1135.02 197.43</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>1139.08 201.08</move>
+	<curve>1155.19 190.59 1149.58 181.13 1146.02 170.94</curve>
+	<curve>1098.08 145.91 1098.83 188.07 994.14 142.69</curve>
+	<curve>990.61 157.88 990.61 157.88 987.28 172.94</curve>
+	<curve>1016.75 182.3 1124.83 208.03 1139.08 201.08</curve>
+	<closepath/>
+</fill>
+<init>875.14 432.04</init>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>848.78 117.25</move>
+	<curve>867.05 126.7 885.66 121.52 895.12 104.67</curve>
+	<curve>904.5 87.63 899.1 69.09 880.67 59.74</curve>
+	<curve>862.27 50.28 842.38 55.81 832.98 72.8</curve>
+	<curve>823.52 89.79 830.35 107.81 848.78 117.25</curve>
+	<closepath/>
+</fill>
+<init>880.85 288.27</init>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>991.44 184.74</move>
+	<curve>1034.77 181.58 1022.24 156.63 1019.79 131.26</curve>
+	<curve>980.44 91.14 950.06 120.59 895.12 70.8</curve>
+	<curve>875.35 83.27 866.25 106.29 866.97 123.5</curve>
+	<curve>926.73 136.51 931.78 162.69 991.44 184.74</curve>
+	<closepath/>
+</fill>
+<init>833 81</init>
+<fill color="rgba(155, 154, 151, 255)">
+	<stroke color="rgba(119, 118, 123, 255)" thickness="3"/>
+	<move>410.21 -119.803</move>
+	<curve>623.059 -22.5849 623.059 -22.5849 835.908 74.6327</curve>
+	<curve>834.246 78.2712 834.246 78.2712 832.585 81.9096</curve>
+	<curve>619.735 -15.308 619.735 -15.308 406.886 -112.526</curve>
+	<curve>408.548 -116.164 408.548 -116.164 410.21 -119.803</curve>
+	<closepath/>
+</fill>
+</frame28>
+<frame29 extend="mid" tween="11" />
+<frame30 extend="mid" tween="11" />
+<frame31 extend="mid" tween="11" />
+<frame32 extend="mid" tween="11" />
+<frame33 extend="mid" tween="11" />
+<frame34 extend="mid" tween="11" />
+<frame35 extend="mid" tween="11" />
+<frame36 extend="end" tween="11" />
+<frame37 extend="start">
+<init>-241.32 174.47</init>
+<fill color="rgba(53, 132, 228, 255)">
+	<stroke color="rgba(26, 95, 180, 255)" thickness="3"/>
+	<move>-171.55 238.5</move>
+	<curve>-184.56 266.22 -212.91 249.08 -222.41 216.77</curve>
+	<curve>-245.57 149.41 -233.99 189.85 -257.18 122.56</curve>
+	<curve>-237.69 113.22 -237.69 113.22 -217.94 103.94</curve>
+	<curve>-210.72 141.8 -206.72 164.71 -171.55 238.5</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>-167.78 241.86</move>
+	<curve>-173.91 258.94 -182.82 255.13 -192 253.27</curve>
+	<curve>-220.68 211.52 -185.34 205.32 -240.41 112.47</curve>
+	<curve>-228.32 106.76 -228.32 106.76 -216.34 101.12</curve>
+	<curve>-203.59 127.84 -164.4 227.02 -167.78 241.86</curve>
+	<closepath/>
+</fill>
+<init>-35.43 582.98</init>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>-372.85 141.99</move>
+	<curve>-301.2 88.44 -296.91 57.61 -311.31 37.65</curve>
+	<curve>-355.64 57.59 -362.58 77.94 -407.7 110.06</curve>
+	<curve>-393.38 129.97 -387.18 132.11 -372.85 141.99</curve>
+	<closepath/>
+</fill>
+<init>-196.44 248.25</init>
+<fill color="rgba(53, 132, 228, 255)">
+	<stroke color="rgba(26, 95, 180, 255)" thickness="3"/>
+	<move>-122.63 331.39</move>
+	<curve>-123.36 261.95 -150.25 233 -211.31 202.24</curve>
+	<curve>-268.64 246.33 -260.89 267.1 -310.41 316.52</curve>
+	<curve>-317.44 350.03 -275.11 391.43 -249.93 401.34</curve>
+	<curve>-192.66 357.3 -179.94 375.46 -122.63 331.39</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>-93 307.47</move>
+	<curve>-103.22 259.25 -145.25 198.47 -182.69 189.24</curve>
+	<curve>-226.82 168.37 -198.26 248.18 -315.14 331.72</curve>
+	<curve>-309.64 355.56 -294.13 374.27 -275.14 383.74</curve>
+	<curve>-150.16 263.57 -117.93 373.96 -93 307.47</curve>
+	<closepath/>
+</fill>
+<init>-167.94 367.18</init>
+<fill color="rgba(53, 132, 228, 255)">
+	<stroke color="rgba(26, 95, 180, 255)" thickness="3"/>
+	<move>-345.45 368.49</move>
+	<curve>-334.75 412.86 -307.22 412.13 -287.37 379</curve>
+	<curve>-270.26 337.91 -264.76 283.66 -260.39 240.26</curve>
+	<curve>-277.89 226.7 -299.95 221.83 -326.38 228.14</curve>
+	<curve>-337.83 277.32 -338.12 300.04 -345.45 368.49</curve>
+	<closepath/>
+</fill>
+<init>-84.75 449.77</init>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>-317.61 266.86</move>
+	<curve>-298.39 255.75 -290.62 249.77 -263.69 232.8</curve>
+	<curve>-301.11 166.71 -308.05 170.1 -345.47 104</curve>
+	<curve>-372.55 121.19 -357.7 111.84 -384.88 128.81</curve>
+	<curve>-347.36 194.87 -355.11 200.81 -317.61 266.86</curve>
+	<closepath/>
+</fill>
+<init>-186.76 96.72</init>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>-29.32 244.45</move>
+	<curve>3.8 218.97 -0.28 185.33 -24.36 154.06</curve>
+	<curve>-48.36 122.82 -105.61 113.21 -128.97 154.19</curve>
+	<curve>-166.18 154.66 -188.53 222.8 -143.44 249.55</curve>
+	<curve>-119 259.92 -73.7 282.35 -29.32 244.45</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 255, 255, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="7"/>
+	<move>-64.97 204.16</move>
+	<curve>-60.11 188.95 -112.06 167.26 -117.09 182.47</curve>
+	<curve>-121.97 197.75 -114.19 212.5 -98.89 218.83</curve>
+	<curve>-83.5 225.19 -70.03 219.36 -64.97 204.16</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(255, 255, 255, 255)">
+	<stroke color="rgba(0, 0, 0, 255)" thickness="6"/>
+	<move>-124.05 169.46</move>
+	<curve>-111.95 167.09 -100.84 129.81 -112.95 131.96</curve>
+	<curve>-125.3 134.13 -135.65 143.69 -138.9 154.66</curve>
+	<curve>-142.28 165.86 -136.38 171.73 -124.05 169.46</curve>
+	<closepath/>
+</fill>
+<init>-280.37 383.96</init>
+<fill color="rgba(53, 132, 228, 255)">
+	<stroke color="rgba(26, 95, 180, 255)" thickness="3"/>
+	<move>-317.77 407.02</move>
+	<curve>-322.55 432.7 -273.98 455.37 -254.32 405.1</curve>
+	<curve>-255.14 359.13 -276.81 297.99 -290.22 254.2</curve>
+	<curve>-311.75 247.18 -334.12 249.99 -355.85 264.93</curve>
+	<curve>-346.73 316.73 -338.55 337.95 -317.77 407.02</curve>
+	<closepath/>
+</fill>
+<init>-278.74 475.35</init>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>-329.69 306.22</move>
+	<curve>-315.31 289.17 -310.08 280.85 -290.49 255.52</curve>
+	<curve>-356.94 203.85 -362.52 209.45 -429.13 157.77</curve>
+	<curve>-448.69 183.12 -438.01 169.29 -457.52 194.67</curve>
+	<curve>-390.95 246.35 -396.3 254.73 -329.69 306.22</curve>
+	<closepath/>
+</fill>
+<init>-272.83 615.58</init>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>-445.64 207.63</move>
+	<curve>-380.81 146.22 -380.08 115.02 -396.47 96.72</curve>
+	<curve>-438.17 121.4 -442.67 142.55 -483.82 179.83</curve>
+	<curve>-467.49 198.06 -461.01 199.45 -445.64 207.63</curve>
+	<closepath/>
+</fill>
+<init>-78.47 417.81</init>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>-264.63 24.14</move>
+	<curve>-263.47 43.56 -251.05 57.4 -234.01 58.56</curve>
+	<curve>-216.9 59.87 -205.43 48.05 -206.72 28.68</curve>
+	<curve>-207.69 9.09 -221.26 -5.39 -238.34 -6.9</curve>
+	<curve>-255.51 -8.4 -266.05 4.76 -264.63 24.14</curve>
+	<closepath/>
+</fill>
+<init>-123.75 267.55</init>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>-254.56 152.44</move>
+	<curve>-236.26 182.95 -222.47 163.44 -204.47 151.19</curve>
+	<curve>-189.16 105.59 -222.16 95.41 -205.51 34.34</curve>
+	<curve>-221.9 24.97 -242.31 27.79 -254.69 35.63</curve>
+	<curve>-242.61 84.72 -260.27 99.4 -254.56 152.44</curve>
+	<closepath/>
+</fill>
+<init>-317.62 221.69</init>
+<fill color="rgba(53, 132, 228, 255)">
+	<stroke color="rgba(26, 95, 180, 255)" thickness="3"/>
+	<move>-132.47 323.56</move>
+	<curve>-100.53 331.3 -91.25 295.19 -108.75 265.02</curve>
+	<curve>-142.34 199.2 -120.28 236.64 -153.81 170.93</curve>
+	<curve>-176.68 181.41 -176.68 181.41 -199.72 191.88</curve>
+	<curve>-176.06 223.94 -161.56 243.08 -132.47 323.56</curve>
+	<closepath/>
+</fill>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>-132.9 329.01</move>
+	<curve>-114.75 335.38 -110.69 325.17 -104.78 316.14</curve>
+	<curve>-114.18 262.87 -147.11 289.17 -174.94 178.51</curve>
+	<curve>-189.16 184.94 -189.16 184.94 -203.12 191.51</curve>
+	<curve>-192.57 220.58 -147.06 321.94 -132.9 329.01</curve>
+	<closepath/>
+</fill>
+<init>-345.33 434.53</init>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>-243.38 47.76</move>
+	<curve>-239.74 68.02 -224.31 79.59 -205.19 76.79</curve>
+	<curve>-185.94 73.9 -174.53 58.31 -178.37 38</curve>
+	<curve>-182.06 17.64 -198.57 5.25 -217.78 8.17</curve>
+	<curve>-237.03 11.02 -247.13 27.4 -243.38 47.76</curve>
+	<closepath/>
+</fill>
+<init>-339.64 290.76</init>
+<fill color="rgba(237, 51, 59, 255)">
+	<stroke color="rgba(165, 29, 45, 255)" thickness="3"/>
+	<move>-209.93 202</move>
+	<curve>-181 234.43 -168.87 209.27 -150.25 191.88</curve>
+	<curve>-142.44 136.22 -184.31 130.07 -178.34 56.16</curve>
+	<curve>-200.26 48.09 -224.03 54.93 -237.25 66</curve>
+	<curve>-211.13 121.3 -228.81 141.27 -209.93 202</curve>
+	<closepath/>
+</fill>
+<init>213.07 -175.382</init>
+<fill color="rgba(155, 154, 151, 255)">
+	<stroke color="rgba(119, 118, 123, 255)" thickness="3"/>
+	<move>213.524 -174.491</move>
+	<curve>5.03693 -68.2413 5.03693 -68.2413 -203.451 38.0083</curve>
+	<curve>-205.267 34.4444 -205.267 34.4444 -207.083 30.8805</curve>
+	<curve>1.40447 -75.3691 1.40447 -75.3691 209.892 -181.619</curve>
+	<curve>211.708 -178.055 211.708 -178.055 213.524 -174.491</curve>
+	<closepath/>
+</fill>
+</frame37>
+<frame38 extend="mid" />
+<frame39 extend="mid" />
+<frame40 extend="mid" />
+<frame41 extend="mid" />
+<frame42 extend="mid" />
+<frame43 extend="mid" />
+<frame44 extend="mid" />
+<frame45 extend="mid" />
+<frame46 extend="mid" />
+<frame47 extend="mid" />
+<frame48 extend="mid" />
+<frame49 extend="mid" />
+<frame50 extend="mid" />
+<frame51 extend="mid" />
+<frame52 extend="mid" />
+<frame53 extend="mid" />
+<frame54 extend="mid" />
+<frame55 extend="end" />
+</layer3>
+<layer4 label="neomouth" visible="true" locked="false">
+<frame1>
+<init>480 310</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>463 310</move>
+	<curve>463 306.39 469.8 304 480 304</curve>
+	<curve>490.2 304 497 306.39 497 310</curve>
+	<curve>497 313.6 490.2 317 480 317</curve>
+	<curve>469.8 317 463 313.6 463 310</curve>
+	<closepath/>
+</fill>
+</frame1>
+<frame2>
+<init>477 310</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>460 310</move>
+	<curve>460 306.39 466.8 304 477 304</curve>
+	<curve>487.2 304 494 306.39 494 310</curve>
+	<curve>494 313.6 487.2 317 477 317</curve>
+	<curve>466.8 317 460 313.6 460 310</curve>
+	<closepath/>
+</fill>
+</frame2>
+<frame3>
+<init>466 309</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>453 309</move>
+	<curve>453 304.8 458.2 302 466 302</curve>
+	<curve>473.8 302 479 304.8 479 309</curve>
+	<curve>479 313.2 473.8 316 466 316</curve>
+	<curve>458.2 316 453 313.2 453 309</curve>
+	<closepath/>
+</fill>
+</frame3>
+<frame4>
+<init>463 309</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>450 309</move>
+	<curve>450 304.8 455.2 302 463 302</curve>
+	<curve>470.8 302 476 304.8 476 309</curve>
+	<curve>476 313.2 470.8 316 463 316</curve>
+	<curve>455.2 316 450 313.2 450 309</curve>
+	<closepath/>
+</fill>
+</frame4>
+<frame5>
+</frame5>
+<frame6>
+<init>447.78 303.42</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>433 303.42</move>
+	<curve>433 300.76 438.89 299 447.78 299</curve>
+	<curve>456.67 299 464 300.76 464 303.42</curve>
+	<curve>464 306.07 456.67 309 447.78 309</curve>
+	<curve>438.89 309 433 306.07 433 303.42</curve>
+	<closepath/>
+</fill>
+</frame6>
+<frame7>
+<init>444 303</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>433 303</move>
+	<curve>433 300.6 437.4 299 444 299</curve>
+	<curve>450.6 299 456 300.6 456 303</curve>
+	<curve>456 305.39 450.6 308 444 308</curve>
+	<curve>437.4 308 433 305.39 433 303</curve>
+	<closepath/>
+</fill>
+</frame7>
+<frame8>
+</frame8>
+<frame9>
+</frame9>
+<frame10>
+<init>426 303</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>414 303</move>
+	<curve>414 300 418.8 298 426 298</curve>
+	<curve>433.2 298 438 300 438 303</curve>
+	<curve>438 306 433.2 309 426 309</curve>
+	<curve>418.8 309 414 306 414 303</curve>
+	<closepath/>
+</fill>
+</frame10>
+<frame11>
+<init>423 303</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>411 303</move>
+	<curve>411 300 415.8 298 423 298</curve>
+	<curve>430.2 298 435 300 435 303</curve>
+	<curve>435 306 430.2 309 423 309</curve>
+	<curve>415.8 309 411 306 411 303</curve>
+	<closepath/>
+</fill>
+</frame11>
+<frame12>
+</frame12>
+<frame13>
+<init>413 298</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>399 298</move>
+	<curve>399 293.2 404.6 290 413 290</curve>
+	<curve>421.4 290 427 293.2 427 298</curve>
+	<curve>427 302.8 421.4 306 413 306</curve>
+	<curve>404.6 306 399 302.8 399 298</curve>
+	<closepath/>
+</fill>
+</frame13>
+<frame14>
+<init>410 298</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>396 298</move>
+	<curve>396 293.2 401.6 290 410 290</curve>
+	<curve>418.4 290 424 293.2 424 298</curve>
+	<curve>424 302.8 418.4 306 410 306</curve>
+	<curve>401.6 306 396 302.8 396 298</curve>
+	<closepath/>
+</fill>
+</frame14>
+<frame15>
+</frame15>
+<frame16>
+<init>396 299</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>381 299</move>
+	<curve>381 294.8 386.96 292 396 292</curve>
+	<curve>404.97 292 411 294.8 411 299</curve>
+	<curve>411 303.2 404.97 307 396 307</curve>
+	<curve>386.96 307 381 303.2 381 299</curve>
+	<closepath/>
+</fill>
+</frame16>
+<frame17>
+<init>390 299</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>378 299</move>
+	<curve>378 294.8 382.8 292 390 292</curve>
+	<curve>397.2 292 402 294.8 402 299</curve>
+	<curve>402 303.2 397.2 307 390 307</curve>
+	<curve>382.8 307 378 303.2 378 299</curve>
+	<closepath/>
+</fill>
+</frame17>
+<frame18>
+</frame18>
+<frame19>
+<init>378 295</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>365 295</move>
+	<curve>365 291.39 370.2 289 378 289</curve>
+	<curve>385.8 289 392 291.39 392 295</curve>
+	<curve>392 298.6 385.8 302 378 302</curve>
+	<curve>370.2 302 365 298.6 365 295</curve>
+	<closepath/>
+</fill>
+</frame19>
+<frame20>
+<init>375 295</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>362 295</move>
+	<curve>362 291.39 367.2 289 375 289</curve>
+	<curve>382.8 289 389 291.39 389 295</curve>
+	<curve>389 298.6 382.8 302 375 302</curve>
+	<curve>367.2 302 362 298.6 362 295</curve>
+	<closepath/>
+</fill>
+</frame20>
+<frame21>
+</frame21>
+<frame22>
+</frame22>
+<frame23>
+<init>356 291</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>344 291</move>
+	<curve>344 286.8 348.8 284 356 284</curve>
+	<curve>363.2 284 368 286.8 368 291</curve>
+	<curve>368 295.2 363.2 299 356 299</curve>
+	<curve>348.8 299 344 295.2 344 291</curve>
+	<closepath/>
+</fill>
+</frame23>
+<frame24>
+<init>353 291</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>341 291</move>
+	<curve>341 286.8 345.8 284 353 284</curve>
+	<curve>360.2 284 365 286.8 365 291</curve>
+	<curve>365 295.2 360.2 299 353 299</curve>
+	<curve>345.8 299 341 295.2 341 291</curve>
+	<closepath/>
+</fill>
+</frame24>
+<frame25>
+<init>346 288</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>332 288</move>
+	<curve>332 283.2 337.6 280 346 280</curve>
+	<curve>354.4 280 360 283.2 360 288</curve>
+	<curve>360 292.8 354.4 297 346 297</curve>
+	<curve>337.6 297 332 292.8 332 288</curve>
+	<closepath/>
+</fill>
+</frame25>
+<frame26>
+</frame26>
+<frame27>
+</frame27>
+<frame28 extend="start">
+</frame28>
+<frame29 extend="mid" />
+<frame30 extend="mid" />
+<frame31 extend="mid" />
+<frame32 extend="mid" />
+<frame33 extend="mid" />
+<frame34 extend="mid" />
+<frame35 extend="mid" />
+<frame36 extend="mid" />
+<frame37 extend="mid" />
+<frame38 extend="mid" />
+<frame39 extend="mid" />
+<frame40 extend="mid" />
+<frame41 extend="mid" />
+<frame42 extend="mid" />
+<frame43 extend="mid" />
+<frame44 extend="mid" />
+<frame45 extend="end" />
+<frame46>
+</frame46>
+<frame47 extend="start">
+<init>327 290</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>312 290</move>
+	<curve>312 284 318 280 327 280</curve>
+	<curve>336 280 343 284 343 290</curve>
+	<curve>343 296 336 301 327 301</curve>
+	<curve>318 301 312 296 312 290</curve>
+	<closepath/>
+</fill>
+</frame47>
+<frame48 extend="end" />
+<frame49 extend="start">
+</frame49>
+<frame50 extend="mid" />
+<frame51 extend="end" />
+<frame52 extend="start">
+<init>327 290</init>
+<fill color="rgba(255, 190, 111, 255)">
+	<stroke color="rgba(255, 120, 0, 255)" thickness="3"/>
+	<move>312 290</move>
+	<curve>312 284 318 280 327 280</curve>
+	<curve>336 280 343 284 343 290</curve>
+	<curve>343 296 336 301 327 301</curve>
+	<curve>318 301 312 296 312 290</curve>
+	<closepath/>
+</fill>
+</frame52>
+<frame53 extend="end" />
+<frame54 extend="start">
+</frame54>
+<frame55 extend="end" />
+</layer4>
+</KageStudio>

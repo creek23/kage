@@ -30,6 +30,7 @@
 	#include <algorithm>
 	#include <cstring>
 	#include <iostream>
+	#include <limits.h>
 	
 	class StringHelper {
 		public:

@@ -1,6 +1,6 @@
 # GdkPixbuf Image Loader Modules file
 # Automatically generated file, do not edit
-# Created by gdk-pixbuf-query-loaders from gdk-pixbuf-2.42.10
+# Created by gdk-pixbuf-query-loaders from gdk-pixbuf-2.42.12
 #
 # LoaderDir = C:\msys64\mingw64\lib\gdk-pixbuf-2.0\2.10.0\loaders
 #
@@ -53,6 +53,13 @@
 "jpeg" "jpe" "jpg" ""
 "\377\330" "" 100
 
+"lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\libpixbufloader-jxl.dll"
+"jxl" 5 "gdk-pixbuf" "JPEG XL image" "BSD-3"
+"image/jxl" ""
+"jxl" ""
+"\377\n" "  " 100
+"...\fJXL \r\n\207\n" "zzz         " 100
+
 "lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\libpixbufloader-png.dll"
 "png" 5 "gdk-pixbuf" "PNG" "LGPL"
 "image/png" ""
@@ -76,13 +83,6 @@
 "qtif" "qif" ""
 "abcdidsc" "xxxx    " 100
 "abcdidat" "xxxx    " 100
-
-"lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\libpixbufloader-svg.dll"
-"svg" 6 "gdk-pixbuf" "Scalable Vector Graphics" "LGPL"
-"image/svg+xml" "image/svg" "image/svg-xml" "image/vnd.adobe.svg+xml" "text/xml-svg" "image/svg+xml-compressed" ""
-"svg" "svgz" "svg.gz" ""
-" <svg" "*    " 100
-" <!DOCTYPE svg" "*             " 100
 
 "lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\libpixbufloader-tga.dll"
 "tga" 4 "gdk-pixbuf" "Targa" "LGPL"
@@ -115,4 +115,11 @@
 "image/x-xpixmap" ""
 "xpm" ""
 "/* XPM */" "" 100
+
+"lib\\gdk-pixbuf-2.0\\2.10.0\\loaders\\pixbufloader_svg.dll"
+"svg" 6 "gdk-pixbuf" "Scalable Vector Graphics" "LGPL"
+"image/svg+xml" "image/svg" "image/svg-xml" "image/vnd.adobe.svg+xml" "text/xml-svg" "image/svg+xml-compressed" ""
+"svg" "svgz" "svg.gz" ""
+" <svg" "*    " 100
+" <!DOCTYPE svg" "*             " 100
 

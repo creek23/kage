@@ -1,0 +1,5 @@
+<KageStudio version="2023.06.24">
+<stage width="800" height="600" background="rgb(255, 255, 255)" fps="12" assets="0" scenes="1" />
+
+<scene label="demo2" />
+</KageStudio>

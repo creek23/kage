@@ -1,5 +1,5 @@
 !define PRODUCT_NAME "Kage Studio"
-!define PRODUCT_VERSION "0.8.240224"
+!define PRODUCT_VERSION "0.8.240824"
 !define PRODUCT_PUBLISHER "Mj Mendoza IV"
 !define PRODUCT_WEB_SITE "https://kage.sourceforge.io"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\kagestudio.exe"

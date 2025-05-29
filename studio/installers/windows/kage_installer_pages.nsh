@@ -17,18 +17,19 @@ Section "Core (2.7 MB)" SEC01
   File "${FILE_PATH}\README.txt"
   File "${FILE_PATH}\kage.ico"
   File "${FILE_PATH}\ksf.ico"
-
+  File "${FILE_PATH}\template.profile.xml"
+  
   ;Store installation folder
   WriteRegStr HKLM "Software\Kage Studio" "" $INSTDIR
 SectionEnd
 
-Section "Demo (0.1 MB)" SEC02
+Section "Demo (0.2 MB)" SEC02
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
 
   File "${FILE_PATH}\demo.ksf"
-  ;File "${FILE_PATH}\demo2.kage"
-  ;File "${FILE_PATH}\demo2.ksf"
+  File "${FILE_PATH}\demo2.kage"
+  File "${FILE_PATH}\demo2.ksf"
   
 SectionEnd
 
@@ -100,6 +101,7 @@ Section "Gtkmm (53.4 MB)" SEC03
   File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-icns.dll"
   File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-ico.dll"
   File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-jpeg.dll"
+  File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-jxl.dll"
   File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-png.dll"
   File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-pnm.dll"
   File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-qtif.dll"
@@ -108,7 +110,7 @@ Section "Gtkmm (53.4 MB)" SEC03
   File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-tiff.dll"
   File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-xbm.dll"
   File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\libpixbufloader-xpm.dll"
-  
+  File "${FILE_PATH}\lib\gdk-pixbuf-2.0\2.10.0\loaders\pixbufloader_svg.dll"
   SetOutPath "$INSTDIR\share\icons"
   SetOverwrite ifnewer
   
@@ -117,7 +119,7 @@ Section "Gtkmm (53.4 MB)" SEC03
 SectionEnd
 
 
-Section "Plugins (77.3 MB)" SEC04
+Section "Plugins (141 MB)" SEC04
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
 

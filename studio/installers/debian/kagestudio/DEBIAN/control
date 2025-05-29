@@ -1,5 +1,5 @@
 Package: kagestudio
-Version: 0.8-240224
+Version: 0.8-240824
 Architecture: amd64
 Maintainer: Mj Mendoza IV <mj.mendoza.iv@gmail.com>
 Depends: libcairomm-1.0-1v5,libgtkmm-3.0-1v5, libgdk-pixbuf2.0-0, ffmpeg

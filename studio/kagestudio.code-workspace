@@ -71,7 +71,12 @@
 			"iomanip": "cpp",
 			"codecvt": "cpp",
 			"optional": "cpp",
-			"*.inc": "cpp"
+			"*.inc": "cpp",
+			"format": "cpp",
+			"variant": "cpp",
+			"charconv": "cpp",
+			"span": "cpp",
+			"text_encoding": "cpp"
 		}
 	},
 	"launch": {

@@ -114,6 +114,7 @@
 			void renderFrame(Cairo::RefPtr<Cairo::Context> p_context, std::vector<VectorData> p_vectorData, double p_alpha = 1.0);
 			void renderFrameOffset(Cairo::RefPtr<Cairo::Context> p_context, bool p_force = false, double p_offsetX = 0.0, double p_offsetY = 0.0);
 			void renderFrameOffset(Cairo::RefPtr<Cairo::Context> p_context, std::vector<VectorData> p_vectorData, double p_alpha = 1.0, double p_offsetX = 0.0, double p_offsetY = 0.0);
+			unsigned int addImage(unsigned int p_ID, double p_x, double p_y);
 			unsigned int addImage(unsigned int p_ID);
 			void initNodeTool();
 			void handleShapes();

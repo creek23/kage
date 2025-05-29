@@ -20,6 +20,10 @@
 	<profile name="Twitter/X FHD 1080p 30fps" fps="30" width="1920" height="1080" />
 	<profile name="Twitter/X FHD Vert 1080p 25fps" fps="25" width="1080" height="1920" />
 	<profile name="Twitter/X FHD Vert 1080p 30fps" fps="30" width="1080" height="1920" />
+	<profile name="Vimeo HD 720p 24fps" fps="24" width="1280" height="720" />
+	<profile name="Vimeo FHD 1080p 60fps" fps="60" width="1920" height="1080" />
+	<profile name="Vimeo Wide HD 720p 24fps" fps="24" width="1366" height="720" />
+	<profile name="Vimeo Wide FHD 1080p 60fps" fps="60" width="2048" height="1080" />
 	<profile name="YouTube HD 720p 24fps" fps="24" width="1280" height="720" />
 	<profile name="YouTube HD 720p 25fps" fps="25" width="1280" height="720" />
 	<profile name="YouTube HD 720p 30fps" fps="30" width="1280" height="720" />

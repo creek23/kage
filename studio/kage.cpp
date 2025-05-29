@@ -4337,74 +4337,17 @@ std::string Kage::dumpFrameToSvg() {
 	bool l_donePrevLine = false;
 	bool l_initFlag = false;
 	bool l_closePathFlag = false;
-	std::ostringstream l_ostreamStyleProp;
+	std::ostringstream l_ostreamProp;
 	std::ostringstream l_ostreamStyle;
 	for (unsigned int i = 0; i < vsize; ++i) {
 		switch (v[i].vectorType) {
 			case VectorData::TYPE_CLOSE_PATH: {
 				l_closePathFlag = false;
-
 				l_ostringstream << "\"";
-				unsigned int l_alpha = 0;
-				l_ostreamStyle.str("");
-				l_ostreamStyle.clear();
-				l_ostreamStyleProp.str("");
-				l_ostreamStyleProp.clear();
-				if (fillCtr > 0) {
-					l_alpha = fcolor.getA();
-					if (l_alpha == 0) {
-						l_ostreamStyle << "fill-opacity:0;";
-					} else {
-						l_ostreamStyleProp << "\n         fill=\"#" << int255ToHex(fcolor.getR()) << int255ToHex(fcolor.getG()) << int255ToHex(fcolor.getB()) << "\"";
-						if (l_alpha == 255) {
-							l_ostreamStyle << "fill-opacity:1;";
-						} else {
-							//l_ostreamStyleProp << "\n         fill=\"#" << int255ToHex(fcolor.getR()) << int255ToHex(fcolor.getG()) << int255ToHex(fcolor.getB()) << int255ToHex(l_alpha) << "\"";
-							l_ostreamStyle << "fill:#" << int255ToHex(fcolor.getR()) << int255ToHex(fcolor.getG()) << int255ToHex(fcolor.getB()) << ";";
-							l_ostreamStyle << "fill-opacity:" << StringHelper::doubleToString((double)((l_alpha * 392156.862745098f) / 100000000.0f)) << ";"; // 392156.862745098f ==> 100000000 / 255
-						}
-					}
-					fcolorPrev = fcolor.clone();
-				}
-					//stroke:#000000;stroke-opacity:0.12;stroke-width:5;stroke-miterlimit:4;stroke-dasharray:none
-					l_alpha = scolor.getA();
-					if (l_alpha == 0 || scolor.getThickness() == 0) {
-						l_ostreamStyle << "stroke:none;";
-					} else if (l_alpha > 0 && scolor.getThickness() > 0) {
-						l_ostreamStyleProp << "\n         stroke=\"#" << int255ToHex(scolor.getR()) << int255ToHex(scolor.getG()) << int255ToHex(scolor.getB()) << "\"";// << int255ToHex(l_alpha) << "\"";
-						l_ostreamStyleProp << "\n         stroke-width=\"" << scolor.getThickness() << "\"";
-						l_ostreamStyle << "stroke:#" << int255ToHex(scolor.getR()) << int255ToHex(scolor.getG()) << int255ToHex(scolor.getB()) << ";";// << int255ToHex(l_alpha) << "\"";
-						l_ostreamStyle << "stroke-opacity:" << StringHelper::doubleToString((double)((l_alpha * 392156.862745098f) / 100000000.0f)) << ";"; // 392156.862745098f ==> 100000000 / 255
-						l_ostreamStyle << "stroke-width:" << scolor.getThickness() << ";";
-						//l_ostreamStyle << "stroke-miterlimit:4;"; //should support soon
-						l_ostreamStyle << "stroke-dasharray:none;"; //should support soon
-						
-						scolorPrev = scolor.clone();
-					}
-				if (l_ostreamStyleProp.str().length() > 0) {
-					l_ostringstream << l_ostreamStyleProp.str();
-				}
-				if (l_ostreamStyle.str().length() > 0) {
-					l_ostringstream << "\n         style=\"" << l_ostreamStyle.str() << "\"";
-				}
-				if (fillCtr > 0) {
-					fillCtr--;
-				}
-				l_ostringstream << " />\n";
+				
 				break;
 			}
 			case VectorData::TYPE_INIT:
-				if (l_closePathFlag == true) {
-					l_ostringstream << "\"";
-					if (l_ostreamStyleProp.str().length() > 0) {
-						l_ostringstream << l_ostreamStyleProp.str();
-					}
-					if (l_ostreamStyle.str().length() > 0) {
-						l_ostringstream << "\n         style=\"" << l_ostreamStyle.str() << "\"";
-					}
-					l_ostringstream << " />\n";
-					l_closePathFlag = false;
-				}
 				if (l_initFlag == true) {
 					l_ostringstream << "    </g>\n";
 					l_initFlag = false;
@@ -4419,26 +4362,50 @@ std::string Kage::dumpFrameToSvg() {
 				}
 				break;
 			case VectorData::TYPE_TEXT: break;
-			case VectorData::TYPE_FILL:
+			case VectorData::TYPE_FILL: {
 				fcolor = v[i].fillColor;
+				
+				unsigned int l_alpha = 0;
+				l_ostreamStyle.str("");
+				l_ostreamStyle.clear();
+				l_ostreamProp.str("");
+				l_ostreamProp.clear();
+				
+				l_alpha = fcolor.getA();
+				if (l_alpha == 0) {
+					l_ostreamStyle << "fill-opacity:0;";
+				} else {
+					l_ostreamProp << "\n         fill=\"#" << int255ToHex(fcolor.getR()) << int255ToHex(fcolor.getG()) << int255ToHex(fcolor.getB()) << "\"";
+					if (l_alpha == 255) {
+						l_ostreamStyle << "fill-opacity:1;";
+					} else {
+						//l_ostreamProp << "\n         fill=\"#" << int255ToHex(fcolor.getR()) << int255ToHex(fcolor.getG()) << int255ToHex(fcolor.getB()) << int255ToHex(l_alpha) << "\"";
+						l_ostreamStyle << "fill:#" << int255ToHex(fcolor.getR()) << int255ToHex(fcolor.getG()) << int255ToHex(fcolor.getB()) << ";";
+						l_ostreamStyle << "fill-opacity:" << StringHelper::doubleToString((double)((l_alpha * 392156.862745098f) / 100000000.0f)) << ";"; // 392156.862745098f ==> 100000000 / 255
+					}
+				}
+				fcolorPrev = fcolor.clone();
+				
+				l_ostringstream << "      <path\n         d=\"";
+				l_donePrevFColor = false;
+				//fillCtr++;
+				break;}
+			case VectorData::TYPE_ENDFILL:
 				if (l_closePathFlag == true) {
 					l_ostringstream << "\"";
-					if (l_ostreamStyleProp.str().length() > 0) {
-						l_ostringstream << l_ostreamStyleProp.str();
-					}
-					if (l_ostreamStyle.str().length() > 0) {
-						l_ostringstream << "\n         style=\"" << l_ostreamStyle.str() << "\"";
-					}
-					l_ostringstream << " />\n";
 					l_closePathFlag = false;
 				}
-				l_ostringstream << "      <path\n         d=\"";
-				l_closePathFlag = true;
-				l_donePrevFColor = false;
-				fillCtr++;
+				
+				if (l_ostreamProp.str().length() > 0) {
+					l_ostringstream << l_ostreamProp.str();
+				}
+				if (l_ostreamStyle.str().length() > 0) {
+					l_ostringstream << "\n         style=\"" << l_ostreamStyle.str() << "\"";
+				}
+				l_ostringstream << " />\n";
+				
 				break;
-			case VectorData::TYPE_ENDFILL: break;
-			case VectorData::TYPE_STROKE:
+			case VectorData::TYPE_STROKE:{
 				scolor = v[i].stroke.clone();
 					if (scolorPrev.equalTo(scolor) == false) {
 						l_donePrevSColor = false;
@@ -4446,8 +4413,23 @@ std::string Kage::dumpFrameToSvg() {
 					if (scolorPrev.getThickness() != scolor.getThickness()) {
 						l_donePrevLine = false;
 					}
-				break;
+					unsigned int l_alpha = scolor.getA();
+					if (l_alpha == 0 || scolor.getThickness() == 0) {
+						l_ostreamStyle << "stroke:none;";
+					} else if (l_alpha > 0 && scolor.getThickness() > 0) {
+						l_ostreamProp << "\n         stroke=\"#" << int255ToHex(scolor.getR()) << int255ToHex(scolor.getG()) << int255ToHex(scolor.getB()) << "\"";// << int255ToHex(l_alpha) << "\"";
+						l_ostreamProp << "\n         stroke-width=\"" << scolor.getThickness() << "\"";
+						l_ostreamStyle << "stroke:#" << int255ToHex(scolor.getR()) << int255ToHex(scolor.getG()) << int255ToHex(scolor.getB()) << ";";// << int255ToHex(l_alpha) << "\"";
+						l_ostreamStyle << "stroke-opacity:" << StringHelper::doubleToString((double)((l_alpha * 392156.862745098f) / 100000000.0f)) << ";"; // 392156.862745098f ==> 100000000 / 255
+						l_ostreamStyle << "stroke-width:" << scolor.getThickness() << ";";
+						//l_ostreamStyle << "stroke-miterlimit:4;"; //should support soon
+						l_ostreamStyle << "stroke-dasharray:none;"; //should support soon
+						
+						scolorPrev = scolor.clone();
+					}
+				break;}
 			case VectorData::TYPE_MOVE:
+				l_closePathFlag = true;
 				l_ostringstream << " M " << v[i].points[0].x*_stage.currentScale << " " << v[i].points[0].y*_stage.currentScale;
 				
 				p.x = v[i].points[0].x;
@@ -4481,8 +4463,8 @@ std::string Kage::dumpFrameToSvg() {
 	
 	if (l_closePathFlag == true) {
 		l_ostringstream << "\"";
-		if (l_ostreamStyleProp.str().length() > 0) {
-			l_ostringstream << l_ostreamStyleProp.str();
+		if (l_ostreamProp.str().length() > 0) {
+			l_ostringstream << l_ostreamProp.str();
 		}
 		if (l_ostreamStyle.str().length() > 0) {
 			l_ostringstream << "\n         style=\"" << l_ostreamStyle.str() << "\"";

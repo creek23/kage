@@ -46,6 +46,7 @@ SOURCES = \
 	resources.cpp \
 	about.cpp \
 	label_rename.cpp \
+	form_new.cpp \
 	main.cpp
 
 OBJECTS = $(SOURCES:.cpp=.o)

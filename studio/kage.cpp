@@ -1210,13 +1210,13 @@ Kage::Kage(std::string p_filePath) :
 		_stage.signal_drag_data_received().connect(sigc::mem_fun(*this, &Kage::Stage_onDragStop));
 }
 
-void Kage::Library_onDragStart(const Glib::RefPtr<Gdk::DragContext>&context, Gtk::SelectionData& selection_data, guint p_guintA, guint p_guintB) {
-	std::cout << "Kage::Library_onDragStart p_guintA " << p_guintA << "\tp_guintB " << p_guintB << std::endl;
+void Kage::Library_onDragStart(const Glib::RefPtr<Gdk::DragContext>&context, Gtk::SelectionData& selection_data, guint p_info, guint time) {
+	std::cout << "Kage::Library_onDragStart p_info " << p_info << "\ttime " << time << std::endl;
 	selection_data.set(selection_data.get_target(), 8, (const guchar*)"KageLibrary", 11);
 }
 
-void Kage::Stage_onDragStop(const Glib::RefPtr<Gdk::DragContext>& context, int p_destX, int p_destY, const Gtk::SelectionData& selection_data, guint p_guint, guint time) {
-	std::cout << "Kage::Stage_onDragStop p_destX " << p_destX << "\tp_destY " << p_destY << "\tp_guint " << p_guint << "\ttime " << time << std::endl;
+void Kage::Stage_onDragStop(const Glib::RefPtr<Gdk::DragContext>& context, int p_destX, int p_destY, const Gtk::SelectionData& selection_data, guint p_info, guint time) {
+	std::cout << "Kage::Stage_onDragStop p_destX " << p_destX << "\tp_destY " << p_destY << "\tp_info " << p_info << "\ttime " << time << std::endl;
 	const int length = selection_data.get_length();
 	if((length >= 0) && (selection_data.get_format() == 8)) {
 		std::string l_data = selection_data.get_data_as_string();
